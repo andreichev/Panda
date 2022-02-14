@@ -1,0 +1,28 @@
+# Directories
+**bin/
+**bin-int/
+
+**cmake-build-debug
+**cmake-build-release
+**build
+xcode
+
+# Mac os stuff
+.DS_Store
+
+#CLion
+.idea
+
+# Visual Studio Code
+.vscode
+
+# Xcode files and folder
+*.xcodeproj
+*.xcworkspace
+
+# Visual Studio files and folder
+.vs/
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
