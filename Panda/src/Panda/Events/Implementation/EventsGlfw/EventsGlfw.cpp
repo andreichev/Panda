@@ -87,4 +87,16 @@ void EventsGlfw::removeWindowSizeListener(WindowSizeListener *listener) {
     s_windowSizeListeners.erase(find(s_windowSizeListeners.begin(), s_windowSizeListeners.end(), listener));
 }
 
+float EventsGlfw::getDeltaX() {
+    float deltaX = EventsGlfw::s_deltaX;
+    EventsGlfw::s_deltaX = 0.f;
+    return deltaX;
+}
+
+float EventsGlfw::getDeltaY() {
+    float deltaY = EventsGlfw::s_deltaY;
+    EventsGlfw::s_deltaY = 0;
+    return deltaY;
+}
+
 } // namespace Panda

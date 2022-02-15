@@ -18,6 +18,8 @@ class EventsGlfw : public IEvents {
     bool isCursorLocked() override;
     bool isKeyPressed(Key key) override;
     bool isKeyJustPressed(Key key) override;
+    float getDeltaX() override;
+    float getDeltaY() override;
 
 private:
     static void resetCursorPos();

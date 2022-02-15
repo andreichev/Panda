@@ -23,6 +23,8 @@ public:
     virtual bool isCursorLocked() = 0;
     virtual bool isKeyPressed(Key key) = 0;
     virtual bool isKeyJustPressed(Key key) = 0;
+    virtual float getDeltaX() = 0;
+    virtual float getDeltaY() = 0;
 };
 
 } // namespace Panda

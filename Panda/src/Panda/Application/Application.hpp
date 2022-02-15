@@ -23,10 +23,10 @@ public:
     IWindow &getWindow();
     IEvents &getEvents();
     IRenderer &getRenderer();
-    void run(std::unique_ptr<ApplicationStartupSettings> settings);
+    void run(Panda::Unique<ApplicationStartupSettings> settings);
 
 private:
-    void initialize(std::unique_ptr<ApplicationStartupSettings> &settings);
+    void initialize(Panda::Unique<ApplicationStartupSettings> &settings);
     void loop();
 
     Shared<IWindow> window;

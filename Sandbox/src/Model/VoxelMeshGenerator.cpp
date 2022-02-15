@@ -10,8 +10,8 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
     ChunksStorage &chunks, int chunkIndexX, int chunkIndexY, int chunkIndexZ, bool ambientOcclusion) {
     Chunk &chunk =
         chunks.chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
-    std::vector<Vertex> verticesList;
-    std::vector<unsigned int> indicesList;
+    std::vector<Vertex>& verticesList = *new std::vector<Vertex>;
+    std::vector<unsigned int>& indicesList = *new std::vector<unsigned int>;
     for (int voxelIndexX = 0; voxelIndexX < Chunk::SIZE_X; voxelIndexX++) {
         for (int voxelIndexY = 0; voxelIndexY < Chunk::SIZE_Y; voxelIndexY++) {
             for (int voxelIndexZ = 0; voxelIndexZ < Chunk::SIZE_Z; voxelIndexZ++) {

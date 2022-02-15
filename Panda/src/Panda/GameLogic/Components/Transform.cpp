@@ -34,6 +34,7 @@ void Transform::updateVectors() {
     rotationMatrix = glm::rotate(rotationMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
     rotationMatrix = glm::rotate(rotationMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
     rotationMatrix = glm::rotate(rotationMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    rotationMatrix = glm::transpose(rotationMatrix);
     front = rotationMatrix * glm::vec4(0.f, 0.f, -1.f, 1.f);
     right = rotationMatrix * glm::vec4(1.f, 0.f, 0.f, 1.f);
     up = rotationMatrix * glm::vec4(0.f, 1.f, 0.f, 1.f);

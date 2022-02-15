@@ -14,12 +14,12 @@ Application &Application::get() {
     return application;
 }
 
-void Application::run(std::unique_ptr<ApplicationStartupSettings> settings) {
+void Application::run(Panda::Unique<ApplicationStartupSettings> settings) {
     initialize(settings);
     loop();
 }
 
-void Application::initialize(std::unique_ptr<ApplicationStartupSettings> &settings) {
+void Application::initialize(Panda::Unique<ApplicationStartupSettings> &settings) {
     Logger::init();
     maximumFps = 60;
     window = Shared<IWindow>(createWindow());

@@ -35,10 +35,6 @@ void CameraMove::update(float deltaTime) {
     if (events->isCursorLocked()) {
         // DeltaX - смещение мыши за реальное время, поэтому умножение на deltaTime не требуется.
         // Действия в реальном мире не нужно умножать на deltaTime, умножать нужно только действия в игровом мире.
-        //        transform->rotate(
-        //            events->getDeltaY() * mouseSpeed,
-        //            events->getDeltaX() * mouseSpeed,
-        //            0.f
-        //        );
+        transform->rotate(events->getDeltaY() * mouseSpeed, events->getDeltaX() * mouseSpeed, 0.f);
     }
 }

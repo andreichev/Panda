@@ -13,8 +13,8 @@ public:
     void update(float deltaTime) override;
 
 private:
-    float mouseSpeed = 0.005f;
-    float moveSpeed = 8.0f;
+    float mouseSpeed = 0.1f;
+    float moveSpeed = 20.0f;
 
     Panda::Shared<Panda::Transform> transform;
     Panda::IEvents *events;
