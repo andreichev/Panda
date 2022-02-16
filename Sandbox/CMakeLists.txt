@@ -4,7 +4,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 file(GLOB_RECURSE SOURCES
         src/*.cpp
-        src/*.mm
         )
 
 file(GLOB_RECURSE INCLUDE
@@ -14,8 +13,16 @@ file(GLOB_RECURSE INCLUDE
 
 file(GLOB RESOURCE_FOLDERS
         Resources-common/*
-        Resources-pc/*
         )
+
+if (DESKTOP)
+    file(GLOB RESOURCE_DESKTOP_FOLDERS Resources-pc/*)
+    list (APPEND RESOURCE_FOLDERS "${RESOURCE_DESKTOP_FOLDERS}")
+elseif(PLATFORM_IOS)
+    file(GLOB RESOURCE_IOS_FOLDERS Resources-ios/*)
+    list (APPEND RESOURCE_FOLDERS "${RESOURCE_IOS_FOLDERS}")
+endif()
+
 list(FILTER RESOURCE_FOLDERS EXCLUDE REGEX "\\.DS_Store")
 
 # Sandbox target
