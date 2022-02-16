@@ -1,7 +1,5 @@
 project(Sandbox)
 
-include(cmake/add_app.cmake)
-
 set(CMAKE_CXX_STANDARD 14)
 
 file(GLOB_RECURSE SOURCES

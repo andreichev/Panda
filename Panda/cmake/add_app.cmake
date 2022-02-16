@@ -1,4 +1,4 @@
-include(cmake/target_platform_app.cmake)
+include(Panda/cmake/target_platform_app.cmake)
 
 function(add_app APP_NAME SOURCE INCLUDE RESOURCE_FOLDERS)
 

@@ -4,13 +4,20 @@ set(CMAKE_CXX_STANDARD 14)
 
 file(GLOB_RECURSE SOURCES
         src/*.cpp
-        src/*.mm
         )
 
 file(GLOB_RECURSE INCLUDE
         src/*.h
         src/*.hpp
         )
+
+if(PLATFORM_MACOS)
+    list (APPEND SOURCES "Main/MacOS/main.cpp")
+elseif(PLATFORM_IOS)
+    list (APPEND SOURCES "Main/iOS/main.m")
+else()
+    message(FATAL_ERROR "Unknown platform")
+endif()
 
 # Panda target
 

@@ -11,6 +11,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-DPND_PROFILE)
 endif ()
 
+include(Panda/cmake/add_app.cmake)
+
 add_subdirectory(Panda)
 add_subdirectory(Panda/Vendor/spdlog)
 add_subdirectory(Panda/Vendor/glfw)

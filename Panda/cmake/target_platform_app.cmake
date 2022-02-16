@@ -1,4 +1,4 @@
-include(cmake/platform.cmake)
+include(Panda/cmake/platform.cmake)
 
 if(PLATFORM_WIN32)
 

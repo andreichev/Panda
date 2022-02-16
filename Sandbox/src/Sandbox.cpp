@@ -10,7 +10,7 @@
 #include <Panda/Application/ApplicationStartupSettings.hpp>
 #include "Levels/BaseLevel.hpp"
 
-int main() {
+int startApp(int argc, char **argv) {
     Panda::Application::get().run(Panda::ApplicationStartupSettings::builder()
                                       ->name("ITIS Craft")
                                       .windowTitle("ITIS Craft")
@@ -18,4 +18,5 @@ int main() {
                                       .isFullScreen(true)
                                       .startupLevel(new BaseLevel())
                                       .build());
+    return 0;
 }
