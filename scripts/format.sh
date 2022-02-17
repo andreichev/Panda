@@ -2,7 +2,7 @@
 
 if which clang-format >/dev/null; then
 
-foldersToExclude=(Vendor vendor cmake-build-debug)
+foldersToExclude=(Vendor vendor cmake-build-debug xcode)
 extensionsToProcess=(cpp hpp h)
 
 command="find . \( "

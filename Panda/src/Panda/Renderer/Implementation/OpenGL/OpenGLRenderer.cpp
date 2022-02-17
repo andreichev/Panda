@@ -11,8 +11,14 @@ namespace Panda {
 
 void OpenGLRenderer::initialize() {
     void *getProcAddressFuncPointer = Application::get().getWindow().getProcAddressFuncPointer();
-    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(getProcAddressFuncPointer))) {
-        PND_CRITICAL("Failed to initialize GLAD");
+    if (getProcAddressFuncPointer == nullptr) {
+        if (!gladLoadGL()) {
+            PND_CRITICAL("Failed to initialize GLAD");
+        }
+    } else {
+        if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(getProcAddressFuncPointer))) {
+            PND_CRITICAL("Failed to initialize GLAD");
+        }
     }
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);

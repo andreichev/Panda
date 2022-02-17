@@ -48,7 +48,7 @@ void Application::loop() {
         thisSecondFramesCount++;
         if (oneSecondTimeCount > 1.0) {
             fps = thisSecondFramesCount;
-            // PND_INFO("FPS: {}", fps);
+            PND_INFO("FPS: {}", fps);
             thisSecondFramesCount = 0;
             oneSecondTimeCount -= 1.f;
         }
