@@ -77,6 +77,7 @@ elseif(PLATFORM_IOS)
         source_group("Resources" FILES "${ASSETS}")
 
         target_compile_definitions(${TARGET_NAME} PUBLIC GL_SILENCE_DEPRECATION)
+        target_compile_definitions(${TARGET_NAME} PUBLIC GLES_SILENCE_DEPRECATION)
 
     endfunction()
 

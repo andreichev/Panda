@@ -19,12 +19,12 @@ IRenderer *RendererInit::getRenderer() {
     }
 }
 
-IShader *RendererInit::createShader(const char *vertexPath, const char *fragmentPath, const char *geometryPath) {
+IShader *RendererInit::createShader(const char *vertexPath, const char *fragmentPath) {
     switch (currentRendererApi) {
         case RendererApi::None:
             PND_CRITICAL("RENDERER API NOT SPECIFIED");
         case RendererApi::OpenGL:
-            return new OpenGLShader(vertexPath, fragmentPath, geometryPath);
+            return new OpenGLShader(vertexPath, fragmentPath);
     }
 }
 

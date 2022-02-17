@@ -5,22 +5,23 @@
 
 #include "OpenGLShader.hpp"
 
+#ifdef PND_PLATFORM_IOS
+#include <OpenGLES/ES3/gl.h>
+#elif defined(PND_PLATFORM_DESKTOP)
 #include <glad/glad.h>
+#endif
 
 namespace Panda {
 
-OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath, const char *geometryPath) {
+OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath) {
     // 1. retrieve the vertex/fragment source code from filePath
     std::string vertexCode;
     std::string fragmentCode;
-    std::string geometryCode;
     std::ifstream vShaderFile;
     std::ifstream fShaderFile;
-    std::ifstream gShaderFile;
     // ensure ifstream objects can throw exceptions:
     vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         // open files
         vShaderFile.open(vertexPath);
@@ -35,14 +36,6 @@ OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath, con
         // convert stream into string
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
-        // if geometry shader path is present, also load a geometry shader
-        if (geometryPath != nullptr) {
-            gShaderFile.open(geometryPath);
-            std::stringstream gShaderStream;
-            gShaderStream << gShaderFile.rdbuf();
-            gShaderFile.close();
-            geometryCode = gShaderStream.str();
-        }
     } catch (std::ifstream::failure &e) { std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl; }
     const char *vShaderCode = vertexCode.c_str();
     const char *fShaderCode = fragmentCode.c_str();
@@ -58,30 +51,17 @@ OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath, con
     glShaderSource(fragment, 1, &fShaderCode, nullptr);
     glCompileShader(fragment);
     checkCompileErrors(fragment, "FRAGMENT");
-    // if geometry shader is given, compile geometry shader
-    unsigned int geometry;
-    if (geometryPath != nullptr) {
-        const char *gShaderCode = geometryCode.c_str();
-        geometry = glCreateShader(GL_GEOMETRY_SHADER);
-        glShaderSource(geometry, 1, &gShaderCode, nullptr);
-        glCompileShader(geometry);
-        checkCompileErrors(geometry, "GEOMETRY");
-    }
+
     // shader Program
     m_RendererID = glCreateProgram();
     glAttachShader(m_RendererID, vertex);
     glAttachShader(m_RendererID, fragment);
-    if (geometryPath != nullptr) {
-        glAttachShader(m_RendererID, geometry);
-    }
+
     glLinkProgram(m_RendererID);
     checkCompileErrors(m_RendererID, "PROGRAM");
     // delete the shaders as they're linked into our program now and no longer necessery
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-    if (geometryPath != nullptr) {
-        glDeleteShader(geometry);
-    }
 }
 
 OpenGLShader::~OpenGLShader() {

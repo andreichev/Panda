@@ -4,7 +4,11 @@
 
 #include "OpenGLIndexBuffer.hpp"
 
+#ifdef PND_PLATFORM_IOS
+#include <OpenGLES/ES3/gl.h>
+#elif defined(PND_PLATFORM_DESKTOP)
 #include <glad/glad.h>
+#endif
 
 namespace Panda {
 

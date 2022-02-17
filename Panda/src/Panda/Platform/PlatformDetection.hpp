@@ -33,3 +33,7 @@
 /* Unknown compiler/platform */
 #    error "Unknown platform!"
 #endif // End of platform detection
+
+#if defined(PND_PLATFORM_WINDOWS) || defined(PND_PLATFORM_LINUX) || defined(PND_PLATFORM_MACOS)
+#define PND_PLATFORM_DESKTOP
+#endif

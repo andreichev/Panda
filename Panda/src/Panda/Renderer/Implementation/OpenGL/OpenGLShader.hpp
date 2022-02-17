@@ -10,7 +10,7 @@ namespace Panda {
 
 class OpenGLShader : public IShader {
 public:
-    OpenGLShader(const char *vertexPath, const char *fragmentPath, const char *geometryPath = nullptr);
+    OpenGLShader(const char *vertexPath, const char *fragmentPath);
     ~OpenGLShader() override;
     void use() override;
     void setUniform(const char *name, glm::mat4 value) override;

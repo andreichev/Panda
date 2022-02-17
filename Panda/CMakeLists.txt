@@ -64,6 +64,7 @@ elseif (PLATFORM_IOS)
     # add_definitions("-x objective-c++")
     # Locate system libraries on iOS
     find_library(UIKIT UIKit)
+    find_library(OPENGLES OpenGLES)
     find_library(METALKIT_LIBRARY MetalKit)
     find_library(QUARTZ_CORE QuartzCore)
     find_library(FOUNDATION Foundation)
@@ -72,7 +73,7 @@ elseif (PLATFORM_IOS)
     find_library(SYSTEMCONFIGURATION SystemConfiguration)
 
     target_link_libraries(Panda
-            ${UIKIT} ${METALKIT_LIBRARY} ${FOUNDATION} ${CFNETWORK} ${SYSTEMCONFIGURATION} ${QUARTZ_CORE}
+            ${UIKIT} ${METALKIT_LIBRARY} ${FOUNDATION} ${CFNETWORK} ${SYSTEMCONFIGURATION} ${QUARTZ_CORE} ${OPENGLES}
     )
 #    set_target_properties(
 #            Panda PROPERTIES XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "2"

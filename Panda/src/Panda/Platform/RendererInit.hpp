@@ -23,7 +23,7 @@ enum class RendererApi {
 class RendererInit {
 public:
     static IRenderer *getRenderer();
-    static IShader *createShader(const char *vertexPath, const char *fragmentPath, const char *geometryPath);
+    static IShader *createShader(const char *vertexPath, const char *fragmentPath);
     static ITexture *createTexture(const char *path);
     static IndexBuffer *createIndexBuffer(unsigned int *indices, unsigned int count, bool isDynamic);
     static IVertexBuffer *createVertexBuffer(Vertex *vertices, unsigned int count, bool isDynamic);

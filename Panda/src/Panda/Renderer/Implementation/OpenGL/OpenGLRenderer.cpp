@@ -5,11 +5,18 @@
 #include "OpenGLRenderer.hpp"
 #include "Panda/Application/Application.hpp"
 
+#ifdef PND_PLATFORM_IOS
+#include <OpenGLES/ES3/gl.h>
+#elif defined(PND_PLATFORM_DESKTOP)
 #include <glad/glad.h>
+#endif
 
 namespace Panda {
 
 void OpenGLRenderer::initialize() {
+#ifdef PND_PLATFORM_IOS
+    // OpenGLES init for iOS
+#elif defined(PND_PLATFORM_DESKTOP)
     void *getProcAddressFuncPointer = Application::get().getWindow().getProcAddressFuncPointer();
     if (getProcAddressFuncPointer == nullptr) {
         if (!gladLoadGL()) {
@@ -20,6 +27,7 @@ void OpenGLRenderer::initialize() {
             PND_CRITICAL("Failed to initialize GLAD");
         }
     }
+#endif
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
