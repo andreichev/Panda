@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <Panda/GameLogic/Primitives/MeshData.hpp>
+#include "Panda.hpp"
 #include "ChunksStorage.hpp"
 
 class VoxelMeshGenerator {

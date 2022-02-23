@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <Panda/Events/IEvents.hpp>
+#include <Panda/Events/Input.hpp>
 #include <Panda/GameLogic/Components/Transform.hpp>
 
 class CameraMove : public Panda::Component {
@@ -17,5 +17,5 @@ private:
     float moveSpeed = 20.0f;
 
     Panda::Shared<Panda::Transform> transform;
-    Panda::IEvents *events;
+    Panda::Input *events;
 };

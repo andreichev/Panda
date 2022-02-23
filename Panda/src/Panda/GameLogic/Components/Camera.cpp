@@ -5,8 +5,7 @@
 #include "pndpch.hpp"
 #include "Camera.hpp"
 
-#include <utility>
-#include "Panda/Application/Application.hpp"
+#include "Panda/Application/ApplicationContext.hpp"
 #include "Panda/GameLogic/Entity.hpp"
 
 namespace Panda {
@@ -15,25 +14,25 @@ Camera::Camera()
     : transform(nullptr)
     , shader(nullptr)
     , fieldOfView(70.f)
-    , windowSize(Application::get().getWindow().getWindowSize())
+    , windowSize(ApplicationContext::get().getWindow().getWindowSize())
     , target(1.f)
     , view(1.f)
     , projection(1.f) {}
 
 Camera::~Camera() {
     transform->removeDelegate(this);
-    Application::get().getEvents().removeWindowSizeListener(this);
+    ApplicationContext::get().getInput().removeWindowSizeListener(this);
 }
 
 void Camera::initialize() {
     transform = getEntity().getTransform();
     transform->addDelegate(this);
-    Application::get().getEvents().addWindowSizeListener(this);
+    ApplicationContext::get().getInput().addWindowSizeListener(this);
 }
 
 void Camera::update(float deltaTime) {}
 
-void Camera::setShader(Shared<IShader> shader) {
+void Camera::setShader(Shared<Shader> shader) {
     this->shader = std::move(shader);
     updateProjectionMatrix();
     updateViewMatrix();

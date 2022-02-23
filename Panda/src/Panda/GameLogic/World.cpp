@@ -10,7 +10,7 @@ namespace Panda {
 World::World()
     : root() {}
 
-void World::update(float deltaTime) {
+void World::update(double deltaTime) {
     root.update(deltaTime);
 }
 

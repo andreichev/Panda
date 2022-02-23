@@ -32,21 +32,21 @@ ApplicationStartupSettingsBuilder &ApplicationStartupSettingsBuilder::isFullScre
     return *this;
 }
 
-std::unique_ptr<ApplicationStartupSettings> ApplicationStartupSettingsBuilder::build() {
-    return std::make_unique<ApplicationStartupSettings>(m_name, m_windowTitle, m_windowSize, m_isFullScreen, m_startupLevel);
+ApplicationStartupSettings ApplicationStartupSettingsBuilder::build() {
+    return ApplicationStartupSettings(m_name, m_windowTitle, m_windowSize, m_isFullScreen, m_startupLevel);
 }
 
-ApplicationStartupSettingsBuilder &ApplicationStartupSettingsBuilder::startupLevel(ILevel *level) {
+ApplicationStartupSettingsBuilder &ApplicationStartupSettingsBuilder::startupLevel(Level *level) {
     m_startupLevel = level;
     return *this;
 }
 
-std::unique_ptr<ApplicationStartupSettingsBuilder> ApplicationStartupSettings::builder() {
-    return std::make_unique<ApplicationStartupSettingsBuilder>();
+ApplicationStartupSettingsBuilder ApplicationStartupSettings::builder() {
+    return ApplicationStartupSettingsBuilder();
 }
 
 ApplicationStartupSettings::ApplicationStartupSettings(
-    const char *name, const char *windowTitle, const GSize &windowSize, bool isFullScreen, ILevel *startupLevel)
+    const char *name, const char *windowTitle, const GSize &windowSize, bool isFullScreen, Level *startupLevel)
     : name(name)
     , windowTitle(windowTitle)
     , windowSize(windowSize)

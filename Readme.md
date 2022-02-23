@@ -3,5 +3,5 @@
 ![Alt text](Resources/Logo.png "Logo")
 ## Features to come:
 1. Rendering api abstraction
-2. IEvents, app layers system
+2. Input, app layers system
 3. Batch rendering

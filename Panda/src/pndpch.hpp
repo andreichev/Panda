@@ -5,7 +5,9 @@
 #pragma once
 
 #include "Panda/Logger/Logger.hpp"
-#include "Panda/Platform/PlatformDetection.hpp"
+#include "Panda/Application/PlatformDetection.hpp"
+
+#include <chrono>
 
 #include <memory>
 #include <iostream>
@@ -25,6 +27,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include <vector>
+#include <queue>
 #include <iterator>
 #include <unordered_set>
 #include <unordered_map>

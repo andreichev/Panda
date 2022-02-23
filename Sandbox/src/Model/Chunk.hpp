@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Voxel.hpp"
-#include <Panda/GameLogic/Components/Mesh.hpp>
+#include "Panda.hpp"
 
 class Chunk {
 public:

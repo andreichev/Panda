@@ -7,30 +7,30 @@
 #include <utility>
 
 #include "Panda/GameLogic/Entity.hpp"
-#include "Panda/Application/Application.hpp"
-#include "Panda/Platform/RendererInit.hpp"
+#include "Panda/Application/ApplicationContext.hpp"
+#include "Panda/Application/Initialization/RendererInit.hpp"
 
 namespace Panda {
 
-Mesh::Mesh(const MeshData &primitiveMeshData, bool isDynamic, Shared<ITexture> texture, Shared<IShader> shader)
+Mesh::Mesh(const MeshData &primitiveMeshData, bool isDynamic, Shared<Texture> texture, Shared<Shader> shader)
     : isDynamic(isDynamic)
     , model(1.f)
     , indexBuffer(RendererInit::createIndexBuffer(primitiveMeshData.indices, primitiveMeshData.indicesCount, isDynamic))
     , vertexBuffer(RendererInit::createVertexBuffer(primitiveMeshData.vertices, primitiveMeshData.verticesCount, isDynamic))
     , texture(std::move(texture))
     , shader(std::move(shader))
-    , renderer(Application::get().getRenderer())
+    , renderer(ApplicationContext::get().getRenderer())
     , transform(nullptr) {}
 
 Mesh::Mesh(Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount, bool isDynamic,
-    Shared<ITexture> texture, Shared<IShader> shader)
+    Shared<Texture> texture, Shared<Shader> shader)
     : isDynamic(isDynamic)
     , model(1.f)
     , indexBuffer(RendererInit::createIndexBuffer(indices, indicesCount, isDynamic))
     , vertexBuffer(RendererInit::createVertexBuffer(vertices, verticesCount, isDynamic))
     , texture(std::move(texture))
     , shader(std::move(shader))
-    , renderer(Application::get().getRenderer())
+    , renderer(ApplicationContext::get().getRenderer())
     , transform(nullptr) {}
 
 Mesh::~Mesh() {

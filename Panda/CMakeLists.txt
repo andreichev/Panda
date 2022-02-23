@@ -2,39 +2,31 @@ project(Panda)
 
 set(CMAKE_CXX_STANDARD 14)
 
-file(GLOB_RECURSE SOURCES
-        src/Panda/*.cpp
-        )
-
-file(GLOB_RECURSE INCLUDE
-        src/Panda/*.h
-        src/Panda/*.hpp
-        )
+file(GLOB_RECURSE SOURCES src/Panda/*.cpp src/Platform/RendererImpl/OpenGL/*.cpp)
+file(GLOB_RECURSE INCLUDE src/Panda/*.hpp src/Platform/RendererImpl/OpenGL/*.hpp)
 
 # Entry point realization binding
 if (PLATFORM_MACOS)
-    list(APPEND SOURCES "src/PlatformSpecificRealizations/EntryPoint/MacOS/main.cpp")
+    list(APPEND SOURCES "src/Platform/EntryPoint/MacOS/main.cpp")
 elseif (PLATFORM_IOS)
-    list(APPEND SOURCES "src/PlatformSpecificRealizations/EntryPoint/iOS/main.mm")
+    list(APPEND SOURCES "src/Platform/EntryPoint/iOS/main.mm")
 else ()
     message(FATAL_ERROR "Unknown platform")
 endif ()
 
 # Other platform specific realizations
 if (DESKTOP)
-    list(APPEND INCLUDE "src/PlatformSpecificRealizations/WindowImpl/GlfwWindow/GlfwWindow.hpp")
-    list(APPEND SOURCES "src/PlatformSpecificRealizations/WindowImpl/GlfwWindow/GlfwWindow.cpp")
-    list(APPEND INCLUDE "src/PlatformSpecificRealizations/EventsImpl/EventsGlfw/EventsGlfw.hpp")
-    list(APPEND SOURCES "src/PlatformSpecificRealizations/EventsImpl/EventsGlfw/EventsGlfw.cpp")
+    list(APPEND INCLUDE "src/Platform/WindowImpl/GlfwWindow/GlfwWindow.hpp")
+    list(APPEND SOURCES "src/Platform/WindowImpl/GlfwWindow/GlfwWindow.cpp")
+    list(APPEND INCLUDE "src/Platform/RendererImpl/Context/OpenGLContext.hpp")
+    list(APPEND SOURCES "src/Platform/RendererImpl/Context/OpenGLContext.cpp")
 elseif (PLATFORM_IOS)
-    list(APPEND INCLUDE "src/PlatformSpecificRealizations/WindowImpl/UIKitWindow/UIKitWindow.hpp")
-    list(APPEND SOURCES "src/PlatformSpecificRealizations/WindowImpl/UIKitWindow/UIKitWindow.mm")
-    list(APPEND INCLUDE "src/PlatformSpecificRealizations/WindowImpl/UIKitWindow/Controller/WonderController.hpp")
-    list(APPEND SOURCES "src/PlatformSpecificRealizations/WindowImpl/UIKitWindow/Controller/WonderController.mm")
-    list(APPEND INCLUDE "src/PlatformSpecificRealizations/WindowImpl/UIKitWindow/Controller/View/WonderView.hpp")
-    list(APPEND SOURCES "src/PlatformSpecificRealizations/WindowImpl/UIKitWindow/Controller/View/WonderView.mm")
-    list(APPEND INCLUDE "src/PlatformSpecificRealizations/EventsImpl/UIKitEvents/UIKitEvents.hpp")
-    list(APPEND SOURCES "src/PlatformSpecificRealizations/EventsImpl/UIKitEvents/UIKitEvents.mm")
+    file(GLOB_RECURSE GLOB_RESULT_INCLUDE src/Platform/WindowImpl/UIKitWindow/*.hpp)
+    file(GLOB_RECURSE GLOB_RESULT_SOURCES src/Platform/WindowImpl/UIKitWindow/*.cpp src/Platform/WindowImpl/UIKitWindow/*.mm)
+    list(APPEND INCLUDE ${GLOB_RESULT_INCLUDE})
+    list(APPEND SOURCES ${GLOB_RESULT_SOURCES})
+    list(APPEND INCLUDE "src/Platform/RendererImpl/Context/GlesContext.hpp")
+    list(APPEND SOURCES "src/Platform/RendererImpl/Context/GlesContext.mm")
 else ()
     message(FATAL_ERROR "Unknown platform")
 endif ()

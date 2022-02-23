@@ -1,10 +1,9 @@
 //
 // Created by Admin on 12.02.2022.
 //
-#include "pndpch.hpp"
+#include "sndbxpch.hpp"
 #include "VoxelMeshGenerator.hpp"
-
-#include <Panda/Renderer/Vertex.hpp>
+#include "Panda.hpp"
 
 Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
     ChunksStorage &chunks, int chunkIndexX, int chunkIndexY, int chunkIndexZ, bool ambientOcclusion) {

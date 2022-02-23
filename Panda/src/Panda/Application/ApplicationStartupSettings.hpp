@@ -6,7 +6,7 @@
 
 #include "Panda/Base/GSize.hpp"
 #include "Panda/Base/Base.hpp"
-#include "Panda/GameLogic/ILevel.hpp"
+#include "Panda/GameLogic/Level.hpp"
 
 namespace Panda {
 
@@ -18,7 +18,7 @@ private:
     const char *m_windowTitle;
     GSize m_windowSize;
     bool m_isFullScreen;
-    ILevel *m_startupLevel;
+    Level *m_startupLevel;
 
 public:
     ApplicationStartupSettingsBuilder();
@@ -31,9 +31,9 @@ public:
 
     ApplicationStartupSettingsBuilder &isFullScreen(bool value);
 
-    ApplicationStartupSettingsBuilder &startupLevel(ILevel *level);
+    ApplicationStartupSettingsBuilder &startupLevel(Level *level);
 
-    Unique<ApplicationStartupSettings> build();
+    ApplicationStartupSettings build();
 };
 
 struct ApplicationStartupSettings {
@@ -42,11 +42,11 @@ public:
     const char *windowTitle;
     GSize windowSize;
     bool isFullScreen;
-    ILevel *startupLevel;
+    Level *startupLevel;
 
-    static Unique<ApplicationStartupSettingsBuilder> builder();
+    static ApplicationStartupSettingsBuilder builder();
 
-    ApplicationStartupSettings(const char *name, const char *windowTitle, const GSize &windowSize, bool isFullScreen, ILevel *startupLevel);
+    ApplicationStartupSettings(const char *name, const char *windowTitle, const GSize &windowSize, bool isFullScreen, Level *startupLevel);
 };
 
 } // namespace Panda

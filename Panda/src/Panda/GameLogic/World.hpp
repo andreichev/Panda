@@ -5,9 +5,9 @@
 #pragma once
 
 #include "Panda/GameLogic/Entity.hpp"
-#include "Panda/Window/IWindow.hpp"
-#include "Panda/Events/IEvents.hpp"
-#include "Panda/Renderer/IRenderer.hpp"
+#include "Panda/Window/Window.hpp"
+#include "Panda/Events/Input.hpp"
+#include "Panda/Renderer/Renderer.hpp"
 
 namespace Panda {
 
@@ -15,7 +15,7 @@ class World {
 public:
     World();
     void initialize();
-    void update(float deltaTime);
+    void update(double deltaTime);
     Shared<Entity> instantiateEntity();
     void destroy(Shared<Entity> &entity);
 

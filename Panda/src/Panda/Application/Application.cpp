@@ -4,81 +4,73 @@
 
 #include "pndpch.hpp"
 #include "Application.hpp"
-#include "Panda/Platform/PlatformInit.hpp"
-#include "Panda/Platform/RendererInit.hpp"
+#include "ApplicationContext.hpp"
 
 namespace Panda {
 
-Application &Application::get() {
-    static Application application;
-    return application;
+uint64_t getMillis() {
+    auto now = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
+    return now.count();
 }
 
-void Application::run(Panda::Unique<ApplicationStartupSettings> settings) {
+Application::~Application() {
+    delete currentLevel;
+    delete world;
+}
+
+void Application::run(ApplicationStartupSettings settings) {
     initialize(settings);
     loop();
 }
 
-void Application::initialize(Panda::Unique<ApplicationStartupSettings> &settings) {
+void Application::initialize(ApplicationStartupSettings &settings) {
     Logger::init();
     maximumFps = 60;
-    window = Shared<IWindow>(createWindow());
-    events = Shared<IEvents>(createEvents());
-    renderer = Shared<IRenderer>(RendererInit::getRenderer());
+
+    ApplicationContext& context = ApplicationContext::get();
     // Порядок важен
-    window->initialize(settings->windowTitle, settings->windowSize, settings->isFullScreen);
-    events->initialize();
-    renderer->initialize();
-    world = createShared<World>();
-    events->setFrameBufferSizeCallback([this](GSize size) { renderer->setViewportSize(size); });
-    time = window->getTime();
-    settings->startupLevel->start(world.get());
+    context.getWindow().initialize(settings.windowTitle, settings.windowSize, settings.isFullScreen);
+    context.getGraphicsContext().create(settings.windowSize.width, settings.windowSize.height);
+    context.getRenderer().initialize();
+    world = new World();
+    timeMillis = getMillis();
+    settings.startupLevel->start(world);
 }
 
 void Application::loop() {
-    while (window->isShouldClose() == false) {
-        double lastTime = time;
-        time = window->getTime();
-        deltaTime += (float)time - (float)lastTime;
-        if (deltaTime - (1.f / (float)maximumFps) < 0) {
+    ApplicationContext& context = ApplicationContext::get();
+    while (context.isApplicationShouldClose == false) {
+        uint64_t lastTime = timeMillis;
+        timeMillis = getMillis();
+        deltaTimeMillis += timeMillis - lastTime;
+        if (deltaTimeMillis < (1000 / maximumFps)) {
             continue;
         }
-        oneSecondTimeCount += deltaTime;
+        oneSecondTimeCount += deltaTimeMillis;
 
         thisSecondFramesCount++;
-        if (oneSecondTimeCount > 1.0) {
+        if (oneSecondTimeCount >= 1000) {
             fps = thisSecondFramesCount;
             PND_INFO("FPS: {}", fps);
             thisSecondFramesCount = 0;
-            oneSecondTimeCount -= 1.f;
+            oneSecondTimeCount -= 1000;
         }
 
-        renderer->clear();
-        if (events->isKeyJustPressed(Key::ESCAPE)) {
-            window->setShouldClose(true);
+        if (context.getInput().isKeyPressed(Key::ESCAPE)) {
+            context.isApplicationShouldClose = true;
         }
-        if (events->isKeyJustPressed(Key::TAB)) {
-            events->toggleCursorLock();
+        if (context.getInput().isKeyPressed(Key::TAB)) {
+            // context.getWindow().toggleCursorLock();
         }
 
-        world->update(deltaTime);
-        deltaTime = 0.f;
-        // renderer->checkForErrors();
-        window->swapBuffers();
-        events->pollEvents();
+        context.getRenderer().clear();
+        world->update(deltaTimeMillis / 1000.0);
+        deltaTimeMillis = 0;
+        context.getRenderer().checkForErrors();
+        context.getGraphicsContext().swapBuffers();
+        context.getWindow().pollEvents();
+        context.pollEvents();
     }
-}
-
-IWindow &Application::getWindow() {
-    return *window;
-}
-
-IEvents &Application::getEvents() {
-    return *events;
-}
-
-IRenderer &Application::getRenderer() {
-    return *renderer;
 }
 
 } // namespace Panda

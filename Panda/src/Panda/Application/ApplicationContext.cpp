@@ -4,4 +4,110 @@
 
 #include "ApplicationContext.hpp"
 
-namespace Panda {}
+#include "Application.hpp"
+#include "Panda/Events/WindowEvents.hpp"
+#include "Panda/Events/KeyEvents.hpp"
+#include "Panda/Events/MouseEvents.hpp"
+#include "Initialization/PlatformInit.hpp"
+#include "Initialization/RendererInit.hpp"
+
+namespace Panda {
+
+ApplicationContext &ApplicationContext::get() {
+    static ApplicationContext context;
+    return context;
+}
+
+ApplicationContext::ApplicationContext() {
+    isApplicationShouldClose = false;
+    // Initialization not performed here
+    application = new Application();
+    window = createWindow();
+    graphicsContext = RendererInit::getContext();
+    renderer = RendererInit::getRenderer();
+}
+
+ApplicationContext::~ApplicationContext() {
+    delete application;
+    delete graphicsContext;
+    delete renderer;
+    delete window;
+}
+
+void ApplicationContext::setResourcesPath(std::string path) {
+    resourcesPath = path + "/";
+}
+
+std::string &ApplicationContext::getResourcesPath() {
+    return resourcesPath;
+}
+
+void ApplicationContext::pollEvents() {
+    const Event* event;
+    while ((event = eventQueue.poll()) != nullptr) {
+        switch (event->type) {
+            case EventType::None:
+                break;
+            case EventType::WindowResize: {
+                const WindowResizeEvent *ev = dynamic_cast<const WindowResizeEvent *>(event);
+                input.windowSizeChanged(GSize(ev->getWidth(), ev->getHeight()));
+                break;
+            }
+            case EventType::KeyPressed: {
+                const KeyPressedEvent *ev = dynamic_cast<const KeyPressedEvent *>(event);
+                input.setKeyPressed(ev->key, true);
+                break;
+            }
+            case EventType::KeyReleased: {
+                const KeyReleasedEvent *ev = dynamic_cast<const KeyReleasedEvent *>(event);
+                input.setKeyPressed(ev->key, false);
+                break;
+            }
+            case EventType::MouseMoved:
+                const MouseMovedEvent *ev = dynamic_cast<const MouseMovedEvent *>(event);
+                input.postMouseChangedPosition(ev->x, ev->y);
+                break;
+        }
+        eventQueue.release(event);
+    }
+}
+
+void ApplicationContext::postSizeEvent(unsigned int width, unsigned int height) {
+    eventQueue.post(new WindowResizeEvent(width, height));
+}
+
+void ApplicationContext::postKeyEvent(Key key, bool down) {
+    Event *ev;
+    if(down) {
+        ev = new KeyPressedEvent(key);
+    } else {
+        ev = new KeyReleasedEvent(key);
+    }
+    eventQueue.post(ev);
+}
+
+void ApplicationContext::postMouseEvent(int x, int y) {
+    eventQueue.post(new MouseMovedEvent(x, y));
+}
+
+Input& ApplicationContext::getInput() {
+    return input;
+}
+
+Window &ApplicationContext::getWindow() {
+    return *window;
+}
+
+Renderer &ApplicationContext::getRenderer() {
+    return *renderer;
+}
+
+Application& ApplicationContext::getApplication() {
+    return *application;
+}
+
+GraphicsContext &ApplicationContext::getGraphicsContext() {
+    return *graphicsContext;
+}
+
+} // namespace Panda

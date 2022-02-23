@@ -4,17 +4,15 @@
 
 #pragma once
 
-#include <Panda/GameLogic/ILevel.hpp>
-#include <Panda/Renderer/IShader.hpp>
-#include <Panda/Renderer/ITexture.hpp>
+#include "Panda.hpp"
 #include "Model/ChunksStorage.hpp"
 
-class BaseLevel : public Panda::ILevel {
+class BaseLevel : public Panda::Level {
 public:
     void start(Panda::World *world) override;
 
 private:
     Panda::Unique<ChunksStorage> chunksStorage;
-    Panda::Shared<Panda::IShader> baseShader;
-    Panda::Shared<Panda::ITexture> texture;
+    Panda::Shared<Panda::Shader> baseShader;
+    Panda::Shared<Panda::Texture> texture;
 };
