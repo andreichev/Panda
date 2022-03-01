@@ -8,20 +8,15 @@
 
 namespace Panda {
 
-class UIKitWindow : public IWindow {
+class UIKitWindow : public Window {
 public:
-    UIKitWindow() = default;
-    ~UIKitWindow() override;
+    ~UIKitWindow() override = default;
     void initialize(const char *title, GSize size, bool isFullscreen) override;
-    double getTime() override;
-    bool isShouldClose() override;
-    void setShouldClose(bool flag) override;
     bool isFullScreen() override;
     void setFullScreen(bool isFullScreen) override;
-    GSize getWindowSize() override;
-    void swapBuffers() override;
-    void *getNativeWindow() override;
-    void *getProcAddressFuncPointer() override;
+    void pollEvents() override;
+    void toggleCursorLock() override;
+    bool isCursorLocked() override;
 };
 
 } // namespace Panda

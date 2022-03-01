@@ -5,19 +5,20 @@
 //  Created by Admin on 02.08.2021.
 //
 
-#include "Panda/Platform/PlatformData.hpp"
+#include "Panda/Application/PlatformData.hpp"
+#include "Panda/Application/ApplicationContext.hpp"
 
 #import <OpenGLES/ES3/gl.h>
 #import "WonderView.hpp"
 
 @implementation WonderView {
     CADisplayLink* displayLink;
+    dispatch_semaphore_t semaphore;
 }
 
 // MARK: - Init
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super initWithFrame:UIScreen.mainScreen.bounds];
     [self commonInit];
     return self;
@@ -28,27 +29,20 @@
     [self addActionHandlers];
 }
 
-- (void) setupStyle {    
+- (void) setupStyle {
+    // self.backgroundColor = UIColor.redColor;
     [self setContentScaleFactor:UIScreen.mainScreen.nativeScale];
-
-
-
-    GLsizei width = self.frame.size.width * self.contentScaleFactor;
-    GLsizei height = self.frame.size.height * self.contentScaleFactor;
-
-    [context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(id<EAGLDrawable>)self.layer];
-    
-    CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
-    eaglLayer.drawableProperties = @{kEAGLDrawablePropertyRetainedBacking : @NO,
-                                     kEAGLDrawablePropertyColorFormat     : kEAGLColorFormatRGBA8 };
-    eaglLayer.opaque = NO;
-    printf("OpenGLES initialized, width: %d, height: %d\n", width, height);
+    CGFloat scale = UIScreen.mainScreen.nativeScale;
+    Panda::ApplicationContext::get().postSizeEvent(self.frame.size.width * scale, self.frame.size.height * scale);
+    semaphore = dispatch_semaphore_create(1);
+    Panda::PlatformData::get().layer = self.layer;
+    Panda::PlatformData::get().nativeWindowHandle = self;
+    Panda::PlatformData::get().semaphoreHandle = &semaphore;
 }
 
 // MARK: - OpenGL stuff
 
-+ (Class) layerClass
-{
++ (Class) layerClass {
     return [CAEAGLLayer class];
 }
 
@@ -57,11 +51,17 @@
 - (void) addActionHandlers {
     displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(displayRefreshed:)];
     displayLink.preferredFramesPerSecond = 60;
-    [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
 -(void) displayRefreshed:(CADisplayLink*)displayLink {
-    [context presentRenderbuffer:GL_RENDERBUFFER];
+    void* context = Panda::PlatformData::get().renderingContext;
+    if(context != nullptr) {
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        EAGLContext* _context = (__bridge EAGLContext*) context;
+        [_context presentRenderbuffer: GL_RENDERBUFFER];
+        dispatch_semaphore_signal(semaphore);
+    }
 }
 
 @end

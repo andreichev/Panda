@@ -30,7 +30,9 @@ void Application::initialize(ApplicationStartupSettings &settings) {
     ApplicationContext& context = ApplicationContext::get();
     // Порядок важен
     context.getWindow().initialize(settings.windowTitle, settings.windowSize, settings.isFullScreen);
-    context.getGraphicsContext().create(settings.windowSize.width, settings.windowSize.height);
+    context.processEvents();
+    GSize windowSize = context.getInput().getWindowSize();
+    context.getGraphicsContext().create(windowSize.width, windowSize.height);
     context.getRenderer().initialize();
     world = new World();
     timeMillis = getMillis();
@@ -51,7 +53,7 @@ void Application::loop() {
         thisSecondFramesCount++;
         if (oneSecondTimeCount >= 1000) {
             fps = thisSecondFramesCount;
-            PND_INFO("FPS: {}", fps);
+            // PND_INFO("FPS: {}", fps);
             thisSecondFramesCount = 0;
             oneSecondTimeCount -= 1000;
         }
@@ -60,16 +62,17 @@ void Application::loop() {
             context.isApplicationShouldClose = true;
         }
         if (context.getInput().isKeyPressed(Key::TAB)) {
-            // context.getWindow().toggleCursorLock();
+            context.getWindow().toggleCursorLock();
         }
 
+        context.getGraphicsContext().beginFrame();
         context.getRenderer().clear();
         world->update(deltaTimeMillis / 1000.0);
         deltaTimeMillis = 0;
         context.getRenderer().checkForErrors();
-        context.getGraphicsContext().swapBuffers();
+        context.getGraphicsContext().endFrame();
         context.getWindow().pollEvents();
-        context.pollEvents();
+        context.processEvents();
     }
 }
 

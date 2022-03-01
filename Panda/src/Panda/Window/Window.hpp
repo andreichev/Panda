@@ -16,8 +16,9 @@ public:
     virtual void initialize(const char *title, GSize size, bool isFullscreen) = 0;
     virtual bool isFullScreen() = 0;
     virtual void setFullScreen(bool isFullScreen) = 0;
-    virtual GSize getWindowSize() = 0;
     virtual void pollEvents() = 0;
+    virtual void toggleCursorLock() = 0;
+    virtual bool isCursorLocked() = 0;
 };
 
 } // namespace Panda

@@ -8,7 +8,7 @@
 #ifdef PND_PLATFORM_MACOS
 #    include "Platform/WindowImpl/GlfwWindow/GlfwWindow.hpp"
 #elif defined(PND_PLATFORM_IOS)
-#    include "PlatformSpecificRealizations/WindowImpl/UIKitWindow/UIKitWindow.hpp"
+#    include "Platform/WindowImpl/UIKitWindow/UIKitWindow.hpp"
 #endif
 
 namespace Panda {

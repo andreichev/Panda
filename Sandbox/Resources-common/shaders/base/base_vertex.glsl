@@ -1,9 +1,7 @@
 #version 330 core
-// #ifdef GL_ES
-// precision highp float;
-// #else
-// #version 330 core
-// #endif
+#ifdef GL_ES
+precision highp float;
+#endif
 
 #if __VERSION__ >= 140
 layout (location = 0) in vec3 aPos;

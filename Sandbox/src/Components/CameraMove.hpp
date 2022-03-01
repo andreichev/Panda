@@ -18,4 +18,5 @@ private:
 
     Panda::Shared<Panda::Transform> transform;
     Panda::Input *events;
+    Panda::Window *window;
 };

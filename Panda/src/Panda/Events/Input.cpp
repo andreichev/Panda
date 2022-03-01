@@ -31,6 +31,7 @@ void Input::removeWindowSizeListener(WindowSizeListener *listener) {
 }
 
 void Input::windowSizeChanged(GSize size) {
+    windowSize = size;
     for(auto& listener: windowSizeListeners) {
         listener->windowSizeChanged(size);
     }
@@ -39,6 +40,10 @@ void Input::windowSizeChanged(GSize size) {
 void Input::postMouseChangedPosition(int x, int y) {
     mousePositionX = x;
     mousePositionY = y;
+}
+
+GSize Input::getWindowSize() {
+    return windowSize;
 }
 
 }

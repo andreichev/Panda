@@ -23,7 +23,7 @@ public:
     ~ApplicationContext();
     void setResourcesPath(std::string path);
     std::string &getResourcesPath();
-    void pollEvents();
+    void processEvents();
     void postSizeEvent(unsigned int width, unsigned int height);
     void postKeyEvent(Key key, bool down);
     void postMouseEvent(int x, int y);

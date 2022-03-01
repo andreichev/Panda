@@ -42,7 +42,7 @@ std::string &ApplicationContext::getResourcesPath() {
     return resourcesPath;
 }
 
-void ApplicationContext::pollEvents() {
+void ApplicationContext::processEvents() {
     const Event* event;
     while ((event = eventQueue.poll()) != nullptr) {
         switch (event->type) {

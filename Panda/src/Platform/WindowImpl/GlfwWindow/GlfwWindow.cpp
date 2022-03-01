@@ -20,6 +20,7 @@ void glfwErrorCallback(int error_code, const char *description) {
 void GlfwWindow::initialize(const char *title, GSize size, bool isFullscreen) {
     m_isFullScreen = isFullscreen;
     m_windowSizeBackup = size;
+    cursorLocked = false;
 
     context = &ApplicationContext::get();
 
@@ -60,6 +61,7 @@ void GlfwWindow::initialize(const char *title, GSize size, bool isFullscreen) {
     }
 
     addEventHandlers();
+    context->postSizeEvent(size.width, size.height);
 }
 
 bool GlfwWindow::isFullScreen() {
@@ -68,22 +70,16 @@ bool GlfwWindow::isFullScreen() {
 
 void GlfwWindow::setFullScreen(bool isFullScreen) {}
 
-GSize GlfwWindow::getWindowSize() {
-    int width;
-    int height;
-    glfwGetWindowSize(m_windowHandle, &width, &height);
-    return {(float)width, (float)height};
-}
-
 void GlfwWindow::addEventHandlers() {
     glfwSetWindowUserPointer(m_windowHandle, this);
     glfwSetWindowSizeCallback(m_windowHandle, [](GLFWwindow* windowHandle, int width, int height) {
         GlfwWindow* self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+        self->m_windowSizeBackup = GSize(width, height);
         self->context->postSizeEvent(width, height);
     });
     glfwSetKeyCallback(m_windowHandle, [](GLFWwindow* windowHandle, int key, int scancode, int action, int mods) {
         GlfwWindow* self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
-        self->context->postKeyEvent(static_cast<Key>(key), action == GLFW_PRESS);
+        self->context->postKeyEvent(static_cast<Key>(key), action == GLFW_PRESS || action == GLFW_REPEAT);
     });
     glfwSetCursorPosCallback(m_windowHandle, [](GLFWwindow* windowHandle, double x, double y) {
         GlfwWindow* self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
@@ -97,6 +93,20 @@ void GlfwWindow::addEventHandlers() {
 
 void GlfwWindow::pollEvents() {
     glfwPollEvents();
+}
+
+bool GlfwWindow::isCursorLocked() {
+    return cursorLocked;
+}
+
+void GlfwWindow::toggleCursorLock() {
+    cursorLocked = cursorLocked == false;
+    resetCursorPos();
+    glfwSetInputMode(m_windowHandle, GLFW_CURSOR, cursorLocked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+}
+
+void GlfwWindow::resetCursorPos() {
+    glfwSetCursorPos(m_windowHandle, m_windowSizeBackup.width / 2, m_windowSizeBackup.height / 2);
 }
 
 } // namespace Panda

@@ -2,6 +2,7 @@
 #include "RendererInit.hpp"
 
 #include "Platform/RendererImpl/Context/OpenGLContext.hpp"
+#include "Platform/RendererImpl/Context/GlesContext.hpp"
 #include "Platform/RendererImpl/OpenGL/OpenGLRenderer.hpp"
 #include "Platform/RendererImpl/OpenGL/OpenGLShader.hpp"
 #include "Platform/RendererImpl/OpenGL/OpenGLTexture.hpp"
@@ -16,7 +17,11 @@ GraphicsContext *RendererInit::getContext() {
         case RendererApi::None:
             PND_CRITICAL("RENDERER API NOT SPECIFIED");
         case RendererApi::OpenGL:
+#ifdef PND_PLATFORM_IOS
+            return new GlesContext();
+#else
             return new OpenGLContext();
+#endif
     }
 }
 

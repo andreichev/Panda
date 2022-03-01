@@ -14,7 +14,7 @@ Camera::Camera()
     : transform(nullptr)
     , shader(nullptr)
     , fieldOfView(70.f)
-    , windowSize(ApplicationContext::get().getWindow().getWindowSize())
+    , windowSize(ApplicationContext::get().getInput().getWindowSize())
     , target(1.f)
     , view(1.f)
     , projection(1.f) {}

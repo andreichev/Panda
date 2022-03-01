@@ -4,11 +4,10 @@
 
 #include "CameraMove.hpp"
 
-#include <Panda/Application/Application.hpp>
-
 void CameraMove::initialize() {
     transform = getEntity().getTransform();
     events = &Panda::ApplicationContext::get().getInput();
+    window = &Panda::ApplicationContext::get().getWindow();
 }
 
 void CameraMove::update(float deltaTime) {
@@ -32,9 +31,17 @@ void CameraMove::update(float deltaTime) {
     if (events->isKeyPressed(Panda::Key::LEFT_SHIFT)) {
         transform->translate(Panda::Direction::Down, speed);
     }
-    // if (events->isCursorLocked()) {
+    static float lastMouseX = events->getMousePositionX();
+    static float lastMouseY = events->getMousePositionY();
+    if (window->isCursorLocked()) {
+        float mouseX = events->getMousePositionX();
+        float mouseY = events->getMousePositionY();
+        float deltaX = mouseX - lastMouseX;
+        float deltaY = mouseY - lastMouseY;
         // DeltaX - смещение мыши за реальное время, поэтому умножение на deltaTime не требуется.
         // Действия в реальном мире не нужно умножать на deltaTime, умножать нужно только действия в игровом мире.
-    //    transform->rotate(events->getDeltaY() * mouseSpeed, events->getDeltaX() * mouseSpeed, 0.f);
-    // }
+        transform->rotate(deltaY * mouseSpeed, deltaX * mouseSpeed, 0.f);
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
+    }
 }

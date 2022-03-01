@@ -5,16 +5,15 @@
 #pragma once
 #include "Panda/Renderer/GraphicsContext.hpp"
 
-#import <OpenGLES/ES3/gl.h>
-
 namespace Panda {
 
 class GlesContext: public GraphicsContext {
     void create(int width, int height) override;
-    void swapBuffers() override;
+    void beginFrame() override;
+    void endFrame() override;
 
 private:
-    EAGLContext* context;
+    void* context;
 };
 
 }

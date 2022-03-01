@@ -20,7 +20,9 @@ void OpenGLContext::create(int width, int height) {
     glfwSwapInterval(1);
 }
 
-void OpenGLContext::swapBuffers() {
+void OpenGLContext::beginFrame() {}
+
+void OpenGLContext::endFrame() {
     glfwSwapBuffers((GLFWwindow *)glfwWindowHandle);
 }
 

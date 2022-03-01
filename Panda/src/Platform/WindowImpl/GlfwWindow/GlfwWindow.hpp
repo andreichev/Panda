@@ -17,11 +17,14 @@ public:
     void initialize(const char *title, GSize size, bool isFullscreen) override;
     bool isFullScreen() override;
     void setFullScreen(bool isFullScreen) override;
-    GSize getWindowSize() override;
     void pollEvents() override;
+    void toggleCursorLock() override;
+    bool isCursorLocked() override;
     ApplicationContext* context;
 private:
+    void resetCursorPos();
     void addEventHandlers();
+    bool cursorLocked;
     bool m_isFullScreen;
     GSize m_windowSizeBackup;
     GLFWwindow *m_windowHandle;

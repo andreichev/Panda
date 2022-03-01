@@ -10,7 +10,10 @@ namespace Panda {
 class PlatformData {
 public:
     static PlatformData& get();
+    void* layer;
     void* nativeWindowHandle;
+    void* renderingContext;
+    void* semaphoreHandle;
 };
 
 }
