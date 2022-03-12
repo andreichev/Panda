@@ -27,12 +27,12 @@ struct VertexBufferElement {
     }
 };
 
-class VertexBufferLayout {
+class VertexBufferLayoutData {
 public:
-    VertexBufferLayout()
+    VertexBufferLayoutData()
         : m_Stride(0) {}
 
-    virtual ~VertexBufferLayout() = default;
+    virtual ~VertexBufferLayoutData() = default;
 
     template<typename T>
     void push(unsigned int count) {
@@ -82,10 +82,6 @@ public:
         // light
         push<float>(1);
     }
-
-    virtual void initializeForRenderer() = 0;
-    virtual void bind() = 0;
-    virtual void unbind() = 0;
 
 protected:
     std::vector<VertexBufferElement> m_Elements;
