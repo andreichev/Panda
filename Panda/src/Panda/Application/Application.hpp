@@ -25,8 +25,8 @@ private:
     void initialize(ApplicationStartupSettings &settings);
     void loop();
 
-    World* world;
-    Level* currentLevel;
+    World *world;
+    Level *currentLevel;
     uint64_t timeMillis;
     // Таймер до 1 секудны для подсчета FPS (в миллисекундах)
     uint64_t oneSecondTimeCount;

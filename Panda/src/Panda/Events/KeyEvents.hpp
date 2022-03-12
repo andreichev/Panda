@@ -10,7 +10,8 @@ namespace Panda {
 class KeyPressedEvent : public Event {
 public:
     KeyPressedEvent(Key key)
-        : Event(EventType::KeyPressed), key(key) {}
+        : Event(EventType::KeyPressed)
+        , key(key) {}
 
     Key key;
 };
@@ -18,9 +19,10 @@ public:
 class KeyReleasedEvent : public Event {
 public:
     KeyReleasedEvent(Key key)
-        : Event(EventType::KeyReleased), key(key) {}
+        : Event(EventType::KeyReleased)
+        , key(key) {}
 
     Key key;
 };
 
-}
+} // namespace Panda

@@ -11,9 +11,11 @@ namespace Panda {
 class MouseMovedEvent : public Event {
 public:
     MouseMovedEvent(int x, int y)
-        : Event(EventType::MouseMoved), x(x), y(y) {}
+        : Event(EventType::MouseMoved)
+        , x(x)
+        , y(y) {}
 
     int x, y;
 };
 
-}
+} // namespace Panda

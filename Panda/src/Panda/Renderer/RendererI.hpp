@@ -35,9 +35,7 @@ public:
     virtual void createIndexBuffer(IndexBufferHandle handle, unsigned int *indices, unsigned int count, bool isDynamic) = 0;
     virtual void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) = 0;
     virtual void createVertexBuffer(
-        VertexBufferHandle handle,
-        float *data, unsigned int count, bool isDynamic, VertexLayoutHandle layoutHandle
-    ) = 0;
+        VertexBufferHandle handle, float *data, unsigned int count, bool isDynamic, VertexLayoutHandle layoutHandle) = 0;
 };
 
-}
+} // namespace Panda

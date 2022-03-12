@@ -55,7 +55,7 @@ struct CreateShaderCommand : RendererCommand {
         , fragmentPath(fragmentPath) {}
 };
 
-struct CreateTextureCommand: RendererCommand {
+struct CreateTextureCommand : RendererCommand {
     const char *path;
     TextureHandle handle;
 
@@ -65,7 +65,7 @@ struct CreateTextureCommand: RendererCommand {
         , path(path) {}
 };
 
-struct CreateIndexBufferCommand: RendererCommand {
+struct CreateIndexBufferCommand : RendererCommand {
     unsigned int *indices;
     unsigned int count;
     bool isDynamic;
@@ -79,7 +79,7 @@ struct CreateIndexBufferCommand: RendererCommand {
         , isDynamic(isDynamic) {}
 };
 
-struct CreateVertexBufferCommand: RendererCommand {
+struct CreateVertexBufferCommand : RendererCommand {
     float *data;
     unsigned int count;
     bool isDynamic;
@@ -95,4 +95,4 @@ struct CreateVertexBufferCommand: RendererCommand {
         , layoutHandle(layoutHandle) {}
 };
 
-}
+} // namespace Panda

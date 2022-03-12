@@ -26,4 +26,4 @@ void OpenGLContext::endFrame() {
     glfwSwapBuffers((GLFWwindow *)glfwWindowHandle);
 }
 
-}
+} // namespace Panda

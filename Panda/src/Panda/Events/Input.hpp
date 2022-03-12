@@ -24,13 +24,13 @@ public:
     int getMousePositionY();
     void removeWindowSizeListener(WindowSizeListener *listener);
     GSize getWindowSize();
+
 private:
     bool keys[1024];
     GSize windowSize;
     std::vector<WindowSizeListener *> windowSizeListeners;
     int mousePositionX;
     int mousePositionY;
-
 };
 
 } // namespace Panda

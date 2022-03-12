@@ -20,7 +20,8 @@ public:
     void pollEvents() override;
     void toggleCursorLock() override;
     bool isCursorLocked() override;
-    ApplicationContext* context;
+    ApplicationContext *context;
+
 private:
     void resetCursorPos();
     void addEventHandlers();

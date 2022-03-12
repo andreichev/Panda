@@ -13,11 +13,12 @@ class EventQueue {
 public:
     EventQueue();
     ~EventQueue();
-    void release(const Event* event);
-    void post(Event* event);
-    const Event* poll();
+    void release(const Event *event);
+    void post(Event *event);
+    const Event *poll();
+
 private:
-    std::queue<Event*> events;
+    std::queue<Event *> events;
 };
 
-}
+} // namespace Panda

@@ -10,12 +10,8 @@
 
 void BaseLevel::start(Panda::World *world) {
     Panda::ApplicationContext::get().getRenderer().setClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    baseShader = Panda::Shared<Panda::Shader>(
-        Panda::RendererInit::createShader(
-            "shaders/base/base_vertex.glsl",
-            "shaders/base/base_fragment.glsl"
-        )
-    );
+    baseShader =
+        Panda::Shared<Panda::Shader>(Panda::RendererInit::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl"));
     PND_INFO("WORLD GENERATION STARTED");
     chunksStorage = Panda::createUnique<ChunksStorage>();
     PND_INFO("WORLD GENERATED");

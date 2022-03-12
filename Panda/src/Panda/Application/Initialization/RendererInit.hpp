@@ -23,7 +23,7 @@ enum class RendererApi {
 
 class RendererInit {
 public:
-    static GraphicsContext* getContext();
+    static GraphicsContext *getContext();
     static Renderer *getRenderer();
     static Shader *createShader(const char *vertexPath, const char *fragmentPath);
     static Texture *createTexture(const char *path);

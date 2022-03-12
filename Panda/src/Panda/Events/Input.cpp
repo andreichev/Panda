@@ -7,11 +7,11 @@
 namespace Panda {
 
 void Input::setKeyPressed(Key key, bool state) {
-    keys[(int) key] = state;
+    keys[(int)key] = state;
 }
 
-bool Input::isKeyPressed(Key key)  {
-    return keys[(int) key];
+bool Input::isKeyPressed(Key key) {
+    return keys[(int)key];
 }
 
 int Input::getMousePositionX() {
@@ -32,7 +32,7 @@ void Input::removeWindowSizeListener(WindowSizeListener *listener) {
 
 void Input::windowSizeChanged(GSize size) {
     windowSize = size;
-    for(auto& listener: windowSizeListeners) {
+    for (auto &listener : windowSizeListeners) {
         listener->windowSizeChanged(size);
     }
 }
@@ -46,4 +46,4 @@ GSize Input::getWindowSize() {
     return windowSize;
 }
 
-}
+} // namespace Panda

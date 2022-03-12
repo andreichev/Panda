@@ -4,7 +4,6 @@
 
 #include "Miren.hpp"
 
-
 namespace Panda {
 
 int Miren::s_shadersCount = 0;
@@ -20,7 +19,7 @@ VertexBufferHandle Miren::createVertexBuffer(Vertex *vertices, unsigned int coun
     VertexBufferLayoutData layoutData;
     layoutData.pushVector();
     VertexLayoutHandle layoutHandle = createVertexLayout(layoutData);
-    return Miren::createVertexBuffer((float*) vertices, count * 6, isDynamic, layoutHandle);
+    return Miren::createVertexBuffer((float *)vertices, count * 6, isDynamic, layoutHandle);
 }
 
 VertexBufferHandle Miren::createVertexBuffer(float *data, unsigned int count, bool isDynamic, VertexLayoutHandle layoutHandle) {
@@ -72,7 +71,7 @@ void Miren::renderFrame() {
 
 void Miren::rendererExecuteCommands() {
     s_context->semaphoreWait();
-    const RendererCommand * command;
+    const RendererCommand *command;
     while ((command = s_commandQueue.poll()) != nullptr) {
         switch (command->type) {
             case RendererCommandType::CreateVertexLayout: {
@@ -106,4 +105,4 @@ void Miren::rendererExecuteCommands() {
     s_context->semaphoreSignal();
 }
 
-}
+} // namespace Panda

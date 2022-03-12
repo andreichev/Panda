@@ -21,10 +21,11 @@ public:
     static void beginFrameProcessing();
     static void endFrameProcessing();
     static void renderFrame();
+
 private:
     static void rendererExecuteCommands();
 
-    static RendererI* s_context;
+    static RendererI *s_context;
     static CommandQueue s_commandQueue;
     static int s_shadersCount;
     static int s_texturesCount;
@@ -33,4 +34,4 @@ private:
     static int s_indexBuffersCount;
 };
 
-}
+} // namespace Panda

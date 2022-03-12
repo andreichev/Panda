@@ -10,11 +10,11 @@
 
 int startApp(int argc, char **argv) {
     runPandaApplication(Panda::ApplicationStartupSettings::builder()
-                                      .name("ITIS Craft")
-                                      .windowTitle("ITIS Craft")
-                                      .windowSize({900, 600})
-                                      .isFullScreen(true)
-                                      .startupLevel(new BaseLevel())
-                                      .build());
+                            .name("ITIS Craft")
+                            .windowTitle("ITIS Craft")
+                            .windowSize({900, 600})
+                            .isFullScreen(true)
+                            .startupLevel(new BaseLevel())
+                            .build());
     return 0;
 }

@@ -7,13 +7,13 @@
 
 namespace Panda {
 
-class GlesContext: public GraphicsContext {
+class GlesContext : public GraphicsContext {
     void create(int width, int height) override;
     void beginFrame() override;
     void endFrame() override;
 
 private:
-    void* context;
+    void *context;
 };
 
-}
+} // namespace Panda

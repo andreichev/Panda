@@ -72,21 +72,21 @@ void GlfwWindow::setFullScreen(bool isFullScreen) {}
 
 void GlfwWindow::addEventHandlers() {
     glfwSetWindowUserPointer(m_windowHandle, this);
-    glfwSetWindowSizeCallback(m_windowHandle, [](GLFWwindow* windowHandle, int width, int height) {
-        GlfwWindow* self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+    glfwSetWindowSizeCallback(m_windowHandle, [](GLFWwindow *windowHandle, int width, int height) {
+        GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->m_windowSizeBackup = GSize(width, height);
         self->context->postSizeEvent(width, height);
     });
-    glfwSetKeyCallback(m_windowHandle, [](GLFWwindow* windowHandle, int key, int scancode, int action, int mods) {
-        GlfwWindow* self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+    glfwSetKeyCallback(m_windowHandle, [](GLFWwindow *windowHandle, int key, int scancode, int action, int mods) {
+        GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->context->postKeyEvent(static_cast<Key>(key), action == GLFW_PRESS || action == GLFW_REPEAT);
     });
-    glfwSetCursorPosCallback(m_windowHandle, [](GLFWwindow* windowHandle, double x, double y) {
-        GlfwWindow* self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+    glfwSetCursorPosCallback(m_windowHandle, [](GLFWwindow *windowHandle, double x, double y) {
+        GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->context->postMouseEvent(x, y);
     });
-    glfwSetWindowCloseCallback(m_windowHandle, [](GLFWwindow* windowHandle) {
-        GlfwWindow* self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+    glfwSetWindowCloseCallback(m_windowHandle, [](GLFWwindow *windowHandle) {
+        GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->context->isApplicationShouldClose = true;
     });
 }

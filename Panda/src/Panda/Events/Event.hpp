@@ -23,10 +23,11 @@ enum class EventType {
 class Event {
 public:
     virtual ~Event() = default;
-    Event(EventType type) : type(type) {}
+    Event(EventType type)
+        : type(type) {}
 
     EventType type;
     bool isHandled = false;
 };
 
-}
+} // namespace Panda

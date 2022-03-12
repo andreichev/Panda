@@ -9,7 +9,7 @@
 namespace Panda {
 
 uint64_t getMillis() {
-    auto now = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     return now.count();
 }
 
@@ -27,7 +27,7 @@ void Application::initialize(ApplicationStartupSettings &settings) {
     Logger::init();
     maximumFps = 60;
 
-    ApplicationContext& context = ApplicationContext::get();
+    ApplicationContext &context = ApplicationContext::get();
     // Порядок важен
     context.getWindow().initialize(settings.windowTitle, settings.windowSize, settings.isFullScreen);
     context.processEvents();
@@ -40,7 +40,7 @@ void Application::initialize(ApplicationStartupSettings &settings) {
 }
 
 void Application::loop() {
-    ApplicationContext& context = ApplicationContext::get();
+    ApplicationContext &context = ApplicationContext::get();
     while (context.isApplicationShouldClose == false) {
         uint64_t lastTime = timeMillis;
         timeMillis = getMillis();

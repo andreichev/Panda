@@ -8,7 +8,8 @@
 
 namespace Panda {
 
-EventQueue::EventQueue() : events() {}
+EventQueue::EventQueue()
+    : events() {}
 
 EventQueue::~EventQueue() {
     for (const Event *event = poll(); event != nullptr; event = poll()) {
@@ -21,8 +22,10 @@ void EventQueue::release(const Event *event) {
 }
 
 const Event *EventQueue::poll() {
-    if (events.empty()) { return nullptr; }
-    Event* event = events.front();
+    if (events.empty()) {
+        return nullptr;
+    }
+    Event *event = events.front();
     events.pop();
     return event;
 }
@@ -31,4 +34,4 @@ void EventQueue::post(Event *event) {
     events.push(event);
 }
 
-}
+} // namespace Panda

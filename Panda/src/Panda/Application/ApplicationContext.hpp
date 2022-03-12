@@ -27,19 +27,19 @@ public:
     void postSizeEvent(unsigned int width, unsigned int height);
     void postKeyEvent(Key key, bool down);
     void postMouseEvent(int x, int y);
-    Input& getInput();
-    Window& getWindow();
-    GraphicsContext& getGraphicsContext();
-    Renderer& getRenderer();
-    Application& getApplication();
+    Input &getInput();
+    Window &getWindow();
+    GraphicsContext &getGraphicsContext();
+    Renderer &getRenderer();
+    Application &getApplication();
     bool isApplicationShouldClose;
 
 private:
-    Application* application;
+    Application *application;
     Input input;
-    Window* window;
-    Renderer* renderer;
-    GraphicsContext* graphicsContext;
+    Window *window;
+    Renderer *renderer;
+    GraphicsContext *graphicsContext;
     EventQueue eventQueue;
     std::string resourcesPath;
 };

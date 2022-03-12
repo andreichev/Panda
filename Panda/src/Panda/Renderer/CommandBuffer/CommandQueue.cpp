@@ -7,7 +7,8 @@
 
 namespace Panda {
 
-CommandQueue::CommandQueue() : commands() {}
+CommandQueue::CommandQueue()
+    : commands() {}
 
 CommandQueue::~CommandQueue() {
     for (const RendererCommand *command = poll(); command != nullptr; command = poll()) {
@@ -32,4 +33,4 @@ const RendererCommand *CommandQueue::poll() {
     return command;
 }
 
-}
+} // namespace Panda

@@ -16,7 +16,7 @@ public:
     void endFrame() override;
 
 private:
-    void* glfwWindowHandle;
+    void *glfwWindowHandle;
 };
 
-}
+} // namespace Panda

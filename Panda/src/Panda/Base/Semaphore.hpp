@@ -8,4 +8,4 @@ void semaphoreWait();
 
 void semaphoreSignal();
 
-}
+} // namespace Panda

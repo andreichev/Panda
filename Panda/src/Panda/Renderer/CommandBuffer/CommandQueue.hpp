@@ -12,11 +12,12 @@ class CommandQueue {
 public:
     CommandQueue();
     ~CommandQueue();
-    void release(const RendererCommand * command);
-    void post(RendererCommand * command);
-    const RendererCommand * poll();
+    void release(const RendererCommand *command);
+    void post(RendererCommand *command);
+    const RendererCommand *poll();
+
 private:
     std::queue<RendererCommand *> commands;
 };
 
-}
+} // namespace Panda

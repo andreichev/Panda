@@ -43,7 +43,7 @@ std::string &ApplicationContext::getResourcesPath() {
 }
 
 void ApplicationContext::processEvents() {
-    const Event* event;
+    const Event *event;
     while ((event = eventQueue.poll()) != nullptr) {
         switch (event->type) {
             case EventType::None:
@@ -78,7 +78,7 @@ void ApplicationContext::postSizeEvent(unsigned int width, unsigned int height) 
 
 void ApplicationContext::postKeyEvent(Key key, bool down) {
     Event *ev;
-    if(down) {
+    if (down) {
         ev = new KeyPressedEvent(key);
     } else {
         ev = new KeyReleasedEvent(key);
@@ -90,7 +90,7 @@ void ApplicationContext::postMouseEvent(int x, int y) {
     eventQueue.post(new MouseMovedEvent(x, y));
 }
 
-Input& ApplicationContext::getInput() {
+Input &ApplicationContext::getInput() {
     return input;
 }
 
@@ -102,7 +102,7 @@ Renderer &ApplicationContext::getRenderer() {
     return *renderer;
 }
 
-Application& ApplicationContext::getApplication() {
+Application &ApplicationContext::getApplication() {
     return *application;
 }
 

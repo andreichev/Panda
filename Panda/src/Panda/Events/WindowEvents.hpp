@@ -9,8 +9,9 @@ namespace Panda {
 class WindowResizeEvent : public Event {
 public:
     WindowResizeEvent(unsigned int width, unsigned int height)
-        : Event(EventType::WindowResize),
-        width(width) , height(height) {}
+        : Event(EventType::WindowResize)
+        , width(width)
+        , height(height) {}
 
     unsigned int getWidth() const {
         return width;
@@ -24,4 +25,4 @@ private:
     unsigned int width, height;
 };
 
-}
+} // namespace Panda

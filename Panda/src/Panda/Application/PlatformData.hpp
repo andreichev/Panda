@@ -9,11 +9,11 @@ namespace Panda {
 // Указатели на главные элементы платформы (окно, контекст для рендера и т. д.)
 class PlatformData {
 public:
-    static PlatformData& get();
-    void* layer;
-    void* nativeWindowHandle;
-    void* renderingContext;
-    void* semaphoreHandle;
+    static PlatformData &get();
+    void *layer;
+    void *nativeWindowHandle;
+    void *renderingContext;
+    void *semaphoreHandle;
 };
 
-}
+} // namespace Panda
