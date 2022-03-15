@@ -6,7 +6,7 @@
 
 #include "Panda/GameLogic/Component.hpp"
 #include "Panda/Events/WindowSizeListener.hpp"
-#include "Panda/Renderer/Shader.hpp"
+#include "Panda/Renderer/Miren.hpp"
 #include "Transform.hpp"
 #include "TransformDelegate.hpp"
 
@@ -17,7 +17,7 @@ public:
     Camera();
     ~Camera() override;
     void initialize() override;
-    void setShader(Shared<Shader> shader);
+    void setShader(ShaderHandle shader);
     void setFieldOfView(float degrees);
     // MARK: - Delegate
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
@@ -33,7 +33,7 @@ private:
     glm::vec3 target;
     glm::mat4 view;
     glm::mat4 projection;
-    Shared<Shader> shader;
+    ShaderHandle shader;
     float fieldOfView;
 };
 

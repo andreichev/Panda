@@ -102,8 +102,8 @@ void OpenGLShader::use() {
     glUseProgram(m_RendererID);
 }
 
-void OpenGLShader::setUniform(const char *name, glm::mat4 value) {
-    glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &value[0][0]);
+void OpenGLShader::setUniformMat4(const char *name, float* value) {
+    glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, value);
 }
 
 } // namespace Panda

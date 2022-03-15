@@ -5,6 +5,7 @@
 #include "pndpch.hpp"
 #include "Application.hpp"
 #include "ApplicationContext.hpp"
+#include "Panda/Renderer/Miren.hpp"
 
 namespace Panda {
 
@@ -32,8 +33,7 @@ void Application::initialize(ApplicationStartupSettings &settings) {
     context.getWindow().initialize(settings.windowTitle, settings.windowSize, settings.isFullScreen);
     context.processEvents();
     GSize windowSize = context.getInput().getWindowSize();
-    context.getGraphicsContext().create(windowSize.width, windowSize.height);
-    context.getRenderer().initialize();
+    Miren::initialize(windowSize);
     world = new World();
     timeMillis = getMillis();
     settings.startupLevel->start(world);
@@ -65,12 +65,11 @@ void Application::loop() {
             context.getWindow().toggleCursorLock();
         }
 
-        context.getGraphicsContext().beginFrame();
-        context.getRenderer().clear();
+        Miren::beginFrameProcessing();
         world->update(deltaTimeMillis / 1000.0);
         deltaTimeMillis = 0;
-        context.getRenderer().checkForErrors();
-        context.getGraphicsContext().endFrame();
+        Miren::endFrameProcessing();
+        Miren::renderFrame();
         context.getWindow().pollEvents();
         context.processEvents();
     }

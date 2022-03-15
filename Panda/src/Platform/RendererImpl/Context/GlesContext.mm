@@ -87,15 +87,8 @@ namespace Panda {
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    void GlesContext::beginFrame() {
-        dispatch_semaphore_t* semaphore = (__bridge dispatch_semaphore_t*)
-            PlatformData::get().semaphoreHandle;
-        dispatch_semaphore_wait(*semaphore, DISPATCH_TIME_FOREVER);
-    }
-
-    void GlesContext::endFrame() {
-        dispatch_semaphore_t* semaphore = (__bridge dispatch_semaphore_t*)
-            PlatformData::get().semaphoreHandle;
-        dispatch_semaphore_signal(*semaphore);
+    void GlesContext::flip() {
+        EAGLContext* _context = (__bridge EAGLContext*) context;
+        [_context presentRenderbuffer: GL_RENDERBUFFER];
     }
 }

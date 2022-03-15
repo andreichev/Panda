@@ -9,7 +9,6 @@ class GraphicsContext {
 public:
     virtual ~GraphicsContext() = default;
     virtual void create(int width, int height) = 0;
-    virtual void beginFrame() = 0;
-    virtual void endFrame() = 0;
+    virtual void flip() = 0;
 };
 } // namespace Panda

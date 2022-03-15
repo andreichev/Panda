@@ -4,8 +4,12 @@
 
 #include "Miren.hpp"
 
+#include "Platform/RendererImpl/OpenGL/RendererOpenGL.hpp"
+
 namespace Panda {
 
+RendererI* Miren::s_context = nullptr;
+Frame Miren::s_frame = Frame();
 int Miren::s_shadersCount = 0;
 int Miren::s_texturesCount = 0;
 int Miren::s_vertexLayoutsCount = 0;
@@ -13,7 +17,11 @@ int Miren::s_vertexBuffersCount = 0;
 int Miren::s_indexBuffersCount = 0;
 CommandQueue Miren::s_commandQueue;
 
-Miren::Miren() {}
+void Miren::initialize(GSize size) {
+    s_context = new RendererOpenGL(size);
+    // TODO: - delete s_context somewhere
+    s_frame.begin();
+}
 
 VertexBufferHandle Miren::createVertexBuffer(Vertex *vertices, unsigned int count, bool isDynamic) {
     VertexBufferLayoutData layoutData;
@@ -59,6 +67,7 @@ IndexBufferHandle Miren::createIndexBuffer(unsigned int *indices, unsigned int c
 
 void Miren::beginFrameProcessing() {
     s_context->semaphoreWait();
+    s_frame.begin();
 }
 
 void Miren::endFrameProcessing() {
@@ -66,12 +75,30 @@ void Miren::endFrameProcessing() {
 }
 
 void Miren::renderFrame() {
+    s_context->semaphoreWait();
     rendererExecuteCommands();
+    RenderDraw *draw = nullptr;
+    while ((draw = s_frame.popDrawCall()) != nullptr) {
+        while (draw->m_uniformBuffer.empty() == false) {
+            Uniform uniform = draw->m_uniformBuffer.front();
+            s_context->setUniform(uniform.handle, uniform.name, uniform.value, uniform.size);
+            draw->m_uniformBuffer.pop();
+        }
+        while(draw->m_textureBindings.empty() == false) {
+            TextureBinding textureBinding = draw->m_textureBindings.front();
+            s_context->setTexture(textureBinding.m_handle, textureBinding.m_slot);
+            draw->m_textureBindings.pop();
+        }
+        s_context->submit(draw->m_shader, draw->m_vertexBuffer, draw->m_indexBuffer, draw->m_numIndices);
+        s_frame.free(draw);
+    }
+    s_context->flip();
+    s_context->semaphoreSignal();
 }
 
 void Miren::rendererExecuteCommands() {
-    s_context->semaphoreWait();
-    const RendererCommand *command;
+    s_context->clear();
+    const RendererCommand *command = nullptr;
     while ((command = s_commandQueue.poll()) != nullptr) {
         switch (command->type) {
             case RendererCommandType::CreateVertexLayout: {
@@ -102,7 +129,37 @@ void Miren::rendererExecuteCommands() {
         }
         s_commandQueue.release(command);
     }
-    s_context->semaphoreSignal();
+}
+
+void Miren::setVertexBuffer(VertexBufferHandle handle) {
+    s_frame.setVertexBuffer(handle);
+}
+
+void Miren::setIndexBuffer(IndexBufferHandle handle, uint32_t count) {
+    s_frame.setIndexBuffer(handle, count);
+}
+
+void Miren::setShader(ShaderHandle handle) {
+    s_frame.setShader(handle);
+}
+
+void Miren::setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) {
+    s_frame.setUniform(handle, name, value, size);
+}
+
+void Miren::setTexture(TextureHandle textureHandle, uint32_t slot) {
+    s_frame.setTexture(textureHandle, slot);
+}
+
+void Miren::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) {
+    s_frame.setShader(shader);
+    s_frame.setVertexBuffer(vertexBuffer);
+    s_frame.setIndexBuffer(indexBuffer, indicesCount);
+    s_frame.begin();
+}
+
+void Miren::submit() {
+    s_frame.begin();
 }
 
 } // namespace Panda

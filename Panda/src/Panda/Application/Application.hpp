@@ -9,7 +9,6 @@
 #include "Panda/GameLogic/Level.hpp"
 #include "Panda/GameLogic/World.hpp"
 #include "Panda/Window/Window.hpp"
-#include "Panda/Renderer/Renderer.hpp"
 #include "Panda/Events/Input.hpp"
 
 namespace Panda {

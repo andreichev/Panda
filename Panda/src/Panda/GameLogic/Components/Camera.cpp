@@ -12,7 +12,7 @@ namespace Panda {
 
 Camera::Camera()
     : transform(nullptr)
-    , shader(nullptr)
+    , shader(0)
     , fieldOfView(70.f)
     , windowSize(ApplicationContext::get().getInput().getWindowSize())
     , target(1.f)
@@ -32,8 +32,8 @@ void Camera::initialize() {
 
 void Camera::update(float deltaTime) {}
 
-void Camera::setShader(Shared<Shader> shader) {
-    this->shader = std::move(shader);
+void Camera::setShader(ShaderHandle _shader) {
+    this->shader = _shader;
     updateProjectionMatrix();
     updateViewMatrix();
 }
@@ -44,8 +44,7 @@ void Camera::setFieldOfView(float degrees) {
 
 void Camera::updateProjectionMatrix() {
     projection = glm::perspective(glm::radians(fieldOfView), windowSize.width / windowSize.height, 0.1f, 1000.0f);
-    shader->use();
-    shader->setUniform("projection", projection);
+    Miren::setUniform(shader, "projection", &projection[0][0], sizeof (glm::mat4));
 }
 
 void Camera::updateViewMatrix() {
@@ -54,8 +53,7 @@ void Camera::updateViewMatrix() {
     glm::vec3 up = transform->getUp();
     target = position + front;
     view = glm::lookAt(glm::vec3(position), target, up);
-    shader->use();
-    shader->setUniform("view", view);
+    Miren::setUniform(shader, "view", &view[0][0], sizeof (glm::mat4));
 }
 
 // MARK: - Window size delegate

@@ -7,7 +7,6 @@
 #include "Panda/GameLogic/Entity.hpp"
 #include "Panda/Window/Window.hpp"
 #include "Panda/Events/Input.hpp"
-#include "Panda/Renderer/Renderer.hpp"
 
 namespace Panda {
 

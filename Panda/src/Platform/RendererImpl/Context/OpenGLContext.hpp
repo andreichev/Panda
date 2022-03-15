@@ -12,9 +12,7 @@ namespace Panda {
 class OpenGLContext : public GraphicsContext {
 public:
     void create(int width, int height) override;
-    void beginFrame() override;
-    void endFrame() override;
-
+    void flip() override;
 private:
     void *glfwWindowHandle;
 };

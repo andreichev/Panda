@@ -4,18 +4,14 @@
 
 #pragma once
 
-#include "Panda/Renderer/Texture.hpp"
-
 namespace Panda {
 
-class OpenGLTexture : public Texture {
+class OpenGLTexture {
 public:
-    ~OpenGLTexture() override;
+    ~OpenGLTexture();
     explicit OpenGLTexture(const char *path);
-
-private:
-    void bind(unsigned int slot) override;
-    void unbind() override;
+    void bind(unsigned int slot);
+    void unbind();
 
 private:
     unsigned int id;

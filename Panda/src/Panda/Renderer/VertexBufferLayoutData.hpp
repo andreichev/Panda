@@ -83,7 +83,6 @@ public:
         push<float>(1);
     }
 
-protected:
     std::vector<VertexBufferElement> m_Elements;
     unsigned int m_Stride;
 };

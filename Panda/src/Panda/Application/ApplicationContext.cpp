@@ -9,7 +9,7 @@
 #include "Panda/Events/KeyEvents.hpp"
 #include "Panda/Events/MouseEvents.hpp"
 #include "Initialization/PlatformInit.hpp"
-#include "Initialization/RendererInit.hpp"
+#include "Panda/Renderer/Miren.hpp"
 
 namespace Panda {
 
@@ -23,14 +23,10 @@ ApplicationContext::ApplicationContext() {
     // Initialization not performed here
     application = new Application();
     window = createWindow();
-    graphicsContext = RendererInit::getContext();
-    renderer = RendererInit::getRenderer();
 }
 
 ApplicationContext::~ApplicationContext() {
     delete application;
-    delete graphicsContext;
-    delete renderer;
     delete window;
 }
 
@@ -98,16 +94,8 @@ Window &ApplicationContext::getWindow() {
     return *window;
 }
 
-Renderer &ApplicationContext::getRenderer() {
-    return *renderer;
-}
-
 Application &ApplicationContext::getApplication() {
     return *application;
-}
-
-GraphicsContext &ApplicationContext::getGraphicsContext() {
-    return *graphicsContext;
 }
 
 } // namespace Panda

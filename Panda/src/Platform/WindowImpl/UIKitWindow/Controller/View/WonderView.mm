@@ -7,6 +7,7 @@
 
 #include "Panda/Application/PlatformData.hpp"
 #include "Panda/Application/ApplicationContext.hpp"
+#include "Panda/Renderer/Miren.hpp"
 
 #import <OpenGLES/ES3/gl.h>
 #import "WonderView.hpp"
@@ -55,13 +56,7 @@
 }
 
 -(void) displayRefreshed:(CADisplayLink*)displayLink {
-    void* context = Panda::PlatformData::get().renderingContext;
-    if(context != nullptr) {
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-        EAGLContext* _context = (__bridge EAGLContext*) context;
-        [_context presentRenderbuffer: GL_RENDERBUFFER];
-        dispatch_semaphore_signal(semaphore);
-    }
+    Miren::renrerFrame();
 }
 
 @end

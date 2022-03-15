@@ -18,7 +18,5 @@
 #include "Panda/GameLogic/Components/Camera.hpp"
 
 // Renderer stuff
-#include "Panda/Application/Initialization/RendererInit.hpp"
-#include "Panda/Renderer/Shader.hpp"
-#include "Panda/Renderer/Texture.hpp"
+#include "Panda/Renderer/Miren.hpp"
 #include "Panda/Renderer/Vertex.hpp"

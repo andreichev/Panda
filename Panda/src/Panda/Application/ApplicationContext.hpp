@@ -8,7 +8,6 @@
 #include "Panda/Events/Input.hpp"
 #include "Panda/Window/Window.hpp"
 #include "Panda/Renderer/GraphicsContext.hpp"
-#include "Panda/Renderer/Renderer.hpp"
 #include "Panda/Events/EventQueue.hpp"
 
 namespace Panda {
@@ -29,8 +28,6 @@ public:
     void postMouseEvent(int x, int y);
     Input &getInput();
     Window &getWindow();
-    GraphicsContext &getGraphicsContext();
-    Renderer &getRenderer();
     Application &getApplication();
     bool isApplicationShouldClose;
 
@@ -38,8 +35,6 @@ private:
     Application *application;
     Input input;
     Window *window;
-    Renderer *renderer;
-    GraphicsContext *graphicsContext;
     EventQueue eventQueue;
     std::string resourcesPath;
 };

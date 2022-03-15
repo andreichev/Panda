@@ -4,16 +4,14 @@
 
 #pragma once
 
-#include "Panda/Renderer/Shader.hpp"
-
 namespace Panda {
 
-class OpenGLShader : public Shader {
+class OpenGLShader {
 public:
     OpenGLShader(const char *vertexPath, const char *fragmentPath);
-    ~OpenGLShader() override;
-    void use() override;
-    void setUniform(const char *name, glm::mat4 value) override;
+    ~OpenGLShader();
+    void use();
+    void setUniformMat4(const char *name, float* value);
 
 private:
     unsigned int m_RendererID;

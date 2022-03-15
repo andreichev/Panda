@@ -3,7 +3,6 @@
 //
 
 #include "Panda/Window/Window.hpp"
-#include "Panda/Renderer/Renderer.hpp"
 
 namespace Panda {
 

@@ -13,6 +13,6 @@ public:
 
 private:
     Panda::Unique<ChunksStorage> chunksStorage;
-    Panda::Shared<Panda::Shader> baseShader;
-    Panda::Shared<Panda::Texture> texture;
+    Panda::ShaderHandle baseShader;
+    Panda::TextureHandle texture;
 };

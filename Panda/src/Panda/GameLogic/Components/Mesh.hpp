@@ -7,11 +7,7 @@
 #include "Panda/GameLogic/Component.hpp"
 #include "Panda/GameLogic/Components/TransformDelegate.hpp"
 #include "Panda/GameLogic/Primitives/MeshData.hpp"
-#include "Panda/Renderer/Texture.hpp"
-#include "Panda/Renderer/Shader.hpp"
-#include "Panda/Renderer/IndexBuffer.hpp"
-#include "Panda/Renderer/VertexBuffer.hpp"
-#include "Panda/Renderer/Renderer.hpp"
+#include "Panda/Renderer/Miren.hpp"
 
 namespace Panda {
 
@@ -20,9 +16,9 @@ class Transform;
 class Mesh : public Component, TransformDelegate {
 public:
     ~Mesh() override;
-    Mesh(const MeshData &primitiveMeshData, bool isDynamic, Shared<Texture> texture, Shared<Shader> shader);
+    Mesh(const MeshData &primitiveMeshData, bool isDynamic, TextureHandle texture, ShaderHandle shader);
     Mesh(Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount, bool isDynamic,
-        Shared<Texture> texture, Shared<Shader> shader);
+        TextureHandle texture, ShaderHandle shader);
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
     void initialize() override;
     void update(float deltaTime) override;
@@ -32,13 +28,13 @@ public:
 private:
     void updateModelMatrix();
 
-    Shared<Texture> texture;
-    Shared<Shader> shader;
+    TextureHandle texture;
+    ShaderHandle shader;
     glm::mat4 model;
-    IndexBuffer *indexBuffer;
-    VertexBuffer *vertexBuffer;
+    IndexBufferHandle indexBuffer;
+    VertexBufferHandle vertexBuffer;
+    uint32_t indicesCount;
     Shared<Transform> transform;
-    Renderer &renderer;
     const bool isDynamic;
 };
 
