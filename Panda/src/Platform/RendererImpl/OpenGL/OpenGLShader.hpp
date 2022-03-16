@@ -11,7 +11,7 @@ public:
     OpenGLShader(const char *vertexPath, const char *fragmentPath);
     ~OpenGLShader();
     void use();
-    void setUniformMat4(const char *name, float* value);
+    void setUniformMat4(const char *name, float *value);
 
 private:
     unsigned int m_RendererID;

@@ -11,7 +11,7 @@
 
 namespace Panda {
 
-Mesh::Mesh(const MeshData &primitiveMeshData, bool isDynamic,TextureHandle texture, ShaderHandle shader)
+Mesh::Mesh(const MeshData &primitiveMeshData, bool isDynamic, TextureHandle texture, ShaderHandle shader)
     : isDynamic(isDynamic)
     , model(1.f)
     , indexBuffer(Miren::createIndexBuffer(primitiveMeshData.indices, primitiveMeshData.indicesCount, isDynamic))
@@ -51,27 +51,27 @@ void Mesh::update(float deltaTime) {
 }
 
 void Mesh::updateBuffer(const MeshData &data) {
-//    if (isDynamic) {
-//        vertexBuffer->update(data.vertices, data.verticesCount);
-//        indexBuffer->update(data.indices);
-//    } else {
-//        delete vertexBuffer;
-//        delete indexBuffer;
-//        vertexBuffer = RendererInit::createVertexBuffer(data.vertices, data.verticesCount, false);
-//        indexBuffer = RendererInit::createIndexBuffer(data.indices, data.indicesCount, false);
-//    }
+    //    if (isDynamic) {
+    //        vertexBuffer->update(data.vertices, data.verticesCount);
+    //        indexBuffer->update(data.indices);
+    //    } else {
+    //        delete vertexBuffer;
+    //        delete indexBuffer;
+    //        vertexBuffer = RendererInit::createVertexBuffer(data.vertices, data.verticesCount, false);
+    //        indexBuffer = RendererInit::createIndexBuffer(data.indices, data.indicesCount, false);
+    //    }
 }
 
 void Mesh::updateBuffer(Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount) {
-//    if (isDynamic) {
-//        vertexBuffer->update(vertices, verticesCount);
-//        indexBuffer->update(indices);
-//    } else {
-//        delete vertexBuffer;
-//        delete indexBuffer;
-//        vertexBuffer = RendererInit::createVertexBuffer(vertices, verticesCount, false);
-//        indexBuffer = RendererInit::createIndexBuffer(indices, indicesCount, false);
-//    }
+    //    if (isDynamic) {
+    //        vertexBuffer->update(vertices, verticesCount);
+    //        indexBuffer->update(indices);
+    //    } else {
+    //        delete vertexBuffer;
+    //        delete indexBuffer;
+    //        vertexBuffer = RendererInit::createVertexBuffer(vertices, verticesCount, false);
+    //        indexBuffer = RendererInit::createIndexBuffer(indices, indicesCount, false);
+    //    }
 }
 
 void Mesh::updateModelMatrix() {

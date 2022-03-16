@@ -6,7 +6,8 @@
 
 namespace Panda {
 
-Frame::Frame() : m_drawCalls() {
+Frame::Frame()
+    : m_drawCalls() {
     begin();
 }
 

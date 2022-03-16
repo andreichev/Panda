@@ -102,7 +102,7 @@ void OpenGLShader::use() {
     glUseProgram(m_RendererID);
 }
 
-void OpenGLShader::setUniformMat4(const char *name, float* value) {
+void OpenGLShader::setUniformMat4(const char *name, float *value) {
     glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, value);
 }
 

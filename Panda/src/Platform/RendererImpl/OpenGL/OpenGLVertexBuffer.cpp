@@ -64,7 +64,7 @@ void OpenGLVertexBuffer::unbind() {
     glBindVertexArray(0);
 }
 
-void OpenGLVertexBuffer::createLayout(VertexBufferLayoutData* data) {
+void OpenGLVertexBuffer::createLayout(VertexBufferLayoutData *data) {
     glGenVertexArrays(1, &layoutId);
     glBindVertexArray(layoutId);
     long pointer = 0;

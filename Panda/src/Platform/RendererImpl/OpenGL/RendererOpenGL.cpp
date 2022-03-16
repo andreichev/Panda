@@ -31,28 +31,28 @@ RendererOpenGL::RendererOpenGL(GSize size) {
 }
 
 RendererOpenGL::~RendererOpenGL() {
-    for(auto ref : shaders) {
-        if(ref != nullptr) {
+    for (auto ref : shaders) {
+        if (ref != nullptr) {
             delete ref;
         }
     }
-    for(auto ref : indexBuffers) {
-        if(ref != nullptr) {
+    for (auto ref : indexBuffers) {
+        if (ref != nullptr) {
             delete ref;
         }
     }
-    for(auto ref : vertexLayouts) {
-        if(ref != nullptr) {
+    for (auto ref : vertexLayouts) {
+        if (ref != nullptr) {
             delete ref;
         }
     }
-    for(auto ref : vertexBuffers) {
-        if(ref != nullptr) {
+    for (auto ref : vertexBuffers) {
+        if (ref != nullptr) {
             delete ref;
         }
     }
-    for(auto ref : textures) {
-        if(ref != nullptr) {
+    for (auto ref : textures) {
+        if (ref != nullptr) {
             delete ref;
         }
     }
@@ -102,7 +102,9 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
 }
 
 void RendererOpenGL::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) {
-    if (vertexBuffers[vertexBuffer] == nullptr) { return; }
+    if (vertexBuffers[vertexBuffer] == nullptr) {
+        return;
+    }
     shaders[shader]->use();
     vertexBuffers[vertexBuffer]->bind();
     indexBuffers[indexBuffer]->bind();

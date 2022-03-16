@@ -20,6 +20,7 @@ public:
     void setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size);
     void setTexture(TextureHandle textureHandle, uint32_t slot);
     void submitCurrentDrawCall();
+
 private:
     std::queue<RenderDraw *> m_drawCalls;
 };

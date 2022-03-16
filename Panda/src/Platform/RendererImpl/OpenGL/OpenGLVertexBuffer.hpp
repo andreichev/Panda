@@ -20,7 +20,7 @@ public:
     void unbind();
 
 private:
-    void createLayout(VertexBufferLayoutData* layoutData);
+    void createLayout(VertexBufferLayoutData *layoutData);
     unsigned int id;
     unsigned int layoutId;
     bool isDynamic;

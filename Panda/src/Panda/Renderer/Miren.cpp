@@ -8,7 +8,7 @@
 
 namespace Panda {
 
-RendererI* Miren::s_context = nullptr;
+RendererI *Miren::s_context = nullptr;
 Frame Miren::s_frame = Frame();
 int Miren::s_shadersCount = 0;
 int Miren::s_texturesCount = 0;
@@ -74,12 +74,14 @@ void Miren::endFrameProcessing() {
 }
 
 void Miren::renderFrame() {
-    if(s_context == nullptr) { return; }
+    if (s_context == nullptr) {
+        return;
+    }
     s_context->semaphoreWait();
     rendererExecuteCommands();
     RenderDraw *draw = nullptr;
     while ((draw = s_frame.popDrawCall()) != nullptr) {
-        if(draw->isSubmitted == false) {
+        if (draw->isSubmitted == false) {
             s_frame.free(draw);
             continue;
         }
@@ -88,7 +90,7 @@ void Miren::renderFrame() {
             s_context->setUniform(uniform.handle, uniform.name, uniform.value, uniform.size);
             draw->m_uniformBuffer.pop();
         }
-        while(draw->m_textureBindings.empty() == false) {
+        while (draw->m_textureBindings.empty() == false) {
             TextureBinding textureBinding = draw->m_textureBindings.front();
             s_context->setTexture(textureBinding.m_handle, textureBinding.m_slot);
             draw->m_textureBindings.pop();
