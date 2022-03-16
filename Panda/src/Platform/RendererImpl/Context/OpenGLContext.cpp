@@ -24,4 +24,8 @@ void OpenGLContext::flip() {
     glfwSwapBuffers((GLFWwindow *)glfwWindowHandle);
 }
 
+void OpenGLContext::semaphoreWait() {}
+
+void OpenGLContext::semaphoreSignal() {}
+
 } // namespace Panda

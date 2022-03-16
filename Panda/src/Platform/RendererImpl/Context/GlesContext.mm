@@ -91,4 +91,16 @@ namespace Panda {
         EAGLContext* _context = (__bridge EAGLContext*) context;
         [_context presentRenderbuffer: GL_RENDERBUFFER];
     }
+
+    void GlesContext::semaphoreWait() {
+        void* semaphore = Panda::PlatformData::get().semaphoreHandle;
+        dispatch_semaphore_t* _semaphore = (__bridge dispatch_semaphore_t*) (semaphore);
+        dispatch_semaphore_wait(*_semaphore, DISPATCH_TIME_FOREVER);
+    }
+
+    void GlesContext::semaphoreSignal() {
+        void* semaphore = Panda::PlatformData::get().semaphoreHandle;
+        dispatch_semaphore_t* _semaphore = (__bridge dispatch_semaphore_t*) (semaphore);
+        dispatch_semaphore_signal(*_semaphore);
+    }
 }

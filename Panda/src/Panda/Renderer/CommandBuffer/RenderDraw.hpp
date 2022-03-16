@@ -31,13 +31,15 @@ struct TextureBinding {
 
 struct RenderDraw {
     RenderDraw()
-        : m_numIndices(0)
+        : isSubmitted(false)
+        , m_numIndices(0)
         , m_shader(0)
         , m_indexBuffer(0)
         , m_vertexBuffer(0)
         , m_uniformBuffer()
         , m_textureBindings() {}
 
+    bool isSubmitted;
     uint32_t m_numIndices;
     ShaderHandle m_shader;
     IndexBufferHandle m_indexBuffer;

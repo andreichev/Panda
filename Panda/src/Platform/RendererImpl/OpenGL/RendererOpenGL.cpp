@@ -63,9 +63,13 @@ RendererType RendererOpenGL::getRendererType() const {
     return RendererType::OpenGL;
 }
 
-void RendererOpenGL::semaphoreWait() {}
+void RendererOpenGL::semaphoreWait() {
+    context->semaphoreWait();
+}
 
-void RendererOpenGL::semaphoreSignal() {}
+void RendererOpenGL::semaphoreSignal() {
+    context->semaphoreSignal();
+}
 
 void RendererOpenGL::createShader(ShaderHandle handle, const char *vertexPath, const char *fragmentPath) {
     shaders[handle] = new OpenGLShader(vertexPath, fragmentPath);
@@ -98,6 +102,7 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
 }
 
 void RendererOpenGL::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) {
+    if (vertexBuffers[vertexBuffer] == nullptr) { return; }
     shaders[shader]->use();
     vertexBuffers[vertexBuffer]->bind();
     indexBuffers[indexBuffer]->bind();

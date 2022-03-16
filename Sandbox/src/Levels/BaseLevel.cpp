@@ -22,7 +22,7 @@ void BaseLevel::start(Panda::World *world) {
     camera->setShader(baseShader);
     cameraEntity->addComponent(Panda::createShared<CameraMove>());
     cameraEntity->getTransform()->translate(
-        ChunksStorage::WORLD_SIZE_X / 2, ChunksStorage::WORLD_SIZE_Y / 2, ChunksStorage::WORLD_SIZE_Z / 2);
+        ChunksStorage::WORLD_SIZE_X / 2, ChunksStorage::WORLD_SIZE_Y / 3, ChunksStorage::WORLD_SIZE_Z / 2);
     cameraEntity->getTransform()->rotate((float)(M_PI / 4.f), (float)M_PI, 0.f);
 
     texture = Panda::Miren::createTexture("textures/Texture.png");

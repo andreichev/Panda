@@ -13,6 +13,9 @@ class OpenGLContext : public GraphicsContext {
 public:
     void create(int width, int height) override;
     void flip() override;
+    void semaphoreWait() override;
+    void semaphoreSignal() override;
+
 private:
     void *glfwWindowHandle;
 };

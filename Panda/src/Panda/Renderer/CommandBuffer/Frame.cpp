@@ -6,8 +6,9 @@
 
 namespace Panda {
 
-Frame::Frame()
-    : m_drawCalls() {}
+Frame::Frame() : m_drawCalls() {
+    begin();
+}
 
 void Frame::begin() {
     RenderDraw *draw = new RenderDraw();
@@ -51,6 +52,11 @@ void Frame::setUniform(ShaderHandle handle, const char *name, void *value, uint1
 void Frame::setTexture(TextureHandle textureHandle, uint32_t slot) {
     RenderDraw *draw = m_drawCalls.back();
     draw->m_textureBindings.emplace(textureHandle, slot);
+}
+
+void Frame::submitCurrentDrawCall() {
+    RenderDraw *draw = m_drawCalls.back();
+    draw->isSubmitted = true;
 }
 
 } // namespace Panda

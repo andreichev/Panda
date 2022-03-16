@@ -10,5 +10,7 @@ public:
     virtual ~GraphicsContext() = default;
     virtual void create(int width, int height) = 0;
     virtual void flip() = 0;
+    virtual void semaphoreWait() = 0;
+    virtual void semaphoreSignal() = 0;
 };
 } // namespace Panda

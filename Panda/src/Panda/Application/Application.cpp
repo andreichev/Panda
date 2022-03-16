@@ -33,7 +33,9 @@ void Application::initialize(ApplicationStartupSettings &settings) {
     context.getWindow().initialize(settings.windowTitle, settings.windowSize, settings.isFullScreen);
     context.processEvents();
     GSize windowSize = context.getInput().getWindowSize();
+#ifdef PND_PLATFORM_DESKTOP
     Miren::initialize(windowSize);
+#endif
     world = new World();
     timeMillis = getMillis();
     settings.startupLevel->start(world);
@@ -53,7 +55,7 @@ void Application::loop() {
         thisSecondFramesCount++;
         if (oneSecondTimeCount >= 1000) {
             fps = thisSecondFramesCount;
-            // PND_INFO("FPS: {}", fps);
+            PND_INFO("FPS: {}", fps);
             thisSecondFramesCount = 0;
             oneSecondTimeCount -= 1000;
         }
@@ -69,7 +71,9 @@ void Application::loop() {
         world->update(deltaTimeMillis / 1000.0);
         deltaTimeMillis = 0;
         Miren::endFrameProcessing();
+#ifdef PND_PLATFORM_DESKTOP
         Miren::renderFrame();
+#endif
         context.getWindow().pollEvents();
         context.processEvents();
     }

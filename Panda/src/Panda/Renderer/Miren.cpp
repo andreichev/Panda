@@ -20,7 +20,6 @@ CommandQueue Miren::s_commandQueue;
 void Miren::initialize(GSize size) {
     s_context = new RendererOpenGL(size);
     // TODO: - delete s_context somewhere
-    s_frame.begin();
 }
 
 VertexBufferHandle Miren::createVertexBuffer(Vertex *vertices, unsigned int count, bool isDynamic) {
@@ -75,10 +74,15 @@ void Miren::endFrameProcessing() {
 }
 
 void Miren::renderFrame() {
+    if(s_context == nullptr) { return; }
     s_context->semaphoreWait();
     rendererExecuteCommands();
     RenderDraw *draw = nullptr;
     while ((draw = s_frame.popDrawCall()) != nullptr) {
+        if(draw->isSubmitted == false) {
+            s_frame.free(draw);
+            continue;
+        }
         while (draw->m_uniformBuffer.empty() == false) {
             Uniform uniform = draw->m_uniformBuffer.front();
             s_context->setUniform(uniform.handle, uniform.name, uniform.value, uniform.size);
@@ -94,6 +98,7 @@ void Miren::renderFrame() {
     }
     s_context->flip();
     s_context->semaphoreSignal();
+    s_frame.begin();
 }
 
 void Miren::rendererExecuteCommands() {
@@ -155,10 +160,12 @@ void Miren::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBu
     s_frame.setShader(shader);
     s_frame.setVertexBuffer(vertexBuffer);
     s_frame.setIndexBuffer(indexBuffer, indicesCount);
+    s_frame.submitCurrentDrawCall();
     s_frame.begin();
 }
 
 void Miren::submit() {
+    s_frame.submitCurrentDrawCall();
     s_frame.begin();
 }
 

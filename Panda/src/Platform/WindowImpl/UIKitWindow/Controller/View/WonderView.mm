@@ -39,6 +39,7 @@
     Panda::PlatformData::get().layer = self.layer;
     Panda::PlatformData::get().nativeWindowHandle = self;
     Panda::PlatformData::get().semaphoreHandle = &semaphore;
+    Panda::Miren::initialize({ (float) (self.frame.size.width * scale), (float) (self.frame.size.height * scale) } );
 }
 
 // MARK: - OpenGL stuff
@@ -56,7 +57,7 @@
 }
 
 -(void) displayRefreshed:(CADisplayLink*)displayLink {
-    Miren::renrerFrame();
+    Panda::Miren::renderFrame();
 }
 
 @end
