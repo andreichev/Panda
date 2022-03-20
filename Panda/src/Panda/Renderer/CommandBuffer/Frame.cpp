@@ -8,10 +8,10 @@ namespace Panda {
 
 Frame::Frame()
     : m_drawCalls() {
-    begin();
+    beginDrawCall();
 }
 
-void Frame::begin() {
+void Frame::beginDrawCall() {
     RenderDraw *draw = new RenderDraw();
     m_drawCalls.push(draw);
 }
@@ -47,7 +47,7 @@ void Frame::setShader(ShaderHandle handle) {
 
 void Frame::setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) {
     RenderDraw *draw = m_drawCalls.back();
-    draw->m_uniformBuffer.emplace(handle, name, value, size);
+    draw->m_uniformBuffer[name] = Uniform(handle, value, size);
 }
 
 void Frame::setTexture(TextureHandle textureHandle, uint32_t slot) {
@@ -58,6 +58,11 @@ void Frame::setTexture(TextureHandle textureHandle, uint32_t slot) {
 void Frame::submitCurrentDrawCall() {
     RenderDraw *draw = m_drawCalls.back();
     draw->isSubmitted = true;
+}
+
+uint32_t Frame::getDrawCallsCount() {
+    if(m_drawCalls.size() == 0) { return 0; }
+    return (uint32_t) m_drawCalls.size() - 1;
 }
 
 } // namespace Panda

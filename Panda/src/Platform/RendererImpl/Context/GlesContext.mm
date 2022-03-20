@@ -58,16 +58,24 @@ namespace Panda {
 
         // -------------------
 
-        context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
+        EAGLContext* _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
+        context = _context;
         PlatformData::get().renderingContext = context;
-        EAGLContext* _context = (__bridge EAGLContext*) context;
         [EAGLContext setCurrentContext:_context];
 
         glGenRenderbuffers(1, &colorRenderBuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, colorRenderBuffer);
         
+        CAEAGLLayer *eaglLayer = (__bridge CAEAGLLayer*) PlatformData::get().layer;;
+        [_context renderbufferStorage:GL_RENDERBUFFER fromDrawable: eaglLayer];
+        
         glGenRenderbuffers(1, &depthRenderBuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
+        
+        // glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &width);
+        // glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &height);
+        printf("Screen size: %d x %d\n", width, height);
+
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 
         glGenFramebuffers(1, &frameBuffer);
@@ -75,15 +83,13 @@ namespace Panda {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderBuffer);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, colorRenderBuffer);
-        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
         
-        CAEAGLLayer *eaglLayer = (__bridge CAEAGLLayer*) PlatformData::get().layer;;
-        [_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(id<EAGLDrawable>) eaglLayer];
         eaglLayer.drawableProperties = @{kEAGLDrawablePropertyRetainedBacking : @NO,
                                          kEAGLDrawablePropertyColorFormat     : kEAGLColorFormatRGBA8 };
         eaglLayer.opaque = NO;
+        
         glViewport(0, 0, width, height);
-        // glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
     }
 

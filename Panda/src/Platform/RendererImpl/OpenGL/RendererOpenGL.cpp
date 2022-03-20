@@ -60,7 +60,11 @@ RendererOpenGL::~RendererOpenGL() {
 }
 
 RendererType RendererOpenGL::getRendererType() const {
+#ifdef PND_PLATFORM_IOS
+    return RendererType::OpenGLES;
+#elif defined(PND_PLATFORM_DESKTOP)
     return RendererType::OpenGL;
+#endif
 }
 
 void RendererOpenGL::semaphoreWait() {
@@ -110,6 +114,8 @@ void RendererOpenGL::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer
     indexBuffers[indexBuffer]->bind();
     glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
     checkForErrors();
+    indexBuffers[indexBuffer]->unbind();
+    vertexBuffers[vertexBuffer]->unbind();
 }
 
 void RendererOpenGL::setViewportSize(GSize size) {

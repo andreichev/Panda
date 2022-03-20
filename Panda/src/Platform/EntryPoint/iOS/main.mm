@@ -29,10 +29,6 @@ extern int startApp(int argc, char** argv);
     _window.rootViewController = controller;
     [_window makeKeyAndVisible];
 
-//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//        startApp(0, nullptr);
-//    });
-
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         startApp(0, nullptr);
     });

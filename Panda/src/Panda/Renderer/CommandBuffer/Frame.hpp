@@ -11,7 +11,7 @@ namespace Panda {
 class Frame {
 public:
     Frame();
-    void begin();
+    void beginDrawCall();
     RenderDraw *popDrawCall();
     void setIndexBuffer(IndexBufferHandle handle, uint32_t count);
     void setVertexBuffer(VertexBufferHandle handle);
@@ -20,6 +20,7 @@ public:
     void setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size);
     void setTexture(TextureHandle textureHandle, uint32_t slot);
     void submitCurrentDrawCall();
+    uint32_t getDrawCallsCount();
 
 private:
     std::queue<RenderDraw *> m_drawCalls;

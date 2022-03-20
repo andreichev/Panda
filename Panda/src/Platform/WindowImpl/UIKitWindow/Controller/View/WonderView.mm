@@ -32,14 +32,16 @@
 
 - (void) setupStyle {
     // self.backgroundColor = UIColor.redColor;
-    [self setContentScaleFactor:UIScreen.mainScreen.nativeScale];
     CGFloat scale = UIScreen.mainScreen.nativeScale;
-    Panda::ApplicationContext::get().postSizeEvent(self.frame.size.width * scale, self.frame.size.height * scale);
+    [self setContentScaleFactor:scale];
+    CGFloat width = self.frame.size.width * scale;
+    CGFloat height = self.frame.size.height * scale;
+    Panda::ApplicationContext::get().postSizeEvent(width, height);
     semaphore = dispatch_semaphore_create(1);
     Panda::PlatformData::get().layer = self.layer;
     Panda::PlatformData::get().nativeWindowHandle = self;
     Panda::PlatformData::get().semaphoreHandle = &semaphore;
-    Panda::Miren::initialize({ (float) (self.frame.size.width * scale), (float) (self.frame.size.height * scale) } );
+    Panda::Miren::initialize({ (float) (width), (float) (height) } );
 }
 
 // MARK: - OpenGL stuff

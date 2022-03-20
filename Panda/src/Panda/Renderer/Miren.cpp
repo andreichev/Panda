@@ -2,6 +2,7 @@
 // Created by Admin on 10.03.2022.
 //
 
+#include "pndpch.hpp"
 #include "Miren.hpp"
 
 #include "Platform/RendererImpl/OpenGL/RendererOpenGL.hpp"
@@ -66,7 +67,6 @@ IndexBufferHandle Miren::createIndexBuffer(unsigned int *indices, unsigned int c
 
 void Miren::beginFrameProcessing() {
     s_context->semaphoreWait();
-    s_frame.begin();
 }
 
 void Miren::endFrameProcessing() {
@@ -79,16 +79,15 @@ void Miren::renderFrame() {
     }
     s_context->semaphoreWait();
     rendererExecuteCommands();
-    RenderDraw *draw = nullptr;
+    RenderDraw *draw;
+    s_context->clear();
     while ((draw = s_frame.popDrawCall()) != nullptr) {
         if (draw->isSubmitted == false) {
             s_frame.free(draw);
             continue;
         }
-        while (draw->m_uniformBuffer.empty() == false) {
-            Uniform uniform = draw->m_uniformBuffer.front();
-            s_context->setUniform(uniform.handle, uniform.name, uniform.value, uniform.size);
-            draw->m_uniformBuffer.pop();
+        for (auto& uniform : draw->m_uniformBuffer) {
+            s_context->setUniform(uniform.second.handle, uniform.first, uniform.second.value, uniform.second.size);
         }
         while (draw->m_textureBindings.empty() == false) {
             TextureBinding textureBinding = draw->m_textureBindings.front();
@@ -99,13 +98,12 @@ void Miren::renderFrame() {
         s_frame.free(draw);
     }
     s_context->flip();
+    s_frame.beginDrawCall();
     s_context->semaphoreSignal();
-    s_frame.begin();
 }
 
 void Miren::rendererExecuteCommands() {
-    s_context->clear();
-    const RendererCommand *command = nullptr;
+    const RendererCommand *command;
     while ((command = s_commandQueue.poll()) != nullptr) {
         switch (command->type) {
             case RendererCommandType::CreateVertexLayout: {
@@ -163,12 +161,12 @@ void Miren::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBu
     s_frame.setVertexBuffer(vertexBuffer);
     s_frame.setIndexBuffer(indexBuffer, indicesCount);
     s_frame.submitCurrentDrawCall();
-    s_frame.begin();
+    s_frame.beginDrawCall();
 }
 
 void Miren::submit() {
     s_frame.submitCurrentDrawCall();
-    s_frame.begin();
+    s_frame.beginDrawCall();
 }
 
 } // namespace Panda

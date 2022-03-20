@@ -7,6 +7,7 @@
 
 #include "sndbxpch.hpp"
 #include "Levels/BaseLevel.hpp"
+#include "Levels/TriangleLevel.hpp"
 
 int startApp(int argc, char **argv) {
     runPandaApplication(Panda::ApplicationStartupSettings::builder()
