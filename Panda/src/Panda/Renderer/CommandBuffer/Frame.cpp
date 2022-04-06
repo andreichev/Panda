@@ -47,7 +47,7 @@ void Frame::setShader(ShaderHandle handle) {
 
 void Frame::setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) {
     RenderDraw *draw = m_drawCalls.back();
-    draw->m_uniformBuffer[name] = Uniform(handle, value, size);
+    draw->m_uniformBuffer.emplace(handle, name, value, size);
 }
 
 void Frame::setTexture(TextureHandle textureHandle, uint32_t slot) {

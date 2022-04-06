@@ -21,15 +21,16 @@ void BaseLevel::start(Panda::World *world) {
     camera->setShader(baseShader);
     cameraEntity->addComponent(Panda::createShared<CameraMove>());
     cameraEntity->getTransform()->translate(
-        ChunksStorage::WORLD_SIZE_X / 2, ChunksStorage::WORLD_SIZE_Y / 3, ChunksStorage::WORLD_SIZE_Z / 2);
+        ChunksStorage::WORLD_SIZE_X / 2, ChunksStorage::WORLD_SIZE_Y, ChunksStorage::WORLD_SIZE_Z / 2);
     cameraEntity->getTransform()->rotate((float)(M_PI / 4.f), (float)M_PI, 0.f);
 
+    Panda::Shared<Panda::Entity> chunkEntity = world->instantiateEntity();
     texture = Panda::Miren::createTexture("textures/Texture.png");
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
         for (int indexY = 0; indexY < ChunksStorage::SIZE_Y; indexY++) {
             for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {
-                Panda::Shared<Panda::Entity> chunkEntity = world->instantiateEntity();
                 Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(*chunksStorage.get(), indexX, indexY, indexZ, true);
+                if(meshData.indicesCount == 0) { continue; }
                 Panda::Shared<Panda::Mesh> mesh = Panda::createShared<Panda::Mesh>(meshData, false, texture, baseShader);
                 chunksStorage->chunks[indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + indexX * ChunksStorage::SIZE_X + indexZ]
                     .setMesh(mesh.get());

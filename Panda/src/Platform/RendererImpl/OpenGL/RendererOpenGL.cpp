@@ -114,8 +114,8 @@ void RendererOpenGL::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer
     indexBuffers[indexBuffer]->bind();
     glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
     checkForErrors();
-    indexBuffers[indexBuffer]->unbind();
-    vertexBuffers[vertexBuffer]->unbind();
+    // indexBuffers[indexBuffer]->unbind();
+    // vertexBuffers[vertexBuffer]->unbind();
 }
 
 void RendererOpenGL::setViewportSize(GSize size) {

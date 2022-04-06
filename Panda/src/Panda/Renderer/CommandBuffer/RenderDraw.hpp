@@ -10,16 +10,13 @@ namespace Panda {
 
 struct Uniform {
     ShaderHandle handle;
+    const char *name;
     void *value;
     uint32_t size;
 
-    Uniform()
-        : handle(0)
-        , value(0)
-        , size(0) {}
-
-    Uniform(ShaderHandle handle, void *value, uint32_t size)
+    Uniform(ShaderHandle handle, const char* name, void *value, uint32_t size)
         : handle(handle)
+        , name(name)
         , value(value)
         , size(size) {}
 };
@@ -47,7 +44,7 @@ struct RenderDraw {
     ShaderHandle m_shader;
     IndexBufferHandle m_indexBuffer;
     VertexBufferHandle m_vertexBuffer;
-    std::unordered_map<const char*, Uniform> m_uniformBuffer;
+    std::queue<Uniform> m_uniformBuffer;
     std::queue<TextureBinding> m_textureBindings;
 };
 
