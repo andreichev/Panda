@@ -7,13 +7,14 @@
 
 #include "sndbxpch.hpp"
 #include "Levels/BaseLevel.hpp"
+#include "Levels/CubeLevel.hpp"
 #include "Levels/TriangleLevel.hpp"
 
 int startApp(int argc, char **argv) {
     runPandaApplication(Panda::ApplicationStartupSettings::builder()
                             .name("ITIS Craft")
                             .windowTitle("ITIS Craft")
-                            .windowSize({640, 960})
+                            .windowSize({900, 600})
                             .isFullScreen(true)
                             .startupLevel(new BaseLevel())
                             .build());

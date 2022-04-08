@@ -12,6 +12,7 @@ public:
     ~OpenGLShader();
     void use();
     void setUniformMat4(const char *name, float *value);
+    void setUniformInt(const char *name, int value);
 
 private:
     unsigned int m_RendererID;

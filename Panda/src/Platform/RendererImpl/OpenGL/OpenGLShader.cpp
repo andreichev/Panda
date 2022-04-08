@@ -106,4 +106,8 @@ void OpenGLShader::setUniformMat4(const char *name, float *value) {
     glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, value);
 }
 
+void OpenGLShader::setUniformInt(const char *name, int value) {
+    glUniform1i(getUniformLocation(name), value);
+}
+
 } // namespace Panda

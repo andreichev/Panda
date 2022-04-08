@@ -21,7 +21,7 @@ void BaseLevel::start(Panda::World *world) {
     camera->setShader(baseShader);
     cameraEntity->addComponent(Panda::createShared<CameraMove>());
     cameraEntity->getTransform()->translate(
-        ChunksStorage::WORLD_SIZE_X / 2, ChunksStorage::WORLD_SIZE_Y, ChunksStorage::WORLD_SIZE_Z / 2);
+        ChunksStorage::WORLD_SIZE_X / 2, ChunksStorage::WORLD_SIZE_Y / 3, ChunksStorage::WORLD_SIZE_Z / 2);
     cameraEntity->getTransform()->rotate((float)(M_PI / 4.f), (float)M_PI, 0.f);
 
     Panda::Shared<Panda::Entity> chunkEntity = world->instantiateEntity();

@@ -20,3 +20,6 @@
 // Renderer stuff
 #include "Panda/Renderer/Miren.hpp"
 #include "Panda/Renderer/Vertex.hpp"
+
+// Third party
+#include <glm/ext.hpp>

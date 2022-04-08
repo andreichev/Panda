@@ -78,9 +78,9 @@ void Miren::renderFrame() {
         return;
     }
     s_context->semaphoreWait();
+    s_context->clear();
     rendererExecuteCommands();
     RenderDraw *draw;
-    s_context->clear();
     while ((draw = s_frame.popDrawCall()) != nullptr) {
         if (draw->isSubmitted == false || draw->m_numIndices == 0) {
             s_frame.free(draw);
