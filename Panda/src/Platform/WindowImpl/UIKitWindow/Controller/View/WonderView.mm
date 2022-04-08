@@ -62,4 +62,43 @@
     Panda::Miren::renderFrame();
 }
 
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self];
+    touchLocation.x *= self.contentScaleFactor;
+    touchLocation.y *= self.contentScaleFactor;
+
+    Panda::ApplicationContext::get().postMouseEvent(touchLocation.x, touchLocation.y);
+    // TODO: Post mouse clicked event
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self];
+    touchLocation.x *= self.contentScaleFactor;
+    touchLocation.y *= self.contentScaleFactor;
+    // TODO: Post mouse released event
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self];
+    touchLocation.x *= self.contentScaleFactor;
+    touchLocation.y *= self.contentScaleFactor;
+
+    Panda::ApplicationContext::get().postMouseEvent(touchLocation.x, touchLocation.y);
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self];
+    touchLocation.x *= self.contentScaleFactor;
+    touchLocation.y *= self.contentScaleFactor;
+    // TODO: Post mouse released event
+}
+
 @end

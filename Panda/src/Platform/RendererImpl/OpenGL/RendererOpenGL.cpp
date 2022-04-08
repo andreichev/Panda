@@ -112,10 +112,11 @@ void RendererOpenGL::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer
     shaders[shader]->use();
     vertexBuffers[vertexBuffer]->bind();
     indexBuffers[indexBuffer]->bind();
+    // TODO: Capture time
     glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
     checkForErrors();
-    // indexBuffers[indexBuffer]->unbind();
-    // vertexBuffers[vertexBuffer]->unbind();
+    indexBuffers[indexBuffer]->unbind();
+    vertexBuffers[vertexBuffer]->unbind();
 }
 
 void RendererOpenGL::setViewportSize(GSize size) {
