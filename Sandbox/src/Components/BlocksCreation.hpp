@@ -4,4 +4,15 @@
 
 #pragma once
 
-class BlocksCreation {};
+#include "Model/ChunksStorage.hpp"
+
+#include <Panda.hpp>
+
+class BlocksCreation : public Panda::Component {
+public:
+    void initialize() override;
+    void update(float deltaTime) override;
+
+private:
+    ChunksStorage *chunksStorage;
+};

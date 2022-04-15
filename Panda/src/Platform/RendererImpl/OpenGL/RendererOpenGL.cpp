@@ -92,7 +92,7 @@ void RendererOpenGL::createVertexLayout(VertexLayoutHandle handle, VertexBufferL
 }
 
 void RendererOpenGL::setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) {
-    shaders[handle]->use();
+    shaders[handle]->bind();
     shaders[handle]->setUniformMat4(name, static_cast<float *>(value));
 }
 
@@ -109,12 +109,13 @@ void RendererOpenGL::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer
     if (vertexBuffers[vertexBuffer] == nullptr) {
         return;
     }
-    shaders[shader]->use();
+    shaders[shader]->bind();
     vertexBuffers[vertexBuffer]->bind();
     indexBuffers[indexBuffer]->bind();
     // TODO: Capture time
     glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
     checkForErrors();
+    shaders[shader]->unbind();
     indexBuffers[indexBuffer]->unbind();
     vertexBuffers[vertexBuffer]->unbind();
 }

@@ -23,6 +23,7 @@ public:
     void removeEntity(Shared<Entity> &entity);
     Shared<Transform> getTransform() const;
     Entity *getParent();
+    std::vector<Shared<Entity>> &getChildEntities();
 
 private:
     std::vector<Shared<Component>> components;

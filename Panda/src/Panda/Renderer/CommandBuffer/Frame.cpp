@@ -61,8 +61,10 @@ void Frame::submitCurrentDrawCall() {
 }
 
 uint32_t Frame::getDrawCallsCount() {
-    if(m_drawCalls.size() == 0) { return 0; }
-    return (uint32_t) m_drawCalls.size() - 1;
+    if (m_drawCalls.size() == 0) {
+        return 0;
+    }
+    return (uint32_t)m_drawCalls.size() - 1;
 }
 
 } // namespace Panda

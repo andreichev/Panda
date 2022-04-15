@@ -87,12 +87,12 @@ void Miren::renderFrame() {
             continue;
         }
         while (draw->m_textureBindings.empty() == false) {
-            TextureBinding& textureBinding = draw->m_textureBindings.front();
+            TextureBinding &textureBinding = draw->m_textureBindings.front();
             s_context->setTexture(textureBinding.m_handle, textureBinding.m_slot);
             draw->m_textureBindings.pop();
         }
         while (draw->m_uniformBuffer.empty() == false) {
-            Uniform& uniform = draw->m_uniformBuffer.front();
+            Uniform &uniform = draw->m_uniformBuffer.front();
             s_context->setUniform(uniform.handle, uniform.name, uniform.value, uniform.size);
             draw->m_uniformBuffer.pop();
         }

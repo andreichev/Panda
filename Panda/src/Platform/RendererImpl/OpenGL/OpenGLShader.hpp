@@ -10,7 +10,8 @@ class OpenGLShader {
 public:
     OpenGLShader(const char *vertexPath, const char *fragmentPath);
     ~OpenGLShader();
-    void use();
+    void bind();
+    void unbind();
     void setUniformMat4(const char *name, float *value);
     void setUniformInt(const char *name, int value);
 

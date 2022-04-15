@@ -26,6 +26,9 @@ Shared<Entity> World::instantiateEntity() {
 
 void World::destroy(Shared<Entity> &entity) {
     root.removeEntity(entity);
+    for (Shared<Entity> child : entity->getChildEntities()) {
+        destroy(child);
+    }
 }
 
 } // namespace Panda

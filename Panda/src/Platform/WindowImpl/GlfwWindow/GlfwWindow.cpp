@@ -85,6 +85,10 @@ void GlfwWindow::addEventHandlers() {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->context->postMouseEvent(x, y);
     });
+    glfwSetMouseButtonCallback(m_windowHandle, [](GLFWwindow *windowHandle, int button, int action, int mods) {
+        GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+        self->context->postMouseButtonEvent(static_cast<MouseButton>(button), action == GLFW_PRESS);
+    });
     glfwSetWindowCloseCallback(m_windowHandle, [](GLFWwindow *windowHandle) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->context->isApplicationShouldClose = true;
@@ -106,7 +110,10 @@ void GlfwWindow::toggleCursorLock() {
 }
 
 void GlfwWindow::resetCursorPos() {
-    glfwSetCursorPos(m_windowHandle, m_windowSizeBackup.width / 2, m_windowSizeBackup.height / 2);
+    int x = m_windowSizeBackup.width / 2;
+    int y = m_windowSizeBackup.height / 2;
+    glfwSetCursorPos(m_windowHandle, x, y);
+    context->postMouseEvent(x, y);
 }
 
 } // namespace Panda

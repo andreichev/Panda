@@ -14,7 +14,7 @@ struct Uniform {
     void *value;
     uint32_t size;
 
-    Uniform(ShaderHandle handle, const char* name, void *value, uint32_t size)
+    Uniform(ShaderHandle handle, const char *name, void *value, uint32_t size)
         : handle(handle)
         , name(name)
         , value(value)

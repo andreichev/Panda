@@ -28,6 +28,7 @@ Voxel *Chunk::get(int x, int y, int z) {
 Panda::Mesh *Chunk::getMesh() {
     return mesh;
 }
+
 void Chunk::setMesh(Panda::Mesh *mesh) {
     this->mesh = mesh;
 }

@@ -79,4 +79,8 @@ Entity *Entity::getParent() {
     return parentEntity;
 }
 
+std::vector<Shared<Entity>> &Entity::getChildEntities() {
+    return childEntities;
+}
+
 } // namespace Panda

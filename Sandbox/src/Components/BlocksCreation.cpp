@@ -3,3 +3,7 @@
 //
 
 #include "BlocksCreation.hpp"
+
+void BlocksCreation::initialize() {}
+
+void BlocksCreation::update(float deltaTime) {}

@@ -26,6 +26,7 @@ public:
     void postSizeEvent(unsigned int width, unsigned int height);
     void postKeyEvent(Key key, bool down);
     void postMouseEvent(int x, int y);
+    void postMouseButtonEvent(MouseButton button, bool pressed);
     Input &getInput();
     Window &getWindow();
     Application &getApplication();

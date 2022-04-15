@@ -59,13 +59,29 @@ void ApplicationContext::processEvents() {
                 input.setKeyPressed(ev->key, false);
                 break;
             }
-            case EventType::MouseMoved:
+            case EventType::MouseMoved: {
                 const MouseMovedEvent *ev = dynamic_cast<const MouseMovedEvent *>(event);
                 input.postMouseChangedPosition(ev->x, ev->y);
                 break;
+            }
+            case EventType::MouseButtonPressed: {
+                const MouseKeyEvent *ev = dynamic_cast<const MouseKeyEvent *>(event);
+                input.setMouseButtonPressed(ev->button, true);
+                break;
+            }
+            case EventType::MouseButtonReleased: {
+                const MouseKeyEvent *ev = dynamic_cast<const MouseKeyEvent *>(event);
+                input.setMouseButtonPressed(ev->button, false);
+                break;
+            }
         }
         eventQueue.release(event);
     }
+    input.eventProcessingFinished();
+}
+
+void ApplicationContext::postMouseButtonEvent(MouseButton button, bool pressed) {
+    eventQueue.post(new MouseKeyEvent(button, pressed));
 }
 
 void ApplicationContext::postSizeEvent(unsigned int width, unsigned int height) {

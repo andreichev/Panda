@@ -6,6 +6,8 @@
 
 namespace Panda {
 
+enum class MouseButton { LEFT = 1, RIGHT = 2, MIDDLE = 3 };
+
 enum class Key {
     UNKNOWN = -1,
     SPACE = 32,
@@ -135,4 +137,4 @@ enum class Key {
     MOD_SUPER = 8
 };
 
-}
+} // namespace Panda

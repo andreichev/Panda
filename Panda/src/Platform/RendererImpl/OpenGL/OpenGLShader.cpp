@@ -98,8 +98,12 @@ int OpenGLShader::getUniformLocation(const std::string &name) {
     return location;
 }
 
-void OpenGLShader::use() {
+void OpenGLShader::bind() {
     glUseProgram(m_RendererID);
+}
+
+void OpenGLShader::unbind() {
+    glUseProgram(0);
 }
 
 void OpenGLShader::setUniformMat4(const char *name, float *value) {

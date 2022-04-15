@@ -8,10 +8,28 @@ namespace Panda {
 
 void Input::setKeyPressed(Key key, bool state) {
     keys[(int)key] = state;
+    framesKeys[(int)key] = frame;
+}
+
+void Input::setMouseButtonPressed(MouseButton mouseButton, bool state) {
+    mouseButtons[(int)mouseButton] = state;
+    framesMouseButtons[(int)mouseButton] = frame;
 }
 
 bool Input::isKeyPressed(Key key) {
     return keys[(int)key];
+}
+
+bool Input::isKeyJustPressed(Key key) {
+    return keys[(int)key] && framesKeys[(int)key] == frame - 1;
+}
+
+bool Input::isMouseButtonPressed(MouseButton mouseButton) {
+    return mouseButtons[(int)mouseButton];
+}
+
+bool Input::isMouseButtonJustPressed(MouseButton mouseButton) {
+    return mouseButtons[(int)mouseButton] && framesMouseButtons[(int)mouseButton] == frame - 1;
 }
 
 int Input::getMousePositionX() {
@@ -44,6 +62,10 @@ void Input::postMouseChangedPosition(int x, int y) {
 
 GSize Input::getWindowSize() {
     return windowSize;
+}
+
+void Input::eventProcessingFinished() {
+    frame++;
 }
 
 } // namespace Panda

@@ -60,11 +60,9 @@ void Application::loop() {
             oneSecondTimeCount -= 1000;
         }
 
-        if (context.getInput().isKeyPressed(Key::ESCAPE)) {
+        // TODO: - Move to scripts
+        if (context.getInput().isKeyJustPressed(Key::ESCAPE)) {
             context.isApplicationShouldClose = true;
-        }
-        if (context.getInput().isKeyPressed(Key::TAB)) {
-            context.getWindow().toggleCursorLock();
         }
 
         Miren::beginFrameProcessing();

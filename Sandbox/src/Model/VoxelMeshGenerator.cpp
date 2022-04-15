@@ -10,8 +10,8 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
     Chunk &chunk =
         chunks.chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
     // TODO: - Clear memory
-    Vertex* vertices = new Vertex[10000];
-    unsigned int* indices = new unsigned int[10000];
+    Vertex *vertices = new Vertex[10000];
+    unsigned int *indices = new unsigned int[10000];
     uint32_t verticesCount = 0;
     uint32_t indicesCount = 0;
     for (int voxelIndexX = 0; voxelIndexX < Chunk::SIZE_X; voxelIndexX++) {
@@ -211,7 +211,7 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
     return Panda::MeshData(vertices, verticesCount, indices, indicesCount);
 }
 
-void VoxelMeshGenerator::addFaceIndices(uint32_t offset, uint32_t& currentIndexNumber, unsigned int* indices) {
+void VoxelMeshGenerator::addFaceIndices(uint32_t offset, uint32_t &currentIndexNumber, unsigned int *indices) {
     indices[currentIndexNumber++] = offset;
     indices[currentIndexNumber++] = offset + 1;
     indices[currentIndexNumber++] = offset + 2;

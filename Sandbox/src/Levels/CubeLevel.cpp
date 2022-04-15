@@ -4,7 +4,7 @@
 
 #include "CubeLevel.hpp"
 
-class CubeComponent: public Panda::Component {
+class CubeComponent : public Panda::Component {
 public:
     void initialize() override {
         static Vertex vertices[24] = {
@@ -53,10 +53,7 @@ public:
         indexBuffer = Panda::Miren::createIndexBuffer(indices, 36, false);
 
         texture = Panda::Miren::createTexture("textures/arbuz1.png");
-        shader = Panda::Miren::createShader(
-            "shaders/base/base_vertex.glsl",
-            "shaders/base/base_fragment.glsl"
-        );
+        shader = Panda::Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
         Panda::Miren::setShader(shader);
 
         Panda::GSize windowSize = Panda::ApplicationContext::get().getInput().getWindowSize();

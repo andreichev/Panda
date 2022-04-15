@@ -14,8 +14,8 @@ enum class EventType {
     // WindowLostFocus,
     KeyPressed,
     KeyReleased,
-    // MouseButtonPressed,
-    // MouseButtonReleased,
+    MouseButtonPressed,
+    MouseButtonReleased,
     MouseMoved,
     // MouseScrolled
 };

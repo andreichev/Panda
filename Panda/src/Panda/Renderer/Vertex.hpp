@@ -9,7 +9,10 @@ struct Vertex {
     glm::vec2 texCoords;
     float light;
 
-    Vertex() : pos(), texCoords(), light(0.f) {}
+    Vertex()
+        : pos()
+        , texCoords()
+        , light(0.f) {}
 
     Vertex(const glm::vec3 &pos, const glm::vec2 &texCoords, float light)
         : pos(pos)

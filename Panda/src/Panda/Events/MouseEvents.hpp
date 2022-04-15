@@ -18,4 +18,13 @@ public:
     int x, y;
 };
 
+class MouseKeyEvent : public Event {
+public:
+    MouseKeyEvent(MouseButton button, bool isPressed)
+        : Event(isPressed ? EventType::MouseButtonPressed : EventType::MouseButtonReleased)
+        , button(button) {}
+
+    MouseButton button;
+};
+
 } // namespace Panda
