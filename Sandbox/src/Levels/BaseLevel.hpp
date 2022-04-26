@@ -12,7 +12,7 @@ public:
     void start(Panda::World *world) override;
 
 private:
-    Panda::Unique<ChunksStorage> chunksStorage;
+    Panda::Shared<ChunksStorage> chunksStorage;
     Panda::ShaderHandle baseShader;
     Panda::TextureHandle texture;
 };

@@ -11,19 +11,20 @@
 namespace Panda {
 
 enum class RendererCommandType {
-    CreateVertexLayout,
-    CreateIndexBuffer,
-    CreateVertexBuffer,
-    // UpdateIndexBuffer,
-    // UpdateVertexBuffer,
     CreateShader,
+    DestroyShader,
     CreateTexture,
-    // CreateUniform,
-    // DestroyVertexLayout,
-    // DestroyIndexBuffer,
-    // DestroyVertexBuffer,
-    // DestroyShader,
-    // DestroyTexture,
+    DestroyTexture,
+    CreateIndexBuffer,
+    CreateDynamicIndexBuffer,
+    UpdateDynamicIndexBuffer,
+    DestroyIndexBuffer,
+    CreateVertexBuffer,
+    CreateDynamicVertexBuffer,
+    UpdateDynamicVertexBuffer,
+    DestroyVertexBuffer,
+    CreateVertexLayout,
+    DestroyVertexLayout
 };
 
 struct RendererCommand {
@@ -31,16 +32,6 @@ struct RendererCommand {
 
     RendererCommand(RendererCommandType type)
         : type(type) {}
-};
-
-struct CreateVertexLayoutCommand : RendererCommand {
-    VertexBufferLayoutData data;
-    VertexLayoutHandle handle;
-
-    CreateVertexLayoutCommand(VertexLayoutHandle handle, VertexBufferLayoutData data)
-        : RendererCommand(RendererCommandType::CreateVertexLayout)
-        , handle(handle)
-        , data(std::move(data)) {}
 };
 
 struct CreateShaderCommand : RendererCommand {
@@ -55,6 +46,14 @@ struct CreateShaderCommand : RendererCommand {
         , fragmentPath(fragmentPath) {}
 };
 
+struct DeleteShaderCommand : RendererCommand {
+    ShaderHandle handle;
+
+    DeleteShaderCommand(ShaderHandle handle)
+        : RendererCommand(RendererCommandType::DestroyShader)
+        , handle(handle) {}
+};
+
 struct CreateTextureCommand : RendererCommand {
     const char *path;
     TextureHandle handle;
@@ -65,34 +64,122 @@ struct CreateTextureCommand : RendererCommand {
         , path(path) {}
 };
 
+struct DeleteTextureCommand : RendererCommand {
+    TextureHandle handle;
+
+    DeleteTextureCommand(TextureHandle handle)
+        : RendererCommand(RendererCommandType::DestroyTexture)
+        , handle(handle) {}
+};
+
 struct CreateIndexBufferCommand : RendererCommand {
-    unsigned int *indices;
-    unsigned int count;
-    bool isDynamic;
+    uint32_t *indices;
+    uint32_t count;
     IndexBufferHandle handle;
 
-    CreateIndexBufferCommand(IndexBufferHandle handle, unsigned int *indices, unsigned int count, bool isDynamic)
+    CreateIndexBufferCommand(IndexBufferHandle handle, uint32_t *indices, uint32_t count)
         : RendererCommand(RendererCommandType::CreateIndexBuffer)
         , handle(handle)
         , indices(indices)
-        , count(count)
-        , isDynamic(isDynamic) {}
+        , count(count) {}
+};
+
+struct CreateDynamicIndexBufferCommand : RendererCommand {
+    uint32_t *indices;
+    uint32_t count;
+    IndexBufferHandle handle;
+
+    CreateDynamicIndexBufferCommand(IndexBufferHandle handle, uint32_t *indices, uint32_t count)
+        : RendererCommand(RendererCommandType::CreateDynamicIndexBuffer)
+        , handle(handle)
+        , indices(indices)
+        , count(count) {}
+};
+
+struct UpdateDynamicIndexBufferCommand : RendererCommand {
+    IndexBufferHandle handle;
+    uint32_t *indices;
+    uint32_t count;
+
+    UpdateDynamicIndexBufferCommand(IndexBufferHandle handle, uint32_t *indices, uint32_t count)
+        : RendererCommand(RendererCommandType::UpdateDynamicIndexBuffer)
+        , handle(handle)
+        , indices(indices)
+        , count(count) {}
+};
+
+struct DeleteIndexBufferCommand : RendererCommand {
+    IndexBufferHandle handle;
+
+    DeleteIndexBufferCommand(IndexBufferHandle handle)
+        : RendererCommand(RendererCommandType::DestroyIndexBuffer)
+        , handle(handle) {}
 };
 
 struct CreateVertexBufferCommand : RendererCommand {
-    float *data;
-    unsigned int count;
-    bool isDynamic;
     VertexBufferHandle handle;
     VertexLayoutHandle layoutHandle;
+    void *data;
+    uint32_t size;
 
-    CreateVertexBufferCommand(VertexBufferHandle handle, float *data, unsigned int count, bool isDynamic, VertexLayoutHandle layoutHandle)
+    CreateVertexBufferCommand(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle)
         : RendererCommand(RendererCommandType::CreateVertexBuffer)
         , handle(handle)
+        , layoutHandle(layoutHandle)
         , data(data)
-        , count(count)
-        , isDynamic(isDynamic)
-        , layoutHandle(layoutHandle) {}
+        , size(size) {}
+};
+
+struct CreateDynamicVertexBufferCommand : RendererCommand {
+    VertexBufferHandle handle;
+    VertexLayoutHandle layoutHandle;
+    void *data;
+    uint32_t size;
+
+    CreateDynamicVertexBufferCommand(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle)
+        : RendererCommand(RendererCommandType::CreateDynamicVertexBuffer)
+        , handle(handle)
+        , layoutHandle(layoutHandle)
+        , data(data)
+        , size(size) {}
+};
+
+struct UpdateDynamicVertexBufferCommand : RendererCommand {
+    VertexBufferHandle handle;
+    void *data;
+    uint32_t size;
+
+    UpdateDynamicVertexBufferCommand(VertexBufferHandle handle, void *data, uint32_t size)
+        : RendererCommand(RendererCommandType::UpdateDynamicVertexBuffer)
+        , handle(handle)
+        , data(data)
+        , size(size) {}
+};
+
+struct DeleteVertexBufferCommand : RendererCommand {
+    VertexBufferHandle handle;
+
+    DeleteVertexBufferCommand(VertexBufferHandle handle)
+        : RendererCommand(RendererCommandType::DestroyVertexBuffer)
+        , handle(handle) {}
+};
+
+struct CreateVertexLayoutCommand : RendererCommand {
+    VertexBufferLayoutData data;
+    VertexLayoutHandle handle;
+
+    CreateVertexLayoutCommand(VertexLayoutHandle handle, VertexBufferLayoutData data)
+        : RendererCommand(RendererCommandType::CreateVertexLayout)
+        , handle(handle)
+        , data(std::move(data)) {}
+};
+
+struct DeleteVertexLayoutCommand : RendererCommand {
+    VertexLayoutHandle handle;
+
+    DeleteVertexLayoutCommand(VertexLayoutHandle handle)
+        : RendererCommand(RendererCommandType::DestroyVertexLayout)
+        , handle(handle) {}
 };
 
 } // namespace Panda

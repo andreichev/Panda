@@ -16,14 +16,14 @@ OpenGLIndexBuffer::~OpenGLIndexBuffer() {
     glDeleteBuffers(1, &id);
 }
 
-OpenGLIndexBuffer::OpenGLIndexBuffer(unsigned int *indices, unsigned int count, bool isDynamic)
+OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t *indices, uint32_t count, bool isDynamic)
     : id(0) {
     this->isDynamic = isDynamic;
+    this->size = count;
     glGenBuffers(1, &id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), indices, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(uint32_t), indices, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    size = count;
 }
 
 void OpenGLIndexBuffer::bind() const {
@@ -34,16 +34,17 @@ void OpenGLIndexBuffer::unbind() const {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-unsigned int OpenGLIndexBuffer::getSize() const {
+uint32_t OpenGLIndexBuffer::getSize() const {
     return size;
 }
 
-void OpenGLIndexBuffer::update(unsigned int *indices) {
+void OpenGLIndexBuffer::update(uint32_t *indices, uint32_t count) {
     if (isDynamic == false) {
         PND_ERROR("Невозможно обновить статичный буфер");
     }
+    this->size = count;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(unsigned int), indices, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(uint32_t), indices, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 

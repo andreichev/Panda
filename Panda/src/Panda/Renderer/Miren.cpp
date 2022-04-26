@@ -11,11 +11,14 @@ namespace Panda {
 
 RendererI *Miren::s_context = nullptr;
 Frame Miren::s_frame = Frame();
-int Miren::s_shadersCount = 0;
-int Miren::s_texturesCount = 0;
-int Miren::s_vertexLayoutsCount = 0;
-int Miren::s_vertexBuffersCount = 0;
-int Miren::s_indexBuffersCount = 0;
+constexpr uint32_t maxHandles = 1000;
+
+MirenHandleAllocator Miren::s_shadersHandleAlloc(maxHandles);
+MirenHandleAllocator Miren::s_texturesHandleAlloc(maxHandles);
+MirenHandleAllocator Miren::s_vertexLayoutsHandleAlloc(maxHandles);
+MirenHandleAllocator Miren::s_vertexBuffersHandleAlloc(maxHandles);
+MirenHandleAllocator Miren::s_indexBuffersHandleAlloc(maxHandles);
+
 CommandQueue Miren::s_commandQueue;
 
 void Miren::initialize(GSize size) {
@@ -23,46 +26,86 @@ void Miren::initialize(GSize size) {
     // TODO: - delete s_context somewhere
 }
 
-VertexBufferHandle Miren::createVertexBuffer(Vertex *vertices, unsigned int count, bool isDynamic) {
-    VertexBufferLayoutData layoutData;
-    layoutData.pushVector();
-    VertexLayoutHandle layoutHandle = createVertexLayout(layoutData);
-    return Miren::createVertexBuffer((float *)vertices, count * 6, isDynamic, layoutHandle);
-}
-
-VertexBufferHandle Miren::createVertexBuffer(float *data, unsigned int count, bool isDynamic, VertexLayoutHandle layoutHandle) {
-    VertexBufferHandle handle = s_vertexBuffersCount;
-    s_vertexBuffersCount++;
-    s_commandQueue.post(new CreateVertexBufferCommand(handle, data, count, isDynamic, layoutHandle));
-    return handle;
-}
-
-VertexLayoutHandle Miren::createVertexLayout(VertexBufferLayoutData data) {
-    VertexLayoutHandle handle = s_vertexLayoutsCount;
-    s_vertexLayoutsCount++;
-    s_commandQueue.post(new CreateVertexLayoutCommand(handle, data));
-    return handle;
-}
-
 ShaderHandle Miren::createShader(const char *vertexPath, const char *fragmentPath) {
-    ShaderHandle handle = s_shadersCount;
-    s_shadersCount++;
+    ShaderHandle handle = s_shadersHandleAlloc.alloc();
     s_commandQueue.post(new CreateShaderCommand(handle, vertexPath, fragmentPath));
     return handle;
 }
 
+void Miren::deleteShader(ShaderHandle handle) {
+    s_shadersHandleAlloc.free(handle);
+    s_commandQueue.post(new DeleteShaderCommand(handle));
+}
+
 TextureHandle Miren::createTexture(const char *path) {
-    TextureHandle handle = s_texturesCount;
-    s_texturesCount++;
+    TextureHandle handle = s_texturesHandleAlloc.alloc();
     s_commandQueue.post(new CreateTextureCommand(handle, path));
     return handle;
 }
 
-IndexBufferHandle Miren::createIndexBuffer(unsigned int *indices, unsigned int count, bool isDynamic) {
-    IndexBufferHandle handle = s_indexBuffersCount;
-    s_indexBuffersCount++;
-    s_commandQueue.post(new CreateIndexBufferCommand(handle, indices, count, isDynamic));
+void Miren::deleteTexture(TextureHandle handle) {
+    s_texturesHandleAlloc.free(handle);
+    s_commandQueue.post(new DeleteTextureCommand(handle));
+}
+
+IndexBufferHandle Miren::createIndexBuffer(uint32_t *indices, uint32_t count) {
+    IndexBufferHandle handle = s_indexBuffersHandleAlloc.alloc();
+    s_commandQueue.post(new CreateIndexBufferCommand(handle, indices, count));
     return handle;
+}
+
+IndexBufferHandle Miren::createDynamicIndexBuffer(uint32_t *indices, uint32_t count) {
+    IndexBufferHandle handle = s_indexBuffersHandleAlloc.alloc();
+    s_commandQueue.post(new CreateDynamicIndexBufferCommand(handle, indices, count));
+    return handle;
+}
+
+void Miren::updateDynamicIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
+    s_commandQueue.post(new UpdateDynamicIndexBufferCommand(handle, indices, count));
+}
+
+void Miren::deleteIndexBuffer(IndexBufferHandle handle) {
+    s_indexBuffersHandleAlloc.free(handle);
+    s_commandQueue.post(new DeleteIndexBufferCommand(handle));
+}
+
+// VertexBufferHandle Miren::createVertexBuffer(Vertex *vertices, uint32_t count) {
+//    VertexBufferLayoutData layoutData;
+//    layoutData.pushVector();
+//    VertexLayoutHandle layoutHandle = createVertexLayout(layoutData);
+//    return Miren::createVertexBuffer((float *)vertices, count * 6, layoutHandle);
+//}
+
+VertexBufferHandle Miren::createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+    VertexBufferHandle handle = s_vertexBuffersHandleAlloc.alloc();
+    s_commandQueue.post(new CreateVertexBufferCommand(handle, data, size, layoutHandle));
+    return handle;
+}
+
+VertexBufferHandle Miren::createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+    VertexBufferHandle handle = s_vertexBuffersHandleAlloc.alloc();
+    s_commandQueue.post(new CreateDynamicVertexBufferCommand(handle, data, size, layoutHandle));
+    return handle;
+}
+
+void Miren::updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
+    s_commandQueue.post(new UpdateDynamicVertexBufferCommand(handle, data, size));
+}
+
+void Miren::deleteVertexBuffer(VertexBufferHandle handle) {
+    s_vertexBuffersHandleAlloc.free(handle);
+    s_commandQueue.post(new DeleteVertexBufferCommand(handle));
+}
+
+VertexLayoutHandle Miren::createVertexLayout(VertexBufferLayoutData data) {
+    VertexLayoutHandle handle = s_vertexLayoutsHandleAlloc.alloc();
+    s_commandQueue.post(new CreateVertexLayoutCommand(handle, data));
+    return handle;
+}
+
+void Miren::deleteVertexLayout(VertexLayoutHandle handle) {
+    s_vertexLayoutsHandleAlloc.free(handle);
+    s_commandQueue.post(new DeleteVertexLayoutCommand(handle));
 }
 
 void Miren::beginFrameProcessing() {
@@ -108,29 +151,74 @@ void Miren::rendererExecuteCommands() {
     const RendererCommand *command;
     while ((command = s_commandQueue.poll()) != nullptr) {
         switch (command->type) {
-            case RendererCommandType::CreateVertexLayout: {
-                const CreateVertexLayoutCommand *cmd = static_cast<const CreateVertexLayoutCommand *>(command);
-                s_context->createVertexLayout(cmd->handle, cmd->data);
-                break;
-            }
-            case RendererCommandType::CreateVertexBuffer: {
-                const CreateVertexBufferCommand *cmd = static_cast<const CreateVertexBufferCommand *>(command);
-                s_context->createVertexBuffer(cmd->handle, cmd->data, cmd->count, cmd->isDynamic, cmd->layoutHandle);
-                break;
-            }
-            case RendererCommandType::CreateIndexBuffer: {
-                const CreateIndexBufferCommand *cmd = static_cast<const CreateIndexBufferCommand *>(command);
-                s_context->createIndexBuffer(cmd->handle, cmd->indices, cmd->count, cmd->isDynamic);
-                break;
-            }
             case RendererCommandType::CreateShader: {
                 const CreateShaderCommand *cmd = static_cast<const CreateShaderCommand *>(command);
                 s_context->createShader(cmd->handle, cmd->vertexPath, cmd->fragmentPath);
                 break;
             }
+            case RendererCommandType::DestroyShader: {
+                const DeleteShaderCommand *cmd = static_cast<const DeleteShaderCommand *>(command);
+                s_context->deleteShader(cmd->handle);
+                break;
+            }
             case RendererCommandType::CreateTexture: {
                 const CreateTextureCommand *cmd = static_cast<const CreateTextureCommand *>(command);
                 s_context->createTexture(cmd->handle, cmd->path);
+                break;
+            }
+            case RendererCommandType::DestroyTexture: {
+                const DeleteTextureCommand *cmd = static_cast<const DeleteTextureCommand *>(command);
+                s_context->deleteTexture(cmd->handle);
+                break;
+            }
+            case RendererCommandType::CreateIndexBuffer: {
+                const CreateIndexBufferCommand *cmd = static_cast<const CreateIndexBufferCommand *>(command);
+                s_context->createIndexBuffer(cmd->handle, cmd->indices, cmd->count);
+                break;
+            }
+            case RendererCommandType::CreateDynamicIndexBuffer: {
+                const CreateDynamicIndexBufferCommand *cmd = static_cast<const CreateDynamicIndexBufferCommand *>(command);
+                s_context->createDynamicIndexBuffer(cmd->handle, cmd->indices, cmd->count);
+                break;
+            }
+            case RendererCommandType::UpdateDynamicIndexBuffer: {
+                const UpdateDynamicIndexBufferCommand *cmd = static_cast<const UpdateDynamicIndexBufferCommand *>(command);
+                s_context->updateDynamicIndexBuffer(cmd->handle, cmd->indices, cmd->count);
+                break;
+            }
+            case RendererCommandType::DestroyIndexBuffer: {
+                const DeleteIndexBufferCommand *cmd = static_cast<const DeleteIndexBufferCommand *>(command);
+                s_context->deleteIndexBuffer(cmd->handle);
+                break;
+            }
+            case RendererCommandType::CreateVertexBuffer: {
+                const CreateVertexBufferCommand *cmd = static_cast<const CreateVertexBufferCommand *>(command);
+                s_context->createVertexBuffer(cmd->handle, cmd->data, cmd->size, cmd->layoutHandle);
+                break;
+            }
+            case RendererCommandType::CreateDynamicVertexBuffer: {
+                const CreateDynamicVertexBufferCommand *cmd = static_cast<const CreateDynamicVertexBufferCommand *>(command);
+                s_context->createDynamicVertexBuffer(cmd->handle, cmd->data, cmd->size, cmd->layoutHandle);
+                break;
+            }
+            case RendererCommandType::UpdateDynamicVertexBuffer: {
+                const UpdateDynamicVertexBufferCommand *cmd = static_cast<const UpdateDynamicVertexBufferCommand *>(command);
+                s_context->updateDynamicVertexBuffer(cmd->handle, cmd->data, cmd->size);
+                break;
+            }
+            case RendererCommandType::DestroyVertexBuffer: {
+                const DeleteVertexBufferCommand *cmd = static_cast<const DeleteVertexBufferCommand *>(command);
+                s_context->deleteVertexBuffer(cmd->handle);
+                break;
+            }
+            case RendererCommandType::CreateVertexLayout: {
+                const CreateVertexLayoutCommand *cmd = static_cast<const CreateVertexLayoutCommand *>(command);
+                s_context->createVertexLayout(cmd->handle, cmd->data);
+                break;
+            }
+            case RendererCommandType::DestroyVertexLayout: {
+                const DeleteVertexLayoutCommand *cmd = static_cast<const DeleteVertexLayoutCommand *>(command);
+                s_context->deleteVertexLayout(cmd->handle);
                 break;
             }
         }

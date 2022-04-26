@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "MirenHandleAllocator.hpp"
 #include "RendererI.hpp"
 #include "CommandBuffer/Frame.hpp"
 #include "CommandBuffer/RenderDraw.hpp"
@@ -14,12 +15,22 @@ namespace Panda {
 class Miren {
 public:
     static void initialize(GSize size);
+    // MARK: - Command buffer
     static ShaderHandle createShader(const char *vertexPath, const char *fragmentPath);
+    static void deleteShader(ShaderHandle handle);
     static TextureHandle createTexture(const char *path);
-    static IndexBufferHandle createIndexBuffer(unsigned int *indices, unsigned int count, bool isDynamic);
-    static VertexBufferHandle createVertexBuffer(Vertex *vertices, unsigned int count, bool isDynamic);
-    static VertexBufferHandle createVertexBuffer(float *data, unsigned int count, bool isDynamic, VertexLayoutHandle layoutHandle);
+    static void deleteTexture(TextureHandle handle);
+    static IndexBufferHandle createIndexBuffer(uint32_t *indices, uint32_t count);
+    static IndexBufferHandle createDynamicIndexBuffer(uint32_t *indices, uint32_t count);
+    static void updateDynamicIndexBuffer(IndexBufferHandle, uint32_t *indices, uint32_t count);
+    static void deleteIndexBuffer(IndexBufferHandle handle);
+    static VertexBufferHandle createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle);
+    static VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle);
+    static void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size);
+    static void deleteVertexBuffer(VertexBufferHandle handle);
     static VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data);
+    static void deleteVertexLayout(VertexLayoutHandle handle);
+    // MARK: - Encoder setup
     static void setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size);
     static void setVertexBuffer(VertexBufferHandle handle);
     static void setIndexBuffer(IndexBufferHandle handle, uint32_t count);
@@ -37,11 +48,11 @@ private:
     static Frame s_frame;
     static RendererI *s_context;
     static CommandQueue s_commandQueue;
-    static int s_shadersCount;
-    static int s_texturesCount;
-    static int s_vertexLayoutsCount;
-    static int s_vertexBuffersCount;
-    static int s_indexBuffersCount;
+    static MirenHandleAllocator s_shadersHandleAlloc;
+    static MirenHandleAllocator s_texturesHandleAlloc;
+    static MirenHandleAllocator s_vertexLayoutsHandleAlloc;
+    static MirenHandleAllocator s_vertexBuffersHandleAlloc;
+    static MirenHandleAllocator s_indexBuffersHandleAlloc;
 };
 
 } // namespace Panda

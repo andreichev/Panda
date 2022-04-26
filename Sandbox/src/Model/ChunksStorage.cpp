@@ -42,7 +42,7 @@ ChunksStorage::ChunksStorage() {
     }
 }
 
-void ChunksStorage::setVoxel(int x, int y, int z, char id) {
+void ChunksStorage::setVoxel(int x, int y, int z, uint8_t id) {
     if (x < 0 || y < 0 || z < 0 || x >= WORLD_SIZE_X || y >= WORLD_SIZE_Y || z >= WORLD_SIZE_Z)
         return;
     int chunkIndexX = x / Chunk::SIZE_X;

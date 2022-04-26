@@ -12,17 +12,15 @@ namespace Panda {
 class OpenGLVertexBuffer {
 public:
     ~OpenGLVertexBuffer();
-    OpenGLVertexBuffer(Vertex *data, unsigned int count, bool isDynamic);
-    OpenGLVertexBuffer(float *data, unsigned int count, bool isDynamic, VertexBufferLayoutData *layout);
-    void update(float *data, unsigned int count);
-    void update(Vertex *data, unsigned int count);
+    OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic, VertexBufferLayoutData *layout);
+    void update(void *data, uint32_t size);
     void bind();
     void unbind();
 
 private:
     void createLayout(VertexBufferLayoutData *layoutData);
-    unsigned int id;
-    unsigned int layoutId;
+    uint32_t id;
+    uint32_t layoutId;
     bool isDynamic;
 };
 

@@ -25,12 +25,20 @@ public:
     void clear() override;
     void flip() override;
     void createShader(ShaderHandle handle, const char *vertexPath, const char *fragmentPath) override;
+    void deleteShader(ShaderHandle handle) override;
     void createTexture(TextureHandle handle, const char *path) override;
-    void createIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count, bool isDynamic) override;
+    void deleteTexture(TextureHandle handle) override;
+    void createIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) override;
+    void createDynamicIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) override;
+    void updateDynamicIndexBuffer(IndexBufferHandle, uint32_t *indices, uint32_t count) override;
+    void deleteIndexBuffer(IndexBufferHandle handle) override;
+    void createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) override;
+    void createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) override;
+    void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) override;
+    void deleteVertexBuffer(VertexBufferHandle handle) override;
     void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) override;
+    void deleteVertexLayout(VertexLayoutHandle handle) override;
     void setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) override;
-    void createVertexBuffer(
-        VertexBufferHandle handle, float *data, uint32_t count, bool isDynamic, VertexLayoutHandle layoutHandle) override;
     void setTexture(TextureHandle handle, uint32_t slot) override;
     void submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) override;
 

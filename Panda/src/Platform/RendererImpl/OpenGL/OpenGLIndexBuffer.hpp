@@ -8,16 +8,16 @@ namespace Panda {
 
 class OpenGLIndexBuffer {
 public:
-    OpenGLIndexBuffer(unsigned int *indices, unsigned int count, bool isDynamic);
+    OpenGLIndexBuffer(uint32_t *indices, uint32_t count, bool isDynamic);
     ~OpenGLIndexBuffer();
-    void update(unsigned int *indices);
+    void update(uint32_t *indices, uint32_t count);
     void bind() const;
     void unbind() const;
-    unsigned int getSize() const;
+    uint32_t getSize() const;
 
 private:
-    unsigned int id;
-    unsigned int size;
+    uint32_t id;
+    uint32_t size;
     bool isDynamic;
 };
 

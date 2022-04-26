@@ -31,31 +31,6 @@ RendererOpenGL::RendererOpenGL(GSize size) {
 }
 
 RendererOpenGL::~RendererOpenGL() {
-    for (auto ref : shaders) {
-        if (ref != nullptr) {
-            delete ref;
-        }
-    }
-    for (auto ref : indexBuffers) {
-        if (ref != nullptr) {
-            delete ref;
-        }
-    }
-    for (auto ref : vertexLayouts) {
-        if (ref != nullptr) {
-            delete ref;
-        }
-    }
-    for (auto ref : vertexBuffers) {
-        if (ref != nullptr) {
-            delete ref;
-        }
-    }
-    for (auto ref : textures) {
-        if (ref != nullptr) {
-            delete ref;
-        }
-    }
     delete context;
 }
 
@@ -75,30 +50,82 @@ void RendererOpenGL::semaphoreSignal() {
     context->semaphoreSignal();
 }
 
+void RendererOpenGL::setViewportSize(GSize size) {
+    glViewport(0, 0, (int)size.width, (int)size.height);
+}
+
+void RendererOpenGL::setClearColor(float r, float g, float b, float a) {
+    PND_INFO("CLEAR COLOR: {}, {}, {}, {}", r, g, b, a);
+    glClearColor(r, g, b, a);
+}
+
+void RendererOpenGL::clear() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void RendererOpenGL::flip() {
+    context->flip();
+}
+
 void RendererOpenGL::createShader(ShaderHandle handle, const char *vertexPath, const char *fragmentPath) {
     shaders[handle] = new OpenGLShader(vertexPath, fragmentPath);
+}
+
+void RendererOpenGL::deleteShader(ShaderHandle handle) {
+    delete shaders[handle];
 }
 
 void RendererOpenGL::createTexture(TextureHandle handle, const char *path) {
     textures[handle] = new OpenGLTexture(path);
 }
 
-void RendererOpenGL::createIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count, bool isDynamic) {
-    indexBuffers[handle] = new OpenGLIndexBuffer(indices, count, isDynamic);
+void RendererOpenGL::deleteTexture(TextureHandle handle) {
+    delete textures[handle];
+}
+
+void RendererOpenGL::createIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
+    indexBuffers[handle] = new OpenGLIndexBuffer(indices, count, false);
+}
+
+void RendererOpenGL::createDynamicIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
+    indexBuffers[handle] = new OpenGLIndexBuffer(indices, count, true);
+}
+
+void RendererOpenGL::updateDynamicIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
+    indexBuffers[handle]->update(indices, count);
+}
+
+void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
+    delete indexBuffers[handle];
+}
+
+void RendererOpenGL::createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+    vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, false, vertexLayouts[layoutHandle]);
+}
+
+void RendererOpenGL::createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+    vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, true, vertexLayouts[layoutHandle]);
+}
+
+void RendererOpenGL::updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
+    vertexBuffers[handle]->update(data, size);
+}
+
+void RendererOpenGL::deleteVertexBuffer(VertexBufferHandle handle) {
+    delete vertexBuffers[handle];
 }
 
 void RendererOpenGL::createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) {
     vertexLayouts[handle] = new VertexBufferLayoutData(layout);
 }
 
+void RendererOpenGL::deleteVertexLayout(VertexLayoutHandle handle) {
+    delete vertexLayouts[handle];
+}
+
 void RendererOpenGL::setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) {
     shaders[handle]->bind();
     shaders[handle]->setUniformMat4(name, static_cast<float *>(value));
-}
-
-void RendererOpenGL::createVertexBuffer(
-    VertexBufferHandle handle, float *data, uint32_t count, bool isDynamic, VertexLayoutHandle layoutHandle) {
-    vertexBuffers[handle] = new OpenGLVertexBuffer(data, count, isDynamic, vertexLayouts[layoutHandle]);
 }
 
 void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
@@ -118,23 +145,6 @@ void RendererOpenGL::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer
     shaders[shader]->unbind();
     indexBuffers[indexBuffer]->unbind();
     vertexBuffers[vertexBuffer]->unbind();
-}
-
-void RendererOpenGL::setViewportSize(GSize size) {
-    glViewport(0, 0, (int)size.width, (int)size.height);
-}
-
-void RendererOpenGL::setClearColor(float r, float g, float b, float a) {
-    PND_INFO("CLEAR COLOR: {}, {}, {}, {}", r, g, b, a);
-    glClearColor(r, g, b, a);
-}
-
-void RendererOpenGL::clear() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void RendererOpenGL::flip() {
-    context->flip();
 }
 
 const char *getGLErrorStr(GLenum err) {

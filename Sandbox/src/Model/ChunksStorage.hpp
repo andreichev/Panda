@@ -22,7 +22,7 @@ public:
     ChunksStorage();
     ~ChunksStorage();
 
-    void setVoxel(int x, int y, int z, char id);
+    void setVoxel(int x, int y, int z, uint8_t id);
     Voxel *getVoxel(int x, int y, int z);
     Chunk *getChunk(int x, int y, int z);
     VoxelRaycastData *bresenham3D(float x1, float y1, float z1, float x2, float y2, float z2, int maximumDistance);

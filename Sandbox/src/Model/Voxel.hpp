@@ -5,11 +5,11 @@
 #pragma once
 
 struct Voxel {
-    char id;
+    int8_t id;
 
     Voxel()
         : id(0) {}
 
-    explicit Voxel(char id)
+    explicit Voxel(int8_t id)
         : id(id) {}
 };

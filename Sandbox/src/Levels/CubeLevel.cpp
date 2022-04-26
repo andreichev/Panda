@@ -49,8 +49,11 @@ public:
             20, 21, 22, 22, 23, 20  // Right
         };
 
-        vertexBuffer = Panda::Miren::createVertexBuffer(vertices, 24, false);
-        indexBuffer = Panda::Miren::createIndexBuffer(indices, 36, false);
+        Panda::VertexBufferLayoutData layoutData;
+        layoutData.pushVector();
+        Panda::VertexLayoutHandle layoutHandle = Panda::Miren::createVertexLayout(layoutData);
+        vertexBuffer = Panda::Miren::createVertexBuffer(vertices, 24, layoutHandle);
+        indexBuffer = Panda::Miren::createIndexBuffer(indices, 36);
 
         texture = Panda::Miren::createTexture("textures/arbuz1.png");
         shader = Panda::Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");

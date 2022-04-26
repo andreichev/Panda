@@ -17,43 +17,22 @@ OpenGLVertexBuffer::~OpenGLVertexBuffer() {
     glDeleteBuffers(1, &id);
 }
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(Vertex *data, unsigned int count, bool isDynamic)
+OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic, VertexBufferLayoutData *layout)
     : isDynamic(isDynamic)
     , id(0) {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(Vertex), data, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-    VertexBufferLayoutData layout = VertexBufferLayoutData();
-    layout.pushVector();
-    createLayout(&layout);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-OpenGLVertexBuffer::OpenGLVertexBuffer(float *data, unsigned int count, bool isDynamic, VertexBufferLayoutData *layout)
-    : isDynamic(isDynamic)
-    , id(0) {
-    glGenBuffers(1, &id);
-    glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(float), data, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, data, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     createLayout(layout);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void OpenGLVertexBuffer::update(float *data, unsigned int count) {
+void OpenGLVertexBuffer::update(void *data, uint32_t size) {
     if (isDynamic == false) {
         PND_CRITICAL("Невозможно обновить статичный буфер");
     }
     glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(float), data, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void OpenGLVertexBuffer::update(Vertex *data, unsigned int count) {
-    if (isDynamic == false) {
-        PND_CRITICAL("Невозможно обновить статичный буфер");
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(Vertex), data, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 

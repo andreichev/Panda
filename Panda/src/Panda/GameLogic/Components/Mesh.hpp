@@ -28,11 +28,12 @@ public:
 private:
     void updateModelMatrix();
 
-    TextureHandle texture;
-    ShaderHandle shader;
+    TextureHandle textureHandle;
+    ShaderHandle shaderHandle;
+    VertexLayoutHandle bufferLayoutHandle;
+    IndexBufferHandle indexBufferHandle;
+    VertexBufferHandle vertexBufferHandle;
     glm::mat4 model;
-    IndexBufferHandle indexBuffer;
-    VertexBufferHandle vertexBuffer;
     uint32_t indicesCount;
     Shared<Transform> transform;
     const bool isDynamic;
