@@ -56,6 +56,7 @@ Mesh::Mesh(Vertex *vertices, uint32_t verticesCount, uint32_t *indices, uint32_t
 }
 
 Mesh::~Mesh() {
+    Miren::deleteVertexLayout(bufferLayoutHandle);
     Miren::deleteVertexBuffer(vertexBufferHandle);
     Miren::deleteIndexBuffer(indexBufferHandle);
     transform->removeDelegate(this);
@@ -75,22 +76,24 @@ void Mesh::update(float deltaTime) {
 }
 
 void Mesh::updateBuffer(const MeshData &data) {
+    indicesCount = data.indicesCount;
     if (isDynamic) {
         Miren::updateDynamicVertexBuffer(vertexBufferHandle, data.vertices, sizeof(Vertex) * data.verticesCount);
         Miren::updateDynamicIndexBuffer(indexBufferHandle, data.indices, data.indicesCount);
     } else {
+        Miren::deleteVertexLayout(bufferLayoutHandle);
         Miren::deleteVertexBuffer(vertexBufferHandle);
         Miren::deleteIndexBuffer(indexBufferHandle);
-        Miren::deleteVertexLayout(bufferLayoutHandle);
         VertexBufferLayoutData layoutData;
         layoutData.pushVector();
         bufferLayoutHandle = Miren::createVertexLayout(layoutData);
-        vertexBufferHandle = Miren::createVertexBuffer(data.vertices, data.verticesCount, bufferLayoutHandle);
+        vertexBufferHandle = Miren::createVertexBuffer(data.vertices, sizeof(Vertex) * data.verticesCount, bufferLayoutHandle);
         indexBufferHandle = Miren::createIndexBuffer(data.indices, data.indicesCount);
     }
 }
 
-void Mesh::updateBuffer(Vertex *vertices, uint32_t verticesCount, uint32_t *indices, uint32_t indicesCount) {
+void Mesh::updateBuffer(Vertex *vertices, uint32_t verticesCount, uint32_t *indices, uint32_t _indicesCount) {
+    this->indicesCount = _indicesCount;
     if (isDynamic) {
         Miren::updateDynamicVertexBuffer(vertexBufferHandle, vertices, sizeof(Vertex) * verticesCount);
         Miren::updateDynamicIndexBuffer(indexBufferHandle, indices, indicesCount);
@@ -101,7 +104,7 @@ void Mesh::updateBuffer(Vertex *vertices, uint32_t verticesCount, uint32_t *indi
         VertexBufferLayoutData layoutData;
         layoutData.pushVector();
         bufferLayoutHandle = Miren::createVertexLayout(layoutData);
-        vertexBufferHandle = Miren::createVertexBuffer(vertices, verticesCount, bufferLayoutHandle);
+        vertexBufferHandle = Miren::createVertexBuffer(vertices, sizeof(Vertex) * verticesCount, bufferLayoutHandle);
         indexBufferHandle = Miren::createIndexBuffer(indices, indicesCount);
     }
 }

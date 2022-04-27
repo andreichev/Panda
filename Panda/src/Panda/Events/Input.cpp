@@ -8,12 +8,12 @@ namespace Panda {
 
 void Input::setKeyPressed(Key key, bool state) {
     keys[(int)key] = state;
-    framesKeys[(int)key] = frame;
+    framesKeys[(int)key] = frame + 1;
 }
 
 void Input::setMouseButtonPressed(MouseButton mouseButton, bool state) {
     mouseButtons[(int)mouseButton] = state;
-    framesMouseButtons[(int)mouseButton] = frame;
+    framesMouseButtons[(int)mouseButton] = frame + 1;
 }
 
 bool Input::isKeyPressed(Key key) {
@@ -21,7 +21,7 @@ bool Input::isKeyPressed(Key key) {
 }
 
 bool Input::isKeyJustPressed(Key key) {
-    return keys[(int)key] && framesKeys[(int)key] == frame - 1;
+    return keys[(int)key] && framesKeys[(int)key] == frame;
 }
 
 bool Input::isMouseButtonPressed(MouseButton mouseButton) {
@@ -29,7 +29,7 @@ bool Input::isMouseButtonPressed(MouseButton mouseButton) {
 }
 
 bool Input::isMouseButtonJustPressed(MouseButton mouseButton) {
-    return mouseButtons[(int)mouseButton] && framesMouseButtons[(int)mouseButton] == frame - 1;
+    return mouseButtons[(int)mouseButton] && framesMouseButtons[(int)mouseButton] == frame;
 }
 
 int Input::getMousePositionX() {

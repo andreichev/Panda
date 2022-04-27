@@ -73,6 +73,7 @@ void RendererOpenGL::createShader(ShaderHandle handle, const char *vertexPath, c
 
 void RendererOpenGL::deleteShader(ShaderHandle handle) {
     delete shaders[handle];
+    shaders[handle] = nullptr;
 }
 
 void RendererOpenGL::createTexture(TextureHandle handle, const char *path) {
@@ -81,38 +82,47 @@ void RendererOpenGL::createTexture(TextureHandle handle, const char *path) {
 
 void RendererOpenGL::deleteTexture(TextureHandle handle) {
     delete textures[handle];
+    textures[handle] = nullptr;
 }
 
 void RendererOpenGL::createIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
     indexBuffers[handle] = new OpenGLIndexBuffer(indices, count, false);
+    delete[] indices;
 }
 
 void RendererOpenGL::createDynamicIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
     indexBuffers[handle] = new OpenGLIndexBuffer(indices, count, true);
+    delete[] indices;
 }
 
 void RendererOpenGL::updateDynamicIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
     indexBuffers[handle]->update(indices, count);
+    delete[] indices;
 }
 
 void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
     delete indexBuffers[handle];
+    indexBuffers[handle] = nullptr;
 }
 
 void RendererOpenGL::createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, false, vertexLayouts[layoutHandle]);
+    delete[] data;
 }
 
 void RendererOpenGL::createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, true, vertexLayouts[layoutHandle]);
+    delete[] data;
 }
 
 void RendererOpenGL::updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
     vertexBuffers[handle]->update(data, size);
+    delete[] data;
 }
 
 void RendererOpenGL::deleteVertexBuffer(VertexBufferHandle handle) {
     delete vertexBuffers[handle];
+    vertexBuffers[handle] = nullptr;
 }
 
 void RendererOpenGL::createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) {
@@ -121,6 +131,7 @@ void RendererOpenGL::createVertexLayout(VertexLayoutHandle handle, VertexBufferL
 
 void RendererOpenGL::deleteVertexLayout(VertexLayoutHandle handle) {
     delete vertexLayouts[handle];
+    vertexLayouts[handle] = nullptr;
 }
 
 void RendererOpenGL::setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) {

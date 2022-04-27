@@ -9,7 +9,6 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
     ChunksStorage &chunks, int chunkIndexX, int chunkIndexY, int chunkIndexZ, bool ambientOcclusion) {
     Chunk &chunk =
         chunks.chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
-    // TODO: - Clear memory
     Vertex *vertices = new Vertex[10000];
     unsigned int *indices = new unsigned int[10000];
     uint32_t verticesCount = 0;
@@ -211,13 +210,13 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
     return Panda::MeshData(vertices, verticesCount, indices, indicesCount);
 }
 
-void VoxelMeshGenerator::addFaceIndices(uint32_t offset, uint32_t &currentIndexNumber, unsigned int *indices) {
-    indices[currentIndexNumber++] = offset;
-    indices[currentIndexNumber++] = offset + 1;
-    indices[currentIndexNumber++] = offset + 2;
-    indices[currentIndexNumber++] = offset + 2;
-    indices[currentIndexNumber++] = offset + 3;
-    indices[currentIndexNumber++] = offset;
+void VoxelMeshGenerator::addFaceIndices(uint32_t offset, uint32_t &indicesCount, unsigned int *indices) {
+    indices[indicesCount++] = offset;
+    indices[indicesCount++] = offset + 1;
+    indices[indicesCount++] = offset + 2;
+    indices[indicesCount++] = offset + 2;
+    indices[indicesCount++] = offset + 3;
+    indices[indicesCount++] = offset;
 }
 
 bool VoxelMeshGenerator::isAir(int x, int y, int z, ChunksStorage &chunks) {

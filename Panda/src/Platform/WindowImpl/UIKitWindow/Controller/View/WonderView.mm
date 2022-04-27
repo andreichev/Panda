@@ -70,7 +70,7 @@
     touchLocation.y *= self.contentScaleFactor;
 
     Panda::ApplicationContext::get().postMouseEvent(touchLocation.x, touchLocation.y);
-    // TODO: Post mouse clicked event
+    Panda::ApplicationContext::get().postMouseButtonEvent(Panda::MouseButton::LEFT, true);
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event

@@ -37,7 +37,7 @@ private:
     // Номера кадров при нажатии клавиш
     uint32_t framesKeys[1024];
     // Состояния кнопок мыши
-    bool mouseButtons[4];
+    bool mouseButtons[8];
     // Номера кадров при нажатии мыши
     uint32_t framesMouseButtons[4];
     GSize windowSize;
