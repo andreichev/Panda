@@ -15,6 +15,7 @@ namespace Panda {
 class Miren {
 public:
     static void initialize(GSize size);
+    static void terminate();
     // MARK: - Command buffer
     static ShaderHandle createShader(const char *vertexPath, const char *fragmentPath);
     static void deleteShader(ShaderHandle handle);

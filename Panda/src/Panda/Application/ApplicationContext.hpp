@@ -9,6 +9,7 @@
 #include "Panda/Window/Window.hpp"
 #include "Panda/Renderer/GraphicsContext.hpp"
 #include "Panda/Events/EventQueue.hpp"
+#include "Panda/Application/ApplicationStartupSettings.hpp"
 
 namespace Panda {
 
@@ -18,8 +19,7 @@ class ApplicationContext {
 public:
     static ApplicationContext &get();
 
-    ApplicationContext();
-    ~ApplicationContext();
+    void runApplication(ApplicationStartupSettings &settings);
     void setResourcesPath(std::string path);
     std::string &getResourcesPath();
     void processEvents();

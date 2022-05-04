@@ -13,7 +13,6 @@ class Input;
 class Window {
 public:
     virtual ~Window() = default;
-    virtual void initialize(const char *title, GSize size, bool isFullscreen) = 0;
     virtual bool isFullScreen() = 0;
     virtual void setFullScreen(bool isFullScreen) = 0;
     virtual void pollEvents() = 0;

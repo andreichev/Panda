@@ -23,7 +23,10 @@ CommandQueue Miren::s_commandQueue;
 
 void Miren::initialize(GSize size) {
     s_context = new RendererOpenGL(size);
-    // TODO: - delete s_context somewhere
+}
+
+void Miren::terminate() {
+    delete s_context;
 }
 
 ShaderHandle Miren::createShader(const char *vertexPath, const char *fragmentPath) {

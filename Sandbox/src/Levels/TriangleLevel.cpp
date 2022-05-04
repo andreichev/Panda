@@ -42,7 +42,7 @@ void TriangleLevel::start(Panda::World *world) {
     Panda::VertexBufferHandle vertexBuffer = Panda::Miren::createVertexBuffer(data, 12, vertexLayout);
     Panda::IndexBufferHandle indexBuffer = Panda::Miren::createIndexBuffer(indices, 6);
 
-    Panda::Shared<TriangleRenderer> triangleRenderer = Panda::createShared<TriangleRenderer>(vertexBuffer, indexBuffer, baseShader);
+    Panda::Shared<TriangleRenderer> triangleRenderer = Panda::makeShared<TriangleRenderer>(vertexBuffer, indexBuffer, baseShader);
 
     Panda::Shared<Panda::Entity> entity = world->instantiateEntity();
     entity->addComponent(triangleRenderer);

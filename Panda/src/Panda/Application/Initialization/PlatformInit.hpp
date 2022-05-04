@@ -3,9 +3,10 @@
 //
 
 #include "Panda/Window/Window.hpp"
+#include "Panda/Application/ApplicationStartupSettings.hpp"
 
 namespace Panda {
 
-Window *createWindow();
+Window *createWindow(ApplicationStartupSettings &settings);
 
 } // namespace Panda

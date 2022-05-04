@@ -9,7 +9,7 @@ namespace Panda {
 
 Entity::Entity()
     : parentEntity(nullptr)
-    , transform(createShared<Transform>()) {
+    , transform(makeShared<Transform>()) {
     Transform transform1;
     addComponent(transform);
 }
@@ -17,6 +17,12 @@ Entity::Entity()
 void Entity::addComponent(Shared<Component> component) {
     component->setEntity(this);
     components.push_back(component);
+    component->initialize();
+}
+
+void Entity::addComponent(Component *component) {
+    component->setEntity(this);
+    components.push_back(Panda::createShared<Component>(component));
     component->initialize();
 }
 

@@ -19,7 +19,7 @@ void World::initialize() {
 }
 
 Shared<Entity> World::instantiateEntity() {
-    Shared<Entity> entity = createShared<Entity>();
+    Shared<Entity> entity = makeShared<Entity>();
     root.addChildEntity(entity);
     return entity;
 }

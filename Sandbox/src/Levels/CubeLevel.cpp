@@ -106,6 +106,6 @@ void CubeLevel::start(Panda::World *world) {
     PND_INFO("CUBE LEVEL STARTED!");
 
     Panda::Shared<Panda::Entity> entity = world->instantiateEntity();
-    Panda::Shared<CubeComponent> cube = Panda::createShared<CubeComponent>();
+    Panda::Shared<CubeComponent> cube = Panda::makeShared<CubeComponent>();
     entity->addComponent(cube);
 }

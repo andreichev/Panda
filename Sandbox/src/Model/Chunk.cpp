@@ -6,7 +6,6 @@
 
 Chunk::~Chunk() {
     delete[] data;
-    delete mesh;
 }
 
 Chunk::Chunk() {

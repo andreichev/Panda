@@ -16,14 +16,12 @@ namespace Panda {
 class Application {
 public:
     ~Application();
-
-    int fps;
-    void run(ApplicationStartupSettings settings);
-
-private:
-    void initialize(ApplicationStartupSettings &settings);
+    Application(ApplicationStartupSettings &settings);
     void loop();
 
+    int fps;
+
+private:
     World *world;
     Level *currentLevel;
     uint64_t timeMillis;

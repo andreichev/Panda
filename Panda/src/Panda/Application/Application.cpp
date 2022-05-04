@@ -15,22 +15,18 @@ uint64_t getMillis() {
 }
 
 Application::~Application() {
+#ifdef PND_PLATFORM_DESKTOP
+    Miren::terminate();
+#endif
     delete currentLevel;
     delete world;
 }
 
-void Application::run(ApplicationStartupSettings settings) {
-    initialize(settings);
-    loop();
-}
-
-void Application::initialize(ApplicationStartupSettings &settings) {
-    Logger::init();
+Application::Application(ApplicationStartupSettings &settings) {
     maximumFps = 60;
+    oneSecondTimeCount = 0;
 
     ApplicationContext &context = ApplicationContext::get();
-    // Порядок важен
-    context.getWindow().initialize(settings.windowTitle, settings.windowSize, settings.isFullScreen);
     context.processEvents();
     GSize windowSize = context.getInput().getWindowSize();
 #ifdef PND_PLATFORM_DESKTOP
@@ -39,6 +35,7 @@ void Application::initialize(ApplicationStartupSettings &settings) {
     world = new World();
     timeMillis = getMillis();
     settings.startupLevel->start(world);
+    currentLevel = settings.startupLevel;
 }
 
 void Application::loop() {
@@ -57,12 +54,7 @@ void Application::loop() {
             fps = thisSecondFramesCount;
             PND_INFO("FPS: {}", fps);
             thisSecondFramesCount = 0;
-            oneSecondTimeCount -= 1000;
-        }
-
-        // TODO: - Move to scripts
-        if (context.getInput().isKeyJustPressed(Key::ESCAPE)) {
-            context.isApplicationShouldClose = true;
+            oneSecondTimeCount = 0;
         }
 
         Miren::beginFrameProcessing();

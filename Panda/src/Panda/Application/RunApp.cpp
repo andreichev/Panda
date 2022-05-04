@@ -3,5 +3,5 @@
 #include "ApplicationContext.hpp"
 
 void runPandaApplication(Panda::ApplicationStartupSettings settings) {
-    Panda::ApplicationContext::get().getApplication().run(settings);
+    Panda::ApplicationContext::get().runApplication(settings);
 }

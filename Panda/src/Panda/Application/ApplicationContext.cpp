@@ -9,7 +9,6 @@
 #include "Panda/Events/KeyEvents.hpp"
 #include "Panda/Events/MouseEvents.hpp"
 #include "Initialization/PlatformInit.hpp"
-#include "Panda/Renderer/Miren.hpp"
 
 namespace Panda {
 
@@ -18,16 +17,14 @@ ApplicationContext &ApplicationContext::get() {
     return context;
 }
 
-ApplicationContext::ApplicationContext() {
+void ApplicationContext::runApplication(ApplicationStartupSettings &settings) {
+    Logger::init();
     isApplicationShouldClose = false;
-    // Initialization not performed here
-    application = new Application();
-    window = createWindow();
-}
-
-ApplicationContext::~ApplicationContext() {
-    delete application;
+    window = createWindow(settings);
+    application = new Application(settings);
+    application->loop();
     delete window;
+    delete application;
 }
 
 void ApplicationContext::setResourcesPath(std::string path) {

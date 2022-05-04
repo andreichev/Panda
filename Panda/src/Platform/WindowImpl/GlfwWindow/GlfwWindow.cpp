@@ -8,16 +8,16 @@
 
 namespace Panda {
 
+void glfwErrorCallback(int error_code, const char *description) {
+    PND_ERROR("GLFW ERROR, code: {}, description: {}", error_code, description);
+}
+
 GlfwWindow::~GlfwWindow() {
     glfwDestroyWindow(m_windowHandle);
     glfwTerminate();
 }
 
-void glfwErrorCallback(int error_code, const char *description) {
-    PND_ERROR("GLFW ERROR, code: {}, description: {}", error_code, description);
-}
-
-void GlfwWindow::initialize(const char *title, GSize size, bool isFullscreen) {
+GlfwWindow::GlfwWindow(const char *title, GSize size, bool isFullscreen) {
     m_isFullScreen = isFullscreen;
     m_windowSizeBackup = size;
     cursorLocked = false;
@@ -44,6 +44,7 @@ void GlfwWindow::initialize(const char *title, GSize size, bool isFullscreen) {
 #endif
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+    glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
 
     // Create the window
     m_windowHandle = glfwCreateWindow((int)size.width, (int)size.height, title, nullptr, nullptr);
@@ -56,19 +57,33 @@ void GlfwWindow::initialize(const char *title, GSize size, bool isFullscreen) {
     glfwShowWindow(m_windowHandle);
     glfwFocusWindow(m_windowHandle);
 
+    context->postSizeEvent(size.width, size.height);
     if (isFullscreen) {
         setFullScreen(true);
     }
 
     addEventHandlers();
-    context->postSizeEvent(size.width, size.height);
 }
 
 bool GlfwWindow::isFullScreen() {
     return m_isFullScreen;
 }
 
-void GlfwWindow::setFullScreen(bool isFullScreen) {}
+void GlfwWindow::setFullScreen(bool isFullScreen) {
+    m_isFullScreen = isFullScreen;
+    // Get primary monitor handle
+    GLFWmonitor *monitorHandle = glfwGetPrimaryMonitor();
+    // Get the resolution of the primary monitor
+    const GLFWvidmode *vidmode = glfwGetVideoMode(monitorHandle);
+    if (isFullScreen) {
+        glfwSetWindowMonitor(m_windowHandle, monitorHandle, 0, 0, vidmode->width, vidmode->height, vidmode->refreshRate);
+    } else {
+        glfwSetWindowMonitor(m_windowHandle, nullptr, 0, 0, m_windowSizeBackup.width, m_windowSizeBackup.height, vidmode->refreshRate);
+        // Center the window
+        glfwSetWindowPos(
+            m_windowHandle, (vidmode->width - m_windowSizeBackup.width) / 2, (vidmode->height - m_windowSizeBackup.height) / 2);
+    }
+}
 
 void GlfwWindow::addEventHandlers() {
     glfwSetWindowUserPointer(m_windowHandle, this);
