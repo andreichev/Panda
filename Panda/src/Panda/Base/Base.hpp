@@ -7,9 +7,6 @@
 // joke from swift (apple) or js
 #define var auto
 #define let const auto
-#define in :
-// joke from C# and JAVA
-#define interface class
 
 namespace Panda {
 

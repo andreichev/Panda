@@ -45,10 +45,10 @@ Shared<T> Entity::getComponentWithType() {
 }
 
 void Entity::initialize() {
-    for (auto &entity in childEntities) {
+    for (auto &entity : childEntities) {
         entity->initialize();
     }
-    for (auto &component in components) {
+    for (auto &component : components) {
         if (component->isActive) {
             component->initialize();
         }
@@ -57,11 +57,11 @@ void Entity::initialize() {
 
 void Entity::update(float deltaTime) {
     // Обновить дочерние сущности
-    for (auto &entity in childEntities) {
+    for (auto &entity : childEntities) {
         entity->update(deltaTime);
     }
     // Обновить все компонеты у этой сущности
-    for (auto &component in components) {
+    for (auto &component : components) {
         if (component->isActive) {
             component->update(deltaTime);
         }

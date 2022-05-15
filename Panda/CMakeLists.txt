@@ -1,6 +1,18 @@
 project(Panda)
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(-DPND_PROFILE)
+endif ()
+
 set(CMAKE_CXX_STANDARD 14)
+
+include(cmake/add_app.cmake)
+
+add_subdirectory(Vendor/spdlog)
+add_subdirectory(Vendor/glfw)
+add_subdirectory(Vendor/glad)
+add_subdirectory(Vendor/glm)
+add_subdirectory(Vendor/stb_image)
 
 file(GLOB_RECURSE SOURCES src/Panda/*.cpp src/Platform/RendererImpl/OpenGL/*.cpp)
 file(GLOB_RECURSE INCLUDE src/Panda/*.hpp src/Platform/RendererImpl/OpenGL/*.hpp)

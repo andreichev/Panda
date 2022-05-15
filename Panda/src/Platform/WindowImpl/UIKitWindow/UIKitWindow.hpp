@@ -10,8 +10,8 @@ namespace Panda {
 
 class UIKitWindow : public Window {
 public:
+    UIKitWindow() = default;
     ~UIKitWindow() override = default;
-    void initialize(const char *title, GSize size, bool isFullscreen) override;
     bool isFullScreen() override;
     void setFullScreen(bool isFullScreen) override;
     void pollEvents() override;

@@ -2,7 +2,6 @@
 // Created by Admin on 01.02.2022.
 //
 
-#include "pndpch.hpp"
 #include "ApplicationStartupSettings.hpp"
 
 namespace Panda {
