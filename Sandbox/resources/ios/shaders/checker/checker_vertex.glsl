@@ -1,17 +1,10 @@
-// #version 330 core
-#ifdef GL_ES
-precision highp float;
-#endif
+#version 300 es
 
-#if __VERSION__ >= 140
+precision highp float;
+
 layout (location = 0) in vec2 aPos;
 
 out vec4 Color;
-#else
-attribute vec2 aPos;
-
-varying vec4 Color;
-#endif
 
 void main()
 {

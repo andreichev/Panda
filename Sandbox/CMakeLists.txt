@@ -12,14 +12,14 @@ file(GLOB_RECURSE INCLUDE
         )
 
 file(GLOB RESOURCE_FOLDERS
-        Resources-common/*
+        resources/common/*
         )
 
 if (DESKTOP)
-    file(GLOB RESOURCE_DESKTOP_FOLDERS Resources-pc/*)
+    file(GLOB RESOURCE_DESKTOP_FOLDERS resources/desktop/*)
     list (APPEND RESOURCE_FOLDERS "${RESOURCE_DESKTOP_FOLDERS}")
 elseif(PLATFORM_IOS)
-    file(GLOB RESOURCE_IOS_FOLDERS Resources-ios/*)
+    file(GLOB RESOURCE_IOS_FOLDERS resources/ios/*)
     list (APPEND RESOURCE_FOLDERS "${RESOURCE_IOS_FOLDERS}")
 endif()
 
