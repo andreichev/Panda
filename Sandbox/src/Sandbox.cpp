@@ -15,7 +15,7 @@ int startApp(int argc, char **argv) {
                             .name("ITIS Craft")
                             .windowTitle("ITIS Craft")
                             .windowSize({900, 600})
-                            .isFullScreen(true)
+                            .isFullScreen(false)
                             .startupLevel(new BaseLevel())
                             .build());
     return 0;

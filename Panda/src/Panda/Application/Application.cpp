@@ -25,6 +25,8 @@ Application::~Application() {
 Application::Application(ApplicationStartupSettings &settings) {
     maximumFps = 60;
     oneSecondTimeCount = 0;
+    deltaTimeMillis = 0;
+    thisSecondFramesCount = 0;
 
     ApplicationContext &context = ApplicationContext::get();
     context.processEvents();

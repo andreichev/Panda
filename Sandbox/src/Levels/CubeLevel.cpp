@@ -7,7 +7,7 @@
 class CubeComponent : public Panda::Component {
 public:
     void initialize() override {
-        static Vertex vertices[24] = {
+        auto vertices = new Vertex[] {
             // Front
             Vertex(-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f), // 0
             Vertex(1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f),  // 1
@@ -40,7 +40,7 @@ public:
             Vertex(1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f)   // 21
         };
 
-        static uint32_t indices[36] = {
+        auto indices = new uint32_t[] {
             0, 1, 2, 2, 3, 0,       // Front
             4, 5, 6, 6, 7, 4,       // Back
             8, 9, 10, 10, 11, 8,    // Top
@@ -52,7 +52,7 @@ public:
         Panda::VertexBufferLayoutData layoutData;
         layoutData.pushVector();
         Panda::VertexLayoutHandle layoutHandle = Panda::Miren::createVertexLayout(layoutData);
-        vertexBuffer = Panda::Miren::createVertexBuffer(vertices, 24, layoutHandle);
+        vertexBuffer = Panda::Miren::createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
         indexBuffer = Panda::Miren::createIndexBuffer(indices, 36);
 
         texture = Panda::Miren::createTexture("textures/arbuz1.png");

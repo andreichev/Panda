@@ -39,7 +39,7 @@ void TriangleLevel::start(Panda::World *world) {
     Panda::VertexBufferLayoutData layoutData;
     layoutData.push<float>(2);
     Panda::VertexLayoutHandle vertexLayout = Panda::Miren::createVertexLayout(layoutData);
-    Panda::VertexBufferHandle vertexBuffer = Panda::Miren::createVertexBuffer(data, 12, vertexLayout);
+    Panda::VertexBufferHandle vertexBuffer = Panda::Miren::createVertexBuffer(data, 32, vertexLayout);
     Panda::IndexBufferHandle indexBuffer = Panda::Miren::createIndexBuffer(indices, 6);
 
     Panda::Shared<TriangleRenderer> triangleRenderer = Panda::makeShared<TriangleRenderer>(vertexBuffer, indexBuffer, baseShader);
