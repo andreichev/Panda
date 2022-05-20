@@ -67,7 +67,7 @@ void Mesh::initialize() {
     transform->addDelegate(this);
 }
 
-void Mesh::update(float deltaTime) {
+void Mesh::update(double deltaTime) {
     Miren::setUniform(shaderHandle, "model", &model[0][0], sizeof(glm::mat4));
     Miren::setTexture(textureHandle, 0);
     Miren::setVertexBuffer(vertexBufferHandle);

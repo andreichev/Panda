@@ -55,7 +55,7 @@ void Entity::initialize() {
     }
 }
 
-void Entity::update(float deltaTime) {
+void Entity::update(double deltaTime) {
     // Обновить дочерние сущности
     for (auto &entity : childEntities) {
         entity->update(deltaTime);

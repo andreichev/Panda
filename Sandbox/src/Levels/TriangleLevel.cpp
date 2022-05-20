@@ -13,7 +13,7 @@ public:
 
     void initialize() override {}
 
-    void update(float deltaTime) override {
+    void update(double deltaTime) override {
         Panda::Miren::setShader(m_shader);
         Panda::Miren::setVertexBuffer(m_vertexBuffer);
         Panda::Miren::setIndexBuffer(m_indexBuffer, 6);

@@ -18,7 +18,7 @@ Transform::Transform()
 
 void Transform::initialize() {}
 
-void Transform::update(float deltaTime) {}
+void Transform::update(double deltaTime) {}
 
 void Transform::rotate(float x, float y, float z) {
     if (x == 0 && y == 0 && z == 0) {

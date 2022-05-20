@@ -71,12 +71,12 @@ public:
         time = 0;
     }
 
-    void update(float deltaTime) override {
+    void update(double deltaTime) override {
         time += deltaTime;
         model = glm::mat4(1.f);
         model = glm::scale(glm::mat4(1.f), glm::vec3(abs(sin(time)) + 1.f, abs(sin(time)) + 1.f, 1.f));
         model = glm::translate(model, translate);
-        model = glm::rotate(model, time, glm::vec3(1.f, 1.f, 0.f));
+        model = glm::rotate(model, (float) time, glm::vec3(1.f, 1.f, 0.f));
 
         Panda::Miren::setShader(shader);
         Panda::Miren::setTexture(texture, 0);
@@ -95,7 +95,7 @@ private:
     glm::mat4 model;
     glm::mat4 projectionMatrix;
 
-    float time;
+    double time;
     Panda::TextureHandle texture;
     Panda::ShaderHandle shader;
     Panda::IndexBufferHandle indexBuffer;

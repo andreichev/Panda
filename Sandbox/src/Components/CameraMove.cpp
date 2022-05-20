@@ -10,7 +10,7 @@ void CameraMove::initialize() {
     window = &Panda::ApplicationContext::get().getWindow();
 }
 
-void CameraMove::update(float deltaTime) {
+void CameraMove::update(double deltaTime) {
     float speed = moveSpeed * deltaTime;
     static float lastMouseX = events->getMousePositionX();
     static float lastMouseY = events->getMousePositionY();

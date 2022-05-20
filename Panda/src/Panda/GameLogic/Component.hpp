@@ -17,7 +17,7 @@ public:
     void setEntity(Entity *entity);
     Entity &getEntity();
     virtual void initialize() = 0;
-    virtual void update(float deltaTime) = 0;
+    virtual void update(double deltaTime) = 0;
     bool isActive;
 
 private:

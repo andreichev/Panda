@@ -21,7 +21,7 @@ public:
         TextureHandle texture, ShaderHandle shader);
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
     void initialize() override;
-    void update(float deltaTime) override;
+    void update(double deltaTime) override;
     void updateBuffer(const MeshData &data);
     void updateBuffer(Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount);
 

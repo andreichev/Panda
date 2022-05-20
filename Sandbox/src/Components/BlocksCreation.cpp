@@ -47,7 +47,7 @@ void BlocksCreation::setVoxel(int x, int y, int z, int8_t id) {
     }
 }
 
-void BlocksCreation::update(float deltaTime) {
+void BlocksCreation::update(double deltaTime) {
     glm::vec4 position = transform->getPosition();
     glm::vec4 target = transform->getFront();
     VoxelRaycastData *v = chunksStorage->bresenham3D(position.x, position.y, position.z, target.x, target.y, target.z, maximumDistance);

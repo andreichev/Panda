@@ -9,7 +9,7 @@ void FullScreenToggle::initialize() {
     m_window = &Panda::ApplicationContext::get().getWindow();
 }
 
-void FullScreenToggle::update(float deltaTime) {
+void FullScreenToggle::update(double deltaTime) {
     if (m_events->isKeyJustPressed(Panda::Key::ESCAPE)) {
         Panda::ApplicationContext::get().isApplicationShouldClose = true;
     }

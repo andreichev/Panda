@@ -22,7 +22,7 @@ public:
     // MARK: - Delegate
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
     void windowSizeChanged(GSize size) override;
-    void update(float deltaTime) override;
+    void update(double deltaTime) override;
 
 private:
     void updateProjectionMatrix();

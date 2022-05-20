@@ -30,7 +30,7 @@ void Camera::initialize() {
     ApplicationContext::get().getInput().addWindowSizeListener(this);
 }
 
-void Camera::update(float deltaTime) {
+void Camera::update(double deltaTime) {
     Miren::setUniform(shader, "view", &view[0][0], sizeof(glm::mat4));
     Miren::setUniform(shader, "projection", &projection[0][0], sizeof(glm::mat4));
 }

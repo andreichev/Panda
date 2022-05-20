@@ -15,7 +15,7 @@ class Transform : public Component {
 public:
     Transform();
     void initialize() override;
-    void update(float deltaTime) override;
+    void update(double deltaTime) override;
     void rotate(float x, float y, float z);
     void translate(Direction direction, float units);
     void translate(float x, float y, float z);

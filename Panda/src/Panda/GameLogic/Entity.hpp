@@ -14,7 +14,7 @@ class Entity {
 public:
     Entity();
     void initialize();
-    void update(float deltaTime);
+    void update(double deltaTime);
     void addComponent(Shared<Component> component);
     void addComponent(Component *component);
     void removeComponent(Shared<Component> component);

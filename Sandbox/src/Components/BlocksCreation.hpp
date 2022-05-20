@@ -11,7 +11,7 @@
 class BlocksCreation : public Panda::Component {
 public:
     void initialize() override;
-    void update(float deltaTime) override;
+    void update(double deltaTime) override;
     void setChunksStorage(Panda::Shared<ChunksStorage> storage);
 
 private:
