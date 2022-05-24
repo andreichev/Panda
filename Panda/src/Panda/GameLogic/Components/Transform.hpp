@@ -16,14 +16,19 @@ public:
     Transform();
     void initialize() override;
     void update(double deltaTime) override;
+    // ------- Rotation -------
     void rotate(float x, float y, float z);
-    void translate(Direction direction, float units);
+    glm::vec3 getRotation();
+    // ------- Position -------
+    void setRotation(float x, float y, float z);
+    void translate(Direction direction, float value);
     void translate(float x, float y, float z);
+    glm::vec4 getPosition();
+    void setPosition(float x, float y, float z);
+    // ------------------------
     glm::vec4 getUp();
     glm::vec4 getFront();
     glm::vec4 getRight();
-    glm::vec4 getPosition();
-    glm::vec3 getRotation();
     void addDelegate(TransformDelegate *delegate);
     void removeDelegate(TransformDelegate *delegate);
 

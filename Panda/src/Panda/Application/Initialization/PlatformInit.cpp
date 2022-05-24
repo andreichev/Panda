@@ -15,11 +15,7 @@ namespace Panda {
 
 Window *createWindow(ApplicationStartupSettings &settings) {
 #ifdef PND_PLATFORM_DESKTOP
-    return new GlfwWindow(
-        settings.windowTitle,
-        settings.windowSize,
-        settings.isFullScreen
-    );
+    return new GlfwWindow(settings.windowTitle, settings.windowSize, settings.isFullScreen);
 #elif defined(PND_PLATFORM_IOS)
     return new UIKitWindow();
 #else

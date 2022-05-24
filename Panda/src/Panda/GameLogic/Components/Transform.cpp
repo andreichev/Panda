@@ -16,9 +16,20 @@ Transform::Transform()
     , up()
     , right() {}
 
-void Transform::initialize() {}
+void Transform::initialize() {
+    updateVectors();
+}
 
 void Transform::update(double deltaTime) {}
+
+void Transform::setRotation(float x, float y, float z) {
+    if(rotation.x == x && rotation.y == y && rotation.z == z) { return; }
+    rotation.x = x;
+    rotation.y = y;
+    rotation.z = z;
+    updateVectors();
+    transformUpdated();
+}
 
 void Transform::rotate(float x, float y, float z) {
     if (x == 0 && y == 0 && z == 0) {
@@ -54,27 +65,36 @@ void Transform::translate(float x, float y, float z) {
     transformUpdated();
 }
 
-void Transform::translate(Direction direction, float units) {
+void Transform::translate(Direction direction, float value) {
     switch (direction) {
         case Direction::Forward:
-            position += front * units;
+            position += front * value;
             break;
         case Direction::Backward:
-            position -= front * units;
+            position -= front * value;
             break;
         case Direction::Left:
-            position -= right * units;
+            position -= right * value;
             break;
         case Direction::Right:
-            position += right * units;
+            position += right * value;
             break;
         case Direction::Up:
-            position += up * units;
+            position += up * value;
             break;
         case Direction::Down:
-            position -= up * units;
+            position -= up * value;
             break;
     }
+    transformUpdated();
+}
+
+void Transform::setPosition(float x, float y, float z) {
+    if(position.x == x && position.y == y && position.z == z) { return; }
+    position.x = x;
+    position.y = y;
+    position.z = z;
+    updateVectors();
     transformUpdated();
 }
 

@@ -7,7 +7,7 @@
 class CubeComponent : public Panda::Component {
 public:
     void initialize() override {
-        auto vertices = new Vertex[] {
+        auto vertices = new Vertex[]{
             // Front
             Vertex(-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f), // 0
             Vertex(1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f),  // 1
@@ -40,7 +40,7 @@ public:
             Vertex(1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f)   // 21
         };
 
-        auto indices = new uint32_t[] {
+        auto indices = new uint32_t[]{
             0, 1, 2, 2, 3, 0,       // Front
             4, 5, 6, 6, 7, 4,       // Back
             8, 9, 10, 10, 11, 8,    // Top
@@ -76,7 +76,7 @@ public:
         model = glm::mat4(1.f);
         model = glm::scale(glm::mat4(1.f), glm::vec3(abs(sin(time)) + 1.f, abs(sin(time)) + 1.f, 1.f));
         model = glm::translate(model, translate);
-        model = glm::rotate(model, (float) time, glm::vec3(1.f, 1.f, 0.f));
+        model = glm::rotate(model, (float)time, glm::vec3(1.f, 1.f, 0.f));
 
         Panda::Miren::setShader(shader);
         Panda::Miren::setTexture(texture, 0);
