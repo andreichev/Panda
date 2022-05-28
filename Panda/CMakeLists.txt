@@ -18,8 +18,8 @@ file(GLOB_RECURSE SOURCES src/Panda/*.cpp src/Platform/RendererImpl/OpenGL/*.cpp
 file(GLOB_RECURSE INCLUDE src/Panda/*.hpp src/Platform/RendererImpl/OpenGL/*.hpp)
 
 # Entry point realization binding
-if (PLATFORM_MACOS)
-    list(APPEND SOURCES "src/Platform/EntryPoint/MacOS/main.cpp")
+if (DESKTOP)
+    list(APPEND SOURCES "src/Platform/EntryPoint/Desktop/main.cpp")
 elseif (PLATFORM_IOS)
     list(APPEND SOURCES "src/Platform/EntryPoint/iOS/main.mm")
 else ()
