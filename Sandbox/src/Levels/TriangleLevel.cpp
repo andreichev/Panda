@@ -37,7 +37,7 @@ void TriangleLevel::start(Panda::World *world) {
     uint32_t *indices = new uint32_t[]{0, 1, 2, 0, 2, 3};
 
     Panda::VertexBufferLayoutData layoutData;
-    layoutData.push<float>(2);
+    layoutData.pushFloat(2);
     Panda::VertexLayoutHandle vertexLayout = Panda::Miren::createVertexLayout(layoutData);
     Panda::VertexBufferHandle vertexBuffer = Panda::Miren::createVertexBuffer(data, 32, vertexLayout);
     Panda::IndexBufferHandle indexBuffer = Panda::Miren::createIndexBuffer(indices, 6);

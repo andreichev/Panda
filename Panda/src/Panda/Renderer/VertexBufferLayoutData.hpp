@@ -34,41 +34,31 @@ public:
 
     virtual ~VertexBufferLayoutData() = default;
 
-    template<typename T>
-    void push(unsigned int count) {
-        PND_ERROR("UNDEFINED REALIZATION");
-    }
-
-    template<>
-    void push<float>(unsigned int count) {
+    void pushFloat(unsigned int count) {
         VertexBufferElement element = {BufferElementType::Float, count, false};
         m_Elements.push_back(element);
         m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::Float);
     }
 
-    template<>
-    void push<unsigned int>(unsigned int count) {
+    void pushUInt(unsigned int count) {
         VertexBufferElement element = {BufferElementType::UnsignedInt, count, false};
         m_Elements.push_back(element);
         m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedInt);
     }
 
-    template<>
-    void push<char>(unsigned int count) {
+    void pushChar(unsigned int count) {
         VertexBufferElement element = {BufferElementType::UnsignedByte, count, true};
         m_Elements.push_back(element);
         m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedByte);
     }
 
-    template<>
-    void push<glm::vec3>(unsigned int count) {
+    void pushVec3(unsigned int count) {
         VertexBufferElement element = {BufferElementType::Float, count * 3, true};
         m_Elements.push_back(element);
         m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::Float) * 3;
     }
 
-    template<>
-    void push<glm::vec2>(unsigned int count) {
+    void pushVec2(unsigned int count) {
         VertexBufferElement element = {BufferElementType::Float, count * 2, false};
         m_Elements.push_back(element);
         m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::Float) * 2;
@@ -76,11 +66,11 @@ public:
 
     void pushVector() {
         // positions
-        push<glm::vec3>(1);
+        pushVec3(1);
         // texture coordinates
-        push<glm::vec2>(1);
+        pushVec2(1);
         // light
-        push<float>(1);
+        pushFloat(1);
     }
 
     std::vector<VertexBufferElement> m_Elements;

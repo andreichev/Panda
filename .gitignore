@@ -21,6 +21,7 @@ xcode
 *.xcworkspace
 
 # Visual Studio files and folder
+visualstudio
 .vs/
 **.sln
 **.vcxproj

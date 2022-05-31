@@ -3,16 +3,17 @@
 //
 #include "sndbxpch.hpp"
 #include "PerlinNoise.hpp"
+#include <random>
 
 float interpolate(float v1, float v2, float blend) {
     return (v2 - v1) * blend + v1;
 }
 
 void PerlinNoise::generate2D(int seedValue, int octaves, float bias, float *values, int width, int height) {
-    srand(seedValue);
-    float seed[width * height];
+    std::srand(seedValue);
+    float* seed = new float[width * height];
     for (int i = 0; i < width * height; i++) {
-        seed[i] = ((float)random() / (float)RAND_MAX);
+        seed[i] = ((float)std::rand() / (float)RAND_MAX);
     }
 
     for (int x = 0; x < width; x++) {
@@ -44,4 +45,6 @@ void PerlinNoise::generate2D(int seedValue, int octaves, float bias, float *valu
             values[x * width + y] /= scaleAccumulation;
         }
     }
+
+    delete[] seed;
 }

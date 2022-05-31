@@ -5,7 +5,7 @@
 #include "Panda/Application/PlatformDetection.hpp"
 #include "PlatformInit.hpp"
 
-#ifdef PND_PLATFORM_MACOS
+#ifdef PND_PLATFORM_DESKTOP
 #    include "Platform/WindowImpl/GlfwWindow/GlfwWindow.hpp"
 #elif defined(PND_PLATFORM_IOS)
 #    include "Platform/WindowImpl/UIKitWindow/UIKitWindow.hpp"
