@@ -11,7 +11,7 @@ float interpolate(float v1, float v2, float blend) {
 
 void PerlinNoise::generate2D(int seedValue, int octaves, float bias, float *values, int width, int height) {
     std::srand(seedValue);
-    float* seed = new float[width * height];
+    float *seed = new float[width * height];
     for (int i = 0; i < width * height; i++) {
         seed[i] = ((float)std::rand() / (float)RAND_MAX);
     }

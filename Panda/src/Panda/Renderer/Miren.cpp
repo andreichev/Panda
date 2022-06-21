@@ -72,13 +72,6 @@ void Miren::deleteIndexBuffer(IndexBufferHandle handle) {
     s_commandQueue.post(new DeleteIndexBufferCommand(handle));
 }
 
-// VertexBufferHandle Miren::createVertexBuffer(Vertex *vertices, uint32_t count) {
-//    VertexBufferLayoutData layoutData;
-//    layoutData.pushVector();
-//    VertexLayoutHandle layoutHandle = createVertexLayout(layoutData);
-//    return Miren::createVertexBuffer((float *)vertices, count * 6, layoutHandle);
-//}
-
 VertexBufferHandle Miren::createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     VertexBufferHandle handle = s_vertexBuffersHandleAlloc.alloc();
     s_commandQueue.post(new CreateVertexBufferCommand(handle, data, size, layoutHandle));
@@ -128,7 +121,7 @@ void Miren::renderFrame() {
     rendererExecuteCommands();
     RenderDraw *draw;
     while ((draw = s_frame.popDrawCall()) != nullptr) {
-        if (draw->isSubmitted == false || draw->m_numIndices == 0) {
+        if (draw->isSubmitted == false) {
             s_frame.free(draw);
             continue;
         }
@@ -142,7 +135,11 @@ void Miren::renderFrame() {
             s_context->setUniform(uniform.handle, uniform.name, uniform.value, uniform.size);
             draw->m_uniformBuffer.pop();
         }
-        s_context->submit(draw->m_shader, draw->m_vertexBuffer, draw->m_indexBuffer, draw->m_numIndices);
+        if (draw->isIndexed) {
+            s_context->submitIndexed(draw->m_shader, draw->m_vertexBuffer, draw->m_indexBuffer, draw->m_numIndices);
+        } else {
+            s_context->submitPrimitives(draw->m_shader, draw->m_vertexBuffer, draw->m_numElemets);
+        }
         s_frame.free(draw);
     }
     s_context->flip();
@@ -249,15 +246,14 @@ void Miren::setTexture(TextureHandle textureHandle, uint32_t slot) {
     s_frame.setTexture(textureHandle, slot);
 }
 
-void Miren::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) {
-    s_frame.setShader(shader);
-    s_frame.setVertexBuffer(vertexBuffer);
-    s_frame.setIndexBuffer(indexBuffer, indicesCount);
+void Miren::submit() {
     s_frame.submitCurrentDrawCall();
     s_frame.beginDrawCall();
 }
 
-void Miren::submit() {
+void Miren::submitPrimitives(uint32_t elements) {
+    s_frame.setIsIndexed(false);
+    s_frame.setNumberOfElements(elements);
     s_frame.submitCurrentDrawCall();
     s_frame.beginDrawCall();
 }

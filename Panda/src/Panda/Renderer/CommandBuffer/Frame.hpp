@@ -16,6 +16,8 @@ public:
     void setIndexBuffer(IndexBufferHandle handle, uint32_t count);
     void setVertexBuffer(VertexBufferHandle handle);
     void setShader(ShaderHandle handle);
+    void setIsIndexed(bool value);
+    void setNumberOfElements(uint32_t count);
     void free(const RenderDraw *draw);
     void setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size);
     void setTexture(TextureHandle textureHandle, uint32_t slot);

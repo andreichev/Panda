@@ -1,5 +1,7 @@
 #version 300 es
 
+precision highp float;
+
 out vec4 f_color;
 
 float rand(vec2 n) {

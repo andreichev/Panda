@@ -55,6 +55,16 @@ void Frame::setTexture(TextureHandle textureHandle, uint32_t slot) {
     draw->m_textureBindings.emplace(textureHandle, slot);
 }
 
+void Frame::setIsIndexed(bool value) {
+    RenderDraw *draw = m_drawCalls.back();
+    draw->isIndexed = value;
+}
+
+void Frame::setNumberOfElements(uint32_t count) {
+    RenderDraw *draw = m_drawCalls.back();
+    draw->m_numElemets = count;
+}
+
 void Frame::submitCurrentDrawCall() {
     RenderDraw *draw = m_drawCalls.back();
     draw->isSubmitted = true;

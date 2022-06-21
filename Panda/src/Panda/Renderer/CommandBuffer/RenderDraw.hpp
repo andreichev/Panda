@@ -32,7 +32,9 @@ struct TextureBinding {
 struct RenderDraw {
     RenderDraw()
         : isSubmitted(false)
+        , isIndexed(true)
         , m_numIndices(0)
+        , m_numElemets(0)
         , m_shader(0)
         , m_indexBuffer(0)
         , m_vertexBuffer(0)
@@ -40,7 +42,11 @@ struct RenderDraw {
         , m_textureBindings() {}
 
     bool isSubmitted;
+    // Отрисовка по индексам или примитив
+    bool isIndexed;
     uint32_t m_numIndices;
+    // Если примитивы, а не индексы - их количество
+    uint32_t m_numElemets;
     ShaderHandle m_shader;
     IndexBufferHandle m_indexBuffer;
     VertexBufferHandle m_vertexBuffer;

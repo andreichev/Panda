@@ -204,9 +204,9 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
             }
         }
     }
-    PND_INFO("MESH GENERATED.");
-    PND_INFO("VERTICES COUNT: {}", verticesCount);
-    PND_INFO("INDICES COUNT: {}", indicesCount);
+    // PND_INFO("MESH GENERATED.");
+    // PND_INFO("VERTICES COUNT: {}", verticesCount);
+    // PND_INFO("INDICES COUNT: {}", indicesCount);
     return Panda::MeshData(vertices, verticesCount, indices, indicesCount);
 }
 

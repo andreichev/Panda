@@ -2,7 +2,7 @@
 
 if which clang-format >/dev/null; then
 
-foldersToExclude=(Vendor vendor submodules cmake-build-debug cmake-build-release xcode visualstudio)
+foldersToExclude=(Vendor vendor submodules build cmake-build-debug cmake-build-release xcode visualstudio)
 extensionsToProcess=(cpp hpp h)
 
 command="find . \( "

@@ -51,7 +51,9 @@ public:
     virtual void deleteVertexLayout(VertexLayoutHandle handle) = 0;
     virtual void setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) = 0;
     virtual void setTexture(TextureHandle handle, uint32_t slot) = 0;
-    virtual void submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) = 0;
+    virtual void submitIndexed(
+        ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) = 0;
+    virtual void submitPrimitives(ShaderHandle shader, VertexBufferHandle vertexBuffer, uint32_t elementsCount) = 0;
 };
 
 } // namespace Panda

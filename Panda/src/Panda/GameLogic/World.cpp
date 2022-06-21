@@ -8,10 +8,12 @@
 namespace Panda {
 
 World::World()
-    : root() {}
+    : root()
+    , uiRoot() {}
 
 void World::update(double deltaTime) {
     root.update(deltaTime);
+    uiRoot.render();
 }
 
 void World::initialize() {
@@ -29,6 +31,10 @@ void World::destroy(Shared<Entity> &entity) {
     for (Shared<Entity> child : entity->getChildEntities()) {
         destroy(child);
     }
+}
+
+UIView *World::getUIView() {
+    return &uiRoot;
 }
 
 } // namespace Panda

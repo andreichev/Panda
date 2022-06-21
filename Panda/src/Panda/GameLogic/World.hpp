@@ -7,6 +7,7 @@
 #include "Panda/GameLogic/Entity.hpp"
 #include "Panda/Window/Window.hpp"
 #include "Panda/Events/Input.hpp"
+#include "Panda/GameLogic/UI/UIView.hpp"
 
 namespace Panda {
 
@@ -17,9 +18,11 @@ public:
     void update(double deltaTime);
     Shared<Entity> instantiateEntity();
     void destroy(Shared<Entity> &entity);
+    UIView *getUIView();
 
 private:
     Entity root;
+    UIView uiRoot;
 };
 
 } // namespace Panda

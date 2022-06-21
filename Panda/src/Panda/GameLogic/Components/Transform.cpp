@@ -23,7 +23,9 @@ void Transform::initialize() {
 void Transform::update(double deltaTime) {}
 
 void Transform::setRotation(float x, float y, float z) {
-    if(rotation.x == x && rotation.y == y && rotation.z == z) { return; }
+    if (rotation.x == x && rotation.y == y && rotation.z == z) {
+        return;
+    }
     rotation.x = x;
     rotation.y = y;
     rotation.z = z;
@@ -90,7 +92,9 @@ void Transform::translate(Direction direction, float value) {
 }
 
 void Transform::setPosition(float x, float y, float z) {
-    if(position.x == x && position.y == y && position.z == z) { return; }
+    if (position.x == x && position.y == y && position.z == z) {
+        return;
+    }
     position.x = x;
     position.y = y;
     position.z = z;

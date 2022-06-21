@@ -8,6 +8,7 @@
 #include "Components/CameraMove.hpp"
 #include "Components/BlocksCreation.hpp"
 #include "Components/FullScreenToggle.hpp"
+#include "Components/UI/UICrosshair.hpp"
 #include "Panda.hpp"
 
 void BaseLevel::start(Panda::World *world) {
@@ -32,6 +33,10 @@ void BaseLevel::start(Panda::World *world) {
 
     FullScreenToggle *fullScreenToggle = new FullScreenToggle();
     cameraEntity->addComponent(fullScreenToggle);
+
+    Panda::Shared<Panda::UIView> view = Panda::makeShared<Panda::UIView>(Panda::GRect(50, 400, 100, 200));
+    world->getUIView()->addSubview(view);
+    world->getUIView()->addSubview(Panda::makeShared<UICrosshair>());
 
     Panda::Shared<Panda::Entity> chunkEntity = world->instantiateEntity();
     texture = Panda::Miren::createTexture("textures/Texture.png");

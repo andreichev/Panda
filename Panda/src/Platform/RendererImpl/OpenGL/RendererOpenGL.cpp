@@ -107,17 +107,17 @@ void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
 
 void RendererOpenGL::createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, false, vertexLayouts[layoutHandle]);
-    delete[] data;
+    free(data);
 }
 
 void RendererOpenGL::createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, true, vertexLayouts[layoutHandle]);
-    delete[] data;
+    free(data);
 }
 
 void RendererOpenGL::updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
     vertexBuffers[handle]->update(data, size);
-    delete[] data;
+    free(data);
 }
 
 void RendererOpenGL::deleteVertexBuffer(VertexBufferHandle handle) {
@@ -143,7 +143,8 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
     textures[handle]->bind(slot);
 }
 
-void RendererOpenGL::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) {
+void RendererOpenGL::submitIndexed(
+    ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) {
     if (vertexBuffers[vertexBuffer] == nullptr) {
         return;
     }
@@ -155,6 +156,19 @@ void RendererOpenGL::submit(ShaderHandle shader, VertexBufferHandle vertexBuffer
     checkForErrors();
     shaders[shader]->unbind();
     indexBuffers[indexBuffer]->unbind();
+    vertexBuffers[vertexBuffer]->unbind();
+}
+
+void RendererOpenGL::submitPrimitives(ShaderHandle shader, VertexBufferHandle vertexBuffer, uint32_t elementsCount) {
+    if (vertexBuffers[vertexBuffer] == nullptr) {
+        return;
+    }
+    shaders[shader]->bind();
+    vertexBuffers[vertexBuffer]->bind();
+    // TODO: Capture time
+    glDrawArrays(GL_TRIANGLES, 0, elementsCount);
+    checkForErrors();
+    shaders[shader]->unbind();
     vertexBuffers[vertexBuffer]->unbind();
 }
 

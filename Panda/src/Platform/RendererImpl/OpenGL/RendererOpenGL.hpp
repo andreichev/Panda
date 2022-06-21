@@ -40,7 +40,8 @@ public:
     void deleteVertexLayout(VertexLayoutHandle handle) override;
     void setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) override;
     void setTexture(TextureHandle handle, uint32_t slot) override;
-    void submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) override;
+    void submitIndexed(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) override;
+    void submitPrimitives(ShaderHandle shader, VertexBufferHandle vertexBuffer, uint32_t elementsCount) override;
 
 private:
     void checkForErrors();

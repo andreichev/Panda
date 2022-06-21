@@ -37,8 +37,8 @@ public:
     static void setIndexBuffer(IndexBufferHandle handle, uint32_t count);
     static void setShader(ShaderHandle handle);
     static void setTexture(TextureHandle textureHandle, uint32_t slot);
-    static void submit(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount);
     static void submit();
+    static void submitPrimitives(uint32_t elements);
     static void beginFrameProcessing();
     static void endFrameProcessing();
     static void renderFrame();
