@@ -18,8 +18,6 @@ public:
     RendererOpenGL(GSize size);
     ~RendererOpenGL() override;
     RendererType getRendererType() const override;
-    void semaphoreWait() override;
-    void semaphoreSignal() override;
     void setViewportSize(GSize size) override;
     void setClearColor(float r, float g, float b, float a) override;
     void clear() override;

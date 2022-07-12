@@ -10,8 +10,6 @@ namespace Panda {
 class GlesContext : public GraphicsContext {
     void create(int width, int height) override;
     void flip() override;
-    void semaphoreWait() override;
-    void semaphoreSignal() override;
 
 private:
     void *context;

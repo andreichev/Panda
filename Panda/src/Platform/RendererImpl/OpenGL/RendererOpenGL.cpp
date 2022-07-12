@@ -42,14 +42,6 @@ RendererType RendererOpenGL::getRendererType() const {
 #endif
 }
 
-void RendererOpenGL::semaphoreWait() {
-    context->semaphoreWait();
-}
-
-void RendererOpenGL::semaphoreSignal() {
-    context->semaphoreSignal();
-}
-
 void RendererOpenGL::setViewportSize(GSize size) {
     glViewport(0, 0, (int)size.width, (int)size.height);
 }

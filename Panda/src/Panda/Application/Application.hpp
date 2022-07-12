@@ -18,7 +18,6 @@ public:
     ~Application();
     Application(ApplicationStartupSettings &settings);
     void loop();
-
     int fps;
 
 private:

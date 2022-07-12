@@ -29,8 +29,6 @@ class RendererI {
 public:
     virtual ~RendererI() = default;
     virtual RendererType getRendererType() const = 0;
-    virtual void semaphoreWait() = 0;
-    virtual void semaphoreSignal() = 0;
     virtual void setViewportSize(GSize size) = 0;
     virtual void setClearColor(float r, float g, float b, float a) = 0;
     virtual void clear() = 0;

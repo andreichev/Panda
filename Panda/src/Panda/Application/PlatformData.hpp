@@ -13,7 +13,6 @@ public:
     void *layer;
     void *nativeWindowHandle;
     void *renderingContext;
-    void *semaphoreHandle;
 };
 
 } // namespace Panda

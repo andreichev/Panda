@@ -37,3 +37,7 @@
 #if defined(PND_PLATFORM_WINDOWS) || defined(PND_PLATFORM_LINUX) || defined(PND_PLATFORM_MACOS)
 #    define PND_PLATFORM_DESKTOP
 #endif
+
+#if defined(PND_PLATFORM_ANDROID) || defined(PND_PLATFORM_IOS) || defined(BX_PLATFORM_LINUX) || defined(PND_PLATFORM_MACOS)
+#    define PND_PLATFORM_POSIX
+#endif

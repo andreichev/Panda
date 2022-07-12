@@ -9,6 +9,8 @@
 
 namespace Panda {
 
+bool Miren::needToIntialize = false;
+GSize Miren::size;
 RendererI *Miren::s_context = nullptr;
 Frame Miren::s_frame = Frame();
 constexpr uint32_t maxHandles = 1000;
@@ -20,9 +22,11 @@ MirenHandleAllocator Miren::s_vertexBuffersHandleAlloc(maxHandles);
 MirenHandleAllocator Miren::s_indexBuffersHandleAlloc(maxHandles);
 
 CommandQueue Miren::s_commandQueue;
+Semaphore Miren::rendererSemaphore;
 
 void Miren::initialize(GSize size) {
-    s_context = new RendererOpenGL(size);
+    Miren::needToIntialize = true;
+    Miren::size = size;
 }
 
 void Miren::terminate() {
@@ -104,19 +108,15 @@ void Miren::deleteVertexLayout(VertexLayoutHandle handle) {
     s_commandQueue.post(new DeleteVertexLayoutCommand(handle));
 }
 
-void Miren::beginFrameProcessing() {
-    s_context->semaphoreWait();
-}
-
-void Miren::endFrameProcessing() {
-    s_context->semaphoreSignal();
-}
-
 void Miren::renderFrame() {
     if (s_context == nullptr) {
+        if (needToIntialize) {
+            s_context = new RendererOpenGL(size);
+            needToIntialize = false;
+        }
         return;
     }
-    s_context->semaphoreWait();
+    renderSemaphoreWait();
     s_context->clear();
     rendererExecuteCommands();
     RenderDraw *draw;
@@ -144,7 +144,7 @@ void Miren::renderFrame() {
     }
     s_context->flip();
     s_frame.beginDrawCall();
-    s_context->semaphoreSignal();
+    renderSemaphorePost();
 }
 
 void Miren::rendererExecuteCommands() {
@@ -224,6 +224,19 @@ void Miren::rendererExecuteCommands() {
         }
         s_commandQueue.release(command);
     }
+}
+
+void Miren::renderSemaphoreWait() {
+    rendererSemaphore.wait();
+}
+
+void Miren::renderSemaphorePost() {
+    rendererSemaphore.post();
+}
+
+// TODO: - Implement, add swapping frames
+void Miren::frame() {
+    renderSemaphoreWait();
 }
 
 void Miren::setVertexBuffer(VertexBufferHandle handle) {

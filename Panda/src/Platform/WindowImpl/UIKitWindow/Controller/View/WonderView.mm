@@ -37,10 +37,8 @@
     CGFloat width = self.frame.size.width * scale;
     CGFloat height = self.frame.size.height * scale;
     Panda::ApplicationContext::get().postSizeEvent(width, height);
-    semaphore = dispatch_semaphore_create(1);
     Panda::PlatformData::get().layer = self.layer;
     Panda::PlatformData::get().nativeWindowHandle = self;
-    Panda::PlatformData::get().semaphoreHandle = &semaphore;
     Panda::Miren::initialize({ (float) (width), (float) (height) } );
 }
 

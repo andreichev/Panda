@@ -9,6 +9,7 @@
 #include "CommandBuffer/Frame.hpp"
 #include "CommandBuffer/RenderDraw.hpp"
 #include "CommandBuffer/CommandQueue.hpp"
+#include "Panda/Thread/Semaphore.hpp"
 
 namespace Panda {
 
@@ -37,15 +38,26 @@ public:
     static void setIndexBuffer(IndexBufferHandle handle, uint32_t count);
     static void setShader(ShaderHandle handle);
     static void setTexture(TextureHandle textureHandle, uint32_t slot);
+    /// Submit draw call
     static void submit();
+    /// Submit not indexed triangles draw call
     static void submitPrimitives(uint32_t elements);
-    static void beginFrameProcessing();
-    static void endFrameProcessing();
+    // MARK: - Main functions
+    /// Process all requests to gpu (from rendering thread)
     static void renderFrame();
+    /// Frame processing finished (from app thread). Wait for renderer to finish rendering frame
+    static void frame();
+
+    // TODO: - Remove
+    static void renderSemaphoreWait();
+    static void renderSemaphorePost();
 
 private:
-    static void rendererExecuteCommands();
+    static bool needToIntialize;
+    static GSize size;
 
+    static void rendererExecuteCommands();
+    static Semaphore rendererSemaphore;
     static Frame s_frame;
     static RendererI *s_context;
     static CommandQueue s_commandQueue;

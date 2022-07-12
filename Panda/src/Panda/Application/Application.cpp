@@ -15,9 +15,6 @@ uint64_t getMillis() {
 }
 
 Application::~Application() {
-#ifdef PND_PLATFORM_DESKTOP
-    Miren::terminate();
-#endif
     delete currentLevel;
     delete world;
 }
@@ -36,7 +33,9 @@ Application::Application(ApplicationStartupSettings &settings) {
 #endif
     world = new World();
     timeMillis = getMillis();
+    Miren::renderSemaphoreWait();
     settings.startupLevel->start(world);
+    Miren::renderSemaphorePost();
     currentLevel = settings.startupLevel;
 }
 
@@ -59,13 +58,10 @@ void Application::loop() {
             oneSecondTimeCount = 0;
         }
 
-        Miren::beginFrameProcessing();
+        Miren::renderSemaphoreWait();
         world->update(deltaTimeMillis / 1000.0);
         deltaTimeMillis = 0;
-        Miren::endFrameProcessing();
-#ifdef PND_PLATFORM_DESKTOP
-        Miren::renderFrame();
-#endif
+        Miren::renderSemaphorePost();
         context.getWindow().pollEvents();
         context.processEvents();
     }
