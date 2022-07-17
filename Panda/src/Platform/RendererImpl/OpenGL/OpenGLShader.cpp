@@ -25,8 +25,8 @@ OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath) {
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         // open files
-        vShaderFile.open(ApplicationContext::get().getResourcesPath() + vertexPath);
-        fShaderFile.open(ApplicationContext::get().getResourcesPath() + fragmentPath);
+        vShaderFile.open(ApplicationContext::get()->getResourcesPath() + vertexPath);
+        fShaderFile.open(ApplicationContext::get()->getResourcesPath() + fragmentPath);
         std::stringstream vShaderStream, fShaderStream;
         // read file's buffer contents into streams
         vShaderStream << vShaderFile.rdbuf();

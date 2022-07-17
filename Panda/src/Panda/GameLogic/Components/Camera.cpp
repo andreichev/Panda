@@ -14,20 +14,20 @@ Camera::Camera()
     : transform(nullptr)
     , shader(0)
     , fieldOfView(70.f)
-    , windowSize(ApplicationContext::get().getInput().getWindowSize())
+    , windowSize(ApplicationContext::get()->getInput().getWindowSize())
     , target(1.f)
     , view(1.f)
     , projection(1.f) {}
 
 Camera::~Camera() {
     transform->removeDelegate(this);
-    ApplicationContext::get().getInput().removeWindowSizeListener(this);
+    ApplicationContext::get()->getInput().removeWindowSizeListener(this);
 }
 
 void Camera::initialize() {
     transform = getEntity().getTransform();
     transform->addDelegate(this);
-    ApplicationContext::get().getInput().addWindowSizeListener(this);
+    ApplicationContext::get()->getInput().addWindowSizeListener(this);
 }
 
 void Camera::update(double deltaTime) {

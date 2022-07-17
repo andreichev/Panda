@@ -7,7 +7,7 @@
 
 void BlocksCreation::initialize() {
     transform = getEntity().getTransform();
-    events = &Panda::ApplicationContext::get().getInput();
+    events = &Panda::ApplicationContext::get()->getInput();
 }
 
 void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ) {

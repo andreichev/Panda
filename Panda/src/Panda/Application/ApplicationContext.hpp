@@ -17,8 +17,10 @@ class Application;
 
 class ApplicationContext {
 public:
-    static ApplicationContext &get();
+    static ApplicationContext* get();
 
+    ApplicationContext();
+    ~ApplicationContext();
     void runApplication(ApplicationStartupSettings &settings);
     void setResourcesPath(std::string path);
     std::string &getResourcesPath();
@@ -33,6 +35,7 @@ public:
     bool isApplicationShouldClose;
 
 private:
+    static ApplicationContext* s_instance;
     Application *application;
     Input input;
     Window *window;

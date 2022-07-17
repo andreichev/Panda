@@ -22,7 +22,7 @@ GlfwWindow::GlfwWindow(const char *title, GSize size, bool isFullscreen) {
     m_windowSizeBackup = size;
     cursorLocked = false;
 
-    context = &ApplicationContext::get();
+    context = ApplicationContext::get();
 
     PND_INFO("Hello GLFW! {}", glfwGetVersionString());
     glfwSetErrorCallback(glfwErrorCallback);

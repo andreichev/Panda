@@ -6,10 +6,11 @@
 extern int startApp(int argc, char **argv);
 
 static int32_t renderThread(Panda::Thread *_thread, void *_userData) {
-    while (Panda::ApplicationContext::get().isApplicationShouldClose == false) {
+    while (Panda::ApplicationContext::get()->isApplicationShouldClose == false) {
         Panda::Miren::renderFrame();
     }
     Panda::Miren::terminate();
+    return 0;
 }
 
 int main(int argc, char **argv) {

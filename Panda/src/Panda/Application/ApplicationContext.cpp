@@ -12,9 +12,21 @@
 
 namespace Panda {
 
-ApplicationContext &ApplicationContext::get() {
-    static ApplicationContext context;
-    return context;
+ApplicationContext* ApplicationContext::s_instance;
+
+ApplicationContext *ApplicationContext::get() {
+    if (ApplicationContext::s_instance == nullptr) {
+        PND_ERROR("APP CONTEXT NOT EXISTS");
+    }
+    return s_instance;
+}
+
+ApplicationContext::ApplicationContext() {
+    s_instance = this;
+}
+
+ApplicationContext::~ApplicationContext() {
+    s_instance = nullptr;
 }
 
 void ApplicationContext::runApplication(ApplicationStartupSettings &settings) {

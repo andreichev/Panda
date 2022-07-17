@@ -6,8 +6,8 @@
 
 void CameraMove::initialize() {
     transform = getEntity().getTransform();
-    events = &Panda::ApplicationContext::get().getInput();
-    window = &Panda::ApplicationContext::get().getWindow();
+    events = &Panda::ApplicationContext::get()->getInput();
+    window = &Panda::ApplicationContext::get()->getWindow();
 }
 
 void CameraMove::update(double deltaTime) {

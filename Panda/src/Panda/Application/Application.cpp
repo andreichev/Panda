@@ -25,9 +25,9 @@ Application::Application(ApplicationStartupSettings &settings) {
     deltaTimeMillis = 0;
     thisSecondFramesCount = 0;
 
-    ApplicationContext &context = ApplicationContext::get();
-    context.processEvents();
-    GSize windowSize = context.getInput().getWindowSize();
+    ApplicationContext* context = ApplicationContext::get();
+    context->processEvents();
+    GSize windowSize = context->getInput().getWindowSize();
 #ifdef PND_PLATFORM_DESKTOP
     Miren::initialize(windowSize);
 #endif
@@ -40,8 +40,8 @@ Application::Application(ApplicationStartupSettings &settings) {
 }
 
 void Application::loop() {
-    ApplicationContext &context = ApplicationContext::get();
-    while (context.isApplicationShouldClose == false) {
+    ApplicationContext* context = ApplicationContext::get();
+    while (context->isApplicationShouldClose == false) {
         uint64_t lastTime = timeMillis;
         timeMillis = getMillis();
         deltaTimeMillis += timeMillis - lastTime;
@@ -62,8 +62,8 @@ void Application::loop() {
         world->update(deltaTimeMillis / 1000.0);
         deltaTimeMillis = 0;
         Miren::renderSemaphorePost();
-        context.getWindow().pollEvents();
-        context.processEvents();
+        context->getWindow().pollEvents();
+        context->processEvents();
     }
 }
 

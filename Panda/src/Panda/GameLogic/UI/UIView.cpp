@@ -13,8 +13,8 @@ UIView::~UIView() {
 }
 
 UIView::UIView(GRect frame)
-    : window(&ApplicationContext::get().getWindow())
-    , input(&ApplicationContext::get().getInput())
+    : window(&ApplicationContext::get()->getWindow())
+    , input(&ApplicationContext::get()->getInput())
     , frame(frame) {
     float *data = new float[12];
     shaderHandle = Miren::createShader("shaders/ui/uiview/uiview_vertex.glsl", "shaders/ui/uiview/uiview_fragment.glsl");

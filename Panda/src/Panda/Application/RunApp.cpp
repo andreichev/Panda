@@ -3,5 +3,7 @@
 #include "ApplicationContext.hpp"
 
 void runPandaApplication(Panda::ApplicationStartupSettings settings) {
-    Panda::ApplicationContext::get().runApplication(settings);
+    auto context = new Panda::ApplicationContext();
+    context->runApplication(settings);
+    delete context;
 }
