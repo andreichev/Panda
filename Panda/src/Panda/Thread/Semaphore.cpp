@@ -161,11 +161,11 @@ Semaphore::Semaphore() {
 
     // #if PND_PLATFORM_WINRT \
 // ||  PND_PLATFORM_XBOXONE
-    si->m_handle = CreateSemaphoreExW(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
+    si->m_handle = CreateSemaphoreExW(NULL, 1, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
     // #else
     // 		si->m_handle = CreateSemaphoreA(NULL, 0, LONG_MAX, NULL);
     // #endif
-    PND_ASSERT(NULL != si->m_handle, "Failed to create Semaphore!");
+    PND_ASSERT(NULL != si->m_handle, "Failed to create Semaphore!", nullptr);
 }
 
 Semaphore::~Semaphore() {

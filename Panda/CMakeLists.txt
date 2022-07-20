@@ -51,15 +51,6 @@ target_precompile_headers(Panda PRIVATE src/pndpch.hpp)
 
 target_include_directories(Panda PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
-# set output directories for all builds (Debug, Release, etc.)
-foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
-    string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
-    set_target_properties(Panda
-        PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${BIN_DIRECTORY}
-    )
-endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
-
 # Dependencies - Panda
 target_link_libraries(Panda spdlog)
 target_include_directories(Panda PRIVATE Vendor/spdlog/include)
