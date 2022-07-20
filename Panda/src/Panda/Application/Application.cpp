@@ -3,11 +3,19 @@
 //
 
 #include "pndpch.hpp"
+#include "Panda/Application/Initialization/PlatformInit.hpp"
 #include "Application.hpp"
-#include "ApplicationContext.hpp"
 #include "Panda/Renderer/Miren.hpp"
+#include "Panda/GameLogic/BasicGameLayer.hpp"
+#include "Panda/Events/WindowEvents.hpp"
 
 namespace Panda {
+
+Application *Application::s_instance = nullptr;
+
+Application *Application::get() {
+    return s_instance;
+}
 
 uint64_t getMillis() {
     auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
@@ -15,33 +23,40 @@ uint64_t getMillis() {
 }
 
 Application::~Application() {
-    delete currentLevel;
-    delete world;
+    delete m_window;
 }
 
-Application::Application(ApplicationStartupSettings &settings) {
-    maximumFps = 60;
-    oneSecondTimeCount = 0;
-    deltaTimeMillis = 0;
-    thisSecondFramesCount = 0;
+void Application::pushLayer(Layer *layer) {
+    m_layerStack.pushLayer(layer);
+    layer->onAttach();
+}
 
-    ApplicationContext* context = ApplicationContext::get();
-    context->processEvents();
-    GSize windowSize = context->getInput().getWindowSize();
-#ifdef PND_PLATFORM_DESKTOP
-    Miren::initialize(windowSize);
-#endif
-    world = new World();
+void Application::pushOverlay(Layer *layer) {
+    m_layerStack.pushOverlay(layer);
+    layer->onAttach();
+}
+
+Application::Application(ApplicationStartupSettings &settings)
+    : isApplicationShouldClose(false)
+    , maximumFps(60)
+    , oneSecondTimeCount(0)
+    , deltaTimeMillis(0)
+    , thisSecondFramesCount(0) {
+    s_instance = this;
+    Logger::init();
+
+    m_window = createWindow(settings);
+    m_window->setEventQueue(&m_eventQueue);
     timeMillis = getMillis();
-    Miren::renderSemaphoreWait();
-    settings.startupLevel->start(world);
-    Miren::renderSemaphorePost();
-    currentLevel = settings.startupLevel;
+    startBasicGame(settings.startupLevel);
+}
+
+void Application::startBasicGame(Level *level) {
+    pushLayer(new BasicGameLayer(level));
 }
 
 void Application::loop() {
-    ApplicationContext* context = ApplicationContext::get();
-    while (context->isApplicationShouldClose == false) {
+    while (isApplicationShouldClose == false) {
         uint64_t lastTime = timeMillis;
         timeMillis = getMillis();
         deltaTimeMillis += timeMillis - lastTime;
@@ -57,13 +72,59 @@ void Application::loop() {
             thisSecondFramesCount = 0;
             oneSecondTimeCount = 0;
         }
+        double deltaTime = deltaTimeMillis / 1000.0;
+        deltaTimeMillis = 0;
 
         Miren::renderSemaphoreWait();
-        world->update(deltaTimeMillis / 1000.0);
-        deltaTimeMillis = 0;
+        for (Layer *layer : m_layerStack) {
+            layer->onUpdate(deltaTime);
+        }
+        m_window->pollEvents();
+        processEvents();
         Miren::renderSemaphorePost();
-        context->getWindow().pollEvents();
-        context->processEvents();
+    }
+}
+
+Window *Application::getWindow() {
+    return m_window;
+}
+
+void Application::processEvents() {
+    Event *event;
+    while ((event = m_eventQueue.poll()) != nullptr) {
+        if (event->type == EventType::WindowResize) {
+            const WindowResizeEvent *ev = dynamic_cast<const WindowResizeEvent *>(event);
+            windowSizeChanged(GSize(ev->getWidth(), ev->getHeight()));
+        } else if (event->type == EventType::WindowClose) {
+            close();
+        }
+        for (auto it = m_layerStack.rbegin(); it != m_layerStack.rend(); ++it) {
+            if (event->isHandled)
+                break;
+            (*it)->onEvent(event);
+        }
+        m_eventQueue.release(event);
+    }
+}
+
+EventQueue *Application::getEventQueue() {
+    return &m_eventQueue;
+}
+
+void Application::addWindowSizeListener(WindowSizeListener *listener) {
+    m_windowSizeListeners.push_back(listener);
+}
+
+void Application::windowSizeChanged(GSize size) {
+    for (auto &listener : m_windowSizeListeners) {
+        listener->windowSizeChanged(size);
+    }
+}
+
+void Application::removeWindowSizeListener(WindowSizeListener *listener) {
+    auto it = std::find(m_windowSizeListeners.begin(), m_windowSizeListeners.end(), listener);
+    if (it != m_windowSizeListeners.end()) {
+        m_windowSizeListeners.erase(it);
     }
 }
 

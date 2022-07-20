@@ -8,7 +8,7 @@ namespace Panda {
 class GraphicsContext {
 public:
     virtual ~GraphicsContext() = default;
-    virtual void create(int width, int height) = 0;
+    virtual void create() = 0;
     virtual void flip() = 0;
 };
 } // namespace Panda

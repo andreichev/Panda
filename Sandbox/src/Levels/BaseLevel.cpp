@@ -25,7 +25,7 @@ void BaseLevel::start(Panda::World *world) {
     cameraEntity->addComponent(Panda::makeShared<CameraMove>());
     cameraEntity->getTransform()->translate(
         ChunksStorage::WORLD_SIZE_X / 2, ChunksStorage::WORLD_SIZE_Y / 4, ChunksStorage::WORLD_SIZE_Z / 2);
-    cameraEntity->getTransform()->rotate(45.f, 0.f, 0.f);
+    cameraEntity->getTransform()->rotate(25.f, 0.f, 0.f);
 
     BlocksCreation *blocksCreation = new BlocksCreation();
     blocksCreation->setChunksStorage(chunksStorage);

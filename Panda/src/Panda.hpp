@@ -5,15 +5,17 @@
 #pragma once
 
 // Base
+#include "Panda/Application/Application.hpp"
 #include "Panda/Logger/Logger.hpp"
 #include "Panda/Application/RunApp.hpp"
-#include "Panda/Application/ApplicationContext.hpp"
-#include <Panda/Application/ApplicationStartupSettings.hpp>
+#include "Panda/Application/ApplicationStartupSettings.hpp"
+#include "Panda/Application/Layer.hpp"
 
 // Game logic
 #include "Panda/GameLogic/Entity.hpp"
 #include "Panda/GameLogic/Level.hpp"
 #include "Panda/GameLogic/Components/Mesh.hpp"
+#include "Panda/GameLogic/Input.hpp"
 #include "Panda/GameLogic/Primitives/MeshData.hpp"
 #include "Panda/GameLogic/Components/Camera.hpp"
 

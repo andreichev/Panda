@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Panda/Logger/Logger.hpp"
+
 namespace Panda {
 
 enum class BufferElementType { Float, UnsignedInt, UnsignedByte };

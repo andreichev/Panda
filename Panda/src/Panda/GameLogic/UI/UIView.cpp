@@ -1,6 +1,6 @@
 #include "pndpch.hpp"
 #include "UIView.hpp"
-#include "Panda/Application/ApplicationContext.hpp"
+#include "Panda/Application/Application.hpp"
 
 namespace Panda {
 
@@ -10,11 +10,11 @@ UIView::UIView()
 UIView::~UIView() {
     Miren::deleteVertexBuffer(vertexBufferHandle);
     Miren::deleteShader(shaderHandle);
+    Application::get()->removeWindowSizeListener(this);
 }
 
 UIView::UIView(GRect frame)
-    : window(&ApplicationContext::get()->getWindow())
-    , input(&ApplicationContext::get()->getInput())
+    : window(Application::get()->getWindow())
     , frame(frame) {
     float *data = new float[12];
     shaderHandle = Miren::createShader("shaders/ui/uiview/uiview_vertex.glsl", "shaders/ui/uiview/uiview_fragment.glsl");
@@ -22,8 +22,9 @@ UIView::UIView(GRect frame)
     layoutData.pushFloat(2);
     VertexLayoutHandle vertexLayout = Miren::createVertexLayout(layoutData);
     vertexBufferHandle = Miren::createDynamicVertexBuffer(data, sizeof(float) * 12, vertexLayout);
-    windowSize = input->getWindowSize();
-    input->addWindowSizeListener(this);
+    windowSize = window->getSize();
+    // TODO: - Subscribe to window size events
+    Application::get()->addWindowSizeListener(this);
     layout();
 }
 

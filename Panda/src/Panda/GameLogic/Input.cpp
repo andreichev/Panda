@@ -6,6 +6,15 @@
 
 namespace Panda {
 
+uint32_t Input::frame;
+bool Input::keys[1024];
+uint32_t Input::framesKeys[1024];
+bool Input::mouseButtons[8];
+uint32_t Input::framesMouseButtons[4];
+GSize Input::windowSize;
+int Input::mousePositionX;
+int Input::mousePositionY;
+
 void Input::setKeyPressed(Key key, bool state) {
     keys[(int)key] = state;
     framesKeys[(int)key] = frame + 1;
@@ -40,31 +49,20 @@ int Input::getMousePositionY() {
     return mousePositionY;
 }
 
-void Input::addWindowSizeListener(WindowSizeListener *listener) {
-    windowSizeListeners.push_back(listener);
-}
-
-void Input::removeWindowSizeListener(WindowSizeListener *listener) {
-    windowSizeListeners.erase(find(windowSizeListeners.begin(), windowSizeListeners.end(), listener));
-}
-
-void Input::windowSizeChanged(GSize size) {
-    windowSize = size;
-    for (auto &listener : windowSizeListeners) {
-        listener->windowSizeChanged(size);
-    }
-}
-
 void Input::postMouseChangedPosition(int x, int y) {
     mousePositionX = x;
     mousePositionY = y;
+}
+
+void Input::setWindowSize(GSize size) {
+    windowSize = size;
 }
 
 GSize Input::getWindowSize() {
     return windowSize;
 }
 
-void Input::eventProcessingFinished() {
+void Input::update() {
     frame++;
 }
 

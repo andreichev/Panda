@@ -4,7 +4,7 @@
 #include "pndpch.hpp"
 #include "RendererOpenGL.hpp"
 
-#include "Panda/Application/ApplicationContext.hpp"
+#include "Panda/Application/PlatformDetection.hpp"
 
 #ifdef PND_PLATFORM_IOS
 #    include <OpenGLES/ES3/gl.h>
@@ -16,13 +16,13 @@
 
 namespace Panda {
 
-RendererOpenGL::RendererOpenGL(GSize size) {
+RendererOpenGL::RendererOpenGL() {
 #ifdef PND_PLATFORM_IOS
     context = new GlesContext();
 #elif defined(PND_PLATFORM_DESKTOP)
     context = new OpenGLContext();
 #endif
-    context->create(size.width, size.height);
+    context->create();
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);

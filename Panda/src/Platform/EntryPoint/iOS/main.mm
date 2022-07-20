@@ -5,7 +5,7 @@
 //  Created by Admin on 03.08.2021.
 //
 
-#include "Panda/Application/ApplicationContext.hpp"
+#include "Panda/Application/PlatformData.hpp"
 #include "Platform/WindowImpl/UIKitWindow/Controller/WonderController.hpp"
 #import <UIKit/UIKit.h>
 
@@ -24,7 +24,7 @@ extern int startApp(int argc, char** argv);
     _window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
     NSString* path = NSBundle.mainBundle.resourcePath;
-    Panda::ApplicationContext::get().setResourcesPath(path.UTF8String);
+    Panda::PlatformData::get()->setResourcesPath(path.UTF8String);
 
     _window.rootViewController = controller;
     [_window makeKeyAndVisible];

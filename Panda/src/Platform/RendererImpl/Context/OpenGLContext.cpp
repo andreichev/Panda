@@ -10,8 +10,8 @@
 
 namespace Panda {
 
-void OpenGLContext::create(int width, int height) {
-    glfwWindowHandle = PlatformData::get().nativeWindowHandle;
+void OpenGLContext::create() {
+    glfwWindowHandle = PlatformData::get()->nativeWindowHandle;
     glfwMakeContextCurrent((GLFWwindow *)glfwWindowHandle);
     if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == false) {
         PND_CRITICAL("Failed to initialize GLAD");

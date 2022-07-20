@@ -20,9 +20,7 @@ GlfwWindow::~GlfwWindow() {
 GlfwWindow::GlfwWindow(const char *title, GSize size, bool isFullscreen) {
     m_isFullScreen = isFullscreen;
     m_windowSizeBackup = size;
-    cursorLocked = false;
-
-    context = ApplicationContext::get();
+    m_isCursorLocked = false;
 
     PND_INFO("Hello GLFW! {}", glfwGetVersionString());
     glfwSetErrorCallback(glfwErrorCallback);
@@ -52,17 +50,14 @@ GlfwWindow::GlfwWindow(const char *title, GSize size, bool isFullscreen) {
         PND_CRITICAL("Failed to create the GLFW window");
         exit(1);
     }
-    PlatformData::get().nativeWindowHandle = m_windowHandle;
+    PlatformData::get()->nativeWindowHandle = m_windowHandle;
 
     glfwShowWindow(m_windowHandle);
     glfwFocusWindow(m_windowHandle);
 
-    context->postSizeEvent(size.width, size.height);
     if (isFullscreen) {
         setFullScreen(true);
     }
-
-    addEventHandlers();
 }
 
 bool GlfwWindow::isFullScreen() {
@@ -90,23 +85,23 @@ void GlfwWindow::addEventHandlers() {
     glfwSetWindowSizeCallback(m_windowHandle, [](GLFWwindow *windowHandle, int width, int height) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->m_windowSizeBackup = GSize(width, height);
-        self->context->postSizeEvent(width, height);
+        self->m_eventQueue->postSizeEvent(width, height);
     });
     glfwSetKeyCallback(m_windowHandle, [](GLFWwindow *windowHandle, int key, int scancode, int action, int mods) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
-        self->context->postKeyEvent(static_cast<Key>(key), action == GLFW_PRESS || action == GLFW_REPEAT);
+        self->m_eventQueue->postKeyEvent(static_cast<Key>(key), action == GLFW_PRESS || action == GLFW_REPEAT);
     });
     glfwSetCursorPosCallback(m_windowHandle, [](GLFWwindow *windowHandle, double x, double y) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
-        self->context->postMouseEvent(x, y);
+        self->m_eventQueue->postMouseEvent(x, y);
     });
     glfwSetMouseButtonCallback(m_windowHandle, [](GLFWwindow *windowHandle, int button, int action, int mods) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
-        self->context->postMouseButtonEvent(static_cast<MouseButton>(button), action == GLFW_PRESS);
+        self->m_eventQueue->postMouseButtonEvent(static_cast<MouseButton>(button), action == GLFW_PRESS);
     });
     glfwSetWindowCloseCallback(m_windowHandle, [](GLFWwindow *windowHandle) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
-        self->context->isApplicationShouldClose = true;
+        self->m_eventQueue->postWindowCloseEvent();
     });
 }
 
@@ -115,20 +110,29 @@ void GlfwWindow::pollEvents() {
 }
 
 bool GlfwWindow::isCursorLocked() {
-    return cursorLocked;
+    return m_isCursorLocked;
 }
 
 void GlfwWindow::toggleCursorLock() {
-    cursorLocked = cursorLocked == false;
+    m_isCursorLocked = m_isCursorLocked == false;
     resetCursorPos();
-    glfwSetInputMode(m_windowHandle, GLFW_CURSOR, cursorLocked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(m_windowHandle, GLFW_CURSOR, m_isCursorLocked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }
 
 void GlfwWindow::resetCursorPos() {
     int x = m_windowSizeBackup.width / 2;
     int y = m_windowSizeBackup.height / 2;
     glfwSetCursorPos(m_windowHandle, x, y);
-    context->postMouseEvent(x, y);
+    m_eventQueue->postMouseEvent(x, y);
+}
+
+void GlfwWindow::setEventQueue(EventQueue *eventQueue) {
+    m_eventQueue = eventQueue;
+    addEventHandlers();
+}
+
+GSize GlfwWindow::getSize() {
+    return m_windowSizeBackup;
 }
 
 } // namespace Panda

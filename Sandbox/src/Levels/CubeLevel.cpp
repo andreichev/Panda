@@ -7,7 +7,7 @@
 class CubeComponent : public Panda::Component {
 public:
     void initialize() override {
-        auto vertices = new Vertex[24] {
+        auto vertices = new Vertex[24]{
             // Front
             Vertex(-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f), // 0
             Vertex(1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f),  // 1
@@ -59,7 +59,7 @@ public:
         shader = Panda::Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
         Panda::Miren::setShader(shader);
 
-        Panda::GSize windowSize = Panda::ApplicationContext::get()->getInput().getWindowSize();
+        Panda::GSize windowSize = Panda::Application::get()->getWindow()->getSize();
         view = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         // view = glm::rotate(glm::mat4(1.0f), glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
         projectionMatrix = glm::perspective(40.f, windowSize.width / windowSize.height, 0.1f, 1000.0f);

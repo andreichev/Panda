@@ -8,7 +8,7 @@
 namespace Panda {
 
 class GlesContext : public GraphicsContext {
-    void create(int width, int height) override;
+    void create() override;
     void flip() override;
 
 private:

@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include "Panda.hpp"
+#include <Panda.hpp>
 
 class FullScreenToggle : public Panda::Component {
     void initialize() override;
     void update(double deltaTime) override;
 
-    Panda::Input *m_events;
     Panda::Window *m_window;
 };

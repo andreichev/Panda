@@ -25,4 +25,10 @@ private:
     unsigned int width, height;
 };
 
+class WindowCloseEvent : public Event {
+public:
+    WindowCloseEvent()
+        : Event(EventType::WindowClose) {}
+};
+
 } // namespace Panda

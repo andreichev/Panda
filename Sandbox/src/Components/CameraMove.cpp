@@ -6,37 +6,36 @@
 
 void CameraMove::initialize() {
     transform = getEntity().getTransform();
-    events = &Panda::ApplicationContext::get()->getInput();
-    window = &Panda::ApplicationContext::get()->getWindow();
+    window = Panda::Application::get()->getWindow();
 }
 
 void CameraMove::update(double deltaTime) {
     float speed = moveSpeed * deltaTime;
-    static float lastMouseX = events->getMousePositionX();
-    static float lastMouseY = events->getMousePositionY();
+    static float lastMouseX = Panda::Input::getMousePositionX();
+    static float lastMouseY = Panda::Input::getMousePositionY();
     static bool cursorStarted = false;
 
-    if (events->isKeyPressed(Panda::Key::W)) {
+    if (Panda::Input::isKeyPressed(Panda::Key::W)) {
         transform->translate(Panda::Direction::Forward, speed);
     }
-    if (events->isKeyPressed(Panda::Key::S)) {
+    if (Panda::Input::isKeyPressed(Panda::Key::S)) {
         transform->translate(Panda::Direction::Backward, speed);
     }
-    if (events->isKeyPressed(Panda::Key::A)) {
+    if (Panda::Input::isKeyPressed(Panda::Key::A)) {
         transform->translate(Panda::Direction::Left, speed);
     }
-    if (events->isKeyPressed(Panda::Key::D)) {
+    if (Panda::Input::isKeyPressed(Panda::Key::D)) {
         transform->translate(Panda::Direction::Right, speed);
     }
-    if (events->isKeyPressed(Panda::Key::SPACE)) {
+    if (Panda::Input::isKeyPressed(Panda::Key::SPACE)) {
         transform->translate(Panda::Direction::Up, speed);
     }
-    if (events->isKeyPressed(Panda::Key::LEFT_SHIFT)) {
+    if (Panda::Input::isKeyPressed(Panda::Key::LEFT_SHIFT)) {
         transform->translate(Panda::Direction::Down, speed);
     }
     if (window->isCursorLocked()) {
-        float mouseX = events->getMousePositionX();
-        float mouseY = events->getMousePositionY();
+        float mouseX = Panda::Input::getMousePositionX();
+        float mouseY = Panda::Input::getMousePositionY();
         float deltaX = mouseX - lastMouseX;
         float deltaY = mouseY - lastMouseY;
         if (cursorStarted == false) {
@@ -50,7 +49,7 @@ void CameraMove::update(double deltaTime) {
         lastMouseX = mouseX;
         lastMouseY = mouseY;
     }
-    if (events->isKeyJustPressed(Panda::Key::TAB)) {
+    if (Panda::Input::isKeyJustPressed(Panda::Key::TAB)) {
         window->toggleCursorLock();
         cursorStarted = false;
     }

@@ -6,10 +6,10 @@
 
 #include "Panda/Base/Base.hpp"
 #include "Panda/Application/ApplicationStartupSettings.hpp"
-#include "Panda/GameLogic/Level.hpp"
-#include "Panda/GameLogic/World.hpp"
 #include "Panda/Window/Window.hpp"
-#include "Panda/Events/Input.hpp"
+#include "Panda/Application/LayerStack.hpp"
+#include "Panda/Events/EventQueue.hpp"
+#include "Panda/Events/WindowSizeListener.hpp"
 
 namespace Panda {
 
@@ -18,11 +18,29 @@ public:
     ~Application();
     Application(ApplicationStartupSettings &settings);
     void loop();
+
+    void startBasicGame(Level *level);
+    void pushLayer(Layer *layer);
+    void pushOverlay(Layer *layer);
+    void processEvents();
+    Window *getWindow();
+    void addWindowSizeListener(WindowSizeListener *listener);
+    void removeWindowSizeListener(WindowSizeListener *listener);
+    inline void close() {
+        isApplicationShouldClose = true;
+    }
+    inline bool isRunning() {
+        return isApplicationShouldClose == false;
+    }
     int fps;
+    EventQueue *getEventQueue();
+
+    static Application *get();
 
 private:
-    World *world;
-    Level *currentLevel;
+    void windowSizeChanged(GSize size);
+
+    bool isApplicationShouldClose;
     uint64_t timeMillis;
     // Таймер до 1 секудны для подсчета FPS (в миллисекундах)
     uint64_t oneSecondTimeCount;
@@ -31,6 +49,12 @@ private:
     int thisSecondFramesCount;
     // Ограничение по FPS
     int maximumFps;
+    LayerStack m_layerStack;
+    EventQueue m_eventQueue;
+    Window *m_window;
+    std::vector<WindowSizeListener *> m_windowSizeListeners;
+
+    static Application *s_instance;
 };
 
 } // namespace Panda

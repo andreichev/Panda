@@ -8,7 +8,6 @@
 #include "Panda/Base/GRect.hpp"
 #include "Panda/Events/WindowSizeListener.hpp"
 #include "Panda/Window/Window.hpp"
-#include "Panda/Events/Input.hpp"
 #include "Panda/Renderer/Miren.hpp"
 
 namespace Panda {
@@ -36,7 +35,6 @@ public:
 protected:
     GSize windowSize;
     Window *window;
-    Input *input;
 
 private:
     std::vector<Shared<UIView>> subviews;

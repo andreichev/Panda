@@ -10,7 +10,6 @@
 namespace Panda {
 
 bool Miren::needToIntialize = false;
-GSize Miren::size;
 RendererI *Miren::s_context = nullptr;
 Frame Miren::s_frame = Frame();
 constexpr uint32_t maxHandles = 1000;
@@ -24,9 +23,8 @@ MirenHandleAllocator Miren::s_indexBuffersHandleAlloc(maxHandles);
 CommandQueue Miren::s_commandQueue;
 Semaphore Miren::rendererSemaphore;
 
-void Miren::initialize(GSize size) {
+void Miren::initialize() {
     Miren::needToIntialize = true;
-    Miren::size = size;
 }
 
 void Miren::terminate() {
@@ -111,7 +109,7 @@ void Miren::deleteVertexLayout(VertexLayoutHandle handle) {
 void Miren::renderFrame() {
     if (s_context == nullptr) {
         if (needToIntialize) {
-            s_context = new RendererOpenGL(size);
+            s_context = new RendererOpenGL();
             needToIntialize = false;
         }
         return;

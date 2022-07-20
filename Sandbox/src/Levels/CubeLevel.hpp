@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Panda.hpp"
+#include <Panda.hpp>
 
 class CubeComponent;
 

@@ -6,7 +6,6 @@
 //
 
 #include "Panda/Application/PlatformData.hpp"
-#include "Panda/Application/ApplicationContext.hpp"
 #include "Panda/Renderer/Miren.hpp"
 
 #import <OpenGLES/ES3/gl.h>
@@ -25,21 +24,25 @@
     return self;
 }
 
-- (void)commonInit {
-    [self setupStyle];
-    [self addActionHandlers];
+- (instancetype)deinit {
+    Panda::Miren::terminate();
 }
 
-- (void) setupStyle {
+- (void)commonInit {
+    [self setupPlatform];
+    [self initDisplayLink];
+}
+
+- (void) setupPlatform {
     // self.backgroundColor = UIColor.redColor;
     CGFloat scale = UIScreen.mainScreen.nativeScale;
     [self setContentScaleFactor:scale];
     CGFloat width = self.frame.size.width * scale;
     CGFloat height = self.frame.size.height * scale;
-    Panda::ApplicationContext::get().postSizeEvent(width, height);
-    Panda::PlatformData::get().layer = self.layer;
-    Panda::PlatformData::get().nativeWindowHandle = self;
-    Panda::Miren::initialize({ (float) (width), (float) (height) } );
+    printf("UIView initialized, width: %f, height: %f\n", width, height);
+    Panda::PlatformData::get()->layer = self.layer;
+    Panda::PlatformData::get()->nativeWindowHandle = self;
+    Panda::Miren::initialize();
 }
 
 // MARK: - OpenGL stuff
@@ -50,7 +53,7 @@
 
 // MARK: - Action handlers
 
-- (void) addActionHandlers {
+- (void) initDisplayLink {
     displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(displayRefreshed:)];
     displayLink.preferredFramesPerSecond = 60;
     [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
@@ -62,17 +65,18 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if (_eventQueue == NULL) { return; }
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:self];
     touchLocation.x *= self.contentScaleFactor;
     touchLocation.y *= self.contentScaleFactor;
-
-    Panda::ApplicationContext::get().postMouseEvent(touchLocation.x, touchLocation.y);
-    Panda::ApplicationContext::get().postMouseButtonEvent(Panda::MouseButton::LEFT, true);
+    _eventQueue->postMouseEvent(touchLocation.x, touchLocation.y);
+    _eventQueue->postMouseButtonEvent(Panda::MouseButton::LEFT, true);
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if (_eventQueue == NULL) { return; }
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:self];
     touchLocation.x *= self.contentScaleFactor;
@@ -82,16 +86,18 @@
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if (_eventQueue == NULL) { return; }
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:self];
     touchLocation.x *= self.contentScaleFactor;
     touchLocation.y *= self.contentScaleFactor;
 
-    Panda::ApplicationContext::get().postMouseEvent(touchLocation.x, touchLocation.y);
+    _eventQueue->postMouseEvent(touchLocation.x, touchLocation.y);
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if (_eventQueue == NULL) { return; }
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:self];
     touchLocation.x *= self.contentScaleFactor;

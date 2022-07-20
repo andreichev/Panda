@@ -20,6 +20,5 @@ private:
 
     Panda::Shared<ChunksStorage> chunksStorage;
     Panda::Shared<Panda::Transform> transform;
-    Panda::Input *events;
     const int maximumDistance = 10;
 };

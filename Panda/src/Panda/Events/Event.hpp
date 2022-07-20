@@ -9,7 +9,7 @@ namespace Panda {
 enum class EventType {
     None = 0,
     WindowResize,
-    // WindowClose,
+    WindowClose,
     // WindowFocus,
     // WindowLostFocus,
     KeyPressed,

@@ -2,7 +2,7 @@
 // Created by Admin on 11.02.2022.
 //
 #include "pndpch.hpp"
-#include "Panda/Application/ApplicationContext.hpp"
+#include "Panda/Application/PlatformData.hpp"
 #include "OpenGLTexture.hpp"
 
 #ifdef PND_PLATFORM_IOS
@@ -21,7 +21,7 @@ OpenGLTexture::OpenGLTexture(const char *path)
     /* Load image */
     // stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
-    std::string texturePath = ApplicationContext::get()->getResourcesPath() + path;
+    std::string texturePath = PlatformData::get()->getResourcesPath() + path;
     unsigned char *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
 
     if (image == nullptr) {

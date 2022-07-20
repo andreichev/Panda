@@ -5,9 +5,9 @@
 #pragma once
 
 #include "Panda/Window/Window.hpp"
-#include <GLFW/glfw3.h>
 #include "Panda/Base/Base.hpp"
-#include "Panda/Application/ApplicationContext.hpp"
+
+#include <GLFW/glfw3.h>
 
 namespace Panda {
 
@@ -20,15 +20,17 @@ public:
     void pollEvents() override;
     void toggleCursorLock() override;
     bool isCursorLocked() override;
-    ApplicationContext *context;
+    void setEventQueue(EventQueue *eventQueue) override;
+    GSize getSize() override;
 
 private:
     void resetCursorPos();
     void addEventHandlers();
-    bool cursorLocked;
+    bool m_isCursorLocked;
     bool m_isFullScreen;
     GSize m_windowSizeBackup;
     GLFWwindow *m_windowHandle;
+    EventQueue *m_eventQueue;
 };
 
 } // namespace Panda

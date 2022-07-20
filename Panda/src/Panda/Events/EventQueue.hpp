@@ -14,10 +14,15 @@ public:
     EventQueue();
     ~EventQueue();
     void release(const Event *event);
-    void post(Event *event);
-    const Event *poll();
+    void postMouseButtonEvent(MouseButton button, bool pressed);
+    void postSizeEvent(unsigned int width, unsigned int height);
+    void postKeyEvent(Key key, bool down);
+    void postMouseEvent(int x, int y);
+    void postWindowCloseEvent();
+    Event *poll();
 
 private:
+    void post(Event *event);
     std::queue<Event *> events;
 };
 

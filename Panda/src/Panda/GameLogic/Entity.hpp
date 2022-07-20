@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Panda/Window/Window.hpp"
-#include "Panda/Events/Input.hpp"
 #include "Components/Transform.hpp"
 
 namespace Panda {

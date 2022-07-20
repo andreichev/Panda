@@ -6,9 +6,17 @@
 
 namespace Panda {
 
-PlatformData &PlatformData::get() {
+PlatformData *PlatformData::get() {
     static PlatformData platformData;
-    return platformData;
+    return &platformData;
+}
+
+void PlatformData::setResourcesPath(std::string path) {
+    resourcesPath = path + "/";
+}
+
+std::string &PlatformData::getResourcesPath() {
+    return resourcesPath;
 }
 
 } // namespace Panda

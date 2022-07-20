@@ -15,7 +15,7 @@ namespace Panda {
 
 class RendererOpenGL : public RendererI {
 public:
-    RendererOpenGL(GSize size);
+    RendererOpenGL();
     ~RendererOpenGL() override;
     RendererType getRendererType() const override;
     void setViewportSize(GSize size) override;

@@ -7,7 +7,6 @@
 
 void BlocksCreation::initialize() {
     transform = getEntity().getTransform();
-    events = &Panda::ApplicationContext::get()->getInput();
 }
 
 void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ) {
@@ -53,12 +52,12 @@ void BlocksCreation::update(double deltaTime) {
     VoxelRaycastData *v = chunksStorage->bresenham3D(position.x, position.y, position.z, target.x, target.y, target.z, maximumDistance);
 
     if (v != nullptr && v->voxel != nullptr) {
-        if (events->isMouseButtonJustPressed(Panda::MouseButton::LEFT)) {
+        if (Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::LEFT)) {
             int x = v->end.x + v->normal.x;
             int y = v->end.y + v->normal.y;
             int z = v->end.z + v->normal.z;
             setVoxel(x, y, z, 11);
-        } else if (events->isMouseButtonJustPressed(Panda::MouseButton::RIGHT)) {
+        } else if (Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::RIGHT)) {
             int x = v->end.x;
             int y = v->end.y;
             int z = v->end.z;

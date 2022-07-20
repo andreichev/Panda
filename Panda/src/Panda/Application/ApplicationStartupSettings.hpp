@@ -22,17 +22,11 @@ private:
 
 public:
     ApplicationStartupSettingsBuilder();
-
     ApplicationStartupSettingsBuilder &name(const char *name);
-
     ApplicationStartupSettingsBuilder &windowTitle(const char *title);
-
     ApplicationStartupSettingsBuilder &windowSize(GSize size);
-
     ApplicationStartupSettingsBuilder &isFullScreen(bool value);
-
     ApplicationStartupSettingsBuilder &startupLevel(Level *level);
-
     ApplicationStartupSettings build();
 };
 

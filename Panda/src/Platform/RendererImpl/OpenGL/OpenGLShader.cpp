@@ -4,7 +4,7 @@
 #include "pndpch.hpp"
 
 #include "OpenGLShader.hpp"
-#include "Panda/Application/ApplicationContext.hpp"
+#include "Panda/Application/PlatformData.hpp"
 
 #ifdef PND_PLATFORM_IOS
 #    include <OpenGLES/ES3/gl.h>
@@ -25,8 +25,8 @@ OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath) {
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         // open files
-        vShaderFile.open(ApplicationContext::get()->getResourcesPath() + vertexPath);
-        fShaderFile.open(ApplicationContext::get()->getResourcesPath() + fragmentPath);
+        vShaderFile.open(PlatformData::get()->getResourcesPath() + vertexPath);
+        fShaderFile.open(PlatformData::get()->getResourcesPath() + fragmentPath);
         std::stringstream vShaderStream, fShaderStream;
         // read file's buffer contents into streams
         vShaderStream << vShaderFile.rdbuf();
