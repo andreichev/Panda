@@ -114,8 +114,11 @@ void Miren::renderFrame() {
         }
         return;
     }
-    renderSemaphoreWait();
+    if (s_frame.getDrawCallsCount() == 0) {
+        return;
+    }
     s_context->clear();
+    renderSemaphoreWait();
     rendererExecuteCommands();
     RenderDraw *draw;
     while ((draw = s_frame.popDrawCall()) != nullptr) {

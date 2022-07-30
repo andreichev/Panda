@@ -41,6 +41,11 @@ foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
     )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
+set_target_properties(Sandbox
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${BIN_DIRECTORY}
+)
+
 # Dependencies - Panda
 target_link_libraries(Sandbox Panda)
 target_include_directories(Sandbox PRIVATE ${PANDA_DIRECTORY}/src)

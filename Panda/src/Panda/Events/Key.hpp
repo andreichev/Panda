@@ -130,7 +130,6 @@ enum class Key {
     RIGHT_ALT = 346,
     RIGHT_SUPER = 347,
     MENU = 348,
-    LAST = 348,
     MOD_SHIFT = 1,
     MOD_CONTROL = 2,
     MOD_ALT = 4,

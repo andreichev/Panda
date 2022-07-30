@@ -10,6 +10,7 @@
 #include "Panda/Application/LayerStack.hpp"
 #include "Panda/Events/EventQueue.hpp"
 #include "Panda/Events/WindowSizeListener.hpp"
+#include "Panda/ImGui/ImGuiLayer.hpp"
 
 namespace Panda {
 
@@ -53,6 +54,7 @@ private:
     EventQueue m_eventQueue;
     Window *m_window;
     std::vector<WindowSizeListener *> m_windowSizeListeners;
+    ImGuiLayer *m_ImGuiLayer;
 
     static Application *s_instance;
 };

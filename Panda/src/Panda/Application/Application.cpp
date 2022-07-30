@@ -49,6 +49,9 @@ Application::Application(ApplicationStartupSettings &settings)
     m_window->setEventQueue(&m_eventQueue);
     timeMillis = getMillis();
     startBasicGame(settings.startupLevel);
+
+    m_ImGuiLayer = new ImGuiLayer();
+    pushOverlay(m_ImGuiLayer);
 }
 
 void Application::startBasicGame(Level *level) {
@@ -79,6 +82,11 @@ void Application::loop() {
         for (Layer *layer : m_layerStack) {
             layer->onUpdate(deltaTime);
         }
+        m_ImGuiLayer->begin(deltaTime);
+        for (Layer *layer : m_layerStack) {
+            layer->onImGuiRender();
+        }
+        m_ImGuiLayer->end();
         m_window->pollEvents();
         processEvents();
         Miren::renderSemaphorePost();

@@ -13,6 +13,7 @@ add_subdirectory(Vendor/glfw)
 add_subdirectory(Vendor/glad)
 add_subdirectory(Vendor/glm)
 add_subdirectory(Vendor/stb_image)
+add_subdirectory(Vendor/imgui)
 
 file(GLOB_RECURSE SOURCES src/Panda/*.cpp src/Platform/RendererImpl/OpenGL/*.cpp)
 file(GLOB_RECURSE INCLUDE src/Panda/*.hpp src/Platform/RendererImpl/OpenGL/*.hpp)
@@ -90,3 +91,7 @@ target_include_directories(Panda PRIVATE Vendor/glad/include)
 # Dependencies - stb_image
 target_link_libraries(Panda stb_image)
 target_include_directories(Panda PRIVATE Vendor/stb_image)
+
+# Dependencies - Dear ImGui
+target_link_libraries(Panda imgui)
+target_include_directories(Panda PRIVATE Vendor/imgui)
