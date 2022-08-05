@@ -8,19 +8,6 @@
 
 namespace Panda {
 
-struct Uniform {
-    ShaderHandle handle;
-    const char *name;
-    void *value;
-    uint32_t size;
-
-    Uniform(ShaderHandle handle, const char *name, void *value, uint32_t size)
-        : handle(handle)
-        , name(name)
-        , value(value)
-        , size(size) {}
-};
-
 struct TextureBinding {
     TextureHandle m_handle;
     uint32_t m_slot;
@@ -31,20 +18,22 @@ struct TextureBinding {
 
 struct RenderDraw {
     RenderDraw()
-        : isSubmitted(false)
-        , isIndexed(true)
+        : m_isSubmitted(false)
+        , m_isIndexed(true)
         , m_numIndices(0)
         , m_numElemets(0)
+        , m_indicesOffset(nullptr)
         , m_shader(0)
         , m_indexBuffer(0)
         , m_vertexBuffer(0)
         , m_uniformBuffer()
         , m_textureBindings() {}
 
-    bool isSubmitted;
+    bool m_isSubmitted;
     // Отрисовка по индексам или примитив
-    bool isIndexed;
+    bool m_isIndexed;
     uint32_t m_numIndices;
+    void *m_indicesOffset;
     // Если примитивы, а не индексы - их количество
     uint32_t m_numElemets;
     ShaderHandle m_shader;

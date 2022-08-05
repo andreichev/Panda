@@ -24,11 +24,12 @@ public:
     void flip() override;
     void createShader(ShaderHandle handle, const char *vertexPath, const char *fragmentPath) override;
     void deleteShader(ShaderHandle handle) override;
-    void createTexture(TextureHandle handle, const char *path) override;
+    void createTextureFromFile(TextureHandle handle, const char *path) override;
+    void createRGBATextureFromPixels(TextureHandle handle, void *pixels, int width, int height) override;
     void deleteTexture(TextureHandle handle) override;
-    void createIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) override;
-    void createDynamicIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) override;
-    void updateDynamicIndexBuffer(IndexBufferHandle, uint32_t *indices, uint32_t count) override;
+    void createIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) override;
+    void createDynamicIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) override;
+    void updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) override;
     void deleteIndexBuffer(IndexBufferHandle handle) override;
     void createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) override;
     void createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) override;
@@ -36,9 +37,10 @@ public:
     void deleteVertexBuffer(VertexBufferHandle handle) override;
     void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) override;
     void deleteVertexLayout(VertexLayoutHandle handle) override;
-    void setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) override;
+    void setUniform(const Uniform &uniform) override;
     void setTexture(TextureHandle handle, uint32_t slot) override;
-    void submitIndexed(ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) override;
+    void submitIndexed(
+        ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, void *offset, uint32_t indicesCount) override;
     void submitPrimitives(ShaderHandle shader, VertexBufferHandle vertexBuffer, uint32_t elementsCount) override;
 
 private:

@@ -29,9 +29,10 @@ void Frame::free(const RenderDraw *draw) {
     delete draw;
 }
 
-void Frame::setIndexBuffer(IndexBufferHandle handle, uint32_t count) {
+void Frame::setIndexBuffer(IndexBufferHandle handle, void *offset, uint32_t count) {
     RenderDraw *draw = m_drawCalls.back();
     draw->m_indexBuffer = handle;
+    draw->m_indicesOffset = offset;
     draw->m_numIndices = count;
 }
 
@@ -45,9 +46,9 @@ void Frame::setShader(ShaderHandle handle) {
     draw->m_shader = handle;
 }
 
-void Frame::setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) {
+void Frame::setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
     RenderDraw *draw = m_drawCalls.back();
-    draw->m_uniformBuffer.emplace(handle, name, value, size);
+    draw->m_uniformBuffer.emplace(handle, name, value, type);
 }
 
 void Frame::setTexture(TextureHandle textureHandle, uint32_t slot) {
@@ -57,7 +58,7 @@ void Frame::setTexture(TextureHandle textureHandle, uint32_t slot) {
 
 void Frame::setIsIndexed(bool value) {
     RenderDraw *draw = m_drawCalls.back();
-    draw->isIndexed = value;
+    draw->m_isIndexed = value;
 }
 
 void Frame::setNumberOfElements(uint32_t count) {
@@ -67,7 +68,7 @@ void Frame::setNumberOfElements(uint32_t count) {
 
 void Frame::submitCurrentDrawCall() {
     RenderDraw *draw = m_drawCalls.back();
-    draw->isSubmitted = true;
+    draw->m_isSubmitted = true;
 }
 
 uint32_t Frame::getDrawCallsCount() {

@@ -64,7 +64,8 @@ void OpenGLVertexBuffer::createLayout(VertexBufferLayoutData *data) {
                 PND_ERROR("Buffer element type is undefined");
                 break;
         }
-        glVertexAttribPointer(i, data->m_Elements[i].count, type, false, data->m_Stride, (const void *)pointer);
+        glVertexAttribPointer(
+            i, data->m_Elements[i].count, type, data->m_Elements[i].normalized ? GL_TRUE : GL_FALSE, data->m_Stride, (const void *)pointer);
         pointer += data->m_Elements[i].count * VertexBufferElement::getSizeOfType(data->m_Elements[i].type);
     }
     glBindVertexArray(0);

@@ -20,11 +20,12 @@ public:
     // MARK: - Command buffer
     static ShaderHandle createShader(const char *vertexPath, const char *fragmentPath);
     static void deleteShader(ShaderHandle handle);
-    static TextureHandle createTexture(const char *path);
+    static TextureHandle createTextureFromFile(const char *path);
+    static TextureHandle createTextureFromPixels(void *pixels, int width, int height);
     static void deleteTexture(TextureHandle handle);
-    static IndexBufferHandle createIndexBuffer(uint32_t *indices, uint32_t count);
-    static IndexBufferHandle createDynamicIndexBuffer(uint32_t *indices, uint32_t count);
-    static void updateDynamicIndexBuffer(IndexBufferHandle, uint32_t *indices, uint32_t count);
+    static IndexBufferHandle createIndexBuffer(void *indices, BufferElementType elementType, size_t count);
+    static IndexBufferHandle createDynamicIndexBuffer(void *indices, BufferElementType elementType, size_t count);
+    static void updateDynamicIndexBuffer(IndexBufferHandle, void *indices, size_t count);
     static void deleteIndexBuffer(IndexBufferHandle handle);
     static VertexBufferHandle createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle);
     static VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle);
@@ -33,9 +34,9 @@ public:
     static VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data);
     static void deleteVertexLayout(VertexLayoutHandle handle);
     // MARK: - Encoder setup
-    static void setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size);
+    static void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
     static void setVertexBuffer(VertexBufferHandle handle);
-    static void setIndexBuffer(IndexBufferHandle handle, uint32_t count);
+    static void setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count);
     static void setShader(ShaderHandle handle);
     static void setTexture(TextureHandle textureHandle, uint32_t slot);
     /// Submit draw call

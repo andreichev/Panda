@@ -33,8 +33,8 @@ void Camera::initialize() {
 }
 
 void Camera::update(double deltaTime) {
-    Miren::setUniform(shader, "view", &view[0][0], sizeof(glm::mat4));
-    Miren::setUniform(shader, "projection", &projection[0][0], sizeof(glm::mat4));
+    Miren::setUniform(shader, "view", &view[0][0], UniformDataType::Mat4);
+    Miren::setUniform(shader, "projection", &projection[0][0], UniformDataType::Mat4);
 }
 
 void Camera::setShader(ShaderHandle _shader) {
@@ -49,7 +49,7 @@ void Camera::setFieldOfView(float degrees) {
 
 void Camera::updateProjectionMatrix() {
     projection = glm::perspective(glm::radians(fieldOfView), windowSize.width / windowSize.height, 0.1f, 1000.0f);
-    Miren::setUniform(shader, "projection", &projection[0][0], sizeof(glm::mat4));
+    Miren::setUniform(shader, "projection", &projection[0][0], UniformDataType::Mat4);
 }
 
 void Camera::updateViewMatrix() {
@@ -58,7 +58,7 @@ void Camera::updateViewMatrix() {
     glm::vec3 up = transform->getUp();
     target = position + front;
     view = glm::lookAt(glm::vec3(position), target, up);
-    Miren::setUniform(shader, "view", &view[0][0], sizeof(glm::mat4));
+    Miren::setUniform(shader, "view", &view[0][0], UniformDataType::Mat4);
 }
 
 // MARK: - Window size delegate

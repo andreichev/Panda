@@ -10,6 +10,7 @@ class OpenGLTexture {
 public:
     ~OpenGLTexture();
     explicit OpenGLTexture(const char *path);
+    explicit OpenGLTexture(void *pixels, int width, int height);
     void bind(unsigned int slot);
     void unbind();
 

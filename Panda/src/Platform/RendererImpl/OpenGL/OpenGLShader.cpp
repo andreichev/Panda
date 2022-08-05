@@ -92,7 +92,7 @@ int OpenGLShader::getUniformLocation(const std::string &name) {
     }
     int location = glGetUniformLocation(m_RendererID, name.c_str());
     if (location == -1) {
-        std::cout << "WARNING:SHADER:UNIFORM " << name << " not found" << std::endl;
+        PND_ERROR("SHADER UNIFORM {} not found", name);
     }
     m_UniformLocationCache[name] = location;
     return location;

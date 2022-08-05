@@ -14,6 +14,18 @@
 
 namespace Panda {
 
+OpenGLTexture::OpenGLTexture(void *pixels, int width, int height)
+    : id(0) {
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+#ifdef GL_UNPACK_ROW_LENGTH
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+}
+
 OpenGLTexture::OpenGLTexture(const char *path)
     : id(0) {
     glGenTextures(1, &id);

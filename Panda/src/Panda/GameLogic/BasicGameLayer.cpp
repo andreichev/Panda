@@ -3,6 +3,7 @@
 #include "Panda/Events/KeyEvents.hpp"
 #include "Panda/Events/MouseEvents.hpp"
 #include "Panda/GameLogic/Input.hpp"
+#include <imgui.h>
 
 namespace Panda {
 
@@ -27,7 +28,12 @@ void BasicGameLayer::onUpdate(double deltaTime) {
     Input::update();
 }
 
-void BasicGameLayer::onImGuiRender() {}
+void BasicGameLayer::onImGuiRender() {
+    ImGui::Begin("Test", nullptr, 0);
+    ImGui::Button("HELLO 1", ImVec2(200, 100));
+    ImGui::Button("HELLO 2", ImVec2(200, 100));
+    ImGui::End();
+}
 
 void BasicGameLayer::onEvent(Event *event) {
     switch (event->type) {

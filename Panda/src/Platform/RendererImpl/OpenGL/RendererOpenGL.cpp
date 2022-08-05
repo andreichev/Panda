@@ -24,10 +24,19 @@ RendererOpenGL::RendererOpenGL() {
 #endif
     context->create();
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_CULL_FACE);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquation(GL_FUNC_ADD);
+    glEnable(GL_DEPTH_TEST);
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    // glDisable(GL_CULL_FACE);
+    // glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_STENCIL_TEST);
+    // glEnable(GL_SCISSOR_TEST);
 }
 
 RendererOpenGL::~RendererOpenGL() {
@@ -68,8 +77,13 @@ void RendererOpenGL::deleteShader(ShaderHandle handle) {
     shaders[handle] = nullptr;
 }
 
-void RendererOpenGL::createTexture(TextureHandle handle, const char *path) {
+void RendererOpenGL::createTextureFromFile(TextureHandle handle, const char *path) {
     textures[handle] = new OpenGLTexture(path);
+}
+
+void RendererOpenGL::createRGBATextureFromPixels(TextureHandle handle, void *pixels, int width, int height) {
+    textures[handle] = new OpenGLTexture(pixels, width, height);
+    free(pixels);
 }
 
 void RendererOpenGL::deleteTexture(TextureHandle handle) {
@@ -77,19 +91,19 @@ void RendererOpenGL::deleteTexture(TextureHandle handle) {
     textures[handle] = nullptr;
 }
 
-void RendererOpenGL::createIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
-    indexBuffers[handle] = new OpenGLIndexBuffer(indices, count, false);
-    delete[] indices;
+void RendererOpenGL::createIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
+    indexBuffers[handle] = new OpenGLIndexBuffer(indices, elementType, count, false);
+    free(indices);
 }
 
-void RendererOpenGL::createDynamicIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
-    indexBuffers[handle] = new OpenGLIndexBuffer(indices, count, true);
-    delete[] indices;
+void RendererOpenGL::createDynamicIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
+    indexBuffers[handle] = new OpenGLIndexBuffer(indices, elementType, count, true);
+    free(indices);
 }
 
-void RendererOpenGL::updateDynamicIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
+void RendererOpenGL::updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) {
     indexBuffers[handle]->update(indices, count);
-    delete[] indices;
+    free(indices);
 }
 
 void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
@@ -126,9 +140,17 @@ void RendererOpenGL::deleteVertexLayout(VertexLayoutHandle handle) {
     vertexLayouts[handle] = nullptr;
 }
 
-void RendererOpenGL::setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) {
-    shaders[handle]->bind();
-    shaders[handle]->setUniformMat4(name, static_cast<float *>(value));
+void RendererOpenGL::setUniform(const Uniform &uniform) {
+    shaders[uniform.handle]->bind();
+    switch (uniform.type) {
+        case UniformDataType::Mat4:
+            shaders[uniform.handle]->setUniformMat4(uniform.name, static_cast<float *>(uniform.value));
+            return;
+        case UniformDataType::Int:
+            shaders[uniform.handle]->setUniformInt(uniform.name, (int)(intptr_t)uniform.value);
+            return;
+    }
+    PND_ERROR("UIFORM TYPE IS UNDEFINED");
 }
 
 void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
@@ -136,7 +158,7 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
 }
 
 void RendererOpenGL::submitIndexed(
-    ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, uint32_t indicesCount) {
+    ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, void *offset, uint32_t indicesCount) {
     if (vertexBuffers[vertexBuffer] == nullptr) {
         return;
     }
@@ -144,7 +166,7 @@ void RendererOpenGL::submitIndexed(
     vertexBuffers[vertexBuffer]->bind();
     indexBuffers[indexBuffer]->bind();
     // TODO: Capture time
-    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, indicesCount, indexBuffers[indexBuffer]->getElementType(), offset);
     checkForErrors();
     shaders[shader]->unbind();
     indexBuffers[indexBuffer]->unbind();

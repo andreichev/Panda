@@ -8,19 +8,21 @@
 
 namespace Panda {
 
-enum class BufferElementType { Float, UnsignedInt, UnsignedByte };
+enum class BufferElementType { Float, UnsignedInt, UnsignedShort, UnsignedByte };
 
 struct VertexBufferElement {
     BufferElementType type;
-    unsigned int count;
+    uint32_t count;
     bool normalized;
 
-    static unsigned int getSizeOfType(BufferElementType type) {
+    static size_t getSizeOfType(BufferElementType type) {
         switch (type) {
             case BufferElementType::Float:
                 return 4;
             case BufferElementType::UnsignedInt:
                 return 4;
+            case BufferElementType::UnsignedShort:
+                return 2;
             case BufferElementType::UnsignedByte:
                 return 1;
         }
@@ -48,29 +50,41 @@ public:
         m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedInt);
     }
 
-    void pushChar(unsigned int count) {
-        VertexBufferElement element = {BufferElementType::UnsignedByte, count, true};
+    void pushChar(unsigned int count, bool normalized) {
+        VertexBufferElement element = {BufferElementType::UnsignedByte, count, normalized};
         m_Elements.push_back(element);
         m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedByte);
     }
 
-    void pushVec3(unsigned int count) {
-        VertexBufferElement element = {BufferElementType::Float, count * 3, true};
+    void pushVec3() {
+        VertexBufferElement element = {BufferElementType::Float, 3, false};
         m_Elements.push_back(element);
-        m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::Float) * 3;
+        m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 3;
     }
 
-    void pushVec2(unsigned int count) {
-        VertexBufferElement element = {BufferElementType::Float, count * 2, false};
+    void pushVec4() {
+        VertexBufferElement element = {BufferElementType::Float, 4, false};
         m_Elements.push_back(element);
-        m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::Float) * 2;
+        m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 4;
+    }
+
+    void push8BitRGBAColor() {
+        VertexBufferElement element = {BufferElementType::UnsignedByte, 4, true};
+        m_Elements.push_back(element);
+        m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::UnsignedByte) * 4;
+    }
+
+    void pushVec2() {
+        VertexBufferElement element = {BufferElementType::Float, 2, false};
+        m_Elements.push_back(element);
+        m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 2;
     }
 
     void pushVector() {
         // positions
-        pushVec3(1);
+        pushVec3();
         // texture coordinates
-        pushVec2(1);
+        pushVec2();
         // light
         pushFloat(1);
     }

@@ -26,19 +26,19 @@ void ImGuiLayer::onAttach() {
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-    // float fontSize = 18.0f; // *2.0f;
+    float fontSize = 18.0f; // *2.0f;
     // io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Bold.ttf", fontSize);
-    // io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Regular.ttf", fontSize);
+    io.FontDefault = io.Fonts->AddFontFromFileTTF("fonts/ProggyTiny.ttf", fontSize);
 
     // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
+    // ImGui::StyleColorsDark();
     // ImGui::StyleColorsClassic();
 
     // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
     // ImGuiStyle &style = ImGui::GetStyle();
-    // if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-    //    style.WindowRounding = 0.0f;
-    //    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    // if (io.ConfigFlags) {
+    //     style.WindowRounding = 20.0f;
+    //     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     // }
 
     setDarkThemeColors();

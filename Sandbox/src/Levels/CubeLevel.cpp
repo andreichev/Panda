@@ -53,9 +53,9 @@ public:
         layoutData.pushVector();
         Panda::VertexLayoutHandle layoutHandle = Panda::Miren::createVertexLayout(layoutData);
         vertexBuffer = Panda::Miren::createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
-        indexBuffer = Panda::Miren::createIndexBuffer(indices, 36);
+        indexBuffer = Panda::Miren::createIndexBuffer(indices, Panda::BufferElementType::UnsignedInt, 36);
 
-        texture = Panda::Miren::createTexture("textures/arbuz1.png");
+        texture = Panda::Miren::createTextureFromFile("textures/arbuz1.png");
         shader = Panda::Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
         Panda::Miren::setShader(shader);
 
@@ -67,7 +67,7 @@ public:
         model = glm::mat4(1.f);
         translate = glm::vec3(0.f, 0.f, 0.f);
 
-        Panda::Miren::setUniform(shader, "projection", &projectionMatrix[0][0], sizeof(glm::mat4));
+        Panda::Miren::setUniform(shader, "projection", &projectionMatrix[0][0], Panda::UniformDataType::Mat4);
         time = 0;
     }
 
@@ -80,12 +80,12 @@ public:
 
         Panda::Miren::setShader(shader);
         Panda::Miren::setTexture(texture, 0);
-        Panda::Miren::setUniform(shader, "model", &model[0][0], sizeof(glm::mat4));
-        Panda::Miren::setUniform(shader, "view", &view[0][0], sizeof(glm::mat4));
-        Panda::Miren::setUniform(shader, "projection", &projectionMatrix[0][0], sizeof(glm::mat4));
+        Panda::Miren::setUniform(shader, "model", &model[0][0], Panda::UniformDataType::Mat4);
+        Panda::Miren::setUniform(shader, "view", &view[0][0], Panda::UniformDataType::Mat4);
+        Panda::Miren::setUniform(shader, "projection", &projectionMatrix[0][0], Panda::UniformDataType::Mat4);
 
         Panda::Miren::setVertexBuffer(vertexBuffer);
-        Panda::Miren::setIndexBuffer(indexBuffer, 36);
+        Panda::Miren::setIndexBuffer(indexBuffer, 0, 36);
         Panda::Miren::submit();
     }
 

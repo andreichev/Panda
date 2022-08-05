@@ -42,9 +42,15 @@ void Miren::deleteShader(ShaderHandle handle) {
     s_commandQueue.post(new DeleteShaderCommand(handle));
 }
 
-TextureHandle Miren::createTexture(const char *path) {
+TextureHandle Miren::createTextureFromFile(const char *path) {
     TextureHandle handle = s_texturesHandleAlloc.alloc();
-    s_commandQueue.post(new CreateTextureCommand(handle, path));
+    s_commandQueue.post(new CreateTextureFromFileCommand(handle, path));
+    return handle;
+}
+
+TextureHandle Miren::createTextureFromPixels(void *pixels, int width, int height) {
+    TextureHandle handle = s_texturesHandleAlloc.alloc();
+    s_commandQueue.post(new CreateRGBATextureFromPixelsCommand(handle, pixels, width, height));
     return handle;
 }
 
@@ -53,19 +59,19 @@ void Miren::deleteTexture(TextureHandle handle) {
     s_commandQueue.post(new DeleteTextureCommand(handle));
 }
 
-IndexBufferHandle Miren::createIndexBuffer(uint32_t *indices, uint32_t count) {
+IndexBufferHandle Miren::createIndexBuffer(void *indices, BufferElementType elementType, size_t count) {
     IndexBufferHandle handle = s_indexBuffersHandleAlloc.alloc();
-    s_commandQueue.post(new CreateIndexBufferCommand(handle, indices, count));
+    s_commandQueue.post(new CreateIndexBufferCommand(handle, indices, elementType, count));
     return handle;
 }
 
-IndexBufferHandle Miren::createDynamicIndexBuffer(uint32_t *indices, uint32_t count) {
+IndexBufferHandle Miren::createDynamicIndexBuffer(void *indices, BufferElementType elementType, size_t count) {
     IndexBufferHandle handle = s_indexBuffersHandleAlloc.alloc();
-    s_commandQueue.post(new CreateDynamicIndexBufferCommand(handle, indices, count));
+    s_commandQueue.post(new CreateDynamicIndexBufferCommand(handle, indices, elementType, count));
     return handle;
 }
 
-void Miren::updateDynamicIndexBuffer(IndexBufferHandle handle, uint32_t *indices, uint32_t count) {
+void Miren::updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) {
     s_commandQueue.post(new UpdateDynamicIndexBufferCommand(handle, indices, count));
 }
 
@@ -122,7 +128,7 @@ void Miren::renderFrame() {
     rendererExecuteCommands();
     RenderDraw *draw;
     while ((draw = s_frame.popDrawCall()) != nullptr) {
-        if (draw->isSubmitted == false) {
+        if (draw->m_isSubmitted == false) {
             s_frame.free(draw);
             continue;
         }
@@ -133,11 +139,11 @@ void Miren::renderFrame() {
         }
         while (draw->m_uniformBuffer.empty() == false) {
             Uniform &uniform = draw->m_uniformBuffer.front();
-            s_context->setUniform(uniform.handle, uniform.name, uniform.value, uniform.size);
+            s_context->setUniform(uniform);
             draw->m_uniformBuffer.pop();
         }
-        if (draw->isIndexed) {
-            s_context->submitIndexed(draw->m_shader, draw->m_vertexBuffer, draw->m_indexBuffer, draw->m_numIndices);
+        if (draw->m_isIndexed) {
+            s_context->submitIndexed(draw->m_shader, draw->m_vertexBuffer, draw->m_indexBuffer, draw->m_indicesOffset, draw->m_numIndices);
         } else {
             s_context->submitPrimitives(draw->m_shader, draw->m_vertexBuffer, draw->m_numElemets);
         }
@@ -162,9 +168,14 @@ void Miren::rendererExecuteCommands() {
                 s_context->deleteShader(cmd->handle);
                 break;
             }
-            case RendererCommandType::CreateTexture: {
-                const CreateTextureCommand *cmd = static_cast<const CreateTextureCommand *>(command);
-                s_context->createTexture(cmd->handle, cmd->path);
+            case RendererCommandType::CreateTextureFromFile: {
+                const CreateTextureFromFileCommand *cmd = static_cast<const CreateTextureFromFileCommand *>(command);
+                s_context->createTextureFromFile(cmd->handle, cmd->path);
+                break;
+            }
+            case RendererCommandType::CreateRGBATextureFromPixelsBuffer: {
+                const CreateRGBATextureFromPixelsCommand *cmd = static_cast<const CreateRGBATextureFromPixelsCommand *>(command);
+                s_context->createRGBATextureFromPixels(cmd->handle, cmd->pixels, cmd->width, cmd->height);
                 break;
             }
             case RendererCommandType::DestroyTexture: {
@@ -174,12 +185,12 @@ void Miren::rendererExecuteCommands() {
             }
             case RendererCommandType::CreateIndexBuffer: {
                 const CreateIndexBufferCommand *cmd = static_cast<const CreateIndexBufferCommand *>(command);
-                s_context->createIndexBuffer(cmd->handle, cmd->indices, cmd->count);
+                s_context->createIndexBuffer(cmd->handle, cmd->indices, cmd->elementType, cmd->count);
                 break;
             }
             case RendererCommandType::CreateDynamicIndexBuffer: {
                 const CreateDynamicIndexBufferCommand *cmd = static_cast<const CreateDynamicIndexBufferCommand *>(command);
-                s_context->createDynamicIndexBuffer(cmd->handle, cmd->indices, cmd->count);
+                s_context->createDynamicIndexBuffer(cmd->handle, cmd->indices, cmd->elementType, cmd->count);
                 break;
             }
             case RendererCommandType::UpdateDynamicIndexBuffer: {
@@ -244,16 +255,16 @@ void Miren::setVertexBuffer(VertexBufferHandle handle) {
     s_frame.setVertexBuffer(handle);
 }
 
-void Miren::setIndexBuffer(IndexBufferHandle handle, uint32_t count) {
-    s_frame.setIndexBuffer(handle, count);
+void Miren::setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count) {
+    s_frame.setIndexBuffer(handle, offset, count);
 }
 
 void Miren::setShader(ShaderHandle handle) {
     s_frame.setShader(handle);
 }
 
-void Miren::setUniform(ShaderHandle handle, const char *name, void *value, uint16_t size) {
-    s_frame.setUniform(handle, name, value, size);
+void Miren::setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
+    s_frame.setUniform(handle, name, value, type);
 }
 
 void Miren::setTexture(TextureHandle textureHandle, uint32_t slot) {

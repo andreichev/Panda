@@ -13,7 +13,8 @@ namespace Panda {
 enum class RendererCommandType {
     CreateShader,
     DestroyShader,
-    CreateTexture,
+    CreateTextureFromFile,
+    CreateRGBATextureFromPixelsBuffer,
     DestroyTexture,
     CreateIndexBuffer,
     CreateDynamicIndexBuffer,
@@ -54,14 +55,27 @@ struct DeleteShaderCommand : RendererCommand {
         , handle(handle) {}
 };
 
-struct CreateTextureCommand : RendererCommand {
+struct CreateTextureFromFileCommand : RendererCommand {
     const char *path;
     TextureHandle handle;
 
-    CreateTextureCommand(TextureHandle handle, const char *path)
-        : RendererCommand(RendererCommandType::CreateTexture)
+    CreateTextureFromFileCommand(TextureHandle handle, const char *path)
+        : RendererCommand(RendererCommandType::CreateTextureFromFile)
         , handle(handle)
         , path(path) {}
+};
+
+struct CreateRGBATextureFromPixelsCommand : RendererCommand {
+    void *pixels;
+    int width, height;
+    TextureHandle handle;
+
+    CreateRGBATextureFromPixelsCommand(TextureHandle handle, void *pixels, int width, int height)
+        : RendererCommand(RendererCommandType::CreateRGBATextureFromPixelsBuffer)
+        , handle(handle)
+        , pixels(pixels)
+        , width(width)
+        , height(height) {}
 };
 
 struct DeleteTextureCommand : RendererCommand {
@@ -73,35 +87,39 @@ struct DeleteTextureCommand : RendererCommand {
 };
 
 struct CreateIndexBufferCommand : RendererCommand {
-    uint32_t *indices;
-    uint32_t count;
     IndexBufferHandle handle;
+    void *indices;
+    BufferElementType elementType;
+    size_t count;
 
-    CreateIndexBufferCommand(IndexBufferHandle handle, uint32_t *indices, uint32_t count)
+    CreateIndexBufferCommand(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count)
         : RendererCommand(RendererCommandType::CreateIndexBuffer)
         , handle(handle)
         , indices(indices)
+        , elementType(elementType)
         , count(count) {}
 };
 
 struct CreateDynamicIndexBufferCommand : RendererCommand {
-    uint32_t *indices;
-    uint32_t count;
     IndexBufferHandle handle;
+    void *indices;
+    BufferElementType elementType;
+    size_t count;
 
-    CreateDynamicIndexBufferCommand(IndexBufferHandle handle, uint32_t *indices, uint32_t count)
+    CreateDynamicIndexBufferCommand(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count)
         : RendererCommand(RendererCommandType::CreateDynamicIndexBuffer)
         , handle(handle)
         , indices(indices)
+        , elementType(elementType)
         , count(count) {}
 };
 
 struct UpdateDynamicIndexBufferCommand : RendererCommand {
     IndexBufferHandle handle;
-    uint32_t *indices;
-    uint32_t count;
+    void *indices;
+    size_t count;
 
-    UpdateDynamicIndexBufferCommand(IndexBufferHandle handle, uint32_t *indices, uint32_t count)
+    UpdateDynamicIndexBufferCommand(IndexBufferHandle handle, void *indices, size_t count)
         : RendererCommand(RendererCommandType::UpdateDynamicIndexBuffer)
         , handle(handle)
         , indices(indices)

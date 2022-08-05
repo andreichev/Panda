@@ -287,7 +287,7 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             ImGuiKey key = ImGui_ImplPanda_KeyCodeToImGuiKey(ev->key);
             io.AddKeyEvent(key, true);
             io.SetKeyEventNativeData(key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user code)
-            event->isHandled = io.WantCaptureKeyboard == false;
+            event->isHandled = io.WantCaptureKeyboard;
             break;
         }
         case EventType::KeyReleased: {
@@ -295,13 +295,13 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             ImGuiKey key = ImGui_ImplPanda_KeyCodeToImGuiKey(ev->key);
             io.AddKeyEvent(key, false);
             io.SetKeyEventNativeData(key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user code)
-            event->isHandled = io.WantCaptureKeyboard == false;
+            event->isHandled = io.WantCaptureKeyboard;
             break;
         }
         case EventType::MouseMoved: {
             const MouseMovedEvent *ev = dynamic_cast<const MouseMovedEvent *>(event);
             io.AddMousePosEvent((float)ev->x, (float)ev->y);
-            event->isHandled = io.WantCaptureMouse == false;
+            event->isHandled = io.WantCaptureMouse;
             break;
         }
         case EventType::MouseButtonPressed: {
@@ -310,7 +310,7 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             if (button >= 0 && button < ImGuiMouseButton_COUNT) {
                 io.AddMouseButtonEvent(button, true);
             }
-            event->isHandled = io.WantCaptureMouse == false;
+            event->isHandled = io.WantCaptureMouse;
             break;
         }
         case EventType::MouseButtonReleased: {
@@ -319,7 +319,7 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             if (button >= 0 && button < ImGuiMouseButton_COUNT) {
                 io.AddMouseButtonEvent(button, false);
             }
-            event->isHandled = io.WantCaptureMouse == false;
+            event->isHandled = io.WantCaptureMouse;
             break;
         }
     }
