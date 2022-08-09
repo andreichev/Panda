@@ -17,7 +17,7 @@ GlfwWindow::~GlfwWindow() {
     glfwTerminate();
 }
 
-GlfwWindow::GlfwWindow(const char *title, GSize size, bool isFullscreen) {
+GlfwWindow::GlfwWindow(const char *title, UISize size, bool isFullscreen) {
     m_isFullScreen = isFullscreen;
     m_windowSizeBackup = size;
     m_isCursorLocked = false;
@@ -84,7 +84,7 @@ void GlfwWindow::addEventHandlers() {
     glfwSetWindowUserPointer(m_windowHandle, this);
     glfwSetWindowSizeCallback(m_windowHandle, [](GLFWwindow *windowHandle, int width, int height) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
-        self->m_windowSizeBackup = GSize(width, height);
+        self->m_windowSizeBackup = UISize(width, height);
         self->m_eventQueue->postSizeEvent(width, height);
     });
     glfwSetKeyCallback(m_windowHandle, [](GLFWwindow *windowHandle, int key, int scancode, int action, int mods) {
@@ -131,7 +131,7 @@ void GlfwWindow::setEventQueue(EventQueue *eventQueue) {
     addEventHandlers();
 }
 
-GSize GlfwWindow::getSize() {
+UISize GlfwWindow::getSize() {
     return m_windowSizeBackup;
 }
 

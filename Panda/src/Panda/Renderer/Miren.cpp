@@ -132,15 +132,15 @@ void Miren::renderFrame() {
             s_frame.free(draw);
             continue;
         }
-        while (draw->m_textureBindings.empty() == false) {
-            TextureBinding &textureBinding = draw->m_textureBindings.front();
-            s_context->setTexture(textureBinding.m_handle, textureBinding.m_slot);
-            draw->m_textureBindings.pop();
-        }
         while (draw->m_uniformBuffer.empty() == false) {
             Uniform &uniform = draw->m_uniformBuffer.front();
             s_context->setUniform(uniform);
             draw->m_uniformBuffer.pop();
+        }
+        while (draw->m_textureBindings.empty() == false) {
+            TextureBinding &textureBinding = draw->m_textureBindings.front();
+            s_context->setTexture(textureBinding.m_handle, textureBinding.m_slot);
+            draw->m_textureBindings.pop();
         }
         if (draw->m_isIndexed) {
             s_context->submitIndexed(draw->m_shader, draw->m_vertexBuffer, draw->m_indexBuffer, draw->m_indicesOffset, draw->m_numIndices);

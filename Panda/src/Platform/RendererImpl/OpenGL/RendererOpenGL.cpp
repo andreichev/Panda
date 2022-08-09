@@ -24,19 +24,20 @@ RendererOpenGL::RendererOpenGL() {
 #endif
     context->create();
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    // glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     // glEnable(GL_CULL_FACE);
     // glEnable(GL_BLEND);
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glEnable(GL_DEPTH_TEST);
-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    // glEnable(GL_BLEND);
+    // glBlendEquation(GL_FUNC_ADD);
+    // glEnable(GL_DEPTH_TEST);
+    // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glDisable(GL_CULL_FACE);
     // glDisable(GL_DEPTH_TEST);
     // glDisable(GL_STENCIL_TEST);
-    // glEnable(GL_SCISSOR_TEST);
+    glEnable(GL_SCISSOR_TEST);
 }
 
 RendererOpenGL::~RendererOpenGL() {
@@ -51,8 +52,8 @@ RendererType RendererOpenGL::getRendererType() const {
 #endif
 }
 
-void RendererOpenGL::setViewportSize(GSize size) {
-    glViewport(0, 0, (int)size.width, (int)size.height);
+void RendererOpenGL::setViewportSize(UISize size) {
+    glViewport(0, 0, size.width, size.height);
 }
 
 void RendererOpenGL::setClearColor(float r, float g, float b, float a) {

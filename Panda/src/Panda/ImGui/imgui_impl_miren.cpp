@@ -59,18 +59,17 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
         void *indices = malloc(cmd_list->IdxBuffer.size_in_bytes());
         memcpy(indices, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.size_in_bytes());
         Panda::Miren::updateDynamicIndexBuffer(indexBuffer, indices, cmd_list->IdxBuffer.Size);
-
-        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++) {
-            const ImDrawCmd *pcmd = &cmd_list->CmdBuffer[cmd_i];
-            if (pcmd->UserCallback) {
-                pcmd->UserCallback(cmd_list, pcmd);
-            } else {
+        const ImDrawCmd* cmd = cmd_list->CmdBuffer.begin(), *cmdEnd = cmd_list->CmdBuffer.end();
+        for (; cmd != cmdEnd; ++cmd) {
+            if (cmd->UserCallback) {
+                cmd->UserCallback(cmd_list, cmd);
+            } else if (0 != cmd->ElemCount) {
                 Miren::setShader(shader);
                 ImGui_ImplMiren_SetProjMat(draw_data, fb_width, fb_height);
-                TextureHandle texture = (TextureHandle)(intptr_t)pcmd->GetTexID();
+                TextureHandle texture = (TextureHandle)(intptr_t) cmd->GetTexID();
                 Miren::setTexture(texture, 0);
                 Miren::setVertexBuffer(vertexBuffer);
-                Miren::setIndexBuffer(indexBuffer, (void *)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)), pcmd->ElemCount);
+                Miren::setIndexBuffer(indexBuffer, (void *)(intptr_t)(cmd->IdxOffset * sizeof(ImDrawIdx)), cmd->ElemCount);
                 Miren::submit();
             }
         }

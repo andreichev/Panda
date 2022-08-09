@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "Panda/Base/GSize.hpp"
+#include "Panda/Base/Size.hpp"
 
 namespace Panda {
 
 class WindowSizeListener {
 public:
-    virtual void windowSizeChanged(GSize size) = 0;
+    virtual void windowSizeChanged(UISize size) = 0;
 };
 
 } // namespace Panda

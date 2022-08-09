@@ -34,7 +34,7 @@ void BaseLevel::start(Panda::World *world) {
     FullScreenToggle *fullScreenToggle = new FullScreenToggle();
     cameraEntity->addComponent(fullScreenToggle);
 
-    Panda::Shared<Panda::UIView> view = Panda::makeShared<Panda::UIView>(Panda::GRect(50, 400, 100, 200));
+    Panda::Shared<Panda::UIView> view = Panda::makeShared<Panda::UIView>(Panda::FRect(50, 400, 100, 200));
     world->getUIView()->addSubview(view);
     world->getUIView()->addSubview(Panda::makeShared<UICrosshair>());
 

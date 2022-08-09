@@ -21,14 +21,14 @@ public:
     void setFieldOfView(float degrees);
     // MARK: - Delegate
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
-    void windowSizeChanged(GSize size) override;
+    void windowSizeChanged(UISize size) override;
     void update(double deltaTime) override;
 
 private:
     void updateProjectionMatrix();
     void updateViewMatrix();
 
-    GSize windowSize;
+    UISize windowSize;
     Shared<Transform> transform;
     glm::vec3 target;
     glm::mat4 view;

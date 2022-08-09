@@ -18,7 +18,7 @@ public:
     RendererOpenGL();
     ~RendererOpenGL() override;
     RendererType getRendererType() const override;
-    void setViewportSize(GSize size) override;
+    void setViewportSize(UISize size) override;
     void setClearColor(float r, float g, float b, float a) override;
     void clear() override;
     void flip() override;

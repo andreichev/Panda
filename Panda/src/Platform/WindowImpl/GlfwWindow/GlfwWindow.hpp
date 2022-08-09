@@ -13,7 +13,7 @@ namespace Panda {
 
 class GlfwWindow : public Window {
 public:
-    GlfwWindow(const char *title, GSize size, bool isFullscreen);
+    GlfwWindow(const char *title, UISize size, bool isFullscreen);
     ~GlfwWindow() override;
     bool isFullScreen() override;
     void setFullScreen(bool isFullScreen) override;
@@ -21,14 +21,14 @@ public:
     void toggleCursorLock() override;
     bool isCursorLocked() override;
     void setEventQueue(EventQueue *eventQueue) override;
-    GSize getSize() override;
+    UISize getSize() override;
 
 private:
     void resetCursorPos();
     void addEventHandlers();
     bool m_isCursorLocked;
     bool m_isFullScreen;
-    GSize m_windowSizeBackup;
+    UISize m_windowSizeBackup;
     GLFWwindow *m_windowHandle;
     EventQueue *m_eventQueue;
 };

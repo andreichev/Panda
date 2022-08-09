@@ -10,6 +10,7 @@
 #include "CommandBuffer/RenderDraw.hpp"
 #include "CommandBuffer/CommandQueue.hpp"
 #include "Panda/Thread/Semaphore.hpp"
+#include "MirenStates.hpp"
 
 namespace Panda {
 

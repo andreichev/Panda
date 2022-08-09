@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Panda/Base/GSize.hpp"
+#include "Panda/Base/Size.hpp"
 #include "Panda/Base/Base.hpp"
 #include "Panda/GameLogic/Level.hpp"
 
@@ -16,7 +16,7 @@ class ApplicationStartupSettingsBuilder {
 private:
     const char *m_name;
     const char *m_windowTitle;
-    GSize m_windowSize;
+    UISize m_windowSize;
     bool m_isFullScreen;
     Level *m_startupLevel;
 
@@ -24,7 +24,7 @@ public:
     ApplicationStartupSettingsBuilder();
     ApplicationStartupSettingsBuilder &name(const char *name);
     ApplicationStartupSettingsBuilder &windowTitle(const char *title);
-    ApplicationStartupSettingsBuilder &windowSize(GSize size);
+    ApplicationStartupSettingsBuilder &windowSize(UISize size);
     ApplicationStartupSettingsBuilder &isFullScreen(bool value);
     ApplicationStartupSettingsBuilder &startupLevel(Level *level);
     ApplicationStartupSettings build();
@@ -34,13 +34,13 @@ struct ApplicationStartupSettings {
 public:
     const char *name;
     const char *windowTitle;
-    GSize windowSize;
+    UISize windowSize;
     bool isFullScreen;
     Level *startupLevel;
 
     static ApplicationStartupSettingsBuilder builder();
 
-    ApplicationStartupSettings(const char *name, const char *windowTitle, const GSize &windowSize, bool isFullScreen, Level *startupLevel);
+    ApplicationStartupSettings(const char *name, const char *windowTitle, const UISize &windowSize, bool isFullScreen, Level *startupLevel);
 };
 
 } // namespace Panda

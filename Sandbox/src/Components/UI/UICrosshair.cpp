@@ -12,6 +12,6 @@ void UICrosshair::addSubviews() {
 }
 
 void UICrosshair::layout() {
-    horizontal->setFrame(Panda::GRect(windowSize.width / 2 - 25, windowSize.height / 2 - 2, 50, 4));
-    vertical->setFrame(Panda::GRect(windowSize.width / 2 - 2, windowSize.height / 2 - 25, 4, 50));
+    horizontal->setFrame(Panda::FRect(windowSize.width / 2 - 25, windowSize.height / 2 - 2, 50, 4));
+    vertical->setFrame(Panda::FRect(windowSize.width / 2 - 2, windowSize.height / 2 - 25, 4, 50));
 }

@@ -102,7 +102,7 @@ void Application::processEvents() {
     while ((event = m_eventQueue.poll()) != nullptr) {
         if (event->type == EventType::WindowResize) {
             const WindowResizeEvent *ev = dynamic_cast<const WindowResizeEvent *>(event);
-            windowSizeChanged(GSize(ev->getWidth(), ev->getHeight()));
+            windowSizeChanged(UISize(ev->getWidth(), ev->getHeight()));
         } else if (event->type == EventType::WindowClose) {
             close();
         }
@@ -123,7 +123,7 @@ void Application::addWindowSizeListener(WindowSizeListener *listener) {
     m_windowSizeListeners.push_back(listener);
 }
 
-void Application::windowSizeChanged(GSize size) {
+void Application::windowSizeChanged(UISize size) {
     for (auto &listener : m_windowSizeListeners) {
         listener->windowSizeChanged(size);
     }

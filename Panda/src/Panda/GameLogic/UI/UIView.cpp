@@ -5,7 +5,7 @@
 namespace Panda {
 
 UIView::UIView()
-    : UIView(GRect::zero()) {}
+    : UIView(FRect::zero()) {}
 
 UIView::~UIView() {
     Miren::deleteVertexBuffer(vertexBufferHandle);
@@ -13,7 +13,7 @@ UIView::~UIView() {
     Application::get()->removeWindowSizeListener(this);
 }
 
-UIView::UIView(GRect frame)
+UIView::UIView(FRect frame)
     : window(Application::get()->getWindow())
     , frame(frame) {
     float *data = new float[12];
@@ -28,7 +28,7 @@ UIView::UIView(GRect frame)
     layout();
 }
 
-void UIView::setFrame(GRect frame) {
+void UIView::setFrame(FRect frame) {
     this->frame = frame;
     layout();
 }
@@ -68,7 +68,7 @@ void UIView::draw() {
     Miren::submitPrimitives(6);
 }
 
-void UIView::windowSizeChanged(GSize size) {
+void UIView::windowSizeChanged(UISize size) {
     windowSize = size;
     layout();
 }

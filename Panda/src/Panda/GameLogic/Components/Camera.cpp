@@ -48,7 +48,7 @@ void Camera::setFieldOfView(float degrees) {
 }
 
 void Camera::updateProjectionMatrix() {
-    projection = glm::perspective(glm::radians(fieldOfView), windowSize.width / windowSize.height, 0.1f, 1000.0f);
+    projection = glm::perspective<float>(glm::radians(fieldOfView), (float) windowSize.width / (float) windowSize.height, 0.1f, 1000.0f);
     Miren::setUniform(shader, "projection", &projection[0][0], UniformDataType::Mat4);
 }
 
@@ -63,7 +63,7 @@ void Camera::updateViewMatrix() {
 
 // MARK: - Window size delegate
 
-void Camera::windowSizeChanged(GSize size) {
+void Camera::windowSizeChanged(UISize size) {
     windowSize = size;
     updateProjectionMatrix();
 }

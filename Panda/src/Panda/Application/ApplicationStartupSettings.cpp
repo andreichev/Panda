@@ -9,7 +9,7 @@ namespace Panda {
 ApplicationStartupSettingsBuilder::ApplicationStartupSettingsBuilder()
     : m_name("Panda Sandbox App")
     , m_windowTitle("Panda")
-    , m_windowSize(GSize(600, 400))
+    , m_windowSize(UISize(600, 400))
     , m_isFullScreen(false)
     , m_startupLevel(nullptr) {}
 
@@ -22,7 +22,7 @@ ApplicationStartupSettingsBuilder &ApplicationStartupSettingsBuilder::windowTitl
     m_windowTitle = title;
     return *this;
 }
-ApplicationStartupSettingsBuilder &ApplicationStartupSettingsBuilder::windowSize(GSize size) {
+ApplicationStartupSettingsBuilder &ApplicationStartupSettingsBuilder::windowSize(UISize size) {
     m_windowSize = size;
     return *this;
 }
@@ -45,7 +45,7 @@ ApplicationStartupSettingsBuilder ApplicationStartupSettings::builder() {
 }
 
 ApplicationStartupSettings::ApplicationStartupSettings(
-    const char *name, const char *windowTitle, const GSize &windowSize, bool isFullScreen, Level *startupLevel)
+    const char *name, const char *windowTitle, const UISize &windowSize, bool isFullScreen, Level *startupLevel)
     : name(name)
     , windowTitle(windowTitle)
     , windowSize(windowSize)

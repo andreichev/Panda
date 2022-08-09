@@ -4,6 +4,7 @@
 #include <imgui.h>
 
 #include "Panda/Application/Application.hpp"
+#include "Panda/Application/PlatformData.hpp"
 
 // ImGui platform impl
 #include "imgui_impl_panda.hpp"
@@ -18,8 +19,8 @@ ImGuiLayer::ImGuiLayer()
 void ImGuiLayer::onAttach() {
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
-    (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    // (void)io;
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
@@ -27,8 +28,8 @@ void ImGuiLayer::onAttach() {
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
     float fontSize = 18.0f; // *2.0f;
-    // io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Bold.ttf", fontSize);
-    io.FontDefault = io.Fonts->AddFontFromFileTTF("fonts/ProggyTiny.ttf", fontSize);
+    std::string fontPath = PlatformData::get()->getResourcesPath() + "fonts/ProggyTiny.ttf";
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize);
 
     // Setup Dear ImGui style
     // ImGui::StyleColorsDark();
@@ -41,7 +42,7 @@ void ImGuiLayer::onAttach() {
     //     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     // }
 
-    setDarkThemeColors();
+    // setDarkThemeColors();
 
     // Setup Platform/Renderer bindings
     ImGui_ImplPanda_Init();
