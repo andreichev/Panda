@@ -13,6 +13,7 @@ public:
     Frame();
     void beginDrawCall();
     RenderDraw *popDrawCall();
+    void setState(uint32_t state);
     void setIndexBuffer(IndexBufferHandle handle, void *offset, uint32_t count);
     void setVertexBuffer(VertexBufferHandle handle);
     void setShader(ShaderHandle handle);

@@ -142,11 +142,7 @@ void Miren::renderFrame() {
             s_context->setTexture(textureBinding.m_handle, textureBinding.m_slot);
             draw->m_textureBindings.pop();
         }
-        if (draw->m_isIndexed) {
-            s_context->submitIndexed(draw->m_shader, draw->m_vertexBuffer, draw->m_indexBuffer, draw->m_indicesOffset, draw->m_numIndices);
-        } else {
-            s_context->submitPrimitives(draw->m_shader, draw->m_vertexBuffer, draw->m_numElemets);
-        }
+        s_context->submit(draw);
         s_frame.free(draw);
     }
     s_context->flip();
@@ -249,6 +245,10 @@ void Miren::renderSemaphorePost() {
 // TODO: - Implement, add swapping frames
 void Miren::frame() {
     renderSemaphoreWait();
+}
+
+void Miren::setState(uint32_t state) {
+    s_frame.setState(state);
 }
 
 void Miren::setVertexBuffer(VertexBufferHandle handle) {

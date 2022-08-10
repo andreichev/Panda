@@ -26,8 +26,8 @@ RendererOpenGL::RendererOpenGL() {
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     // glEnable(GL_CULL_FACE);
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // glEnable(GL_BLEND);
     // glBlendEquation(GL_FUNC_ADD);
@@ -37,7 +37,7 @@ RendererOpenGL::RendererOpenGL() {
     // glDisable(GL_CULL_FACE);
     // glDisable(GL_DEPTH_TEST);
     // glDisable(GL_STENCIL_TEST);
-    glEnable(GL_SCISSOR_TEST);
+    // glEnable(GL_SCISSOR_TEST);
 }
 
 RendererOpenGL::~RendererOpenGL() {
@@ -158,33 +158,34 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
     textures[handle]->bind(slot);
 }
 
-void RendererOpenGL::submitIndexed(
-    ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, void *offset, uint32_t indicesCount) {
-    if (vertexBuffers[vertexBuffer] == nullptr) {
+void RendererOpenGL::submit(RenderDraw* draw) {
+    if (vertexBuffers[draw->m_vertexBuffer] == nullptr) {
         return;
     }
-    shaders[shader]->bind();
-    vertexBuffers[vertexBuffer]->bind();
-    indexBuffers[indexBuffer]->bind();
+    shaders[draw->m_shader]->bind();
+    vertexBuffers[draw->m_vertexBuffer]->bind();
     // TODO: Capture time
-    glDrawElements(GL_TRIANGLES, indicesCount, indexBuffers[indexBuffer]->getElementType(), offset);
-    checkForErrors();
-    shaders[shader]->unbind();
-    indexBuffers[indexBuffer]->unbind();
-    vertexBuffers[vertexBuffer]->unbind();
-}
-
-void RendererOpenGL::submitPrimitives(ShaderHandle shader, VertexBufferHandle vertexBuffer, uint32_t elementsCount) {
-    if (vertexBuffers[vertexBuffer] == nullptr) {
-        return;
+    if(draw->m_state & MIREN_STATE_CULL_FACE) {
+        glEnable(GL_CULL_FACE);
+    } else {
+        glDisable(GL_CULL_FACE);
     }
-    shaders[shader]->bind();
-    vertexBuffers[vertexBuffer]->bind();
-    // TODO: Capture time
-    glDrawArrays(GL_TRIANGLES, 0, elementsCount);
+    if(draw->m_state & MIREN_STATE_DEPTH_TEST) {
+        glEnable(GL_DEPTH_TEST);
+    } else {
+        glDisable(GL_DEPTH_TEST);
+    }
+    if(draw->m_isIndexed) {
+        indexBuffers[draw->m_indexBuffer]->bind();
+        glDrawElements(GL_TRIANGLES, draw->m_numIndices, indexBuffers[draw->m_indexBuffer]->getElementType(), draw->m_indicesOffset);
+        indexBuffers[draw->m_indexBuffer]->unbind();
+    } else {
+        // TODO: Add offset value
+        glDrawArrays(GL_TRIANGLES, 0, draw->m_numElemets);
+    }
     checkForErrors();
-    shaders[shader]->unbind();
-    vertexBuffers[vertexBuffer]->unbind();
+    shaders[draw->m_shader]->unbind();
+    vertexBuffers[draw->m_vertexBuffer]->unbind();
 }
 
 const char *getGLErrorStr(GLenum err) {

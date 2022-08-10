@@ -29,6 +29,11 @@ void Frame::free(const RenderDraw *draw) {
     delete draw;
 }
 
+void Frame::setState(uint32_t state) {
+    RenderDraw *draw = m_drawCalls.back();
+    draw->m_state = state;
+}
+
 void Frame::setIndexBuffer(IndexBufferHandle handle, void *offset, uint32_t count) {
     RenderDraw *draw = m_drawCalls.back();
     draw->m_indexBuffer = handle;

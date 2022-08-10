@@ -39,9 +39,7 @@ public:
     void deleteVertexLayout(VertexLayoutHandle handle) override;
     void setUniform(const Uniform &uniform) override;
     void setTexture(TextureHandle handle, uint32_t slot) override;
-    void submitIndexed(
-        ShaderHandle shader, VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, void *offset, uint32_t indicesCount) override;
-    void submitPrimitives(ShaderHandle shader, VertexBufferHandle vertexBuffer, uint32_t elementsCount) override;
+    void submit(RenderDraw* draw) override;
 
 private:
     void checkForErrors();

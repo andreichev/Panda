@@ -4,7 +4,9 @@
 
 #pragma once
 
-#include "Panda/Renderer/RendererI.hpp"
+#include "Panda/Renderer/HandleTypes.hpp"
+#include "Panda/Renderer/MirenStates.hpp"
+#include "Uniform.hpp"
 
 namespace Panda {
 
@@ -19,6 +21,7 @@ struct TextureBinding {
 struct RenderDraw {
     RenderDraw()
         : m_isSubmitted(false)
+        , m_state(MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST)
         , m_isIndexed(true)
         , m_numIndices(0)
         , m_numElemets(0)
@@ -41,6 +44,7 @@ struct RenderDraw {
     VertexBufferHandle m_vertexBuffer;
     std::queue<Uniform> m_uniformBuffer;
     std::queue<TextureBinding> m_textureBindings;
+    uint32_t m_state;
 };
 
 } // namespace Panda

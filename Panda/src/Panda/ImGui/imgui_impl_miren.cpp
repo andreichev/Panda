@@ -64,6 +64,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
             if (cmd->UserCallback) {
                 cmd->UserCallback(cmd_list, cmd);
             } else if (0 != cmd->ElemCount) {
+                Miren::setState(MIREN_STATE_DEPTH_TEST);
                 Miren::setShader(shader);
                 ImGui_ImplMiren_SetProjMat(draw_data, fb_width, fb_height);
                 TextureHandle texture = (TextureHandle)(intptr_t) cmd->GetTexID();

@@ -35,6 +35,7 @@ public:
     static VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data);
     static void deleteVertexLayout(VertexLayoutHandle handle);
     // MARK: - Encoder setup
+    static void setState(uint32_t state);
     static void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
     static void setVertexBuffer(VertexBufferHandle handle);
     static void setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count);
@@ -61,6 +62,7 @@ private:
     static Semaphore rendererSemaphore;
     static Frame s_frame;
     static RendererI *s_context;
+    // TODO: - Move command queue to Render Draw
     static CommandQueue s_commandQueue;
     static MirenHandleAllocator s_shadersHandleAlloc;
     static MirenHandleAllocator s_texturesHandleAlloc;
