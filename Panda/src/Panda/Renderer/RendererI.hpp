@@ -46,7 +46,7 @@ public:
     virtual void deleteVertexLayout(VertexLayoutHandle handle) = 0;
     virtual void setUniform(const Uniform &uniform) = 0;
     virtual void setTexture(TextureHandle handle, uint32_t slot) = 0;
-    virtual void submit(RenderDraw* draw) = 0;
+    virtual void submit(RenderDraw *draw) = 0;
 };
 
 } // namespace Panda

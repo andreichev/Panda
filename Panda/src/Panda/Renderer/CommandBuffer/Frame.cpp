@@ -71,6 +71,11 @@ void Frame::setNumberOfElements(uint32_t count) {
     draw->m_numElemets = count;
 }
 
+void Frame::setScissorRect(UIRect rect) {
+    RenderDraw *draw = m_drawCalls.back();
+    draw->m_scissorRect = rect;
+}
+
 void Frame::submitCurrentDrawCall() {
     RenderDraw *draw = m_drawCalls.back();
     draw->m_isSubmitted = true;

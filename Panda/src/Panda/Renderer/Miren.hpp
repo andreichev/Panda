@@ -36,6 +36,7 @@ public:
     static void deleteVertexLayout(VertexLayoutHandle handle);
     // MARK: - Encoder setup
     static void setState(uint32_t state);
+    static void setScissorRect(UIRect rect);
     static void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
     static void setVertexBuffer(VertexBufferHandle handle);
     static void setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count);

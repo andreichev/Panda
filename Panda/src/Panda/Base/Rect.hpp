@@ -24,6 +24,10 @@ struct FRect {
     inline static FRect zero() {
         return FRect();
     }
+
+    inline bool isZero() {
+        return origin.isZero() && size.isZero();
+    }
 };
 
 struct UIRect {
@@ -40,6 +44,10 @@ struct UIRect {
 
     inline static UIRect zero() {
         return UIRect();
+    }
+
+    inline bool isZero() {
+        return origin.isZero() && size.isZero();
     }
 };
 

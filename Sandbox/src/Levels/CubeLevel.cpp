@@ -62,7 +62,7 @@ public:
         Panda::UISize windowSize = Panda::Application::get()->getWindow()->getSize();
         view = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         // view = glm::rotate(glm::mat4(1.0f), glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
-        projectionMatrix = glm::perspective<float>(40.f, (float) windowSize.width / (float) windowSize.height, 0.1f, 1000.0f);
+        projectionMatrix = glm::perspective<float>(40.f, (float)windowSize.width / (float)windowSize.height, 0.1f, 1000.0f);
         // projectionMatrix = glm::perspective(90.f, 1.0f, 0.1f, 1000.0f);
         model = glm::mat4(1.f);
         translate = glm::vec3(0.f, 0.f, 0.f);

@@ -24,20 +24,12 @@ RendererOpenGL::RendererOpenGL() {
 #endif
     context->create();
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    // glEnable(GL_BLEND);
-    // glBlendEquation(GL_FUNC_ADD);
-    // glEnable(GL_DEPTH_TEST);
-    // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_STENCIL_TEST);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    // glDisable(GL_CULL_FACE);
-    // glDisable(GL_DEPTH_TEST);
-    // glDisable(GL_STENCIL_TEST);
-    // glEnable(GL_SCISSOR_TEST);
 }
 
 RendererOpenGL::~RendererOpenGL() {
@@ -158,24 +150,31 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
     textures[handle]->bind(slot);
 }
 
-void RendererOpenGL::submit(RenderDraw* draw) {
+void RendererOpenGL::submit(RenderDraw *draw) {
     if (vertexBuffers[draw->m_vertexBuffer] == nullptr) {
         return;
     }
     shaders[draw->m_shader]->bind();
     vertexBuffers[draw->m_vertexBuffer]->bind();
     // TODO: Capture time
-    if(draw->m_state & MIREN_STATE_CULL_FACE) {
+    if (draw->m_state & MIREN_STATE_CULL_FACE) {
         glEnable(GL_CULL_FACE);
     } else {
         glDisable(GL_CULL_FACE);
     }
-    if(draw->m_state & MIREN_STATE_DEPTH_TEST) {
+    if (draw->m_state & MIREN_STATE_DEPTH_TEST) {
         glEnable(GL_DEPTH_TEST);
     } else {
         glDisable(GL_DEPTH_TEST);
     }
-    if(draw->m_isIndexed) {
+    if (draw->m_scissorRect.isZero() == false) {
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(
+            (int) draw->m_scissorRect.origin.x, (int) draw->m_scissorRect.origin.y, (int) draw->m_scissorRect.size.width, (int) draw->m_scissorRect.size.height);
+    } else {
+        glDisable(GL_SCISSOR_TEST);
+    }
+    if (draw->m_isIndexed) {
         indexBuffers[draw->m_indexBuffer]->bind();
         glDrawElements(GL_TRIANGLES, draw->m_numIndices, indexBuffers[draw->m_indexBuffer]->getElementType(), draw->m_indicesOffset);
         indexBuffers[draw->m_indexBuffer]->unbind();
@@ -186,6 +185,7 @@ void RendererOpenGL::submit(RenderDraw* draw) {
     checkForErrors();
     shaders[draw->m_shader]->unbind();
     vertexBuffers[draw->m_vertexBuffer]->unbind();
+    glDisable(GL_SCISSOR_TEST);
 }
 
 const char *getGLErrorStr(GLenum err) {

@@ -59,19 +59,44 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
         void *indices = malloc(cmd_list->IdxBuffer.size_in_bytes());
         memcpy(indices, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.size_in_bytes());
         Panda::Miren::updateDynamicIndexBuffer(indexBuffer, indices, cmd_list->IdxBuffer.Size);
-        const ImDrawCmd* cmd = cmd_list->CmdBuffer.begin(), *cmdEnd = cmd_list->CmdBuffer.end();
+        const ImDrawCmd *cmd = cmd_list->CmdBuffer.begin(), *cmdEnd = cmd_list->CmdBuffer.end();
+        
+        const ImVec2 clipPos   = draw_data->DisplayPos;
+		const ImVec2 clipScale = draw_data->FramebufferScale;
+        
         for (; cmd != cmdEnd; ++cmd) {
             if (cmd->UserCallback) {
                 cmd->UserCallback(cmd_list, cmd);
             } else if (0 != cmd->ElemCount) {
-                Miren::setState(MIREN_STATE_DEPTH_TEST);
-                Miren::setShader(shader);
-                ImGui_ImplMiren_SetProjMat(draw_data, fb_width, fb_height);
-                TextureHandle texture = (TextureHandle)(intptr_t) cmd->GetTexID();
-                Miren::setTexture(texture, 0);
-                Miren::setVertexBuffer(vertexBuffer);
-                Miren::setIndexBuffer(indexBuffer, (void *)(intptr_t)(cmd->IdxOffset * sizeof(ImDrawIdx)), cmd->ElemCount);
-                Miren::submit();
+                ImVec4 clipRect;
+				clipRect.x = (cmd->ClipRect.x - clipPos.x) * clipScale.x;
+				clipRect.y = (cmd->ClipRect.y - clipPos.y) * clipScale.y;
+				clipRect.z = (cmd->ClipRect.z - clipPos.x) * clipScale.x;
+				clipRect.w = (cmd->ClipRect.w - clipPos.y) * clipScale.y;
+
+                if (clipRect.x <  fb_width
+					&&  clipRect.y <  fb_height
+					&&  clipRect.z >= 0.0f
+					&&  clipRect.w >= 0.0f)
+                {
+					// Miren::setScissorRect(
+                    //     UIRect(
+                    //         uint32_t(clipRect.x), 
+                    //         uint32_t(fb_height - clipRect.w),
+                    //         uint32_t(clipRect.z - clipRect.x),
+                    //         uint32_t(clipRect.w - clipRect.y)
+                    //     )
+					// );
+
+                    Miren::setState(0);
+                    Miren::setShader(shader);
+                    ImGui_ImplMiren_SetProjMat(draw_data, fb_width, fb_height);
+                    TextureHandle texture = (TextureHandle)(intptr_t)cmd->GetTexID();
+                    Miren::setTexture(texture, 0);
+                    Miren::setVertexBuffer(vertexBuffer);
+                    Miren::setIndexBuffer(indexBuffer, (void *)(intptr_t)(cmd->IdxOffset * sizeof(ImDrawIdx)), cmd->ElemCount);
+                    Miren::submit();
+                }
             }
         }
     }

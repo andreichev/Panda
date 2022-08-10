@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Panda/Base/Rect.hpp"
 #include "Panda/Renderer/HandleTypes.hpp"
 #include "Panda/Renderer/MirenStates.hpp"
 #include "Uniform.hpp"
@@ -30,7 +31,8 @@ struct RenderDraw {
         , m_indexBuffer(0)
         , m_vertexBuffer(0)
         , m_uniformBuffer()
-        , m_textureBindings() {}
+        , m_textureBindings()
+        , m_scissorRect(UIRect::zero()) {}
 
     bool m_isSubmitted;
     // Отрисовка по индексам или примитив
@@ -44,6 +46,7 @@ struct RenderDraw {
     VertexBufferHandle m_vertexBuffer;
     std::queue<Uniform> m_uniformBuffer;
     std::queue<TextureBinding> m_textureBindings;
+    UIRect m_scissorRect;
     uint32_t m_state;
 };
 

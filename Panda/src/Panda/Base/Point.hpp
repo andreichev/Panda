@@ -17,6 +17,10 @@ struct FPoint {
     FPoint(float x, float y)
         : x(x)
         , y(y) {}
+
+    inline bool isZero() {
+        return x == 0 && y == 0;
+    }
 };
 
 struct UIPoint {
@@ -30,6 +34,10 @@ struct UIPoint {
     UIPoint(uint32_t x, uint32_t y)
         : x(x)
         , y(y) {}
+
+    inline bool isZero() {
+        return x == 0 && y == 0;
+    }
 };
 
 } // namespace Panda

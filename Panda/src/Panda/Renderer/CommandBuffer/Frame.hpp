@@ -19,6 +19,7 @@ public:
     void setShader(ShaderHandle handle);
     void setIsIndexed(bool value);
     void setNumberOfElements(uint32_t count);
+    void setScissorRect(UIRect rect);
     void free(const RenderDraw *draw);
     void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
     void setTexture(TextureHandle textureHandle, uint32_t slot);

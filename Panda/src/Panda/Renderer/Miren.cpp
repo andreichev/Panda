@@ -251,6 +251,10 @@ void Miren::setState(uint32_t state) {
     s_frame.setState(state);
 }
 
+void Miren::setScissorRect(UIRect rect) {
+    s_frame.setScissorRect(rect);
+}
+
 void Miren::setVertexBuffer(VertexBufferHandle handle) {
     s_frame.setVertexBuffer(handle);
 }
