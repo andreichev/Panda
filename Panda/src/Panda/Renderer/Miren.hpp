@@ -14,6 +14,23 @@
 
 namespace Panda {
 
+struct TransientIndexBuffer {
+    uint8_t *data;
+    uint32_t size;
+    uint32_t startIndex;
+    IndexBufferHandle handle;
+    bool isIndex16;
+};
+
+struct TransientVertexBuffer {
+    uint8_t *data;
+    uint32_t size;
+    uint32_t startVertex;
+    uint16_t stride;
+    VertexBufferHandle handle;
+    VertexLayoutHandle layoutHandle;
+};
+
 class Miren {
 public:
     static void initialize();
@@ -28,6 +45,10 @@ public:
     static IndexBufferHandle createDynamicIndexBuffer(void *indices, BufferElementType elementType, size_t count);
     static void updateDynamicIndexBuffer(IndexBufferHandle, void *indices, size_t count);
     static void deleteIndexBuffer(IndexBufferHandle handle);
+    // Only next frame vertex buffer
+    static void allocTransientVertexBuffer(TransientVertexBuffer *buffer, int32_t count, const VertexLayoutHandle layoutHandle);
+    // Only next frame index buffer
+    static void allocTransientIndexBuffer(TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType);
     static VertexBufferHandle createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle);
     static VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle);
     static void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size);

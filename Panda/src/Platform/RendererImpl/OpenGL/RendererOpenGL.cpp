@@ -26,9 +26,9 @@ RendererOpenGL::RendererOpenGL() {
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glEnable(GL_BLEND);
     glDisable(GL_STENCIL_TEST);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glBlendEquation(GL_FUNC_ADD);
+    // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
@@ -154,8 +154,6 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     if (vertexBuffers[draw->m_vertexBuffer] == nullptr) {
         return;
     }
-    shaders[draw->m_shader]->bind();
-    vertexBuffers[draw->m_vertexBuffer]->bind();
     // TODO: Capture time
     if (draw->m_state & MIREN_STATE_CULL_FACE) {
         glEnable(GL_CULL_FACE);
@@ -169,11 +167,13 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     }
     if (draw->m_scissorRect.isZero() == false) {
         glEnable(GL_SCISSOR_TEST);
-        glScissor(
-            (int) draw->m_scissorRect.origin.x, (int) draw->m_scissorRect.origin.y, (int) draw->m_scissorRect.size.width, (int) draw->m_scissorRect.size.height);
+        glScissor((int)draw->m_scissorRect.origin.x, (int)draw->m_scissorRect.origin.y, (int)draw->m_scissorRect.size.width,
+            (int)draw->m_scissorRect.size.height);
     } else {
         glDisable(GL_SCISSOR_TEST);
     }
+    shaders[draw->m_shader]->bind();
+    vertexBuffers[draw->m_vertexBuffer]->bind();
     if (draw->m_isIndexed) {
         indexBuffers[draw->m_indexBuffer]->bind();
         glDrawElements(GL_TRIANGLES, draw->m_numIndices, indexBuffers[draw->m_indexBuffer]->getElementType(), draw->m_indicesOffset);

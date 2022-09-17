@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Panda/Logger/Logger.hpp"
+
 // joke from swift (apple) or js
 #define var auto
 #define let const auto

@@ -5,8 +5,12 @@
 #pragma once
 
 // Base
-#include "Panda/Application/Application.hpp"
 #include "Panda/Logger/Logger.hpp"
+#include "Panda/Base/Base.hpp"
+#include "Panda/Base/Allocator.hpp"
+#include "Panda/Base/Memory.hpp"
+#include "Panda/Base/Vector.hpp"
+#include "Panda/Application/Application.hpp"
 #include "Panda/Application/RunApp.hpp"
 #include "Panda/Application/ApplicationStartupSettings.hpp"
 #include "Panda/Application/Layer.hpp"

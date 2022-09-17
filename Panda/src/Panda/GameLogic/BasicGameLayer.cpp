@@ -29,9 +29,15 @@ void BasicGameLayer::onUpdate(double deltaTime) {
 }
 
 void BasicGameLayer::onImGuiRender() {
-    ImGui::Begin("Test", nullptr, 0);
+    ImGui::Begin("Test 1", nullptr, 0);
     ImGui::Button("HELLO 1", ImVec2(200, 100));
     ImGui::Button("HELLO 2", ImVec2(200, 100));
+    ImGui::End();
+
+    ImGui::Begin("Test 2", nullptr, 0);
+    ImGui::Text("GREAT! I LIKE IT!");
+    ImGui::Text("Thanks thanks thanks thanks");
+    ImGui::Button("SAVE", ImVec2(200, 100));
     ImGui::End();
 }
 

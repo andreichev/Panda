@@ -16,14 +16,14 @@ public:
     void bind() const;
     void unbind() const;
     uint32_t getCount() const;
-    inline int getElementType() {
+    inline uint32_t getElementType() {
         return elementType;
     };
 
 private:
     uint32_t id;
     uint32_t count;
-    int elementType;
+    uint32_t elementType;
     size_t elementSize;
     bool isDynamic;
 };
