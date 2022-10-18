@@ -18,7 +18,7 @@ void BaseLevel::start(Panda::World *world) {
     chunksStorage = Panda::makeShared<ChunksStorage>();
     PND_INFO("WORLD GENERATED");
     Panda::Shared<Panda::Entity> cameraEntity = world->instantiateEntity();
-    Panda::Camera *camera = new Panda::Camera();
+    Panda::Shared<Panda::Camera> camera = Panda::makeShared<Panda::Camera>();
     cameraEntity->addComponent(camera);
     camera->setFieldOfView(60.f);
     camera->setShader(baseShader);
@@ -27,11 +27,11 @@ void BaseLevel::start(Panda::World *world) {
         ChunksStorage::WORLD_SIZE_X / 2, ChunksStorage::WORLD_SIZE_Y / 4, ChunksStorage::WORLD_SIZE_Z / 2);
     cameraEntity->getTransform()->rotate(25.f, 0.f, 0.f);
 
-    BlocksCreation *blocksCreation = new BlocksCreation();
+    Panda::Shared<BlocksCreation> blocksCreation = Panda::makeShared<BlocksCreation>();
     blocksCreation->setChunksStorage(chunksStorage);
     cameraEntity->addComponent(blocksCreation);
 
-    FullScreenToggle *fullScreenToggle = new FullScreenToggle();
+    Panda::Shared<FullScreenToggle> fullScreenToggle = Panda::makeShared<FullScreenToggle>();
     cameraEntity->addComponent(fullScreenToggle);
 
     Panda::Shared<Panda::UIView> view = Panda::makeShared<Panda::UIView>(Panda::FRect(50, 400, 100, 200));

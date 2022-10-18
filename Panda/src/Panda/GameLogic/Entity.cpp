@@ -20,12 +20,6 @@ void Entity::addComponent(Shared<Component> component) {
     component->initialize();
 }
 
-void Entity::addComponent(Component *component) {
-    component->setEntity(this);
-    components.push_back(Panda::createShared<Component>(component));
-    component->initialize();
-}
-
 void Entity::removeComponent(Shared<Component> component) {
     components.erase(find(components.begin(), components.end(), component));
 }

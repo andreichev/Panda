@@ -15,7 +15,6 @@ public:
     void initialize();
     void update(double deltaTime);
     void addComponent(Shared<Component> component);
-    void addComponent(Component *component);
     void removeComponent(Shared<Component> component);
     template<typename T>
     Shared<T> getComponentWithType();
