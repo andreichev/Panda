@@ -2,6 +2,7 @@
 // Created by Admin on 14.03.2022.
 //
 
+#include "Panda/Base/Allocator.hpp"
 #include "Frame.hpp"
 
 namespace Panda {
@@ -9,6 +10,8 @@ namespace Panda {
 Frame::Frame()
     : m_drawCalls() {
     beginDrawCall();
+    m_transientVb = (TransientVertexBuffer*) PND_ALLOC(getAllocator(), TRANSIENT_VERTEX_BUFFER_SIZE);
+    m_transientIb = (TransientIndexBuffer*) PND_ALLOC(getAllocator(), TRANSIENT_INDEX_BUFFER_SIZE);
 }
 
 void Frame::beginDrawCall() {

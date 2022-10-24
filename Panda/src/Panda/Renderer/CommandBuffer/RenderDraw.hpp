@@ -19,6 +19,7 @@ struct TextureBinding {
         , m_slot(mSlot) {}
 };
 
+// Вызов отрисовки кадра
 struct RenderDraw {
     RenderDraw()
         : m_isSubmitted(false)

@@ -9,110 +9,115 @@
 
 namespace Panda {
 
-bool Miren::needToIntialize = false;
-RendererI *Miren::s_context = nullptr;
-Frame Miren::s_frame = Frame();
+namespace Miren {
+
+// TODO: - Create context
+bool needToIntialize = false;
+RendererI *s_context = nullptr;
+Frame s_frame = Frame();
 constexpr uint32_t maxHandles = 1000;
 
-MirenHandleAllocator Miren::s_shadersHandleAlloc(maxHandles);
-MirenHandleAllocator Miren::s_texturesHandleAlloc(maxHandles);
-MirenHandleAllocator Miren::s_vertexLayoutsHandleAlloc(maxHandles);
-MirenHandleAllocator Miren::s_vertexBuffersHandleAlloc(maxHandles);
-MirenHandleAllocator Miren::s_indexBuffersHandleAlloc(maxHandles);
+MirenHandleAllocator s_shadersHandleAlloc(maxHandles);
+MirenHandleAllocator s_texturesHandleAlloc(maxHandles);
+MirenHandleAllocator s_vertexLayoutsHandleAlloc(maxHandles);
+MirenHandleAllocator s_vertexBuffersHandleAlloc(maxHandles);
+MirenHandleAllocator s_indexBuffersHandleAlloc(maxHandles);
 
-CommandQueue Miren::s_commandQueue;
-Semaphore Miren::rendererSemaphore;
+CommandQueue s_commandQueue;
+Semaphore rendererSemaphore;
 
-void Miren::initialize() {
-    Miren::needToIntialize = true;
+void initialize() {
+    needToIntialize = true;
 }
 
-void Miren::terminate() {
+void terminate() {
     delete s_context;
 }
 
-ShaderHandle Miren::createShader(const char *vertexPath, const char *fragmentPath) {
+ShaderHandle createShader(const char *vertexPath, const char *fragmentPath) {
     ShaderHandle handle = s_shadersHandleAlloc.alloc();
     s_commandQueue.post(new CreateShaderCommand(handle, vertexPath, fragmentPath));
     return handle;
 }
 
-void Miren::deleteShader(ShaderHandle handle) {
+void deleteShader(ShaderHandle handle) {
     s_shadersHandleAlloc.free(handle);
     s_commandQueue.post(new DeleteShaderCommand(handle));
 }
 
-TextureHandle Miren::createTextureFromFile(const char *path) {
+TextureHandle createTextureFromFile(const char *path) {
     TextureHandle handle = s_texturesHandleAlloc.alloc();
     s_commandQueue.post(new CreateTextureFromFileCommand(handle, path));
     return handle;
 }
 
-TextureHandle Miren::createTextureFromPixels(void *pixels, int width, int height) {
+TextureHandle createTextureFromPixels(void *pixels, int width, int height) {
     TextureHandle handle = s_texturesHandleAlloc.alloc();
     s_commandQueue.post(new CreateRGBATextureFromPixelsCommand(handle, pixels, width, height));
     return handle;
 }
 
-void Miren::deleteTexture(TextureHandle handle) {
+void deleteTexture(TextureHandle handle) {
     s_texturesHandleAlloc.free(handle);
     s_commandQueue.post(new DeleteTextureCommand(handle));
 }
 
-IndexBufferHandle Miren::createIndexBuffer(void *indices, BufferElementType elementType, size_t count) {
+IndexBufferHandle createIndexBuffer(void *indices, BufferElementType elementType, size_t count) {
     IndexBufferHandle handle = s_indexBuffersHandleAlloc.alloc();
     s_commandQueue.post(new CreateIndexBufferCommand(handle, indices, elementType, count));
     return handle;
 }
 
-IndexBufferHandle Miren::createDynamicIndexBuffer(void *indices, BufferElementType elementType, size_t count) {
+IndexBufferHandle createDynamicIndexBuffer(void *indices, BufferElementType elementType, size_t count) {
     IndexBufferHandle handle = s_indexBuffersHandleAlloc.alloc();
     s_commandQueue.post(new CreateDynamicIndexBufferCommand(handle, indices, elementType, count));
     return handle;
 }
 
-void Miren::updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) {
+void updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) {
     s_commandQueue.post(new UpdateDynamicIndexBufferCommand(handle, indices, count));
 }
 
-void Miren::deleteIndexBuffer(IndexBufferHandle handle) {
+void deleteIndexBuffer(IndexBufferHandle handle) {
     s_indexBuffersHandleAlloc.free(handle);
     s_commandQueue.post(new DeleteIndexBufferCommand(handle));
 }
 
-VertexBufferHandle Miren::createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+VertexBufferHandle createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     VertexBufferHandle handle = s_vertexBuffersHandleAlloc.alloc();
     s_commandQueue.post(new CreateVertexBufferCommand(handle, data, size, layoutHandle));
     return handle;
 }
 
-VertexBufferHandle Miren::createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     VertexBufferHandle handle = s_vertexBuffersHandleAlloc.alloc();
     s_commandQueue.post(new CreateDynamicVertexBufferCommand(handle, data, size, layoutHandle));
     return handle;
 }
 
-void Miren::updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
+void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
     s_commandQueue.post(new UpdateDynamicVertexBufferCommand(handle, data, size));
 }
 
-void Miren::deleteVertexBuffer(VertexBufferHandle handle) {
+void deleteVertexBuffer(VertexBufferHandle handle) {
     s_vertexBuffersHandleAlloc.free(handle);
     s_commandQueue.post(new DeleteVertexBufferCommand(handle));
 }
 
-VertexLayoutHandle Miren::createVertexLayout(VertexBufferLayoutData data) {
+VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data) {
     VertexLayoutHandle handle = s_vertexLayoutsHandleAlloc.alloc();
     s_commandQueue.post(new CreateVertexLayoutCommand(handle, data));
     return handle;
 }
 
-void Miren::deleteVertexLayout(VertexLayoutHandle handle) {
+void deleteVertexLayout(VertexLayoutHandle handle) {
     s_vertexLayoutsHandleAlloc.free(handle);
     s_commandQueue.post(new DeleteVertexLayoutCommand(handle));
 }
 
-void Miren::renderFrame() {
+void rendererExecuteCommands();
+
+void renderFrame() {
     if (s_context == nullptr) {
         if (needToIntialize) {
             s_context = new RendererOpenGL();
@@ -150,7 +155,7 @@ void Miren::renderFrame() {
     renderSemaphorePost();
 }
 
-void Miren::rendererExecuteCommands() {
+void rendererExecuteCommands() {
     const RendererCommand *command;
     while ((command = s_commandQueue.poll()) != nullptr) {
         switch (command->type) {
@@ -234,57 +239,59 @@ void Miren::rendererExecuteCommands() {
     }
 }
 
-void Miren::renderSemaphoreWait() {
+void renderSemaphoreWait() {
     rendererSemaphore.wait();
 }
 
-void Miren::renderSemaphorePost() {
+void renderSemaphorePost() {
     rendererSemaphore.post();
 }
 
 // TODO: - Implement, add swapping frames
-void Miren::frame() {
+void frame() {
     renderSemaphoreWait();
 }
 
-void Miren::setState(uint32_t state) {
+void setState(uint32_t state) {
     s_frame.setState(state);
 }
 
-void Miren::setScissorRect(UIRect rect) {
+void setScissorRect(UIRect rect) {
     s_frame.setScissorRect(rect);
 }
 
-void Miren::setVertexBuffer(VertexBufferHandle handle) {
+void setVertexBuffer(VertexBufferHandle handle) {
     s_frame.setVertexBuffer(handle);
 }
 
-void Miren::setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count) {
+void setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count) {
     s_frame.setIndexBuffer(handle, offset, count);
 }
 
-void Miren::setShader(ShaderHandle handle) {
+void setShader(ShaderHandle handle) {
     s_frame.setShader(handle);
 }
 
-void Miren::setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
+void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
     s_frame.setUniform(handle, name, value, type);
 }
 
-void Miren::setTexture(TextureHandle textureHandle, uint32_t slot) {
+void setTexture(TextureHandle textureHandle, uint32_t slot) {
     s_frame.setTexture(textureHandle, slot);
 }
 
-void Miren::submit() {
+void submit() {
     s_frame.submitCurrentDrawCall();
     s_frame.beginDrawCall();
 }
 
-void Miren::submitPrimitives(uint32_t elements) {
+void submitPrimitives(uint32_t elements) {
     s_frame.setIsIndexed(false);
     s_frame.setNumberOfElements(elements);
     s_frame.submitCurrentDrawCall();
     s_frame.beginDrawCall();
+}
+
 }
 
 } // namespace Panda
