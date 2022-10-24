@@ -60,6 +60,6 @@ namespace Miren {
     void renderSemaphoreWait();
     void renderSemaphorePost();
 
-}
+} // namespace Miren
 
 } // namespace Panda

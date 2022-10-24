@@ -10,8 +10,8 @@ namespace Panda {
 Frame::Frame()
     : m_drawCalls() {
     beginDrawCall();
-    m_transientVb = (TransientVertexBuffer*) PND_ALLOC(getAllocator(), TRANSIENT_VERTEX_BUFFER_SIZE);
-    m_transientIb = (TransientIndexBuffer*) PND_ALLOC(getAllocator(), TRANSIENT_INDEX_BUFFER_SIZE);
+    m_transientVb = (TransientVertexBuffer *)PND_ALLOC(getAllocator(), TRANSIENT_VERTEX_BUFFER_SIZE);
+    m_transientIb = (TransientIndexBuffer *)PND_ALLOC(getAllocator(), TRANSIENT_INDEX_BUFFER_SIZE);
 }
 
 void Frame::beginDrawCall() {

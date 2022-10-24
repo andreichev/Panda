@@ -10,7 +10,7 @@
 
 namespace Panda {
 
-/// Класс используемый для хранения данных о кадре. 
+/// Класс используемый для хранения данных о кадре.
 /// Тут хранятся буферы, которые существуют только один кадр и данные о графических вызовах
 class Frame {
 public:
@@ -28,13 +28,13 @@ public:
     void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
     void setTexture(TextureHandle textureHandle, uint32_t slot);
     void submitCurrentDrawCall();
-    TransientVertexBuffer* createTransientVertexBuffer(uint32_t size, VertexBufferLayoutData* layout);
+    TransientVertexBuffer *createTransientVertexBuffer(uint32_t size, VertexBufferLayoutData *layout);
     uint32_t getDrawCallsCount();
 
 private:
     std::queue<RenderDraw *> m_drawCalls;
-    TransientIndexBuffer* m_transientIb;
-	TransientVertexBuffer* m_transientVb;
+    TransientIndexBuffer *m_transientIb;
+    TransientVertexBuffer *m_transientVb;
 };
 
 } // namespace Panda

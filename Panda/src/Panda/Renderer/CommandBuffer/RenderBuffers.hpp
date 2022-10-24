@@ -24,4 +24,4 @@ struct TransientVertexBuffer {
     VertexLayoutHandle layoutHandle;
 };
 
-}
+} // namespace Panda
