@@ -14,6 +14,7 @@ namespace Panda {
 Application *Application::s_instance = nullptr;
 
 Application *Application::get() {
+    PND_ASSERT(s_instance != nullptr, "APP USED BUT NOT INITIALISED");
     return s_instance;
 }
 
@@ -48,6 +49,11 @@ Application::Application(ApplicationStartupSettings &settings)
     m_window = createWindow(settings);
     m_window->setEventQueue(&m_eventQueue);
     timeMillis = getMillis();
+
+#ifdef PND_PLATFORM_DESKTOP
+    Panda::Miren::initialize();
+#endif
+
     startBasicGame(settings.startupLevel);
 
     m_ImGuiLayer = new ImGuiLayer();

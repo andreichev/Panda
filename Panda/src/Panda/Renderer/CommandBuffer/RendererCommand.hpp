@@ -11,6 +11,7 @@
 namespace Panda {
 
 enum class RendererCommandType {
+    RendererInit,
     CreateShader,
     DestroyShader,
     CreateTextureFromFile,

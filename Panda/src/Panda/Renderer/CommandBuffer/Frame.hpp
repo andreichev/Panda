@@ -31,10 +31,11 @@ public:
     TransientVertexBuffer *createTransientVertexBuffer(uint32_t size, VertexBufferLayoutData *layout);
     uint32_t getDrawCallsCount();
 
-private:
-    std::queue<RenderDraw *> m_drawCalls;
     TransientIndexBuffer *m_transientIb;
     TransientVertexBuffer *m_transientVb;
+
+private:
+    std::queue<RenderDraw *> m_drawCalls;
 };
 
 } // namespace Panda

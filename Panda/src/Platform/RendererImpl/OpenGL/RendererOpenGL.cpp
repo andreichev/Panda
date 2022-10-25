@@ -76,7 +76,7 @@ void RendererOpenGL::createTextureFromFile(TextureHandle handle, const char *pat
 
 void RendererOpenGL::createRGBATextureFromPixels(TextureHandle handle, void *pixels, int width, int height) {
     textures[handle] = new OpenGLTexture(pixels, width, height);
-    free(pixels);
+    PND_FREE(getAllocator(), pixels);
 }
 
 void RendererOpenGL::deleteTexture(TextureHandle handle) {
@@ -86,17 +86,17 @@ void RendererOpenGL::deleteTexture(TextureHandle handle) {
 
 void RendererOpenGL::createIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
     indexBuffers[handle] = new OpenGLIndexBuffer(indices, elementType, count, false);
-    free(indices);
+    PND_FREE(getAllocator(), indices);
 }
 
 void RendererOpenGL::createDynamicIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
     indexBuffers[handle] = new OpenGLIndexBuffer(indices, elementType, count, true);
-    free(indices);
+    PND_FREE(getAllocator(), indices);
 }
 
 void RendererOpenGL::updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) {
     indexBuffers[handle]->update(indices, count);
-    free(indices);
+    PND_FREE(getAllocator(), indices);
 }
 
 void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
@@ -106,17 +106,19 @@ void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
 
 void RendererOpenGL::createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, false, vertexLayouts[layoutHandle]);
-    free(data);
+    PND_FREE(getAllocator(), data);
 }
 
 void RendererOpenGL::createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, true, vertexLayouts[layoutHandle]);
-    free(data);
+    if (data != nullptr) {
+        PND_FREE(getAllocator(), data);
+    }
 }
 
 void RendererOpenGL::updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
     vertexBuffers[handle]->update(data, size);
-    free(data);
+    PND_FREE(getAllocator(), data);
 }
 
 void RendererOpenGL::deleteVertexBuffer(VertexBufferHandle handle) {

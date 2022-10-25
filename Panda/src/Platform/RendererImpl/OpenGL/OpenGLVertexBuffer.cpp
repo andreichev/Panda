@@ -22,7 +22,9 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic
     , id(0) {
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, size, data, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    if (data != nullptr) {
+        glBufferData(GL_ARRAY_BUFFER, size, data, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    }
     createLayout(layout);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

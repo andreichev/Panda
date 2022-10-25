@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include "Panda/Logger/Logger.hpp"
-#include "Panda/Application/PlatformDetection.hpp"
-
 #include <chrono>
 
 #include <memory>
@@ -34,3 +31,8 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+#include "Panda/Base/Assert.hpp"
+#include "Panda/Base/Allocator.hpp"
+#include "Panda/Logger/Logger.hpp"
+#include "Panda/Application/PlatformDetection.hpp"

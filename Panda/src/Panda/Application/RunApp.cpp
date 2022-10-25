@@ -15,7 +15,6 @@ void operator delete(void *ptr) noexcept {
 
 #ifdef PND_PLATFORM_DESKTOP
 static int32_t renderThread(Panda::Thread *_thread, void *_userData) {
-    Panda::Miren::initialize();
     while (Panda::Application::get()->isRunning()) {
         Panda::Miren::renderFrame();
     }
@@ -25,13 +24,12 @@ static int32_t renderThread(Panda::Thread *_thread, void *_userData) {
 #endif
 
 void runPandaApplication(Panda::ApplicationStartupSettings settings) {
-    auto application = new Panda::Application(settings);
-
 #ifdef PND_PLATFORM_DESKTOP
     Panda::Thread thread;
     thread.init(renderThread, nullptr, 0, "Render thread");
 #endif
 
+    auto application = new Panda::Application(settings);
     application->loop();
     delete application;
 

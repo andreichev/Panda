@@ -12,26 +12,30 @@ namespace Panda {
 namespace Miren {
 
     // TODO: - Create context
-    bool needToIntialize = false;
-    RendererI *s_context = nullptr;
-    Frame s_frame = Frame();
+    static RendererI *s_renderer = nullptr;
+    static Frame s_frame = Frame();
     constexpr uint32_t maxHandles = 1000;
 
-    MirenHandleAllocator s_shadersHandleAlloc(maxHandles);
-    MirenHandleAllocator s_texturesHandleAlloc(maxHandles);
-    MirenHandleAllocator s_vertexLayoutsHandleAlloc(maxHandles);
-    MirenHandleAllocator s_vertexBuffersHandleAlloc(maxHandles);
-    MirenHandleAllocator s_indexBuffersHandleAlloc(maxHandles);
+    static MirenHandleAllocator s_shadersHandleAlloc(maxHandles);
+    static MirenHandleAllocator s_texturesHandleAlloc(maxHandles);
+    static MirenHandleAllocator s_vertexLayoutsHandleAlloc(maxHandles);
+    static MirenHandleAllocator s_vertexBuffersHandleAlloc(maxHandles);
+    static MirenHandleAllocator s_indexBuffersHandleAlloc(maxHandles);
 
-    CommandQueue s_commandQueue;
+    static CommandQueue s_commandQueue;
     Semaphore rendererSemaphore;
 
+    TransientVertexBuffer *createTransientVertexBuffer(uint32_t _size, VertexBufferLayoutData layout);
+    TransientIndexBuffer *createTransientIndexBuffer(uint32_t _size);
+
     void initialize() {
-        needToIntialize = true;
+        s_commandQueue.post(new RendererCommand(RendererCommandType::RendererInit));
+        s_frame.m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE, VertexBufferLayoutData());
+        s_frame.m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
     }
 
     void terminate() {
-        delete s_context;
+        delete s_renderer;
     }
 
     ShaderHandle createShader(const char *vertexPath, const char *fragmentPath) {
@@ -115,22 +119,56 @@ namespace Miren {
         s_commandQueue.post(new DeleteVertexLayoutCommand(handle));
     }
 
+    TransientVertexBuffer *createTransientVertexBuffer(uint32_t size, VertexBufferLayoutData layout) {
+        TransientVertexBuffer *tvb = nullptr;
+        VertexBufferHandle handle = s_vertexBuffersHandleAlloc.alloc();
+
+        uint16_t stride = 0;
+        VertexLayoutHandle layoutHandle = createVertexLayout(layout);
+        stride = layout.m_Stride;
+
+        CreateDynamicVertexBufferCommand *cmd = new CreateDynamicVertexBufferCommand(handle, nullptr, size, layoutHandle);
+        s_commandQueue.post(cmd);
+
+        tvb = (TransientVertexBuffer *)PND_ALLOC(getAllocator(), size);
+        tvb->data = (uint8_t *)tvb + sizeof(TransientVertexBuffer);
+        tvb->size = size;
+        tvb->startVertex = 0;
+        tvb->stride = stride;
+        tvb->handle = handle;
+        tvb->layoutHandle = layoutHandle;
+
+        return tvb;
+    }
+
+    TransientIndexBuffer *createTransientIndexBuffer(uint32_t _size) {
+        TransientIndexBuffer *tib = NULL;
+
+        IndexBufferHandle handle = s_indexBuffersHandleAlloc.alloc();
+        RendererCommand *cmd = new CreateDynamicIndexBufferCommand(handle, nullptr, BufferElementType::UnsignedInt, _size / 4);
+        s_commandQueue.post(cmd);
+
+        const uint32_t size = sizeof(TransientIndexBuffer) + _size;
+        tib = (TransientIndexBuffer *)PND_ALLOC(getAllocator(), size);
+        tib->data = (uint8_t *)tib + sizeof(TransientIndexBuffer);
+        tib->size = _size;
+        tib->handle = handle;
+
+        return tib;
+    }
+
     void rendererExecuteCommands();
 
     void renderFrame() {
-        if (s_context == nullptr) {
-            if (needToIntialize) {
-                s_context = new RendererOpenGL();
-                needToIntialize = false;
-            }
-            return;
-        }
         if (s_frame.getDrawCallsCount() == 0) {
             return;
         }
-        s_context->clear();
-        renderSemaphoreWait();
         rendererExecuteCommands();
+        if (s_renderer == nullptr) {
+            return;
+        }
+        s_renderer->clear();
+        renderSemaphoreWait();
         RenderDraw *draw;
         while ((draw = s_frame.popDrawCall()) != nullptr) {
             if (draw->m_isSubmitted == false) {
@@ -139,99 +177,112 @@ namespace Miren {
             }
             while (draw->m_uniformBuffer.empty() == false) {
                 Uniform &uniform = draw->m_uniformBuffer.front();
-                s_context->setUniform(uniform);
+                s_renderer->setUniform(uniform);
                 draw->m_uniformBuffer.pop();
             }
             while (draw->m_textureBindings.empty() == false) {
                 TextureBinding &textureBinding = draw->m_textureBindings.front();
-                s_context->setTexture(textureBinding.m_handle, textureBinding.m_slot);
+                s_renderer->setTexture(textureBinding.m_handle, textureBinding.m_slot);
                 draw->m_textureBindings.pop();
             }
-            s_context->submit(draw);
+            s_renderer->submit(draw);
             s_frame.free(draw);
         }
-        s_context->flip();
+        s_renderer->flip();
         s_frame.beginDrawCall();
         renderSemaphorePost();
     }
 
     void rendererExecuteCommands() {
         const RendererCommand *command;
+        if (s_renderer == nullptr) {
+            command = s_commandQueue.poll();
+            if (command != nullptr) {
+                PND_ASSERT(command->type == RendererCommandType::RendererInit, "First command in command buffer should be RendererInit");
+                s_renderer = new RendererOpenGL();
+                s_commandQueue.release(command);
+            }
+        }
+
+        if (s_renderer == nullptr) {
+            return;
+        }
+
         while ((command = s_commandQueue.poll()) != nullptr) {
             switch (command->type) {
                 case RendererCommandType::CreateShader: {
                     const CreateShaderCommand *cmd = static_cast<const CreateShaderCommand *>(command);
-                    s_context->createShader(cmd->handle, cmd->vertexPath, cmd->fragmentPath);
+                    s_renderer->createShader(cmd->handle, cmd->vertexPath, cmd->fragmentPath);
                     break;
                 }
                 case RendererCommandType::DestroyShader: {
                     const DeleteShaderCommand *cmd = static_cast<const DeleteShaderCommand *>(command);
-                    s_context->deleteShader(cmd->handle);
+                    s_renderer->deleteShader(cmd->handle);
                     break;
                 }
                 case RendererCommandType::CreateTextureFromFile: {
                     const CreateTextureFromFileCommand *cmd = static_cast<const CreateTextureFromFileCommand *>(command);
-                    s_context->createTextureFromFile(cmd->handle, cmd->path);
+                    s_renderer->createTextureFromFile(cmd->handle, cmd->path);
                     break;
                 }
                 case RendererCommandType::CreateRGBATextureFromPixelsBuffer: {
                     const CreateRGBATextureFromPixelsCommand *cmd = static_cast<const CreateRGBATextureFromPixelsCommand *>(command);
-                    s_context->createRGBATextureFromPixels(cmd->handle, cmd->pixels, cmd->width, cmd->height);
+                    s_renderer->createRGBATextureFromPixels(cmd->handle, cmd->pixels, cmd->width, cmd->height);
                     break;
                 }
                 case RendererCommandType::DestroyTexture: {
                     const DeleteTextureCommand *cmd = static_cast<const DeleteTextureCommand *>(command);
-                    s_context->deleteTexture(cmd->handle);
+                    s_renderer->deleteTexture(cmd->handle);
                     break;
                 }
                 case RendererCommandType::CreateIndexBuffer: {
                     const CreateIndexBufferCommand *cmd = static_cast<const CreateIndexBufferCommand *>(command);
-                    s_context->createIndexBuffer(cmd->handle, cmd->indices, cmd->elementType, cmd->count);
+                    s_renderer->createIndexBuffer(cmd->handle, cmd->indices, cmd->elementType, cmd->count);
                     break;
                 }
                 case RendererCommandType::CreateDynamicIndexBuffer: {
                     const CreateDynamicIndexBufferCommand *cmd = static_cast<const CreateDynamicIndexBufferCommand *>(command);
-                    s_context->createDynamicIndexBuffer(cmd->handle, cmd->indices, cmd->elementType, cmd->count);
+                    s_renderer->createDynamicIndexBuffer(cmd->handle, cmd->indices, cmd->elementType, cmd->count);
                     break;
                 }
                 case RendererCommandType::UpdateDynamicIndexBuffer: {
                     const UpdateDynamicIndexBufferCommand *cmd = static_cast<const UpdateDynamicIndexBufferCommand *>(command);
-                    s_context->updateDynamicIndexBuffer(cmd->handle, cmd->indices, cmd->count);
+                    s_renderer->updateDynamicIndexBuffer(cmd->handle, cmd->indices, cmd->count);
                     break;
                 }
                 case RendererCommandType::DestroyIndexBuffer: {
                     const DeleteIndexBufferCommand *cmd = static_cast<const DeleteIndexBufferCommand *>(command);
-                    s_context->deleteIndexBuffer(cmd->handle);
+                    s_renderer->deleteIndexBuffer(cmd->handle);
                     break;
                 }
                 case RendererCommandType::CreateVertexBuffer: {
                     const CreateVertexBufferCommand *cmd = static_cast<const CreateVertexBufferCommand *>(command);
-                    s_context->createVertexBuffer(cmd->handle, cmd->data, cmd->size, cmd->layoutHandle);
+                    s_renderer->createVertexBuffer(cmd->handle, cmd->data, cmd->size, cmd->layoutHandle);
                     break;
                 }
                 case RendererCommandType::CreateDynamicVertexBuffer: {
                     const CreateDynamicVertexBufferCommand *cmd = static_cast<const CreateDynamicVertexBufferCommand *>(command);
-                    s_context->createDynamicVertexBuffer(cmd->handle, cmd->data, cmd->size, cmd->layoutHandle);
+                    s_renderer->createDynamicVertexBuffer(cmd->handle, cmd->data, cmd->size, cmd->layoutHandle);
                     break;
                 }
                 case RendererCommandType::UpdateDynamicVertexBuffer: {
                     const UpdateDynamicVertexBufferCommand *cmd = static_cast<const UpdateDynamicVertexBufferCommand *>(command);
-                    s_context->updateDynamicVertexBuffer(cmd->handle, cmd->data, cmd->size);
+                    s_renderer->updateDynamicVertexBuffer(cmd->handle, cmd->data, cmd->size);
                     break;
                 }
                 case RendererCommandType::DestroyVertexBuffer: {
                     const DeleteVertexBufferCommand *cmd = static_cast<const DeleteVertexBufferCommand *>(command);
-                    s_context->deleteVertexBuffer(cmd->handle);
+                    s_renderer->deleteVertexBuffer(cmd->handle);
                     break;
                 }
                 case RendererCommandType::CreateVertexLayout: {
                     const CreateVertexLayoutCommand *cmd = static_cast<const CreateVertexLayoutCommand *>(command);
-                    s_context->createVertexLayout(cmd->handle, cmd->data);
+                    s_renderer->createVertexLayout(cmd->handle, cmd->data);
                     break;
                 }
                 case RendererCommandType::DestroyVertexLayout: {
                     const DeleteVertexLayoutCommand *cmd = static_cast<const DeleteVertexLayoutCommand *>(command);
-                    s_context->deleteVertexLayout(cmd->handle);
+                    s_renderer->deleteVertexLayout(cmd->handle);
                     break;
                 }
             }
