@@ -7,7 +7,8 @@
 #include "Panda/GameLogic/Component.hpp"
 #include "Panda/GameLogic/Components/TransformDelegate.hpp"
 #include "Panda/GameLogic/Primitives/MeshData.hpp"
-#include "Panda/Renderer/Miren.hpp"
+
+#include <Miren/Miren.hpp>
 
 namespace Panda {
 

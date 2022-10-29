@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "Panda/Base/Base.hpp"
+#include "pndpch.hpp"
+
 #include "Panda/Application/ApplicationStartupSettings.hpp"
 #include "Panda/Window/Window.hpp"
 #include "Panda/Application/LayerStack.hpp"

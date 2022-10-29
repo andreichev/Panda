@@ -5,11 +5,6 @@
 #pragma once
 
 // Base
-#include "Panda/Logger/Logger.hpp"
-#include "Panda/Base/Base.hpp"
-#include "Panda/Base/Allocator.hpp"
-#include "Panda/Base/Buffer.hpp"
-#include "Panda/Base/Vector.hpp"
 #include "Panda/Application/Application.hpp"
 #include "Panda/Application/RunApp.hpp"
 #include "Panda/Application/ApplicationStartupSettings.hpp"
@@ -24,8 +19,15 @@
 #include "Panda/GameLogic/Components/Camera.hpp"
 
 // Renderer stuff
-#include "Panda/Renderer/Miren.hpp"
-#include "Panda/Renderer/Vertex.hpp"
+#include <Miren/Miren.hpp>
+#include <Miren/Vertex.hpp>
 
 // Third party
 #include <glm/ext.hpp>
+
+// Foundation
+#include <Foundation/Foundation.hpp>
+#include <Foundation/Logger.hpp>
+#include <Foundation/Allocator.hpp>
+#include <Foundation/Buffer.hpp>
+#include <Foundation/Vector.hpp>

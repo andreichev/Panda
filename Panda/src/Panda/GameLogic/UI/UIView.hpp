@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include "Panda/Base/Base.hpp"
-#include "Panda/Base/Rect.hpp"
 #include "Panda/Events/WindowSizeListener.hpp"
 #include "Panda/Window/Window.hpp"
-#include "Panda/Renderer/Miren.hpp"
+
+#include <Miren/Miren.hpp>
+#include <Foundation/Foundation.hpp>
+#include <Foundation/Rect.hpp>
 
 namespace Panda {
 

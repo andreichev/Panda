@@ -1,9 +1,11 @@
 //
 // Created by Admin on 22.01.2022.
 //
+
 #include "pndpch.hpp"
-#include "Panda/Application/PlatformDetection.hpp"
 #include "PlatformInit.hpp"
+
+#include <Foundation/PlatformDetection.hpp>
 
 #ifdef PND_PLATFORM_DESKTOP
 #    include "Platform/WindowImpl/GlfwWindow/GlfwWindow.hpp"

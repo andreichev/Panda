@@ -5,7 +5,8 @@
 #pragma once
 
 #include "Panda/Window/Window.hpp"
-#include "Panda/Base/Base.hpp"
+
+#include <Foundation/Foundation.hpp>
 
 #include <GLFW/glfw3.h>
 

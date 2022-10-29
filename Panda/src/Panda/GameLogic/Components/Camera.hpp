@@ -6,9 +6,10 @@
 
 #include "Panda/GameLogic/Component.hpp"
 #include "Panda/Events/WindowSizeListener.hpp"
-#include "Panda/Renderer/Miren.hpp"
 #include "Transform.hpp"
 #include "TransformDelegate.hpp"
+
+#include <Miren/Miren.hpp>
 
 namespace Panda {
 

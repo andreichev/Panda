@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "Panda/Base/Size.hpp"
-#include "Panda/Base/Base.hpp"
+#include <Foundation/Foundation.hpp>
+#include <Foundation/Size.hpp>
+
 #include "Panda/GameLogic/Level.hpp"
 
 namespace Panda {

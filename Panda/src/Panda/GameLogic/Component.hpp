@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Panda/Base/Base.hpp"
+#include <Foundation/Foundation.hpp>
 
 namespace Panda {
 

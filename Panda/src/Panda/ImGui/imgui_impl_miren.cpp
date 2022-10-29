@@ -1,6 +1,6 @@
 #include "imgui_impl_miren.hpp"
 
-#include "Panda/Renderer/Miren.hpp"
+#include <Miren/Miren.hpp>
 
 #include <glm/glm.hpp>
 

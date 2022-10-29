@@ -32,7 +32,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "Panda/Base/Assert.hpp"
-#include "Panda/Base/Allocator.hpp"
-#include "Panda/Logger/Logger.hpp"
-#include "Panda/Application/PlatformDetection.hpp"
+#include <Foundation/Assert.hpp>
+#include <Foundation/Allocator.hpp>
+#include <Foundation/Logger.hpp>
+#include <Foundation/PlatformDetection.hpp>

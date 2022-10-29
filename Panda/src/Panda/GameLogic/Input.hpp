@@ -5,7 +5,8 @@
 #pragma once
 
 #include "Panda/Events/Key.hpp"
-#include "Panda/Base/Size.hpp"
+
+#include <Foundation/Size.hpp>
 
 namespace Panda {
 

@@ -1,7 +1,8 @@
 #include "RunApp.hpp"
-#include "Panda/Thread/Thread.hpp"
 #include "Panda/Application/Application.hpp"
-#include "Panda/Renderer/Miren.hpp"
+
+#include <Miren/Miren.hpp>
+#include <Foundation/Thread.hpp>
 
 void *operator new(size_t size) {
     // std::cout << "NEW" << std::endl;

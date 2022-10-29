@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "Panda/Base/Size.hpp"
 #include "Panda/Events/EventQueue.hpp"
+
+#include <Foundation/Size.hpp>
 
 namespace Panda {
 

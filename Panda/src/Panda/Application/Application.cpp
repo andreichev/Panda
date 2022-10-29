@@ -2,12 +2,12 @@
 // Created by Admin on 22.01.2022.
 //
 
-#include "pndpch.hpp"
-#include "Panda/Application/Initialization/PlatformInit.hpp"
 #include "Application.hpp"
-#include "Panda/Renderer/Miren.hpp"
+#include "Panda/Application/Initialization/PlatformInit.hpp"
 #include "Panda/GameLogic/BasicGameLayer.hpp"
 #include "Panda/Events/WindowEvents.hpp"
+
+#include <Miren/Miren.hpp>
 
 namespace Panda {
 

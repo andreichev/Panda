@@ -4,7 +4,8 @@
 #include <imgui.h>
 
 #include "Panda/Application/Application.hpp"
-#include "Panda/Application/PlatformData.hpp"
+
+#include <Miren/PlatformData.hpp>
 
 // ImGui platform impl
 #include "imgui_impl_panda.hpp"
