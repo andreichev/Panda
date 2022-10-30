@@ -15,8 +15,8 @@ public:
     World();
     void initialize();
     void update(double deltaTime);
-    Shared<Entity> instantiateEntity();
-    void destroy(Shared<Entity> &entity);
+    Foundation::Shared<Entity> instantiateEntity();
+    void destroy(Foundation::Shared<Entity> &entity);
     UIView *getUIView();
 
 private:

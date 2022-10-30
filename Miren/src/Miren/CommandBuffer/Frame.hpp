@@ -10,7 +10,7 @@
 
 #include <queue>
 
-namespace Panda {
+namespace Miren {
 
 /// Класс используемый для хранения данных о кадре.
 /// Тут хранятся буферы, которые существуют только один кадр и данные о графических вызовах
@@ -41,4 +41,4 @@ private:
     std::queue<RenderDraw *> m_drawCalls;
 };
 
-} // namespace Panda
+} // namespace Miren

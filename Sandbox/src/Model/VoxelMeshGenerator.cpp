@@ -7,6 +7,7 @@
 
 Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
     ChunksStorage &chunks, int chunkIndexX, int chunkIndexY, int chunkIndexZ, bool ambientOcclusion) {
+    using namespace Miren;
     Chunk &chunk =
         chunks.chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
     Vertex *vertices = new Vertex[10000];

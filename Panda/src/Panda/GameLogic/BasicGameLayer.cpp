@@ -49,7 +49,7 @@ void BasicGameLayer::onEvent(Event *event) {
             break;
         case EventType::WindowResize: {
             const WindowResizeEvent *ev = dynamic_cast<const WindowResizeEvent *>(event);
-            Input::setWindowSize(UISize(ev->getWidth(), ev->getHeight()));
+            Input::setWindowSize(Size(ev->getWidth(), ev->getHeight()));
             break;
         }
         case EventType::KeyPressed: {

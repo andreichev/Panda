@@ -7,7 +7,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace Panda {
+namespace Miren {
 
 class OpenGLShader {
 public:
@@ -25,4 +25,4 @@ private:
     int getUniformLocation(const std::string &name);
 };
 
-} // namespace Panda
+} // namespace Miren

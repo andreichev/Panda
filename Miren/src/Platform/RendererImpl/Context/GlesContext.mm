@@ -3,12 +3,12 @@
 //
 
 #include "GlesContext.hpp"
-#include "Panda/Application/PlatformData.hpp"
+#include "Miren/PlatformData.hpp"
 
 #import <UIKit/UIKit.h>
 #import <OpenGLES/ES3/gl.h>
 
-namespace Panda {
+namespace Miren {
     GLuint colorRenderBuffer;
     GLuint depthRenderBuffer;
     GLuint frameBuffer;

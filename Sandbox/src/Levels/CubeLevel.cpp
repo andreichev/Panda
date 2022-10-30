@@ -7,6 +7,7 @@
 class CubeComponent : public Panda::Component {
 public:
     void initialize() override {
+        using namespace Miren;
         auto vertices = new Vertex[24]{
             // Front
             Vertex(-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f), // 0
@@ -49,17 +50,17 @@ public:
             20, 21, 22, 22, 23, 20  // Right
         };
 
-        Panda::VertexBufferLayoutData layoutData;
+        Miren::VertexBufferLayoutData layoutData;
         layoutData.pushVector();
-        Panda::VertexLayoutHandle layoutHandle = Panda::Miren::createVertexLayout(layoutData);
-        vertexBuffer = Panda::Miren::createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
-        indexBuffer = Panda::Miren::createIndexBuffer(indices, Panda::BufferElementType::UnsignedInt, 36);
+        Miren::VertexLayoutHandle layoutHandle = Miren::createVertexLayout(layoutData);
+        vertexBuffer = Miren::createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
+        indexBuffer = Miren::createIndexBuffer(indices, Miren::BufferElementType::UnsignedInt, 36);
 
-        texture = Panda::Miren::createTextureFromFile("textures/arbuz1.png");
-        shader = Panda::Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
-        Panda::Miren::setShader(shader);
+        texture = Miren::createTextureFromFile("textures/arbuz1.png");
+        shader = Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
+        Miren::setShader(shader);
 
-        Panda::UISize windowSize = Panda::Application::get()->getWindow()->getSize();
+        Panda::Size windowSize = Panda::Application::get()->getWindow()->getSize();
         view = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         // view = glm::rotate(glm::mat4(1.0f), glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
         projectionMatrix = glm::perspective<float>(40.f, (float)windowSize.width / (float)windowSize.height, 0.1f, 1000.0f);
@@ -67,7 +68,7 @@ public:
         model = glm::mat4(1.f);
         translate = glm::vec3(0.f, 0.f, 0.f);
 
-        Panda::Miren::setUniform(shader, "projection", &projectionMatrix[0][0], Panda::UniformDataType::Mat4);
+        Miren::setUniform(shader, "projection", &projectionMatrix[0][0], Miren::UniformDataType::Mat4);
         time = 0;
     }
 
@@ -78,15 +79,15 @@ public:
         model = glm::translate(model, translate);
         model = glm::rotate(model, (float)time, glm::vec3(1.f, 1.f, 0.f));
 
-        Panda::Miren::setShader(shader);
-        Panda::Miren::setTexture(texture, 0);
-        Panda::Miren::setUniform(shader, "model", &model[0][0], Panda::UniformDataType::Mat4);
-        Panda::Miren::setUniform(shader, "view", &view[0][0], Panda::UniformDataType::Mat4);
-        Panda::Miren::setUniform(shader, "projection", &projectionMatrix[0][0], Panda::UniformDataType::Mat4);
+        Miren::setShader(shader);
+        Miren::setTexture(texture, 0);
+        Miren::setUniform(shader, "model", &model[0][0], Miren::UniformDataType::Mat4);
+        Miren::setUniform(shader, "view", &view[0][0], Miren::UniformDataType::Mat4);
+        Miren::setUniform(shader, "projection", &projectionMatrix[0][0], Miren::UniformDataType::Mat4);
 
-        Panda::Miren::setVertexBuffer(vertexBuffer);
-        Panda::Miren::setIndexBuffer(indexBuffer, 0, 36);
-        Panda::Miren::submit();
+        Miren::setVertexBuffer(vertexBuffer);
+        Miren::setIndexBuffer(indexBuffer, 0, 36);
+        Miren::submit();
     }
 
 private:
@@ -96,16 +97,16 @@ private:
     glm::mat4 projectionMatrix;
 
     double time;
-    Panda::TextureHandle texture;
-    Panda::ShaderHandle shader;
-    Panda::IndexBufferHandle indexBuffer;
-    Panda::VertexBufferHandle vertexBuffer;
+    Miren::TextureHandle texture;
+    Miren::ShaderHandle shader;
+    Miren::IndexBufferHandle indexBuffer;
+    Miren::VertexBufferHandle vertexBuffer;
 };
 
 void CubeLevel::start(Panda::World *world) {
     PND_INFO("CUBE LEVEL STARTED!");
 
-    Panda::Shared<Panda::Entity> entity = world->instantiateEntity();
-    Panda::Shared<CubeComponent> cube = Panda::makeShared<CubeComponent>();
+    Foundation::Shared<Panda::Entity> entity = world->instantiateEntity();
+    Foundation::Shared<CubeComponent> cube = Foundation::makeShared<CubeComponent>();
     entity->addComponent(cube);
 }

@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace Panda {
+namespace Miren {
 
 class OpenGLTexture {
 public:
@@ -18,4 +18,4 @@ private:
     unsigned int id;
 };
 
-} // namespace Panda
+} // namespace Miren

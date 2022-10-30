@@ -5,8 +5,7 @@
 #pragma once
 
 #include "Panda/Events/Key.hpp"
-
-#include <Foundation/Size.hpp>
+#include "Panda/Base/Base.hpp"
 
 namespace Panda {
 
@@ -17,9 +16,9 @@ public:
     // POST EVENTS
     static void setKeyPressed(Key key, bool state);
     static void setMouseButtonPressed(MouseButton mouseButton, bool state);
-    static void windowSizeChanged(UISize size);
+    static void windowSizeChanged(Size size);
     static void postMouseChangedPosition(int x, int y);
-    static void setWindowSize(UISize size);
+    static void setWindowSize(Size size);
     // GET INPUT DATA
     static bool isKeyPressed(Key key);
     static bool isKeyJustPressed(Key key);
@@ -27,7 +26,7 @@ public:
     static bool isMouseButtonJustPressed(MouseButton mouseButton);
     static int getMousePositionX();
     static int getMousePositionY();
-    static UISize getWindowSize();
+    static Size getWindowSize();
     static void update();
 
 private:
@@ -40,7 +39,7 @@ private:
     static bool mouseButtons[8];
     // Номера кадров при нажатии мыши
     static uint32_t framesMouseButtons[4];
-    static UISize windowSize;
+    static Size windowSize;
     static int mousePositionX;
     static int mousePositionY;
 };

@@ -66,6 +66,6 @@ void BlocksCreation::update(double deltaTime) {
     }
 }
 
-void BlocksCreation::setChunksStorage(Panda::Shared<ChunksStorage> storage) {
+void BlocksCreation::setChunksStorage(Foundation::Shared<ChunksStorage> storage) {
     this->chunksStorage = storage;
 }

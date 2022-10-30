@@ -6,7 +6,7 @@
 
 #include <Foundation/Allocator.hpp>
 
-namespace Panda {
+namespace Miren {
 
 Frame::Frame()
     : m_drawCalls() {
@@ -90,4 +90,4 @@ uint32_t Frame::getDrawCallsCount() {
     return (uint32_t)m_drawCalls.size() - 1;
 }
 
-} // namespace Panda
+} // namespace Miren

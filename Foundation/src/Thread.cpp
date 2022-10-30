@@ -13,7 +13,7 @@
 #    include <errno.h>
 #endif
 
-namespace Panda {
+namespace Foundation {
 
 struct ThreadInternal {
 #ifdef PND_PLATFORM_WINDOWS
@@ -202,4 +202,4 @@ int32_t Thread::entry() {
     return result;
 }
 
-} // namespace Panda
+} // namespace Foundation

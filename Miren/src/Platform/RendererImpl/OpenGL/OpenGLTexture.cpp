@@ -16,7 +16,7 @@
 #endif
 #include <stb_image.h>
 
-namespace Panda {
+namespace Miren {
 
 OpenGLTexture::OpenGLTexture(void *pixels, int width, int height)
     : id(0) {
@@ -80,4 +80,4 @@ void OpenGLTexture::unbind() {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-} // namespace Panda
+} // namespace Miren

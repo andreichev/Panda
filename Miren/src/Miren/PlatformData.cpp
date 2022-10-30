@@ -4,7 +4,7 @@
 
 #include "Miren/PlatformData.hpp"
 
-namespace Panda {
+namespace Miren {
 
 PlatformData *PlatformData::get() {
     static PlatformData platformData;
@@ -19,4 +19,4 @@ std::string &PlatformData::getResourcesPath() {
     return resourcesPath;
 }
 
-} // namespace Panda
+} // namespace Miren

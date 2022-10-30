@@ -3,26 +3,26 @@
 #include <cstdlib>
 
 #if DEBUG
-#    define PND_ALLOC(allocator, size) Panda::alloc(allocator, _size, __FILE__, __LINE__)
-#    define PND_FREE(allocator, ptr) Panda::free(allocator, ptr, __FILE__, __LINE__)
-#    define PND_DELETE(_allocator, _ptr) Panda::deleteObject(_allocator, _ptr)
+#    define ALLOC(allocator, size) Foundation::alloc(allocator, _size, __FILE__, __LINE__)
+#    define FREE(allocator, ptr) Foundation::free(allocator, ptr, __FILE__, __LINE__)
+#    define DELETE(_allocator, _ptr) Foundation::deleteObject(_allocator, _ptr)
 #else
-#    define PND_ALLOC(allocator, size) Panda::alloc(allocator, size)
-#    define PND_FREE(allocator, ptr) Panda::free(allocator, ptr)
-#    define PND_DELETE(_allocator, _ptr) Panda::deleteObject(_allocator, _ptr, __FILE__, __LINE__)
+#    define ALLOC(allocator, size) Foundation::alloc(allocator, size)
+#    define FREE(allocator, ptr) Foundation::free(allocator, ptr)
+#    define DELETE(_allocator, _ptr) Foundation::deleteObject(_allocator, _ptr, __FILE__, __LINE__)
 #endif
 
-#define PND_NEW(_allocator, _type) PND_PLACEMENT_NEW(PND_ALLOC(_allocator, sizeof(_type)), _type)
-#define PND_PLACEMENT_NEW(_ptr, _type) ::new (Panda::PlacementNewTag(), _ptr) _type
+#define NEW(_allocator, _type) PLACEMENT_NEW(ALLOC(_allocator, sizeof(_type)), _type)
+#define PLACEMENT_NEW(_ptr, _type) ::new (Foundation::PlacementNewTag(), _ptr) _type
 
-namespace Panda {
+namespace Foundation {
 struct PlacementNewTag {};
-} // namespace Panda
+} // namespace Foundation
 
-void *operator new(size_t, Panda::PlacementNewTag, void *_ptr);
-void operator delete(void *, Panda::PlacementNewTag, void *) throw();
+void *operator new(size_t, Foundation::PlacementNewTag, void *_ptr);
+void operator delete(void *, Foundation::PlacementNewTag, void *) throw();
 
-namespace Panda {
+namespace Foundation {
 
 struct AllocatorI {
     virtual ~AllocatorI() = default;
@@ -45,4 +45,4 @@ void free(AllocatorI *allocator, void *ptr, const char *file = NULL, uint32_t li
 
 AllocatorI *getAllocator();
 
-} // namespace Panda
+} // namespace Foundation

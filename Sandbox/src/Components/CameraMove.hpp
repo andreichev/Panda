@@ -15,6 +15,6 @@ private:
     float mouseSpeed = 0.1f;
     float moveSpeed = 20.0f;
 
-    Panda::Shared<Panda::Transform> transform;
+    Foundation::Shared<Panda::Transform> transform;
     Panda::Window *window;
 };

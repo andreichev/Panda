@@ -5,7 +5,7 @@
 namespace Panda {
 
 UIView::UIView()
-    : UIView(FRect::zero()) {}
+    : UIView(Rect::zero()) {}
 
 UIView::~UIView() {
     Miren::deleteVertexBuffer(vertexBufferHandle);
@@ -13,14 +13,14 @@ UIView::~UIView() {
     Application::get()->removeWindowSizeListener(this);
 }
 
-UIView::UIView(FRect frame)
+UIView::UIView(Rect frame)
     : window(Application::get()->getWindow())
     , frame(frame) {
     float *data = new float[12];
     shaderHandle = Miren::createShader("shaders/ui/uiview/uiview_vertex.glsl", "shaders/ui/uiview/uiview_fragment.glsl");
-    VertexBufferLayoutData layoutData;
+    Miren::VertexBufferLayoutData layoutData;
     layoutData.pushFloat(2);
-    VertexLayoutHandle vertexLayout = Miren::createVertexLayout(layoutData);
+    Miren::VertexLayoutHandle vertexLayout = Miren::createVertexLayout(layoutData);
     vertexBufferHandle = Miren::createDynamicVertexBuffer(data, sizeof(float) * 12, vertexLayout);
     windowSize = window->getSize();
     // TODO: - Subscribe to window size events
@@ -28,17 +28,17 @@ UIView::UIView(FRect frame)
     layout();
 }
 
-void UIView::setFrame(FRect frame) {
+void UIView::setFrame(Rect frame) {
     this->frame = frame;
     layout();
 }
 
-void UIView::addSubview(Shared<UIView> node) {
+void UIView::addSubview(Foundation::Shared<UIView> node) {
     subviews.push_back(node);
     node->layout();
 }
 
-void UIView::removeSubview(Shared<UIView> node) {
+void UIView::removeSubview(Foundation::Shared<UIView> node) {
     subviews.erase(find(subviews.begin(), subviews.end(), node));
 }
 
@@ -68,7 +68,7 @@ void UIView::draw() {
     Miren::submitPrimitives(6);
 }
 
-void UIView::windowSizeChanged(UISize size) {
+void UIView::windowSizeChanged(Size size) {
     windowSize = size;
     layout();
 }

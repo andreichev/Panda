@@ -11,7 +11,7 @@
 #include "OpenGLIndexBuffer.hpp"
 #include "OpenGLVertexBuffer.hpp"
 
-namespace Panda {
+namespace Miren {
 
 class RendererOpenGL : public RendererI {
 public:
@@ -52,4 +52,4 @@ private:
     OpenGLTexture *textures[1000];
 };
 
-} // namespace Panda
+} // namespace Miren

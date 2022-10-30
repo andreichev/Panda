@@ -9,7 +9,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-namespace Panda {
+namespace Miren {
 
 void OpenGLContext::create() {
     glfwWindowHandle = PlatformData::get()->nativeWindowHandle;
@@ -25,4 +25,4 @@ void OpenGLContext::flip() {
     glfwSwapBuffers((GLFWwindow *)glfwWindowHandle);
 }
 
-} // namespace Panda
+} // namespace Miren

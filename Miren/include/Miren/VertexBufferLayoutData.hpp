@@ -6,7 +6,7 @@
 
 #include <Foundation/Logger.hpp>
 
-namespace Panda {
+namespace Miren {
 
 enum class BufferElementType { Float, UnsignedInt, UnsignedShort, UnsignedByte };
 
@@ -93,4 +93,4 @@ public:
     unsigned int m_Stride;
 };
 
-} // namespace Panda
+} // namespace Miren

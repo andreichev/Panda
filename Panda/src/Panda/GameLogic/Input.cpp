@@ -11,7 +11,7 @@ bool Input::keys[1024];
 uint32_t Input::framesKeys[1024];
 bool Input::mouseButtons[8];
 uint32_t Input::framesMouseButtons[4];
-UISize Input::windowSize;
+Size Input::windowSize;
 int Input::mousePositionX;
 int Input::mousePositionY;
 
@@ -54,11 +54,11 @@ void Input::postMouseChangedPosition(int x, int y) {
     mousePositionY = y;
 }
 
-void Input::setWindowSize(UISize size) {
+void Input::setWindowSize(Size size) {
     windowSize = size;
 }
 
-UISize Input::getWindowSize() {
+Size Input::getWindowSize() {
     return windowSize;
 }
 

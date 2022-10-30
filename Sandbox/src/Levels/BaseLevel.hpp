@@ -12,7 +12,7 @@ public:
     void start(Panda::World *world) override;
 
 private:
-    Panda::Shared<ChunksStorage> chunksStorage;
-    Panda::ShaderHandle baseShader;
-    Panda::TextureHandle texture;
+    Foundation::Shared<ChunksStorage> chunksStorage;
+    Miren::ShaderHandle baseShader;
+    Miren::TextureHandle texture;
 };

@@ -18,10 +18,10 @@ public:
     void toggleCursorLock() override;
     bool isCursorLocked() override;
     void setEventQueue(EventQueue *eventQueue) override;
-    GSize getSize() override;
+    Size getSize() override;
 
 private:
-    GSize size;
+    Size size;
 };
 
 } // namespace Panda

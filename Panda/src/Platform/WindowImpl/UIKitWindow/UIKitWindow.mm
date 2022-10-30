@@ -12,7 +12,7 @@ namespace Panda {
 
 UIKitWindow::UIKitWindow() {
     dispatch_async(dispatch_get_main_queue(), ^{
-        size = GSize(
+        size = Size(
             UIScreen.mainScreen.bounds.size.width,
             UIScreen.mainScreen.bounds.size.height
         );
@@ -38,7 +38,7 @@ void UIKitWindow::setEventQueue(EventQueue *eventQueue) {
     });
 }
 
-GSize UIKitWindow::getSize() {
+Size UIKitWindow::getSize() {
     return size;
 }
 

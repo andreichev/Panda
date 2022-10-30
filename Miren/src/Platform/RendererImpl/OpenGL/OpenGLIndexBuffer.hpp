@@ -6,7 +6,7 @@
 
 #include "Miren/VertexBufferLayoutData.hpp"
 
-namespace Panda {
+namespace Miren {
 
 class OpenGLIndexBuffer {
 public:
@@ -28,4 +28,4 @@ private:
     bool isDynamic;
 };
 
-} // namespace Panda
+} // namespace Miren

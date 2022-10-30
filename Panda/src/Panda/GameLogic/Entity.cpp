@@ -9,23 +9,23 @@ namespace Panda {
 
 Entity::Entity()
     : parentEntity(nullptr)
-    , transform(makeShared<Transform>()) {
+    , transform(Foundation::makeShared<Transform>()) {
     Transform transform1;
     addComponent(transform);
 }
 
-void Entity::addComponent(Shared<Component> component) {
+void Entity::addComponent(Foundation::Shared<Component> component) {
     component->setEntity(this);
     components.push_back(component);
     component->initialize();
 }
 
-void Entity::removeComponent(Shared<Component> component) {
+void Entity::removeComponent(Foundation::Shared<Component> component) {
     components.erase(find(components.begin(), components.end(), component));
 }
 
 template<typename T>
-Shared<T> Entity::getComponentWithType() {
+Foundation::Shared<T> Entity::getComponentWithType() {
     auto &it = find_if(components.begin(), components.end(), [](const auto &item) {
         if (dynamic_cast<T>(item) != nullptr) {
             return true;
@@ -62,16 +62,16 @@ void Entity::update(double deltaTime) {
     }
 }
 
-Shared<Transform> Entity::getTransform() const {
+Foundation::Shared<Transform> Entity::getTransform() const {
     return transform;
 }
 
-void Entity::addChildEntity(Shared<Entity> &entity) {
+void Entity::addChildEntity(Foundation::Shared<Entity> &entity) {
     entity->parentEntity = this;
     childEntities.push_back(entity);
 }
 
-void Entity::removeEntity(Shared<Entity> &entity) {
+void Entity::removeEntity(Foundation::Shared<Entity> &entity) {
     childEntities.erase(find(childEntities.begin(), childEntities.end(), entity));
 }
 
@@ -79,7 +79,7 @@ Entity *Entity::getParent() {
     return parentEntity;
 }
 
-std::vector<Shared<Entity>> &Entity::getChildEntities() {
+std::vector<Foundation::Shared<Entity>> &Entity::getChildEntities() {
     return childEntities;
 }
 

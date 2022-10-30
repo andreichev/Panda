@@ -18,7 +18,7 @@
 #include <sstream>
 #include <fstream>
 
-namespace Panda {
+namespace Miren {
 
 OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath) {
     // 1. retrieve the vertex/fragment source code from filePath
@@ -120,4 +120,4 @@ void OpenGLShader::setUniformInt(const char *name, int value) {
     glUniform1i(getUniformLocation(name), value);
 }
 
-} // namespace Panda
+} // namespace Miren

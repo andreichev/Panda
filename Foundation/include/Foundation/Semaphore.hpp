@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Panda {
+namespace Foundation {
 
 class Semaphore {
 public:
@@ -13,4 +13,4 @@ private:
     uint8_t m_internal[128];
 };
 
-} // namespace Panda
+} // namespace Foundation

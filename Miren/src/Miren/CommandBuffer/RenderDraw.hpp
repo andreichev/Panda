@@ -10,7 +10,7 @@
 
 #include <queue>
 
-namespace Panda {
+namespace Miren {
 
 struct TextureBinding {
     TextureHandle m_handle;
@@ -52,4 +52,4 @@ struct RenderDraw {
     uint32_t m_state;
 };
 
-} // namespace Panda
+} // namespace Miren

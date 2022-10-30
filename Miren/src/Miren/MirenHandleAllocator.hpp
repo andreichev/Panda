@@ -6,7 +6,7 @@
 
 #include <cstdlib>
 
-namespace Panda {
+namespace Miren {
 
 constexpr uint16_t kInvalidHandle = UINT16_MAX;
 
@@ -29,4 +29,4 @@ private:
     uint16_t m_maxHandles;
 };
 
-} // namespace Panda
+} // namespace Miren

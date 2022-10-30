@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace Panda {
+namespace Miren {
 
 // Указатели на главные элементы платформы (окно, контекст для рендера и т. д.)
 class PlatformData {
@@ -22,4 +22,4 @@ private:
     std::string resourcesPath;
 };
 
-} // namespace Panda
+} // namespace Miren

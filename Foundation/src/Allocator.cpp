@@ -2,13 +2,13 @@
 
 #include <cstdlib>
 
-void *operator new(size_t, Panda::PlacementNewTag, void *_ptr) {
+void *operator new(size_t, Foundation::PlacementNewTag, void *_ptr) {
     return _ptr;
 }
 
-void operator delete(void *, Panda::PlacementNewTag, void *) throw() {}
+void operator delete(void *, Foundation::PlacementNewTag, void *) throw() {}
 
-namespace Panda {
+namespace Foundation {
 
 AllocatorI *getAllocator() {
     static DefaultAllocator allocator;
@@ -47,4 +47,4 @@ void *DefaultAllocator::realloc(void *_ptr, size_t _size, const char *_file, uin
     return ::realloc(_ptr, _size);
 }
 
-} // namespace Panda
+} // namespace Foundation

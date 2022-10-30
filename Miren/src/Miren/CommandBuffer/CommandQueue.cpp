@@ -4,7 +4,7 @@
 
 #include "CommandQueue.hpp"
 
-namespace Panda {
+namespace Miren {
 
 CommandQueue::CommandQueue()
     : commands() {}
@@ -32,4 +32,4 @@ const RendererCommand *CommandQueue::poll() {
     return command;
 }
 
-} // namespace Panda
+} // namespace Miren

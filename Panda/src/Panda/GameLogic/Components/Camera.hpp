@@ -18,23 +18,23 @@ public:
     Camera();
     ~Camera() override;
     void initialize() override;
-    void setShader(ShaderHandle shader);
+    void setShader(Miren::ShaderHandle shader);
     void setFieldOfView(float degrees);
     // MARK: - Delegate
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
-    void windowSizeChanged(UISize size) override;
+    void windowSizeChanged(Size size) override;
     void update(double deltaTime) override;
 
 private:
     void updateProjectionMatrix();
     void updateViewMatrix();
 
-    UISize windowSize;
-    Shared<Transform> transform;
+    Size windowSize;
+    Foundation::Shared<Transform> transform;
     glm::vec3 target;
     glm::mat4 view;
     glm::mat4 projection;
-    ShaderHandle shader;
+    Miren::ShaderHandle shader;
     float fieldOfView;
 };
 

@@ -12,7 +12,7 @@
 #    include <glad/glad.h>
 #endif
 
-namespace Panda {
+namespace Miren {
 
 OpenGLIndexBuffer::~OpenGLIndexBuffer() {
     glDeleteBuffers(1, &id);
@@ -61,4 +61,4 @@ void OpenGLIndexBuffer::update(void *indices, size_t count) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-} // namespace Panda
+} // namespace Miren

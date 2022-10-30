@@ -1,4 +1,4 @@
-namespace Panda {
+namespace Foundation {
 
 #define PND_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 
@@ -8,4 +8,4 @@ namespace Panda {
         assert(false);                                                                                                                     \
     }
 
-} // namespace Panda
+} // namespace Foundation

@@ -7,7 +7,7 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace Panda {
+namespace Foundation {
 
 class Logger {
 public:
@@ -20,10 +20,10 @@ private:
     static std::shared_ptr<spdlog::logger> s_logger;
 };
 
-} // namespace Panda
+} // namespace Foundation
 
-#define PND_TRACE(...) ::Panda::Logger::getLogger()->trace(__VA_ARGS__)
-#define PND_INFO(...) ::Panda::Logger::getLogger()->info(__VA_ARGS__)
-#define PND_WARN(...) ::Panda::Logger::getLogger()->warn(__VA_ARGS__)
-#define PND_ERROR(...) ::Panda::Logger::getLogger()->error(__VA_ARGS__)
-#define PND_CRITICAL(...) ::Panda::Logger::getLogger()->critical(__VA_ARGS__)
+#define PND_TRACE(...) ::Foundation::Logger::getLogger()->trace(__VA_ARGS__)
+#define PND_INFO(...) ::Foundation::Logger::getLogger()->info(__VA_ARGS__)
+#define PND_WARN(...) ::Foundation::Logger::getLogger()->warn(__VA_ARGS__)
+#define PND_ERROR(...) ::Foundation::Logger::getLogger()->error(__VA_ARGS__)
+#define PND_CRITICAL(...) ::Foundation::Logger::getLogger()->critical(__VA_ARGS__)

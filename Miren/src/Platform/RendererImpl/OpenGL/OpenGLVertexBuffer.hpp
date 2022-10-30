@@ -7,7 +7,7 @@
 #include "Miren/Vertex.hpp"
 #include "Miren/VertexBufferLayoutData.hpp"
 
-namespace Panda {
+namespace Miren {
 
 class OpenGLVertexBuffer {
 public:
@@ -24,4 +24,4 @@ private:
     bool isDynamic;
 };
 
-} // namespace Panda
+} // namespace Miren

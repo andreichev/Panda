@@ -3,9 +3,10 @@
 //
 
 #pragma once
-#include "Panda/Renderer/GraphicsContext.hpp"
 
-namespace Panda {
+#include "Miren/GraphicsContext.hpp"
+
+namespace Miren {
 
 class GlesContext : public GraphicsContext {
     void create() override;
@@ -15,4 +16,4 @@ private:
     void *context;
 };
 
-} // namespace Panda
+} // namespace Miren

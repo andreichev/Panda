@@ -16,7 +16,7 @@
 #    include "Platform/RendererImpl/Context/OpenGLContext.hpp"
 #endif
 
-namespace Panda {
+namespace Miren {
 
 RendererOpenGL::RendererOpenGL() {
 #ifdef PND_PLATFORM_IOS
@@ -78,7 +78,7 @@ void RendererOpenGL::createTextureFromFile(TextureHandle handle, const char *pat
 
 void RendererOpenGL::createRGBATextureFromPixels(TextureHandle handle, void *pixels, int width, int height) {
     textures[handle] = new OpenGLTexture(pixels, width, height);
-    PND_FREE(getAllocator(), pixels);
+    FREE(Foundation::getAllocator(), pixels);
 }
 
 void RendererOpenGL::deleteTexture(TextureHandle handle) {
@@ -88,17 +88,17 @@ void RendererOpenGL::deleteTexture(TextureHandle handle) {
 
 void RendererOpenGL::createIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
     indexBuffers[handle] = new OpenGLIndexBuffer(indices, elementType, count, false);
-    PND_FREE(getAllocator(), indices);
+    FREE(Foundation::getAllocator(), indices);
 }
 
 void RendererOpenGL::createDynamicIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
     indexBuffers[handle] = new OpenGLIndexBuffer(indices, elementType, count, true);
-    PND_FREE(getAllocator(), indices);
+    FREE(Foundation::getAllocator(), indices);
 }
 
 void RendererOpenGL::updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) {
     indexBuffers[handle]->update(indices, count);
-    PND_FREE(getAllocator(), indices);
+    FREE(Foundation::getAllocator(), indices);
 }
 
 void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
@@ -108,19 +108,19 @@ void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
 
 void RendererOpenGL::createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, false, vertexLayouts[layoutHandle]);
-    PND_FREE(getAllocator(), data);
+    FREE(Foundation::getAllocator(), data);
 }
 
 void RendererOpenGL::createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, true, vertexLayouts[layoutHandle]);
     if (data != nullptr) {
-        PND_FREE(getAllocator(), data);
+        FREE(Foundation::getAllocator(), data);
     }
 }
 
 void RendererOpenGL::updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
     vertexBuffers[handle]->update(data, size);
-    PND_FREE(getAllocator(), data);
+    FREE(Foundation::getAllocator(), data);
 }
 
 void RendererOpenGL::deleteVertexBuffer(VertexBufferHandle handle) {
@@ -220,4 +220,4 @@ void RendererOpenGL::checkForErrors() {
     }
 }
 
-} // namespace Panda
+} // namespace Miren

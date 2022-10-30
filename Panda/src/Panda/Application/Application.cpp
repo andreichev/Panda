@@ -44,14 +44,14 @@ Application::Application(ApplicationStartupSettings &settings)
     , deltaTimeMillis(0)
     , thisSecondFramesCount(0) {
     s_instance = this;
-    Logger::init();
+    Foundation::Logger::init();
 
     m_window = createWindow(settings);
     m_window->setEventQueue(&m_eventQueue);
     timeMillis = getMillis();
 
 #ifdef PND_PLATFORM_DESKTOP
-    Panda::Miren::initialize();
+    Miren::initialize();
 #endif
 
     startBasicGame(settings.startupLevel);
@@ -108,7 +108,7 @@ void Application::processEvents() {
     while ((event = m_eventQueue.poll()) != nullptr) {
         if (event->type == EventType::WindowResize) {
             const WindowResizeEvent *ev = dynamic_cast<const WindowResizeEvent *>(event);
-            windowSizeChanged(UISize(ev->getWidth(), ev->getHeight()));
+            windowSizeChanged(Size(ev->getWidth(), ev->getHeight()));
         } else if (event->type == EventType::WindowClose) {
             close();
         }
@@ -129,7 +129,7 @@ void Application::addWindowSizeListener(WindowSizeListener *listener) {
     m_windowSizeListeners.push_back(listener);
 }
 
-void Application::windowSizeChanged(UISize size) {
+void Application::windowSizeChanged(Size size) {
     for (auto &listener : m_windowSizeListeners) {
         listener->windowSizeChanged(size);
     }

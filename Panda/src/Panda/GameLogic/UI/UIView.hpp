@@ -6,22 +6,22 @@
 
 #include "Panda/Events/WindowSizeListener.hpp"
 #include "Panda/Window/Window.hpp"
+#include "Panda/Base/Base.hpp"
 
 #include <Miren/Miren.hpp>
 #include <Foundation/Foundation.hpp>
-#include <Foundation/Rect.hpp>
 
 namespace Panda {
 
 class UIView : public WindowSizeListener {
 public:
     UIView();
-    UIView(FRect frame);
+    UIView(Rect frame);
     virtual ~UIView();
     void render();
-    void addSubview(Shared<UIView> node);
-    void removeSubview(Shared<UIView> node);
-    void setFrame(FRect frame);
+    void addSubview(Foundation::Shared<UIView> node);
+    void removeSubview(Foundation::Shared<UIView> node);
+    void setFrame(Rect frame);
 
     // Вызывается для позиционирования (обновление буфера)
     virtual void layout();
@@ -30,20 +30,20 @@ public:
 
     // MARK: - WindowSizeListener
 
-    void windowSizeChanged(UISize size) override;
+    void windowSizeChanged(Size size) override;
 
     // TODO: - Добавить superview
 protected:
-    UISize windowSize;
+    Size windowSize;
     Window *window;
 
 private:
-    std::vector<Shared<UIView>> subviews;
+    std::vector<Foundation::Shared<UIView>> subviews;
 
     // TODO: - Один шейдер на все вьюхи
-    ShaderHandle shaderHandle;
-    VertexBufferHandle vertexBufferHandle;
-    FRect frame;
+    Miren::ShaderHandle shaderHandle;
+    Miren::VertexBufferHandle vertexBufferHandle;
+    Rect frame;
 };
 
 } // namespace Panda

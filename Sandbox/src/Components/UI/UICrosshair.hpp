@@ -8,7 +8,7 @@ public:
     void layout() override;
 
 private:
-    Panda::Shared<Panda::UIView> horizontal;
-    Panda::Shared<Panda::UIView> vertical;
+    Foundation::Shared<Panda::UIView> horizontal;
+    Foundation::Shared<Panda::UIView> vertical;
     void addSubviews();
 };

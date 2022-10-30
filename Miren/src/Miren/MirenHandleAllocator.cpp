@@ -4,7 +4,7 @@
 
 #include "MirenHandleAllocator.hpp"
 
-namespace Panda {
+namespace Miren {
 
 MirenHandleAllocator::MirenHandleAllocator(uint16_t maxHandles)
     : m_numHandles(0)
@@ -65,4 +65,4 @@ void MirenHandleAllocator::reset() {
     }
 }
 
-} // namespace Panda
+} // namespace Miren

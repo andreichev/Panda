@@ -6,7 +6,7 @@
 
 #include "RendererCommand.hpp"
 
-namespace Panda {
+namespace Miren {
 
 class CommandQueue {
 public:
@@ -20,4 +20,4 @@ private:
     std::queue<RendererCommand *> commands;
 };
 
-} // namespace Panda
+} // namespace Miren

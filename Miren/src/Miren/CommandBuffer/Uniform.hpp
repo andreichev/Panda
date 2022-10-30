@@ -4,7 +4,7 @@
 
 #include <Foundation/Logger.hpp>
 
-namespace Panda {
+namespace Miren {
 
 struct Uniform {
     ShaderHandle handle;
@@ -33,4 +33,4 @@ struct Uniform {
     }
 };
 
-} // namespace Panda
+} // namespace Miren

@@ -20,15 +20,15 @@ void World::initialize() {
     root.initialize();
 }
 
-Shared<Entity> World::instantiateEntity() {
-    Shared<Entity> entity = makeShared<Entity>();
+Foundation::Shared<Entity> World::instantiateEntity() {
+    Foundation::Shared<Entity> entity = Foundation::makeShared<Entity>();
     root.addChildEntity(entity);
     return entity;
 }
 
-void World::destroy(Shared<Entity> &entity) {
+void World::destroy(Foundation::Shared<Entity> &entity) {
     root.removeEntity(entity);
-    for (Shared<Entity> child : entity->getChildEntities()) {
+    for (Foundation::Shared<Entity> child : entity->getChildEntities()) {
         destroy(child);
     }
 }

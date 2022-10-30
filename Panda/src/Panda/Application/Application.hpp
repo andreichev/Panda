@@ -40,7 +40,7 @@ public:
     static Application *get();
 
 private:
-    void windowSizeChanged(UISize size);
+    void windowSizeChanged(Size size);
 
     bool isApplicationShouldClose;
     uint64_t timeMillis;

@@ -15,7 +15,7 @@
 #    include <limits.h>
 #endif // PND_PLATFORM_
 
-namespace Panda {
+namespace Foundation {
 
 struct SemaphoreInternal {
 #if defined(PND_PLATFORM_MACOS) || defined(PND_PLATFORM_IOS)
@@ -193,4 +193,4 @@ bool Semaphore::wait(int32_t _msecs) {
 }
 #endif // PND_PLATFORM_
 
-} // namespace Panda
+} // namespace Foundation

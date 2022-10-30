@@ -5,8 +5,7 @@
 #pragma once
 
 #include "Panda/Events/EventQueue.hpp"
-
-#include <Foundation/Size.hpp>
+#include "Panda/Base/Base.hpp"
 
 namespace Panda {
 
@@ -19,7 +18,7 @@ public:
     virtual void toggleCursorLock() = 0;
     virtual bool isCursorLocked() = 0;
     virtual void setEventQueue(EventQueue *eventQueue) = 0;
-    virtual UISize getSize() = 0;
+    virtual Size getSize() = 0;
 };
 
 } // namespace Panda

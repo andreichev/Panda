@@ -17,26 +17,26 @@ class Transform;
 class Mesh : public Component, TransformDelegate {
 public:
     ~Mesh() override;
-    Mesh(const MeshData &primitiveMeshData, bool isDynamic, TextureHandle texture, ShaderHandle shader);
-    Mesh(Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount, bool isDynamic,
-        TextureHandle texture, ShaderHandle shader);
+    Mesh(const MeshData &primitiveMeshData, bool isDynamic, Miren::TextureHandle texture, Miren::ShaderHandle shader);
+    Mesh(Miren::Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount, bool isDynamic,
+        Miren::TextureHandle texture, Miren::ShaderHandle shader);
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
     void initialize() override;
     void update(double deltaTime) override;
     void updateBuffer(const MeshData &data);
-    void updateBuffer(Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount);
+    void updateBuffer(Miren::Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount);
 
 private:
     void updateModelMatrix();
 
-    TextureHandle textureHandle;
-    ShaderHandle shaderHandle;
-    VertexLayoutHandle bufferLayoutHandle;
-    IndexBufferHandle indexBufferHandle;
-    VertexBufferHandle vertexBufferHandle;
+    Miren::TextureHandle textureHandle;
+    Miren::ShaderHandle shaderHandle;
+    Miren::VertexLayoutHandle bufferLayoutHandle;
+    Miren::IndexBufferHandle indexBufferHandle;
+    Miren::VertexBufferHandle vertexBufferHandle;
     glm::mat4 model;
     uint32_t indicesCount;
-    Shared<Transform> transform;
+    Foundation::Shared<Transform> transform;
     const bool isDynamic;
 };
 

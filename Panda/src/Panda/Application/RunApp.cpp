@@ -15,18 +15,18 @@ void operator delete(void *ptr) noexcept {
 }
 
 #ifdef PND_PLATFORM_DESKTOP
-static int32_t renderThread(Panda::Thread *_thread, void *_userData) {
+static int32_t renderThread(Foundation::Thread *_thread, void *_userData) {
     while (Panda::Application::get()->isRunning()) {
-        Panda::Miren::renderFrame();
+        Miren::renderFrame();
     }
-    Panda::Miren::terminate();
+    Miren::terminate();
     return 0;
 }
 #endif
 
 void runPandaApplication(Panda::ApplicationStartupSettings settings) {
 #ifdef PND_PLATFORM_DESKTOP
-    Panda::Thread thread;
+    Foundation::Thread thread;
     thread.init(renderThread, nullptr, 0, "Render thread");
 #endif
 

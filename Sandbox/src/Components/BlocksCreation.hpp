@@ -12,13 +12,13 @@ class BlocksCreation : public Panda::Component {
 public:
     void initialize() override;
     void update(double deltaTime) override;
-    void setChunksStorage(Panda::Shared<ChunksStorage> storage);
+    void setChunksStorage(Foundation::Shared<ChunksStorage> storage);
 
 private:
     void setVoxel(int x, int y, int z, int8_t id);
     void updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ);
 
-    Panda::Shared<ChunksStorage> chunksStorage;
-    Panda::Shared<Panda::Transform> transform;
+    Foundation::Shared<ChunksStorage> chunksStorage;
+    Foundation::Shared<Panda::Transform> transform;
     const int maximumDistance = 10;
 };

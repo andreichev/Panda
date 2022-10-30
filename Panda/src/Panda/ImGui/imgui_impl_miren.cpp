@@ -5,10 +5,10 @@
 #include <glm/glm.hpp>
 
 bool deviceObjectsCreated = false;
-Panda::ShaderHandle shader;
-Panda::VertexBufferHandle vertexBuffer;
-Panda::IndexBufferHandle indexBuffer;
-Panda::TextureHandle fontTexture;
+Miren::ShaderHandle shader;
+Miren::VertexBufferHandle vertexBuffer;
+Miren::IndexBufferHandle indexBuffer;
+Miren::TextureHandle fontTexture;
 glm::mat4 projMat(1.f);
 
 IMGUI_IMPL_API bool ImGui_ImplMiren_Init() {
@@ -29,7 +29,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_NewFrame() {
 }
 
 static void ImGui_ImplMiren_SetProjMat(ImDrawData *draw_data, int fb_width, int fb_height) {
-    using namespace Panda;
+    using namespace Miren;
 
     float L = draw_data->DisplayPos.x;
     float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
@@ -42,7 +42,7 @@ static void ImGui_ImplMiren_SetProjMat(ImDrawData *draw_data, int fb_width, int 
 }
 
 IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
-    using namespace Panda;
+    using namespace Miren;
 
     // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
     int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
@@ -63,11 +63,11 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
         // Upload vertex/index buffers
         void *vertices = malloc(cmd_list->VtxBuffer.size_in_bytes());
         memcpy(vertices, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.size_in_bytes());
-        Panda::Miren::updateDynamicVertexBuffer(vertexBuffer, vertices, cmd_list->VtxBuffer.size_in_bytes());
+        updateDynamicVertexBuffer(vertexBuffer, vertices, cmd_list->VtxBuffer.size_in_bytes());
 
         void *indices = malloc(cmd_list->IdxBuffer.size_in_bytes());
         memcpy(indices, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.size_in_bytes());
-        Panda::Miren::updateDynamicIndexBuffer(indexBuffer, indices, cmd_list->IdxBuffer.Size);
+        updateDynamicIndexBuffer(indexBuffer, indices, cmd_list->IdxBuffer.Size);
 
         // Will project scissor/clipping rectangles into framebuffer space
         ImVec2 clip_off = draw_data->DisplayPos;         // (0,0) unless using multi-viewports
@@ -109,18 +109,18 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateFontsTexture() {
     void *texture = malloc(textureSize);
     memcpy(texture, pixels, textureSize);
 
-    using namespace Panda;
-    fontTexture = Miren::createTextureFromPixels(texture, width, height);
+    using namespace Miren;
+    fontTexture = createTextureFromPixels(texture, width, height);
     io.Fonts->SetTexID((ImTextureID)(intptr_t)fontTexture);
     return true;
 }
 
 IMGUI_IMPL_API void ImGui_ImplMiren_DestroyFontsTexture() {
-    Panda::Miren::deleteTexture(fontTexture);
+    Miren::deleteTexture(fontTexture);
 }
 
 IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
-    using namespace Panda;
+    using namespace Miren;
     shader = Miren::createShader("shaders/imgui/imgui_vertex.glsl", "shaders/imgui/imgui_fragment.glsl");
 
     VertexBufferLayoutData layoutData;
@@ -146,10 +146,10 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
 }
 
 IMGUI_IMPL_API void ImGui_ImplMiren_DestroyDeviceObjects() {
-    using namespace Panda;
-    Miren::deleteShader(shader);
-    Miren::deleteVertexBuffer(vertexBuffer);
-    Miren::deleteIndexBuffer(indexBuffer);
+    using namespace Miren;
+    deleteShader(shader);
+    deleteVertexBuffer(vertexBuffer);
+    deleteIndexBuffer(indexBuffer);
     ImGui_ImplMiren_DestroyFontsTexture();
     deviceObjectsCreated = false;
 }

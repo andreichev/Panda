@@ -13,38 +13,38 @@
 
 void BaseLevel::start(Panda::World *world) {
     // Panda::Miren::setClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    baseShader = Panda::Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
+    baseShader = Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
     PND_INFO("WORLD GENERATION STARTED");
-    chunksStorage = Panda::makeShared<ChunksStorage>();
+    chunksStorage = Foundation::makeShared<ChunksStorage>();
     PND_INFO("WORLD GENERATED");
-    Panda::Shared<Panda::Entity> cameraEntity = world->instantiateEntity();
-    Panda::Shared<Panda::Camera> camera = Panda::makeShared<Panda::Camera>();
+    Foundation::Shared<Panda::Entity> cameraEntity = world->instantiateEntity();
+    Foundation::Shared<Panda::Camera> camera = Foundation::makeShared<Panda::Camera>();
     cameraEntity->addComponent(camera);
     camera->setFieldOfView(60.f);
     camera->setShader(baseShader);
-    cameraEntity->addComponent(Panda::makeShared<CameraMove>());
+    cameraEntity->addComponent(Foundation::makeShared<CameraMove>());
     cameraEntity->getTransform()->translate(
         ChunksStorage::WORLD_SIZE_X / 2, ChunksStorage::WORLD_SIZE_Y / 4, ChunksStorage::WORLD_SIZE_Z / 2);
     cameraEntity->getTransform()->rotate(25.f, 0.f, 0.f);
 
-    Panda::Shared<BlocksCreation> blocksCreation = Panda::makeShared<BlocksCreation>();
+    Foundation::Shared<BlocksCreation> blocksCreation = Foundation::makeShared<BlocksCreation>();
     blocksCreation->setChunksStorage(chunksStorage);
     cameraEntity->addComponent(blocksCreation);
 
-    Panda::Shared<FullScreenToggle> fullScreenToggle = Panda::makeShared<FullScreenToggle>();
+    Foundation::Shared<FullScreenToggle> fullScreenToggle = Foundation::makeShared<FullScreenToggle>();
     cameraEntity->addComponent(fullScreenToggle);
 
-    Panda::Shared<Panda::UIView> view = Panda::makeShared<Panda::UIView>(Panda::FRect(50, 400, 100, 200));
+    Foundation::Shared<Panda::UIView> view = Foundation::makeShared<Panda::UIView>(Panda::Rect(50, 400, 100, 200));
     world->getUIView()->addSubview(view);
-    world->getUIView()->addSubview(Panda::makeShared<UICrosshair>());
+    world->getUIView()->addSubview(Foundation::makeShared<UICrosshair>());
 
-    Panda::Shared<Panda::Entity> chunkEntity = world->instantiateEntity();
-    texture = Panda::Miren::createTextureFromFile("textures/Texture.png");
+    Foundation::Shared<Panda::Entity> chunkEntity = world->instantiateEntity();
+    texture = Miren::createTextureFromFile("textures/Texture.png");
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
         for (int indexY = 0; indexY < ChunksStorage::SIZE_Y; indexY++) {
             for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {
                 Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(*chunksStorage.get(), indexX, indexY, indexZ, true);
-                Panda::Shared<Panda::Mesh> mesh = Panda::makeShared<Panda::Mesh>(meshData, false, texture, baseShader);
+                Foundation::Shared<Panda::Mesh> mesh = Foundation::makeShared<Panda::Mesh>(meshData, false, texture, baseShader);
                 chunksStorage->chunks[indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + indexX * ChunksStorage::SIZE_X + indexZ]
                     .setMesh(mesh.get());
                 chunkEntity->addComponent(mesh);

@@ -8,7 +8,7 @@
 #include "Miren/VertexBufferLayoutData.hpp"
 #include "Miren/RendererI.hpp"
 
-namespace Panda {
+namespace Miren {
 
 enum class RendererCommandType {
     RendererInit,
@@ -201,4 +201,4 @@ struct DeleteVertexLayoutCommand : RendererCommand {
         , handle(handle) {}
 };
 
-} // namespace Panda
+} // namespace Miren

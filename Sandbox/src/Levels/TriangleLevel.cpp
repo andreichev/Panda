@@ -14,21 +14,20 @@ public:
     void initialize() override {}
 
     void update(double deltaTime) override {
-        Panda::Miren::setShader(m_shader);
-        Panda::Miren::setVertexBuffer(m_vertexBuffer);
-        Panda::Miren::setIndexBuffer(m_indexBuffer, 0, 6);
-        Panda::Miren::submit();
+        Miren::setShader(m_shader);
+        Miren::setVertexBuffer(m_vertexBuffer);
+        Miren::setIndexBuffer(m_indexBuffer, 0, 6);
+        Miren::submit();
     }
 
 private:
-    Panda::VertexBufferHandle m_vertexBuffer;
-    Panda::IndexBufferHandle m_indexBuffer;
-    Panda::ShaderHandle m_shader;
+    Miren::VertexBufferHandle m_vertexBuffer;
+    Miren::IndexBufferHandle m_indexBuffer;
+    Miren::ShaderHandle m_shader;
 };
 
 void TriangleLevel::start(Panda::World *world) {
-    Panda::ShaderHandle baseShader =
-        Panda::Miren::createShader("shaders/checker/checker_vertex.glsl", "shaders/checker/checker_fragment.glsl");
+    Miren::ShaderHandle baseShader = Miren::createShader("shaders/checker/checker_vertex.glsl", "shaders/checker/checker_fragment.glsl");
     float rightEdge = 0.5f;
     float topEdge = 0.5f;
     float leftEdge = -0.5f;
@@ -36,14 +35,14 @@ void TriangleLevel::start(Panda::World *world) {
     float *data = new float[8]{rightEdge, topEdge, leftEdge, topEdge, leftEdge, bottomEdge, rightEdge, bottomEdge};
     uint32_t *indices = new uint32_t[6]{0, 1, 2, 0, 2, 3};
 
-    Panda::VertexBufferLayoutData layoutData;
+    Miren::VertexBufferLayoutData layoutData;
     layoutData.pushFloat(2);
-    Panda::VertexLayoutHandle vertexLayout = Panda::Miren::createVertexLayout(layoutData);
-    Panda::VertexBufferHandle vertexBuffer = Panda::Miren::createVertexBuffer(data, 32, vertexLayout);
-    Panda::IndexBufferHandle indexBuffer = Panda::Miren::createIndexBuffer(indices, Panda::BufferElementType::UnsignedInt, 6);
+    Miren::VertexLayoutHandle vertexLayout = Miren::createVertexLayout(layoutData);
+    Miren::VertexBufferHandle vertexBuffer = Miren::createVertexBuffer(data, 32, vertexLayout);
+    Miren::IndexBufferHandle indexBuffer = Miren::createIndexBuffer(indices, Miren::BufferElementType::UnsignedInt, 6);
 
-    Panda::Shared<TriangleRenderer> triangleRenderer = Panda::makeShared<TriangleRenderer>(vertexBuffer, indexBuffer, baseShader);
+    Foundation::Shared<TriangleRenderer> triangleRenderer = Foundation::makeShared<TriangleRenderer>(vertexBuffer, indexBuffer, baseShader);
 
-    Panda::Shared<Panda::Entity> entity = world->instantiateEntity();
+    Foundation::Shared<Panda::Entity> entity = world->instantiateEntity();
     entity->addComponent(triangleRenderer);
 }

@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-namespace Panda {
+namespace Foundation {
 
 struct Buffer {
     Buffer() = delete;
@@ -15,4 +15,4 @@ const Buffer *allocateBuffer(uint32_t size);
 
 void releaseBuffer(const Buffer *buffer);
 
-} // namespace Panda
+} // namespace Foundation

@@ -10,7 +10,7 @@
 #include "Miren/VertexBufferLayoutData.hpp"
 #include "Miren/Vertex.hpp"
 
-namespace Panda {
+namespace Miren {
 
 enum class RendererType {
     Noop, //!< No rendering.
@@ -49,4 +49,4 @@ public:
     virtual void submit(RenderDraw *draw) = 0;
 };
 
-} // namespace Panda
+} // namespace Miren

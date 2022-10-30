@@ -2,7 +2,7 @@
 
 #define INVALID_HANDLE_VALUE -1
 
-namespace Panda {
+namespace Foundation {
 
 typedef int32_t (*ThreadFn)(class Thread *_self, void *_userData);
 
@@ -28,4 +28,4 @@ private:
     bool m_running;
 };
 
-} // namespace Panda
+} // namespace Foundation

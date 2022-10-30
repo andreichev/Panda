@@ -6,7 +6,7 @@
 
 #include "Miren/GraphicsContext.hpp"
 
-namespace Panda {
+namespace Miren {
 
 // GLFW and GLAD based context
 class OpenGLContext : public GraphicsContext {
@@ -18,4 +18,4 @@ private:
     void *glfwWindowHandle;
 };
 
-} // namespace Panda
+} // namespace Miren

@@ -6,6 +6,8 @@
 
 #include <glm/glm.hpp>
 
+namespace Miren {
+
 struct Vertex {
     glm::vec3 pos;
     glm::vec2 texCoords;
@@ -26,3 +28,5 @@ struct Vertex {
         , texCoords(u, v)
         , light(light) {}
 };
+
+} // namespace Miren

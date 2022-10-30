@@ -29,7 +29,7 @@ void ImGuiLayer::onAttach() {
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
     float fontSize = 18.0f; // *2.0f;
-    std::string fontPath = PlatformData::get()->getResourcesPath() + "fonts/ProggyTiny.ttf";
+    std::string fontPath = Miren::PlatformData::get()->getResourcesPath() + "fonts/ProggyTiny.ttf";
     io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize);
 
     // Setup Dear ImGui style

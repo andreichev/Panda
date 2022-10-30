@@ -8,12 +8,12 @@
 
 namespace Panda {
 struct MeshData {
-    Vertex *vertices;
+    Miren::Vertex *vertices;
     unsigned int verticesCount;
     unsigned int *indices;
     unsigned int indicesCount;
 
-    MeshData(Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount)
+    MeshData(Miren::Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount)
         : vertices(vertices)
         , verticesCount(verticesCount)
         , indices(indices)

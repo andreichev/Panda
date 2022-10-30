@@ -14,7 +14,7 @@
 #    include <glad/glad.h>
 #endif
 
-namespace Panda {
+namespace Miren {
 
 OpenGLVertexBuffer::~OpenGLVertexBuffer() {
     glDeleteVertexArrays(1, &layoutId);
@@ -77,4 +77,4 @@ void OpenGLVertexBuffer::createLayout(VertexBufferLayoutData *data) {
     glBindVertexArray(0);
 }
 
-} // namespace Panda
+} // namespace Miren

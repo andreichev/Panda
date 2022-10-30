@@ -4,11 +4,11 @@
 
 #pragma once
 
-namespace Panda {
+namespace Miren {
 class GraphicsContext {
 public:
     virtual ~GraphicsContext() = default;
     virtual void create() = 0;
     virtual void flip() = 0;
 };
-} // namespace Panda
+} // namespace Miren
