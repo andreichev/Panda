@@ -104,7 +104,7 @@ private:
 };
 
 void CubeLevel::start(Panda::World *world) {
-    PND_INFO("CUBE LEVEL STARTED!");
+    LOG_INFO("CUBE LEVEL STARTED!");
 
     Foundation::Shared<Panda::Entity> entity = world->instantiateEntity();
     Foundation::Shared<CubeComponent> cube = Foundation::makeShared<CubeComponent>();

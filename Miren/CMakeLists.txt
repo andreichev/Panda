@@ -1,7 +1,7 @@
 project(Miren)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-DPND_PROFILE)
+    add_compile_options(-DPROFILE)
 endif ()
 
 set(CMAKE_CXX_STANDARD 14)

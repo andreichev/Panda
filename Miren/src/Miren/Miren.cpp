@@ -211,7 +211,7 @@ void rendererExecuteCommands() {
     if (s_renderer == nullptr) {
         command = s_commandQueue.poll();
         if (command != nullptr) {
-            PND_ASSERT(command->type == RendererCommandType::RendererInit, "First command in command buffer should be RendererInit");
+            ASSERT(command->type == RendererCommandType::RendererInit, "First command in command buffer should be RendererInit");
             s_renderer = new RendererOpenGL();
             s_commandQueue.release(command);
         }

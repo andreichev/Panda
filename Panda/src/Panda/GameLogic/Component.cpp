@@ -17,7 +17,7 @@ void Component::setEntity(Entity *entity) {
 
 Entity &Component::getEntity() {
     if (m_entity == nullptr) {
-        PND_ERROR("Инициализация компонента должна происходить в методе initialize(), а не в конструкторе");
+        LOG_ERROR("Инициализация компонента должна происходить в методе initialize(), а не в конструкторе");
     }
     return *m_entity;
 }

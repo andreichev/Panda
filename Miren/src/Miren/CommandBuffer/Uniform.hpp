@@ -20,7 +20,7 @@ struct Uniform {
             case UniformDataType::Mat4:
                 return sizeof(float) * 16;
         }
-        PND_ERROR("Uniform type is undefined");
+        LOG_ERROR("Uniform type is undefined");
         return 0;
     }
 

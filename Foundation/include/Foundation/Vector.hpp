@@ -47,7 +47,7 @@ public:
         }
         if (m_data) {
             m_size = m_capacity = 0;
-            PND_FREE(getAllocator(), m_data);
+            FREE(getAllocator(), m_data);
             m_data = NULL;
         }
     }
@@ -69,12 +69,12 @@ public:
     }
 
     inline T &operator[](int i) {
-        PND_ASSERT(i >= 0 && i < m_size, "index out of bounds");
+        ASSERT(i >= 0 && i < m_size, "index out of bounds");
         return m_data[i];
     }
 
     inline const T &operator[](int i) const {
-        PND_ASSERT(i >= 0 && i < m_size, "index out of bounds");
+        ASSERT(i >= 0 && i < m_size, "index out of bounds");
         return m_data[i];
     }
 
@@ -95,22 +95,22 @@ public:
     }
 
     inline T &front() {
-        PND_ASSERT(m_size > 0, "vector is empty");
+        ASSERT(m_size > 0, "vector is empty");
         return m_data[0];
     }
 
     inline const T &front() const {
-        PND_ASSERT(m_size > 0, "vector is empty");
+        ASSERT(m_size > 0, "vector is empty");
         return m_data[0];
     }
 
     inline T &back() {
-        PND_ASSERT(m_size > 0, "vector is empty");
+        ASSERT(m_size > 0, "vector is empty");
         return m_data[m_size - 1];
     }
 
     inline const T &back() const {
-        PND_ASSERT(m_size > 0, "vector is empty");
+        ASSERT(m_size > 0, "vector is empty");
         return m_data[m_size - 1];
     }
 
@@ -131,7 +131,7 @@ public:
         T *new_data = (T *)ALLOC(getAllocator(), (size_t)new_capacity * sizeof(T));
         if (m_data) {
             memcpy(new_data, m_data, (size_t)m_size * sizeof(T));
-            PND_FREE(getAllocator(), m_data);
+            FREE(getAllocator(), m_data);
         }
         m_data = new_data;
         m_capacity = new_capacity;
@@ -141,7 +141,7 @@ public:
         if (new_capacity <= m_capacity)
             return;
         if (m_data)
-            PND_FREE(getAllocator(), m_data);
+            FREE(getAllocator(), m_data);
         m_data = (T *)ALLOC(getAllocator(), (size_t)new_capacity * sizeof(T));
         m_capacity = new_capacity;
     }
@@ -156,7 +156,7 @@ public:
     }
 
     inline void pop_back() {
-        PND_ASSERT(m_size > 0, "vector is empty");
+        ASSERT(m_size > 0, "vector is empty");
         m_size--;
     }
 
@@ -168,7 +168,7 @@ public:
     }
 
     inline T *erase(const T *it) {
-        PND_ASSERT(it >= m_data && it < m_data + m_size, "element not found");
+        ASSERT(it >= m_data && it < m_data + m_size, "element not found");
         const ptrdiff_t off = it - m_data;
         memmove(m_data + off, m_data + off + 1, ((size_t)m_size - (size_t)off - 1) * sizeof(T));
         m_size--;
@@ -176,7 +176,7 @@ public:
     }
 
     inline T *erase(const T *it, const T *it_last) {
-        PND_ASSERT(it >= m_data && it < m_data + m_size && it_last >= it && it_last <= m_data + m_size, "element not found");
+        ASSERT(it >= m_data && it < m_data + m_size && it_last >= it && it_last <= m_data + m_size, "element not found");
         const ptrdiff_t count = it_last - it;
         const ptrdiff_t off = it - m_data;
         memmove(m_data + off, m_data + off + count, ((size_t)m_size - (size_t)off - (size_t)count) * sizeof(T));
@@ -185,7 +185,7 @@ public:
     }
 
     inline T *erase_unsorted(const T *it) {
-        PND_ASSERT(it >= m_data && it < m_data + m_size, "element not found");
+        ASSERT(it >= m_data && it < m_data + m_size, "element not found");
         const ptrdiff_t off = it - m_data;
         if (it < m_data + m_size - 1)
             memcpy(m_data + off, m_data + m_size - 1, sizeof(T));
@@ -194,7 +194,7 @@ public:
     }
 
     inline T *insert(const T *it, const T &v) {
-        PND_ASSERT(it >= m_data && it <= m_data + m_size, "element not found");
+        ASSERT(it >= m_data && it <= m_data + m_size, "element not found");
         const ptrdiff_t off = it - m_data;
         if (m_size == m_capacity)
             reserve(growCapacity(m_size + 1));
@@ -255,7 +255,7 @@ public:
     }
 
     inline int index_from_ptr(const T *it) const {
-        PND_ASSERT(it >= m_data && it < m_data + m_size, "element not found");
+        ASSERT(it >= m_data && it < m_data + m_size, "element not found");
         const ptrdiff_t off = it - m_data;
         return (int)off;
     }

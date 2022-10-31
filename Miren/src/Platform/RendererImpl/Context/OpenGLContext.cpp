@@ -15,7 +15,7 @@ void OpenGLContext::create() {
     glfwWindowHandle = PlatformData::get()->nativeWindowHandle;
     glfwMakeContextCurrent((GLFWwindow *)glfwWindowHandle);
     if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == false) {
-        PND_CRITICAL("Failed to initialize GLAD");
+        LOG_CRITICAL("Failed to initialize GLAD");
     }
     // Enable v-sync
     glfwSwapInterval(1);

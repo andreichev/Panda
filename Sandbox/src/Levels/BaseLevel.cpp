@@ -14,9 +14,9 @@
 void BaseLevel::start(Panda::World *world) {
     // Panda::Miren::setClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     baseShader = Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
-    PND_INFO("WORLD GENERATION STARTED");
+    LOG_INFO("WORLD GENERATION STARTED");
     chunksStorage = Foundation::makeShared<ChunksStorage>();
-    PND_INFO("WORLD GENERATED");
+    LOG_INFO("WORLD GENERATED");
     Foundation::Shared<Panda::Entity> cameraEntity = world->instantiateEntity();
     Foundation::Shared<Panda::Camera> camera = Foundation::makeShared<Panda::Camera>();
     cameraEntity->addComponent(camera);
@@ -52,5 +52,5 @@ void BaseLevel::start(Panda::World *world) {
         }
     }
 
-    PND_INFO("BASE LEVEL STARTED!");
+    LOG_INFO("BASE LEVEL STARTED!");
 }

@@ -18,7 +18,7 @@ Camera::Camera()
     , target(1.f)
     , view(1.f)
     , projection(1.f) {
-    PND_INFO("Camera created, viewport size: {}, {}", windowSize.width, windowSize.height);
+    LOG_INFO("Camera created, viewport size: {}, {}", windowSize.width, windowSize.height);
 }
 
 Camera::~Camera() {

@@ -64,7 +64,7 @@ template<typename T, typename... Args>
 Shared<T> makeWeak(Args &&...args) {
     AllocatorI *alloc = getAllocator();
     T *ptr = NEW(alloc, T)(std::forward<Args>(args)...);
-    auto deleter = [alloc](T *ptr) { PND_FREE(alloc, ptr); };
+    auto deleter = [alloc](T *ptr) { FREE(alloc, ptr); };
     return std::weak_ptr<T>(ptr, deleter);
 }
 

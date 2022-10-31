@@ -8,10 +8,10 @@
 #include <Foundation/Logger.hpp>
 #include <Foundation/PlatformDetection.hpp>
 
-#ifdef PND_PLATFORM_IOS
+#ifdef PLATFORM_IOS
 #    include <OpenGLES/ES3/gl.h>
 #    include "Platform/RendererImpl/Context/GlesContext.hpp"
-#elif defined(PND_PLATFORM_DESKTOP)
+#elif defined(PLATFORM_DESKTOP)
 #    include <glad/glad.h>
 #    include "Platform/RendererImpl/Context/OpenGLContext.hpp"
 #endif
@@ -19,9 +19,9 @@
 namespace Miren {
 
 RendererOpenGL::RendererOpenGL() {
-#ifdef PND_PLATFORM_IOS
+#ifdef PLATFORM_IOS
     context = new GlesContext();
-#elif defined(PND_PLATFORM_DESKTOP)
+#elif defined(PLATFORM_DESKTOP)
     context = new OpenGLContext();
 #endif
     context->create();
@@ -39,9 +39,9 @@ RendererOpenGL::~RendererOpenGL() {
 }
 
 RendererType RendererOpenGL::getRendererType() const {
-#ifdef PND_PLATFORM_IOS
+#ifdef PLATFORM_IOS
     return RendererType::OpenGLES;
-#elif defined(PND_PLATFORM_DESKTOP)
+#elif defined(PLATFORM_DESKTOP)
     return RendererType::OpenGL;
 #endif
 }
@@ -51,7 +51,7 @@ void RendererOpenGL::setViewportSize(Size size) {
 }
 
 void RendererOpenGL::setClearColor(float r, float g, float b, float a) {
-    PND_INFO("CLEAR COLOR: {}, {}, {}, {}", r, g, b, a);
+    LOG_INFO("CLEAR COLOR: {}, {}, {}, {}", r, g, b, a);
     glClearColor(r, g, b, a);
 }
 
@@ -147,7 +147,7 @@ void RendererOpenGL::setUniform(const Uniform &uniform) {
             shaders[uniform.handle]->setUniformInt(uniform.name, (int)(intptr_t)uniform.value);
             return;
     }
-    PND_ERROR("UIFORM TYPE IS UNDEFINED");
+    LOG_ERROR("UIFORM TYPE IS UNDEFINED");
 }
 
 void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
@@ -216,7 +216,7 @@ void RendererOpenGL::checkForErrors() {
         const GLenum err = glGetError();
         if (GL_NO_ERROR == err)
             break;
-        PND_ERROR("OPENGL: {}", getGLErrorStr(err));
+        LOG_ERROR("OPENGL: {}", getGLErrorStr(err));
     }
 }
 

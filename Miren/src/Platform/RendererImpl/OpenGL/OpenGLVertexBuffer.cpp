@@ -8,9 +8,9 @@
 #include <Foundation/Logger.hpp>
 #include <Foundation/PlatformDetection.hpp>
 
-#ifdef PND_PLATFORM_IOS
+#ifdef PLATFORM_IOS
 #    include <OpenGLES/ES3/gl.h>
-#elif defined(PND_PLATFORM_DESKTOP)
+#elif defined(PLATFORM_DESKTOP)
 #    include <glad/glad.h>
 #endif
 
@@ -35,7 +35,7 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic
 
 void OpenGLVertexBuffer::update(void *data, uint32_t size) {
     if (isDynamic == false) {
-        PND_CRITICAL("Невозможно обновить статичный буфер");
+        LOG_CRITICAL("Невозможно обновить статичный буфер");
     }
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
@@ -67,7 +67,7 @@ void OpenGLVertexBuffer::createLayout(VertexBufferLayoutData *data) {
                 type = GL_UNSIGNED_BYTE;
                 break;
             default:
-                PND_ERROR("Buffer element type is undefined");
+                LOG_ERROR("Buffer element type is undefined");
                 break;
         }
         glVertexAttribPointer(

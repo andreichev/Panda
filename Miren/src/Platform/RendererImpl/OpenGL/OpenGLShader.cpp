@@ -9,9 +9,9 @@
 #include <Foundation/Logger.hpp>
 #include <Foundation/PlatformDetection.hpp>
 
-#ifdef PND_PLATFORM_IOS
+#ifdef PLATFORM_IOS
 #    include <OpenGLES/ES3/gl.h>
-#elif defined(PND_PLATFORM_DESKTOP)
+#elif defined(PLATFORM_DESKTOP)
 #    include <glad/glad.h>
 #endif
 
@@ -43,7 +43,7 @@ OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath) {
         // convert stream into string
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
-    } catch (std::ifstream::failure &e) { PND_ERROR("SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath); }
+    } catch (std::ifstream::failure &e) { LOG_ERROR("SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath); }
     const char *vShaderCode = vertexCode.c_str();
     const char *fShaderCode = fragmentCode.c_str();
     // 2. compile shaders
@@ -82,13 +82,13 @@ void OpenGLShader::checkCompileErrors(unsigned int shader, const std::string &ty
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            PND_ERROR("SHADER_COMPILATION_ERROR of type: {}\n{}", type, infoLog);
+            LOG_ERROR("SHADER_COMPILATION_ERROR of type: {}\n{}", type, infoLog);
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            PND_ERROR("PROGRAM_LINKING_ERROR of type: {}\n{}", type, infoLog);
+            LOG_ERROR("PROGRAM_LINKING_ERROR of type: {}\n{}", type, infoLog);
         }
     }
 }
@@ -98,7 +98,7 @@ int OpenGLShader::getUniformLocation(const std::string &name) {
     }
     int location = glGetUniformLocation(m_RendererID, name.c_str());
     if (location == -1) {
-        PND_ERROR("SHADER UNIFORM {} not found", name);
+        LOG_ERROR("SHADER UNIFORM {} not found", name);
     }
     m_UniformLocationCache[name] = location;
     return location;

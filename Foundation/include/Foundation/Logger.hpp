@@ -22,8 +22,8 @@ private:
 
 } // namespace Foundation
 
-#define PND_TRACE(...) ::Foundation::Logger::getLogger()->trace(__VA_ARGS__)
-#define PND_INFO(...) ::Foundation::Logger::getLogger()->info(__VA_ARGS__)
-#define PND_WARN(...) ::Foundation::Logger::getLogger()->warn(__VA_ARGS__)
-#define PND_ERROR(...) ::Foundation::Logger::getLogger()->error(__VA_ARGS__)
-#define PND_CRITICAL(...) ::Foundation::Logger::getLogger()->critical(__VA_ARGS__)
+#define LOG_TRACE(...) ::Foundation::Logger::getLogger()->trace(__VA_ARGS__)
+#define LOG_INFO(...) ::Foundation::Logger::getLogger()->info(__VA_ARGS__)
+#define LOG_WARN(...) ::Foundation::Logger::getLogger()->warn(__VA_ARGS__)
+#define LOG_ERROR(...) ::Foundation::Logger::getLogger()->error(__VA_ARGS__)
+#define LOG_CRITICAL(...) ::Foundation::Logger::getLogger()->critical(__VA_ARGS__)

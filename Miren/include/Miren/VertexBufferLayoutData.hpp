@@ -26,7 +26,7 @@ struct VertexBufferElement {
             case BufferElementType::UnsignedByte:
                 return 1;
         }
-        PND_ERROR("Vertex buffer element type is undefined");
+        LOG_ERROR("Vertex buffer element type is undefined");
         return 0;
     }
 };

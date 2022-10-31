@@ -10,7 +10,7 @@
 namespace Panda {
 
 void glfwErrorCallback(int error_code, const char *description) {
-    PND_ERROR("GLFW ERROR, code: {}, description: {}", error_code, description);
+    LOG_ERROR("GLFW ERROR, code: {}, description: {}", error_code, description);
 }
 
 GlfwWindow::~GlfwWindow() {
@@ -23,19 +23,19 @@ GlfwWindow::GlfwWindow(const char *title, Size size, bool isFullscreen) {
     m_windowSizeBackup = size;
     m_isCursorLocked = false;
 
-    PND_INFO("Hello GLFW! {}", glfwGetVersionString());
+    LOG_INFO("Hello GLFW! {}", glfwGetVersionString());
     glfwSetErrorCallback(glfwErrorCallback);
 
     // Initialize GLFW. Most GLFW functions will not work before doing this.
     if (glfwInit() == false) {
-        PND_CRITICAL("GLFW INITIALIZATION ERROR");
+        LOG_CRITICAL("GLFW INITIALIZATION ERROR");
         exit(1);
     }
 
     // Configure GLFW
     glfwDefaultWindowHints(); // optional, the current window hints are already the default
 
-#ifdef PND_PLATFORM_MACOS
+#ifdef PLATFORM_MACOS
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -48,7 +48,7 @@ GlfwWindow::GlfwWindow(const char *title, Size size, bool isFullscreen) {
     // Create the window
     m_windowHandle = glfwCreateWindow((int)size.width, (int)size.height, title, nullptr, nullptr);
     if (m_windowHandle == nullptr) {
-        PND_CRITICAL("Failed to create the GLFW window");
+        LOG_CRITICAL("Failed to create the GLFW window");
         exit(1);
     }
     Miren::PlatformData::get()->nativeWindowHandle = m_windowHandle;

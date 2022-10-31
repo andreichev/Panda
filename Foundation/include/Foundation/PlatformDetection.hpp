@@ -1,7 +1,7 @@
 // Platform detection using predefined macros
 #ifdef _WIN32
 #    ifdef _WIN64
-#        define PND_PLATFORM_WINDOWS
+#        define PLATFORM_WINDOWS
 #    else
 #        error "x86 Builds are not supported!"
 #    endif
@@ -12,11 +12,11 @@
  * to ensure that we're running on MAC
  * and not some other Apple platform */
 #    if TARGET_IPHONE_SIMULATOR == 1
-#        define PND_PLATFORM_IOS
+#        define PLATFORM_IOS
 #    elif TARGET_OS_IPHONE == 1
-#        define PND_PLATFORM_IOS
+#        define PLATFORM_IOS
 #    elif TARGET_OS_MAC == 1
-#        define PND_PLATFORM_MACOS
+#        define PLATFORM_MACOS
 #    else
 #        error "Unknown Apple platform!"
 #    endif
@@ -24,20 +24,20 @@
  * since android is based on the linux kernel
  * it has __linux__ defined */
 #elif defined(__ANDROID__)
-#    define PND_PLATFORM_ANDROID
+#    define PLATFORM_ANDROID
 #    error "Android is not supported!"
 #elif defined(__linux__)
-#    define PND_PLATFORM_LINUX
+#    define PLATFORM_LINUX
 #    error "Linux is not supported!"
 #else
 /* Unknown compiler/platform */
 #    error "Unknown platform!"
 #endif // End of platform detection
 
-#if defined(PND_PLATFORM_WINDOWS) || defined(PND_PLATFORM_LINUX) || defined(PND_PLATFORM_MACOS)
-#    define PND_PLATFORM_DESKTOP
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS)
+#    define PLATFORM_DESKTOP
 #endif
 
-#if defined(PND_PLATFORM_ANDROID) || defined(PND_PLATFORM_IOS) || defined(BX_PLATFORM_LINUX) || defined(PND_PLATFORM_MACOS)
-#    define PND_PLATFORM_POSIX
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS)
+#    define PLATFORM_POSIX
 #endif

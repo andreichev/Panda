@@ -9,9 +9,9 @@
 #include <Foundation/Logger.hpp>
 #include <Foundation/PlatformDetection.hpp>
 
-#ifdef PND_PLATFORM_IOS
+#ifdef PLATFORM_IOS
 #    include <OpenGLES/ES3/gl.h>
-#elif defined(PND_PLATFORM_DESKTOP)
+#elif defined(PLATFORM_DESKTOP)
 #    include <glad/glad.h>
 #endif
 #include <stb_image.h>
@@ -41,7 +41,7 @@ OpenGLTexture::OpenGLTexture(const char *path)
     unsigned char *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
 
     if (image == nullptr) {
-        PND_ERROR("Failed to load a texture file! {}", stbi_failure_reason());
+        LOG_ERROR("Failed to load a texture file! {}", stbi_failure_reason());
     }
 
     int format;

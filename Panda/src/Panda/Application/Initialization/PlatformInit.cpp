@@ -7,18 +7,18 @@
 
 #include <Foundation/PlatformDetection.hpp>
 
-#ifdef PND_PLATFORM_DESKTOP
+#ifdef PLATFORM_DESKTOP
 #    include "Platform/WindowImpl/GlfwWindow/GlfwWindow.hpp"
-#elif defined(PND_PLATFORM_IOS)
+#elif defined(PLATFORM_IOS)
 #    include "Platform/WindowImpl/UIKitWindow/UIKitWindow.hpp"
 #endif
 
 namespace Panda {
 
 Window *createWindow(ApplicationStartupSettings &settings) {
-#ifdef PND_PLATFORM_DESKTOP
+#ifdef PLATFORM_DESKTOP
     return new GlfwWindow(settings.windowTitle, settings.windowSize, settings.isFullScreen);
-#elif defined(PND_PLATFORM_IOS)
+#elif defined(PLATFORM_IOS)
     return new UIKitWindow();
 #else
 #    error "Unknown platform"

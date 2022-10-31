@@ -14,7 +14,7 @@ namespace Panda {
 Application *Application::s_instance = nullptr;
 
 Application *Application::get() {
-    PND_ASSERT(s_instance != nullptr, "APP USED BUT NOT INITIALISED");
+    ASSERT(s_instance != nullptr, "APP USED BUT NOT INITIALISED");
     return s_instance;
 }
 
@@ -50,7 +50,7 @@ Application::Application(ApplicationStartupSettings &settings)
     m_window->setEventQueue(&m_eventQueue);
     timeMillis = getMillis();
 
-#ifdef PND_PLATFORM_DESKTOP
+#ifdef PLATFORM_DESKTOP
     Miren::initialize();
 #endif
 
@@ -77,7 +77,7 @@ void Application::loop() {
         thisSecondFramesCount++;
         if (oneSecondTimeCount >= 1000) {
             fps = thisSecondFramesCount;
-            PND_INFO("FPS: {}", fps);
+            LOG_INFO("FPS: {}", fps);
             thisSecondFramesCount = 0;
             oneSecondTimeCount = 0;
         }

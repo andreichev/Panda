@@ -10,7 +10,7 @@ ChunksStorage::~ChunksStorage() {
 }
 
 ChunksStorage::ChunksStorage() {
-    PND_INFO("NOISE GENERATION STARTED, number of chunks: {}", SIZE_X * SIZE_Y * SIZE_Z);
+    LOG_INFO("NOISE GENERATION STARTED, number of chunks: {}", SIZE_X * SIZE_Y * SIZE_Z);
     chunks = new Chunk[SIZE_X * SIZE_Y * SIZE_Z];
     char groundVoxelId = 12;
     char stoneVoxelId = 8;

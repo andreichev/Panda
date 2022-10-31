@@ -3,40 +3,40 @@
 
 #include "Foundation/Semaphore.hpp"
 
-#if defined(PND_PLATFORM_MACOS) || defined(PND_PLATFORM_IOS)
+#if defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
 #    include <dispatch/dispatch.h>
-#elif defined(PND_PLATFORM_POSIX)
+#elif defined(PLATFORM_POSIX)
 #    include <errno.h>
 #    include <pthread.h>
 #    include <semaphore.h>
 #    include <time.h>
-#elif defined(PND_PLATFORM_WINDOWS)
+#elif defined(PLATFORM_WINDOWS)
 #    include <windows.h>
 #    include <limits.h>
-#endif // PND_PLATFORM_
+#endif
 
 namespace Foundation {
 
 struct SemaphoreInternal {
-#if defined(PND_PLATFORM_MACOS) || defined(PND_PLATFORM_IOS)
+#if defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
     dispatch_semaphore_t m_handle;
-#elif defined(PND_PLATFORM_POSIX)
+#elif defined(PLATFORM_POSIX)
     pthread_mutex_t m_mutex;
     pthread_cond_t m_cond;
     int32_t m_count;
-#elif defined(PND_PLATFORM_WINDOWS)
+#elif defined(PLATFORM_WINDOWS)
     HANDLE m_handle;
-#endif // PND_PLATFORM_
+#endif
 };
 
-#if defined(PND_PLATFORM_MACOS) || defined(PND_PLATFORM_IOS)
+#if defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
 
 Semaphore::Semaphore() {
-    PND_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
+    STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
 
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
     si->m_handle = dispatch_semaphore_create(1);
-    PND_ASSERT(NULL != si->m_handle, "dispatch_semaphore_create failed.");
+    ASSERT(NULL != si->m_handle, "dispatch_semaphore_create failed.");
 }
 
 Semaphore::~Semaphore() {
@@ -59,7 +59,7 @@ bool Semaphore::wait(int32_t _msecs) {
     return !dispatch_semaphore_wait(si->m_handle, dt);
 }
 
-#elif defined(PND_PLATFORM_POSIX)
+#elif defined(PLATFORM_POSIX)
 
 uint64_t toNs(const timespec &_ts) {
     return _ts.tv_sec * UINT64_C(1000000000) + _ts.tv_nsec;
@@ -80,7 +80,7 @@ void add(timespec &_ts, int32_t _msecs) {
 }
 
 Semaphore::Semaphore() {
-    PND_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
+    STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
 
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
     si->m_count = 0;
@@ -88,10 +88,10 @@ Semaphore::Semaphore() {
     int result;
 
     result = pthread_mutex_init(&si->m_mutex, NULL);
-    PND_ASSERT(0 == result, "pthread_mutex_init %d", result);
+    ASSERT(0 == result, "pthread_mutex_init %d", result);
 
     result = pthread_cond_init(&si->m_cond, NULL);
-    PND_ASSERT(0 == result, "pthread_cond_init %d", result);
+    ASSERT(0 == result, "pthread_cond_init %d", result);
 }
 
 Semaphore::~Semaphore() {
@@ -99,34 +99,34 @@ Semaphore::~Semaphore() {
 
     int result;
     result = pthread_cond_destroy(&si->m_cond);
-    PND_ASSERT(0 == result, "pthread_cond_destroy %d", result);
+    ASSERT(0 == result, "pthread_cond_destroy %d", result);
 
     result = pthread_mutex_destroy(&si->m_mutex);
-    PND_ASSERT(0 == result, "pthread_mutex_destroy %d", result);
+    ASSERT(0 == result, "pthread_mutex_destroy %d", result);
 }
 
 void Semaphore::post(uint32_t _count) {
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
 
     int result = pthread_mutex_lock(&si->m_mutex);
-    PND_ASSERT(0 == result, "pthread_mutex_lock %d", result);
+    ASSERT(0 == result, "pthread_mutex_lock %d", result);
 
     for (uint32_t ii = 0; ii < _count; ++ii) {
         result = pthread_cond_signal(&si->m_cond);
-        PND_ASSERT(0 == result, "pthread_cond_signal %d", result);
+        ASSERT(0 == result, "pthread_cond_signal %d", result);
     }
 
     si->m_count += _count;
 
     result = pthread_mutex_unlock(&si->m_mutex);
-    PND_ASSERT(0 == result, "pthread_mutex_unlock %d", result);
+    ASSERT(0 == result, "pthread_mutex_unlock %d", result);
 }
 
 bool Semaphore::wait(int32_t _msecs) {
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
 
     int result = pthread_mutex_lock(&si->m_mutex);
-    PND_ASSERT(0 == result, "pthread_mutex_lock %d", result);
+    ASSERT(0 == result, "pthread_mutex_lock %d", result);
 
     if (-1 == _msecs) {
         while (0 == result && 0 >= si->m_count) {
@@ -149,23 +149,23 @@ bool Semaphore::wait(int32_t _msecs) {
     }
 
     result = pthread_mutex_unlock(&si->m_mutex);
-    PND_ASSERT(0 == result, "pthread_mutex_unlock %d", result);
+    ASSERT(0 == result, "pthread_mutex_unlock %d", result);
 
     return ok;
 }
 
-#elif defined(PND_PLATFORM_WINDOWS)
+#elif defined(PLATFORM_WINDOWS)
 
 Semaphore::Semaphore() {
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
 
-    // #if PND_PLATFORM_WINRT \
-// ||  PND_PLATFORM_XBOXONE
+    // #if PLATFORM_WINRT \
+// ||  PLATFORM_XBOXONE
     si->m_handle = CreateSemaphoreExW(NULL, 1, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
     // #else
     // 		si->m_handle = CreateSemaphoreA(NULL, 0, LONG_MAX, NULL);
     // #endif
-    PND_ASSERT(NULL != si->m_handle, "Failed to create Semaphore!", nullptr);
+    ASSERT(NULL != si->m_handle, "Failed to create Semaphore!", nullptr);
 }
 
 Semaphore::~Semaphore() {
@@ -184,13 +184,13 @@ bool Semaphore::wait(int32_t _msecs) {
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
 
     DWORD milliseconds = (0 > _msecs) ? INFINITE : _msecs;
-    // #if PND_PLATFORM_WINRT \
-// ||  PND_PLATFORM_XBOXONE
+    // #if PLATFORM_WINRT \
+// ||  PLATFORM_XBOXONE
     return WAIT_OBJECT_0 == WaitForSingleObjectEx(si->m_handle, milliseconds, FALSE);
     // #else
     //		return WAIT_OBJECT_0 == WaitForSingleObject(si->m_handle, milliseconds);
     // #endif
 }
-#endif // PND_PLATFORM_
+#endif // PLATFORM_
 
 } // namespace Foundation

@@ -6,9 +6,9 @@
 
 #include <Foundation/PlatformDetection.hpp>
 
-#ifdef PND_PLATFORM_IOS
+#ifdef PLATFORM_IOS
 #    include <OpenGLES/ES3/gl.h>
-#elif defined(PND_PLATFORM_DESKTOP)
+#elif defined(PLATFORM_DESKTOP)
 #    include <glad/glad.h>
 #endif
 
@@ -53,7 +53,7 @@ uint32_t OpenGLIndexBuffer::getCount() const {
 
 void OpenGLIndexBuffer::update(void *indices, size_t count) {
     if (isDynamic == false) {
-        PND_ERROR("Невозможно обновить статичный буфер");
+        LOG_ERROR("Невозможно обновить статичный буфер");
     }
     this->count = count;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
