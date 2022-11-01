@@ -8,16 +8,19 @@
 #include "Miren/MirenStates.hpp"
 #include "Uniform.hpp"
 
-#include <queue>
-
 namespace Miren {
 
 struct TextureBinding {
     TextureHandle m_handle;
     uint32_t m_slot;
+
     TextureBinding(TextureHandle mHandle, uint32_t mSlot)
         : m_handle(mHandle)
         , m_slot(mSlot) {}
+
+    TextureBinding()
+        : m_handle(0)
+        , m_slot(0) {}
 };
 
 // Вызов отрисовки кадра
@@ -32,9 +35,32 @@ struct RenderDraw {
         , m_shader(0)
         , m_indexBuffer(0)
         , m_vertexBuffer(0)
-        , m_uniformBuffer()
-        , m_textureBindings()
+        , m_uniformsCount(0)
+        , m_textureBindingsCount(0)
         , m_scissorRect(Rect::zero()) {}
+
+    void reset() {
+        m_isSubmitted = false;
+        m_state = MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST;
+        m_isIndexed = true;
+        m_numIndices = 0;
+        m_numElemets = 0;
+        m_indicesOffset = nullptr;
+        m_shader = 0;
+        m_indexBuffer = 0;
+        m_vertexBuffer = 0;
+        m_uniformsCount = 0;
+        m_textureBindingsCount = 0;
+        m_scissorRect = Rect::zero();
+    }
+
+    void addUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
+        m_uniformBuffer[m_uniformsCount++] = Uniform(handle, name, value, type);
+    }
+
+    void setTexture(TextureHandle textureHandle, uint32_t slot) {
+        m_textureBindings[m_textureBindingsCount++] = TextureBinding(textureHandle, slot);
+    }
 
     bool m_isSubmitted;
     // Отрисовка по индексам или примитив
@@ -46,8 +72,10 @@ struct RenderDraw {
     ShaderHandle m_shader;
     IndexBufferHandle m_indexBuffer;
     VertexBufferHandle m_vertexBuffer;
-    std::queue<Uniform> m_uniformBuffer;
-    std::queue<TextureBinding> m_textureBindings;
+    uint32_t m_uniformsCount;
+    Uniform m_uniformBuffer[MAX_UNIFORMS];
+    uint32_t m_textureBindingsCount;
+    TextureBinding m_textureBindings[MAX_TEXTURE_BINDINGS];
     Rect m_scissorRect;
     uint32_t m_state;
 };

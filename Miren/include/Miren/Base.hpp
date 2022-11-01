@@ -1,9 +1,8 @@
 #pragma once
 
-#include <cstdlib>
+#include "Config.hpp"
 
-#define TRANSIENT_VERTEX_BUFFER_SIZE 10000000
-#define TRANSIENT_INDEX_BUFFER_SIZE 10000000
+#include <cstdlib>
 
 namespace Miren {
 

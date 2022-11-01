@@ -31,6 +31,13 @@ struct Uniform {
         , type(type) {
         size = getSizeOfType(type);
     }
+
+    Uniform()
+        : handle(0)
+        , name(nullptr)
+        , value(nullptr)
+        , type(UniformDataType::Int)
+        , size(0) {}
 };
 
 } // namespace Miren

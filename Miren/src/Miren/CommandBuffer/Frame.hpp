@@ -8,8 +8,6 @@
 #include "Miren/VertexBufferLayoutData.hpp"
 #include "RenderDraw.hpp"
 
-#include <queue>
-
 namespace Miren {
 
 /// Класс используемый для хранения данных о кадре.
@@ -18,7 +16,6 @@ class Frame {
 public:
     Frame();
     void beginDrawCall();
-    RenderDraw *popDrawCall();
     void setState(uint32_t state);
     void setIndexBuffer(IndexBufferHandle handle, void *offset, uint32_t count);
     void setVertexBuffer(VertexBufferHandle handle);
@@ -26,19 +23,21 @@ public:
     void setIsIndexed(bool value);
     void setNumberOfElements(uint32_t count);
     void setScissorRect(Rect rect);
-    void free(const RenderDraw *draw);
     void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
     void setTexture(TextureHandle textureHandle, uint32_t slot);
     void submitCurrentDrawCall();
     TransientVertexBuffer *createTransientVertexBuffer(uint32_t size, VertexBufferLayoutData *layout);
     uint32_t getDrawCallsCount();
+    RenderDraw *getDrawCalls();
+    void reset();
 
     TransientIndexBuffer *m_transientIb;
     TransientVertexBuffer *m_transientVb;
     uint32_t m_transientVbOffset;
 
 private:
-    std::queue<RenderDraw *> m_drawCalls;
+    int m_drawCallsCount;
+    RenderDraw m_drawCalls[MAX_DRAW_CALLS];
 };
 
 } // namespace Miren

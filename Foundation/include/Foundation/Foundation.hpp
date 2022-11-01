@@ -43,7 +43,7 @@ constexpr Shared<T> createShared(T *ptr) {
 }
 
 template<typename T, typename... Args>
-Shared<T> makeShared(Args &&...args) {
+constexpr Shared<T> makeShared(Args &&...args) {
     AllocatorI *alloc = getAllocator();
     T *ptr = NEW(alloc, T)(std::forward<Args>(args)...);
     auto deleter = [alloc](T *ptr) { FREE(alloc, ptr); };
@@ -61,11 +61,18 @@ constexpr Weak<T> createWeak(T *ptr) {
 }
 
 template<typename T, typename... Args>
-Shared<T> makeWeak(Args &&...args) {
+constexpr Shared<T> makeWeak(Args &&...args) {
     AllocatorI *alloc = getAllocator();
     T *ptr = NEW(alloc, T)(std::forward<Args>(args)...);
     auto deleter = [alloc](T *ptr) { FREE(alloc, ptr); };
     return std::weak_ptr<T>(ptr, deleter);
+}
+
+template<typename Ty>
+inline void swap(Ty &_a, Ty &_b) {
+    Ty tmp = _a;
+    _a = _b;
+    _b = tmp;
 }
 
 } // namespace Foundation

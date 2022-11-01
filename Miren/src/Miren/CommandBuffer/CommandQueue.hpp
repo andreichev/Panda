@@ -6,6 +6,8 @@
 
 #include "RendererCommand.hpp"
 
+#include <queue>
+
 namespace Miren {
 
 class CommandQueue {

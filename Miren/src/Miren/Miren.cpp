@@ -182,27 +182,24 @@ void renderFrame() {
     }
     s_renderer->clear();
     renderSemaphoreWait();
-    RenderDraw *draw;
-    while ((draw = s_frame.popDrawCall()) != nullptr) {
-        if (draw->m_isSubmitted == false) {
-            s_frame.free(draw);
+
+    for (int i = 0; i < s_frame.getDrawCallsCount(); i++) {
+        RenderDraw &draw = s_frame.getDrawCalls()[i];
+        if (draw.m_isSubmitted == false) {
             continue;
         }
-        while (draw->m_uniformBuffer.empty() == false) {
-            Uniform &uniform = draw->m_uniformBuffer.front();
+        for (size_t u = 0; u < draw.m_uniformsCount; u++) {
+            Uniform &uniform = draw.m_uniformBuffer[u];
             s_renderer->setUniform(uniform);
-            draw->m_uniformBuffer.pop();
         }
-        while (draw->m_textureBindings.empty() == false) {
-            TextureBinding &textureBinding = draw->m_textureBindings.front();
+        for (size_t t = 0; t < draw.m_textureBindingsCount; t++) {
+            TextureBinding &textureBinding = draw.m_textureBindings[t];
             s_renderer->setTexture(textureBinding.m_handle, textureBinding.m_slot);
-            draw->m_textureBindings.pop();
         }
-        s_renderer->submit(draw);
-        s_frame.free(draw);
+        s_renderer->submit(&draw);
     }
     s_renderer->flip();
-    s_frame.beginDrawCall();
+    s_frame.reset();
     renderSemaphorePost();
 }
 
