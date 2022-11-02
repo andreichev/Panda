@@ -56,7 +56,13 @@ void *alloc(AllocatorI *allocator, size_t size, size_t _align = 0, const char *f
 void free(AllocatorI *allocator, void *ptr, size_t _align = 0, const char *file = nullptr, uint32_t line = 0);
 
 template<typename ObjectT>
-void deleteObject(AllocatorI *_allocator, ObjectT *_object, size_t _align = 0, const char *_file = nullptr, uint32_t _line = 0);
+inline void deleteObject(AllocatorI *_allocator, ObjectT *_object, size_t _align = 0, const char *_file = nullptr, uint32_t _line = 0) {
+    if (_object == nullptr) {
+        return;
+    }
+    _object->~ObjectT();
+    free(_allocator, _object, _align, _file, _line);
+}
 
 AllocatorI *getAllocator();
 

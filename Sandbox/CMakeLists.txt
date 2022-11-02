@@ -46,6 +46,14 @@ set_target_properties(Sandbox
     RUNTIME_OUTPUT_DIRECTORY ${BIN_DIRECTORY}
 )
 
+# Dependencies - Foundation
+target_link_libraries(Sandbox Foundation)
+target_include_directories(Sandbox PRIVATE ${FOUNDATION_DIRECTORY}/include)
+
+# Dependencies - Miren
+target_link_libraries(Sandbox Miren)
+target_include_directories(Sandbox PRIVATE ${MIREN_DIRECTORY}/include)
+
 # Dependencies - Panda
 target_link_libraries(Sandbox Panda)
 target_include_directories(Sandbox PRIVATE ${PANDA_DIRECTORY}/src)

@@ -14,27 +14,8 @@ void operator delete(void *ptr) noexcept {
     free(ptr);
 }
 
-#ifdef PLATFORM_DESKTOP
-static int32_t renderThread(Foundation::Thread *_thread, void *_userData) {
-    while (Panda::Application::get()->isRunning()) {
-        Miren::renderFrame();
-    }
-    Miren::terminate();
-    return 0;
-}
-#endif
-
 void runPandaApplication(Panda::ApplicationStartupSettings settings) {
-#ifdef PLATFORM_DESKTOP
-    Foundation::Thread thread;
-    thread.init(renderThread, nullptr, 0, "Render thread");
-#endif
-
     auto application = new Panda::Application(settings);
     application->loop();
     delete application;
-
-#ifdef PLATFORM_DESKTOP
-    thread.shutdown();
-#endif
 }

@@ -65,11 +65,11 @@ endif ()
 
 # Dependencies - Foundation
 target_link_libraries(Panda Foundation)
-target_include_directories(Panda PUBLIC ${FOUNDATION_DIRECTORY}/include)
+target_include_directories(Panda PRIVATE ${FOUNDATION_DIRECTORY}/include)
 
 # Dependencies - Miren
 target_link_libraries(Panda Miren)
-target_include_directories(Panda PUBLIC ${MIREN_DIRECTORY}/include)
+target_include_directories(Panda PRIVATE ${MIREN_DIRECTORY}/include)
 
 # Dependencies - GLM
 target_link_libraries(Panda glm)
