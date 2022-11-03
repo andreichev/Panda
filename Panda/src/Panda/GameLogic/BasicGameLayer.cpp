@@ -12,10 +12,8 @@ BasicGameLayer::BasicGameLayer(Level *startupLevel) {
 }
 
 void BasicGameLayer::onAttach() {
-    Miren::renderSemaphoreWait();
     m_world = new World();
     m_currentLevel->start(m_world);
-    Miren::renderSemaphorePost();
 }
 
 void BasicGameLayer::onDetach() {
