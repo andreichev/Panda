@@ -85,8 +85,9 @@ void renderFrame() {
     s_context->renderFrame();
 }
 
-// TODO: - Implement, add swapping frames
-void frame() {}
+void frame() {
+    s_context->frame();
+}
 
 void setState(uint32_t state) {
     s_context->setState(state);

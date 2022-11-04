@@ -95,6 +95,7 @@ void Application::loop() {
         m_ImGuiLayer->end();
         m_window->pollEvents();
         processEvents();
+        Miren::frame();
         Miren::renderSemaphorePost();
     }
 }

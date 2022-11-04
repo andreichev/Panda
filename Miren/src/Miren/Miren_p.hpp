@@ -22,21 +22,23 @@ uint32_t maxHandles = 1000;
 struct Context {
     Context()
         : m_renderer(nullptr)
-        , m_frame()
         , m_shadersHandleAlloc(maxHandles)
         , m_texturesHandleAlloc(maxHandles)
         , m_vertexLayoutsHandleAlloc(maxHandles)
         , m_vertexBuffersHandleAlloc(maxHandles)
         , m_indexBuffersHandleAlloc(maxHandles)
         , m_commandQueue()
-        , m_rendererSemaphore() {}
+        , m_rendererSemaphore() {
+        m_render = &m_frame[0];
+        m_submit = &m_frame[1];
+    }
 
     void init() {
         m_rendererSemaphore.post();
         m_thread.init(renderThread, nullptr, 0, "Render thread");
         m_commandQueue.post(new RendererCommand(RendererCommandType::RendererInit));
-        m_frame.m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE, VertexBufferLayoutData());
-        m_frame.m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
+        m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE, VertexBufferLayoutData());
+        m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
     }
 
     void shutdown() {
@@ -153,7 +155,7 @@ struct Context {
 
     void renderFrame() {
         m_rendererSemaphore.wait();
-        if (m_frame.getDrawCallsCount() == 0) {
+        if (m_render->getDrawCallsCount() == 0) {
             m_rendererSemaphore.post();
             return;
         }
@@ -164,8 +166,8 @@ struct Context {
         }
         m_renderer->clear();
 
-        for (int i = 0; i < m_frame.getDrawCallsCount(); i++) {
-            RenderDraw &draw = m_frame.getDrawCalls()[i];
+        for (int i = 0; i < m_render->getDrawCallsCount(); i++) {
+            RenderDraw &draw = m_render->getDrawCalls()[i];
             if (draw.m_isSubmitted == false) {
                 continue;
             }
@@ -180,7 +182,6 @@ struct Context {
             m_renderer->submit(&draw);
         }
         m_renderer->flip();
-        m_frame.reset();
         m_rendererSemaphore.post();
     }
 
@@ -304,49 +305,60 @@ struct Context {
     }
 
     void setState(uint32_t state) {
-        m_frame.setState(state);
+        m_submit->setState(state);
     }
 
     void setScissorRect(Rect rect) {
-        m_frame.setScissorRect(rect);
+        m_submit->setScissorRect(rect);
     }
 
     void setVertexBuffer(VertexBufferHandle handle) {
-        m_frame.setVertexBuffer(handle);
+        m_submit->setVertexBuffer(handle);
     }
 
     void setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count) {
-        m_frame.setIndexBuffer(handle, offset, count);
+        m_submit->setIndexBuffer(handle, offset, count);
     }
 
     void setShader(ShaderHandle handle) {
-        m_frame.setShader(handle);
+        m_submit->setShader(handle);
     }
 
     void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
-        m_frame.setUniform(handle, name, value, type);
+        m_submit->setUniform(handle, name, value, type);
     }
 
     void setTexture(TextureHandle textureHandle, uint32_t slot) {
-        m_frame.setTexture(textureHandle, slot);
+        m_submit->setTexture(textureHandle, slot);
     }
 
     void submit() {
-        m_frame.submitCurrentDrawCall();
-        m_frame.beginDrawCall();
+        m_submit->submitCurrentDrawCall();
+        m_submit->beginDrawCall();
     }
 
     void submitPrimitives(uint32_t elements) {
-        m_frame.setIsIndexed(false);
-        m_frame.setNumberOfElements(elements);
-        m_frame.submitCurrentDrawCall();
-        m_frame.beginDrawCall();
+        m_submit->setIsIndexed(false);
+        m_submit->setNumberOfElements(elements);
+        m_submit->submitCurrentDrawCall();
+        m_submit->beginDrawCall();
+    }
+
+    void swap() {
+        Foundation::swap(m_render, m_submit);
+    }
+
+    void frame() {
+        swap();
+        m_submit->reset();
     }
 
 private:
     Foundation::Thread m_thread;
     RendererI *m_renderer;
-    Frame m_frame;
+    Frame m_frame[2];
+    Frame *m_render;
+    Frame *m_submit;
     MirenHandleAllocator m_shadersHandleAlloc;
     MirenHandleAllocator m_texturesHandleAlloc;
     MirenHandleAllocator m_vertexLayoutsHandleAlloc;
