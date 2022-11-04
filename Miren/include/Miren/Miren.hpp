@@ -49,4 +49,7 @@ void renderFrame();
 /// Frame processing finished (from app thread). Wait for renderer to finish rendering frame
 void frame();
 
+void renderSemaphoreWait();
+void renderSemaphorePost();
+
 } // namespace Miren

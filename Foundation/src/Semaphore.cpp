@@ -35,7 +35,7 @@ Semaphore::Semaphore() {
     STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
 
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
-    si->m_handle = dispatch_semaphore_create(1);
+    si->m_handle = dispatch_semaphore_create(0);
     ASSERT(NULL != si->m_handle, "dispatch_semaphore_create failed.");
 }
 

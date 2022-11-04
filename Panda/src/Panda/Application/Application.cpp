@@ -84,6 +84,7 @@ void Application::loop() {
         double deltaTime = deltaTimeMillis / 1000.0;
         deltaTimeMillis = 0;
 
+        Miren::renderSemaphoreWait();
         for (Layer *layer : m_layerStack) {
             layer->onUpdate(deltaTime);
         }
@@ -94,6 +95,7 @@ void Application::loop() {
         m_ImGuiLayer->end();
         m_window->pollEvents();
         processEvents();
+        Miren::renderSemaphorePost();
     }
 }
 

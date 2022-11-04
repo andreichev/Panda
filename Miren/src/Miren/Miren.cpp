@@ -124,4 +124,12 @@ void submitPrimitives(uint32_t elements) {
     s_context->submitPrimitives(elements);
 }
 
+void renderSemaphoreWait() {
+    s_context->m_rendererSemaphore.wait();
+}
+
+void renderSemaphorePost() {
+    s_context->m_rendererSemaphore.post();
+}
+
 } // namespace Miren

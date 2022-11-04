@@ -32,6 +32,7 @@ struct Context {
         , m_rendererSemaphore() {}
 
     void init() {
+        m_rendererSemaphore.post();
         m_thread.init(renderThread, nullptr, 0, "Render thread");
         m_commandQueue.post(new RendererCommand(RendererCommandType::RendererInit));
         m_frame.m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE, VertexBufferLayoutData());
@@ -151,15 +152,17 @@ struct Context {
     }
 
     void renderFrame() {
+        m_rendererSemaphore.wait();
         if (m_frame.getDrawCallsCount() == 0) {
+            m_rendererSemaphore.post();
             return;
         }
         rendererExecuteCommands();
         if (m_renderer == nullptr) {
+            m_rendererSemaphore.post();
             return;
         }
         m_renderer->clear();
-        m_rendererSemaphore.wait();
 
         for (int i = 0; i < m_frame.getDrawCallsCount(); i++) {
             RenderDraw &draw = m_frame.getDrawCalls()[i];
@@ -350,6 +353,8 @@ private:
     MirenHandleAllocator m_vertexBuffersHandleAlloc;
     MirenHandleAllocator m_indexBuffersHandleAlloc;
     CommandQueue m_commandQueue;
+
+public:
     Foundation::Semaphore m_rendererSemaphore;
 };
 
