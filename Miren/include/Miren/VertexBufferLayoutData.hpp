@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <Foundation/Assert.hpp>
 #include <Foundation/Logger.hpp>
 
 namespace Miren {
+
+#define MAX_VERTEX_LAYOUT_ELEMENTS 20
 
 enum class BufferElementType { Float, UnsignedInt, UnsignedShort, UnsignedByte };
 
@@ -26,57 +29,68 @@ struct VertexBufferElement {
             case BufferElementType::UnsignedByte:
                 return 1;
         }
-        LOG_ERROR("Vertex buffer element type is undefined");
+        ASSERT(false, "Vertex buffer element type is undefined");
         return 0;
     }
 };
 
 class VertexBufferLayoutData {
 public:
+    VertexBufferLayoutData(const VertexBufferLayoutData &other)
+        : m_Stride(other.m_Stride)
+        , m_ElementsCount(other.m_ElementsCount) {
+        for (size_t i = 0; i < m_ElementsCount; i++) {
+            m_Elements[i] = other.m_Elements[i];
+        }
+    }
+
+    VertexBufferLayoutData(const VertexBufferLayoutData &&other) = delete;
+
     VertexBufferLayoutData()
-        : m_Stride(0) {}
+        : m_Stride(0)
+        , m_ElementsCount(0) {}
 
     virtual ~VertexBufferLayoutData() = default;
 
-    void pushFloat(unsigned int count) {
+    void pushFloat(uint32_t count) {
         VertexBufferElement element = {BufferElementType::Float, count, false};
-        m_Elements.push_back(element);
+        m_Elements[m_ElementsCount++] = element;
         m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::Float);
     }
 
-    void pushUInt(unsigned int count) {
+    void pushUInt(uint32_t count) {
         VertexBufferElement element = {BufferElementType::UnsignedInt, count, false};
-        m_Elements.push_back(element);
+        m_Elements[m_ElementsCount++] = element;
         m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedInt);
     }
 
-    void pushChar(unsigned int count, bool normalized) {
+    void pushChar(uint32_t count, bool normalized) {
         VertexBufferElement element = {BufferElementType::UnsignedByte, count, normalized};
-        m_Elements.push_back(element);
+        m_Elements[m_ElementsCount++] = element;
         m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedByte);
     }
 
     void pushVec3() {
         VertexBufferElement element = {BufferElementType::Float, 3, false};
-        m_Elements.push_back(element);
+        m_Elements[m_ElementsCount++] = element;
         m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 3;
     }
 
     void pushVec4() {
         VertexBufferElement element = {BufferElementType::Float, 4, false};
-        m_Elements.push_back(element);
+        m_Elements[m_ElementsCount++] = element;
         m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 4;
     }
 
     void push8BitRGBAColor() {
         VertexBufferElement element = {BufferElementType::UnsignedByte, 4, true};
-        m_Elements.push_back(element);
+        m_Elements[m_ElementsCount++] = element;
         m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::UnsignedByte) * 4;
     }
 
     void pushVec2() {
         VertexBufferElement element = {BufferElementType::Float, 2, false};
-        m_Elements.push_back(element);
+        m_Elements[m_ElementsCount++] = element;
         m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 2;
     }
 
@@ -89,8 +103,9 @@ public:
         pushFloat(1);
     }
 
-    std::vector<VertexBufferElement> m_Elements;
-    unsigned int m_Stride;
+    VertexBufferElement m_Elements[MAX_VERTEX_LAYOUT_ELEMENTS];
+    uint32_t m_ElementsCount;
+    uint32_t m_Stride;
 };
 
 } // namespace Miren

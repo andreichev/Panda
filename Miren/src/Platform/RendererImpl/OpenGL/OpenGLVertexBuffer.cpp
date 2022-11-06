@@ -53,7 +53,7 @@ void OpenGLVertexBuffer::createLayout(VertexBufferLayoutData *data) {
     glGenVertexArrays(1, &layoutId);
     glBindVertexArray(layoutId);
     long pointer = 0;
-    for (int i = 0; i < data->m_Elements.size(); i++) {
+    for (int i = 0; i < data->m_ElementsCount; i++) {
         glEnableVertexAttribArray(i);
         int type;
         switch (data->m_Elements[i].type) {
@@ -67,7 +67,7 @@ void OpenGLVertexBuffer::createLayout(VertexBufferLayoutData *data) {
                 type = GL_UNSIGNED_BYTE;
                 break;
             default:
-                LOG_ERROR("Buffer element type is undefined");
+                ASSERT(false, "Buffer element type is undefined");
                 break;
         }
         glVertexAttribPointer(

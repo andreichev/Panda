@@ -4,6 +4,7 @@
 
 #include "RendererOpenGL.hpp"
 
+#include <Foundation/Assert.hpp>
 #include <Foundation/Allocator.hpp>
 #include <Foundation/Logger.hpp>
 #include <Foundation/PlatformDetection.hpp>
@@ -217,6 +218,7 @@ void RendererOpenGL::checkForErrors() {
         if (GL_NO_ERROR == err)
             break;
         LOG_ERROR("OPENGL: {}", getGLErrorStr(err));
+        ASSERT(false, "OPENGL ERROR");
     }
 }
 

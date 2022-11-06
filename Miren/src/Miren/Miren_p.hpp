@@ -1,19 +1,18 @@
 #pragma once
 
-#include "Miren/Miren.hpp"
-#include "MirenHandleAllocator.hpp"
+#include "CommandBuffer/RendererCommand.hpp"
 #include "CommandBuffer/Frame.hpp"
 #include "CommandBuffer/RenderDraw.hpp"
-#include "CommandBuffer/CommandQueue.hpp"
+#include "Miren/Miren.hpp"
+#include "MirenHandleAllocator.hpp"
 #include "MirenStates.hpp"
-#include "RendererI.hpp"
 #include "Platform/RendererImpl/OpenGL/RendererOpenGL.hpp"
+#include "RendererI.hpp"
 
 #include <Foundation/Foundation.hpp>
-#include <Foundation/Thread.hpp>
-#include <Foundation/Semaphore.hpp>
-#include <Foundation/Semaphore.hpp>
 #include <Foundation/Logger.hpp>
+#include <Foundation/Semaphore.hpp>
+#include <Foundation/Thread.hpp>
 
 namespace Miren {
 
@@ -27,7 +26,7 @@ struct Context {
         , m_vertexLayoutsHandleAlloc(maxHandles)
         , m_vertexBuffersHandleAlloc(maxHandles)
         , m_indexBuffersHandleAlloc(maxHandles)
-        , m_commandQueue()
+        , m_commandQueue(300000)
         , m_rendererSemaphore() {
         m_render = &m_frame[0];
         m_submit = &m_frame[1];
@@ -36,13 +35,14 @@ struct Context {
     void init() {
         m_rendererSemaphore.post();
         m_thread.init(renderThread, nullptr, 0, "Render thread");
-        m_commandQueue.post(new RendererCommand(RendererCommandType::RendererInit));
-        m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE, VertexBufferLayoutData());
-        m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
+        Foundation::CommandBuffer::Command cmd(RendererCommandType::RendererInit);
+        m_commandQueue.write(cmd);
+        // m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE, VertexBufferLayoutData());
+        // m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
     }
 
     void shutdown() {
-        delete m_renderer;
+        DELETE(Foundation::getAllocator(), m_renderer);
         m_thread.shutdown();
     }
 
@@ -54,21 +54,22 @@ struct Context {
     }
 
     void rendererExecuteCommands() {
-        const RendererCommand *command;
+        m_commandQueue.finishWriting();
+        Foundation::CommandBuffer::Command *command;
         if (m_renderer == nullptr) {
-            command = m_commandQueue.poll();
+            command = m_commandQueue.read();
             if (command != nullptr) {
                 ASSERT(command->type == RendererCommandType::RendererInit, "First command in command buffer should be RendererInit");
-                m_renderer = new RendererOpenGL();
-                m_commandQueue.release(command);
+                m_renderer = NEW(Foundation::getAllocator(), RendererOpenGL);
             }
         }
 
         if (m_renderer == nullptr) {
+            m_commandQueue.reset();
             return;
         }
 
-        while ((command = m_commandQueue.poll()) != nullptr) {
+        while ((command = m_commandQueue.read()) != nullptr) {
             switch (command->type) {
                 case RendererCommandType::RendererInit: {
                     break;
@@ -149,8 +150,8 @@ struct Context {
                     break;
                 }
             }
-            m_commandQueue.release(command);
         }
+        m_commandQueue.reset();
     }
 
     void renderFrame() {
@@ -187,91 +188,106 @@ struct Context {
 
     ShaderHandle createShader(const char *vertexPath, const char *fragmentPath) {
         ShaderHandle handle = m_shadersHandleAlloc.alloc();
-        m_commandQueue.post(new CreateShaderCommand(handle, vertexPath, fragmentPath));
+        CreateShaderCommand cmd(handle, vertexPath, fragmentPath);
+        m_commandQueue.write(cmd);
         return handle;
     }
 
     void deleteShader(ShaderHandle handle) {
         m_shadersHandleAlloc.free(handle);
-        m_commandQueue.post(new DeleteShaderCommand(handle));
+        DeleteShaderCommand cmd(handle);
+        m_commandQueue.write(cmd);
     }
 
     TextureHandle createTextureFromFile(const char *path) {
         TextureHandle handle = m_texturesHandleAlloc.alloc();
-        m_commandQueue.post(new CreateTextureFromFileCommand(handle, path));
+        CreateTextureFromFileCommand cmd(handle, path);
+        m_commandQueue.write(cmd);
         return handle;
     }
 
     TextureHandle createTextureFromPixels(void *pixels, int width, int height) {
         TextureHandle handle = m_texturesHandleAlloc.alloc();
-        m_commandQueue.post(new CreateRGBATextureFromPixelsCommand(handle, pixels, width, height));
+        CreateRGBATextureFromPixelsCommand cmd(handle, pixels, width, height);
+        m_commandQueue.write(cmd);
         return handle;
     }
 
     void deleteTexture(TextureHandle handle) {
         m_texturesHandleAlloc.free(handle);
-        m_commandQueue.post(new DeleteTextureCommand(handle));
+        DeleteTextureCommand cmd(handle);
+        m_commandQueue.write(cmd);
     }
 
     IndexBufferHandle createIndexBuffer(void *indices, BufferElementType elementType, size_t count) {
         IndexBufferHandle handle = m_indexBuffersHandleAlloc.alloc();
-        m_commandQueue.post(new CreateIndexBufferCommand(handle, indices, elementType, count));
+        CreateIndexBufferCommand cmd(handle, indices, elementType, count);
+        m_commandQueue.write(cmd);
         return handle;
     }
 
     IndexBufferHandle createDynamicIndexBuffer(void *indices, BufferElementType elementType, size_t count) {
         IndexBufferHandle handle = m_indexBuffersHandleAlloc.alloc();
-        m_commandQueue.post(new CreateDynamicIndexBufferCommand(handle, indices, elementType, count));
+        CreateDynamicIndexBufferCommand cmd(handle, indices, elementType, count);
+        m_commandQueue.write(cmd);
         return handle;
     }
 
     void updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) {
-        m_commandQueue.post(new UpdateDynamicIndexBufferCommand(handle, indices, count));
+        UpdateDynamicIndexBufferCommand cmd(handle, indices, count);
+        m_commandQueue.write(cmd);
     }
 
     void deleteIndexBuffer(IndexBufferHandle handle) {
         m_indexBuffersHandleAlloc.free(handle);
-        m_commandQueue.post(new DeleteIndexBufferCommand(handle));
+        DeleteIndexBufferCommand cmd(handle);
+        m_commandQueue.write(cmd);
     }
 
     VertexBufferHandle createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
         VertexBufferHandle handle = m_vertexBuffersHandleAlloc.alloc();
-        m_commandQueue.post(new CreateVertexBufferCommand(handle, data, size, layoutHandle));
+        CreateVertexBufferCommand cmd(handle, data, size, layoutHandle);
+        m_commandQueue.write(cmd);
         return handle;
     }
 
     VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
         VertexBufferHandle handle = m_vertexBuffersHandleAlloc.alloc();
-        m_commandQueue.post(new CreateDynamicVertexBufferCommand(handle, data, size, layoutHandle));
+        CreateDynamicVertexBufferCommand cmd(handle, data, size, layoutHandle);
+        m_commandQueue.write(cmd);
         return handle;
     }
 
     void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
-        m_commandQueue.post(new UpdateDynamicVertexBufferCommand(handle, data, size));
+        UpdateDynamicVertexBufferCommand cmd(handle, data, size);
+        m_commandQueue.write(cmd);
     }
 
     void deleteVertexBuffer(VertexBufferHandle handle) {
         m_vertexBuffersHandleAlloc.free(handle);
-        m_commandQueue.post(new DeleteVertexBufferCommand(handle));
+        DeleteVertexBufferCommand cmd(handle);
+        m_commandQueue.write(cmd);
     }
 
     VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data) {
         VertexLayoutHandle handle = m_vertexLayoutsHandleAlloc.alloc();
-        m_commandQueue.post(new CreateVertexLayoutCommand(handle, data));
+        CreateVertexLayoutCommand cmd(handle, data);
+        m_commandQueue.write(cmd);
         return handle;
     }
 
     void deleteVertexLayout(VertexLayoutHandle handle) {
         m_vertexLayoutsHandleAlloc.free(handle);
-        m_commandQueue.post(new DeleteVertexLayoutCommand(handle));
+        DeleteVertexLayoutCommand cmd(handle);
+        m_commandQueue.write(cmd);
     }
 
     TransientIndexBuffer *createTransientIndexBuffer(uint32_t _size) {
         TransientIndexBuffer *tib = NULL;
 
         IndexBufferHandle handle = m_indexBuffersHandleAlloc.alloc();
-        RendererCommand *cmd = new CreateDynamicIndexBufferCommand(handle, nullptr, BufferElementType::UnsignedInt, _size / 4);
-        m_commandQueue.post(cmd);
+        CreateDynamicIndexBufferCommand cmd(handle, nullptr, BufferElementType::UnsignedInt, _size / 4);
+        m_commandQueue.write(cmd);
 
         const uint32_t size = sizeof(TransientIndexBuffer) + _size;
         tib = (TransientIndexBuffer *)ALLOC(Foundation::getAllocator(), size);
@@ -290,8 +306,8 @@ struct Context {
         VertexLayoutHandle layoutHandle = createVertexLayout(layout);
         stride = layout.m_Stride;
 
-        CreateDynamicVertexBufferCommand *cmd = new CreateDynamicVertexBufferCommand(handle, nullptr, size, layoutHandle);
-        m_commandQueue.post(cmd);
+        CreateDynamicVertexBufferCommand cmd(handle, nullptr, size, layoutHandle);
+        m_commandQueue.write(cmd);
 
         tvb = (TransientVertexBuffer *)ALLOC(Foundation::getAllocator(), size);
         tvb->data = (uint8_t *)tvb + sizeof(TransientVertexBuffer);
@@ -364,7 +380,7 @@ private:
     MirenHandleAllocator m_vertexLayoutsHandleAlloc;
     MirenHandleAllocator m_vertexBuffersHandleAlloc;
     MirenHandleAllocator m_indexBuffersHandleAlloc;
-    CommandQueue m_commandQueue;
+    Foundation::CommandBuffer m_commandQueue;
 
 public:
     Foundation::Semaphore m_rendererSemaphore;

@@ -85,8 +85,8 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
                     continue;
                 }
 
-                // Miren::setScissorRect(UIRect(clip_min.x, ((float)fb_height - clip_max.y), (clip_max.x - clip_min.x), (clip_max.y -
-                // clip_min.y)));
+                // Miren::setScissorRect(UIRect(clip_min.x, ((float)fb_height - clip_max.y), (clip_max.x - clip_min.x),
+                // (clip_max.y - clip_min.y)));
                 Miren::setState(0);
                 Miren::setShader(shader);
                 TextureHandle texture = (TextureHandle)(intptr_t)cmd->GetTexID();

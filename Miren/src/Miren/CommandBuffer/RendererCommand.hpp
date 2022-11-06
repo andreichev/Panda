@@ -8,9 +8,11 @@
 #include "Miren/VertexBufferLayoutData.hpp"
 #include "Miren/RendererI.hpp"
 
+#include <Foundation/CommandBuffer.hpp>
+
 namespace Miren {
 
-enum class RendererCommandType {
+enum RendererCommandType {
     RendererInit,
     CreateShader,
     DestroyShader,
@@ -29,175 +31,168 @@ enum class RendererCommandType {
     DestroyVertexLayout
 };
 
-struct RendererCommand {
-    RendererCommandType type;
-
-    RendererCommand(RendererCommandType type)
-        : type(type) {}
-};
-
-struct CreateShaderCommand : RendererCommand {
+struct CreateShaderCommand : Foundation::CommandBuffer::Command {
     const char *vertexPath;
     const char *fragmentPath;
     ShaderHandle handle;
 
     CreateShaderCommand(ShaderHandle handle, const char *vertexPath, const char *fragmentPath)
-        : RendererCommand(RendererCommandType::CreateShader)
+        : Command(RendererCommandType::CreateShader)
         , handle(handle)
         , vertexPath(vertexPath)
         , fragmentPath(fragmentPath) {}
 };
 
-struct DeleteShaderCommand : RendererCommand {
+struct DeleteShaderCommand : Foundation::CommandBuffer::Command {
     ShaderHandle handle;
 
     DeleteShaderCommand(ShaderHandle handle)
-        : RendererCommand(RendererCommandType::DestroyShader)
+        : Command(RendererCommandType::DestroyShader)
         , handle(handle) {}
 };
 
-struct CreateTextureFromFileCommand : RendererCommand {
+struct CreateTextureFromFileCommand : Foundation::CommandBuffer::Command {
     const char *path;
     TextureHandle handle;
 
     CreateTextureFromFileCommand(TextureHandle handle, const char *path)
-        : RendererCommand(RendererCommandType::CreateTextureFromFile)
+        : Command(RendererCommandType::CreateTextureFromFile)
         , handle(handle)
         , path(path) {}
 };
 
-struct CreateRGBATextureFromPixelsCommand : RendererCommand {
+struct CreateRGBATextureFromPixelsCommand : Foundation::CommandBuffer::Command {
     void *pixels;
     int width, height;
     TextureHandle handle;
 
     CreateRGBATextureFromPixelsCommand(TextureHandle handle, void *pixels, int width, int height)
-        : RendererCommand(RendererCommandType::CreateRGBATextureFromPixelsBuffer)
+        : Command(RendererCommandType::CreateRGBATextureFromPixelsBuffer)
         , handle(handle)
         , pixels(pixels)
         , width(width)
         , height(height) {}
 };
 
-struct DeleteTextureCommand : RendererCommand {
+struct DeleteTextureCommand : Foundation::CommandBuffer::Command {
     TextureHandle handle;
 
     DeleteTextureCommand(TextureHandle handle)
-        : RendererCommand(RendererCommandType::DestroyTexture)
+        : Command(RendererCommandType::DestroyTexture)
         , handle(handle) {}
 };
 
-struct CreateIndexBufferCommand : RendererCommand {
+struct CreateIndexBufferCommand : Foundation::CommandBuffer::Command {
     IndexBufferHandle handle;
     void *indices;
     BufferElementType elementType;
     size_t count;
 
     CreateIndexBufferCommand(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count)
-        : RendererCommand(RendererCommandType::CreateIndexBuffer)
+        : Command(RendererCommandType::CreateIndexBuffer)
         , handle(handle)
         , indices(indices)
         , elementType(elementType)
         , count(count) {}
 };
 
-struct CreateDynamicIndexBufferCommand : RendererCommand {
+struct CreateDynamicIndexBufferCommand : Foundation::CommandBuffer::Command {
     IndexBufferHandle handle;
     void *indices;
     BufferElementType elementType;
     size_t count;
 
     CreateDynamicIndexBufferCommand(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count)
-        : RendererCommand(RendererCommandType::CreateDynamicIndexBuffer)
+        : Command(RendererCommandType::CreateDynamicIndexBuffer)
         , handle(handle)
         , indices(indices)
         , elementType(elementType)
         , count(count) {}
 };
 
-struct UpdateDynamicIndexBufferCommand : RendererCommand {
+struct UpdateDynamicIndexBufferCommand : Foundation::CommandBuffer::Command {
     IndexBufferHandle handle;
     void *indices;
     size_t count;
 
     UpdateDynamicIndexBufferCommand(IndexBufferHandle handle, void *indices, size_t count)
-        : RendererCommand(RendererCommandType::UpdateDynamicIndexBuffer)
+        : Command(RendererCommandType::UpdateDynamicIndexBuffer)
         , handle(handle)
         , indices(indices)
         , count(count) {}
 };
 
-struct DeleteIndexBufferCommand : RendererCommand {
+struct DeleteIndexBufferCommand : Foundation::CommandBuffer::Command {
     IndexBufferHandle handle;
 
     DeleteIndexBufferCommand(IndexBufferHandle handle)
-        : RendererCommand(RendererCommandType::DestroyIndexBuffer)
+        : Command(RendererCommandType::DestroyIndexBuffer)
         , handle(handle) {}
 };
 
-struct CreateVertexBufferCommand : RendererCommand {
+struct CreateVertexBufferCommand : Foundation::CommandBuffer::Command {
     VertexBufferHandle handle;
     VertexLayoutHandle layoutHandle;
     void *data;
     uint32_t size;
 
     CreateVertexBufferCommand(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle)
-        : RendererCommand(RendererCommandType::CreateVertexBuffer)
+        : Command(RendererCommandType::CreateVertexBuffer)
         , handle(handle)
         , layoutHandle(layoutHandle)
         , data(data)
         , size(size) {}
 };
 
-struct CreateDynamicVertexBufferCommand : RendererCommand {
+struct CreateDynamicVertexBufferCommand : Foundation::CommandBuffer::Command {
     VertexBufferHandle handle;
     VertexLayoutHandle layoutHandle;
     void *data;
     uint32_t size;
 
     CreateDynamicVertexBufferCommand(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle)
-        : RendererCommand(RendererCommandType::CreateDynamicVertexBuffer)
+        : Command(RendererCommandType::CreateDynamicVertexBuffer)
         , handle(handle)
         , layoutHandle(layoutHandle)
         , data(data)
         , size(size) {}
 };
 
-struct UpdateDynamicVertexBufferCommand : RendererCommand {
+struct UpdateDynamicVertexBufferCommand : Foundation::CommandBuffer::Command {
     VertexBufferHandle handle;
     void *data;
     uint32_t size;
 
     UpdateDynamicVertexBufferCommand(VertexBufferHandle handle, void *data, uint32_t size)
-        : RendererCommand(RendererCommandType::UpdateDynamicVertexBuffer)
+        : Command(RendererCommandType::UpdateDynamicVertexBuffer)
         , handle(handle)
         , data(data)
         , size(size) {}
 };
 
-struct DeleteVertexBufferCommand : RendererCommand {
+struct DeleteVertexBufferCommand : Foundation::CommandBuffer::Command {
     VertexBufferHandle handle;
 
     DeleteVertexBufferCommand(VertexBufferHandle handle)
-        : RendererCommand(RendererCommandType::DestroyVertexBuffer)
+        : Command(RendererCommandType::DestroyVertexBuffer)
         , handle(handle) {}
 };
 
-struct CreateVertexLayoutCommand : RendererCommand {
+struct CreateVertexLayoutCommand : Foundation::CommandBuffer::Command {
     VertexBufferLayoutData data;
     VertexLayoutHandle handle;
 
     CreateVertexLayoutCommand(VertexLayoutHandle handle, VertexBufferLayoutData data)
-        : RendererCommand(RendererCommandType::CreateVertexLayout)
+        : Command(RendererCommandType::CreateVertexLayout)
         , handle(handle)
-        , data(std::move(data)) {}
+        , data(data) {}
 };
 
-struct DeleteVertexLayoutCommand : RendererCommand {
+struct DeleteVertexLayoutCommand : Foundation::CommandBuffer::Command {
     VertexLayoutHandle handle;
 
     DeleteVertexLayoutCommand(VertexLayoutHandle handle)
-        : RendererCommand(RendererCommandType::DestroyVertexLayout)
+        : Command(RendererCommandType::DestroyVertexLayout)
         , handle(handle) {}
 };
 
