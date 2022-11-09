@@ -4,6 +4,18 @@
 
 #include <cstdlib>
 
+#if MIREN_LOG_ENABLED == 1
+#    define MIREN_LOG(x) LOG_INFO(x)
+#else
+#    define MIREN_LOG(x)
+#endif
+
+#if MIREN_CMDBUF_LOG_ENABLED == 1
+#    define CMDBUF_LOG(x) LOG_INFO(x)
+#else
+#    define CMDBUF_LOG(x)
+#endif
+
 namespace Miren {
 
 enum class UniformDataType { Int, Mat4 };
@@ -29,6 +41,23 @@ struct TransientVertexBuffer {
     uint16_t stride;
     VertexBufferHandle handle;
     VertexLayoutHandle layoutHandle;
+};
+
+struct DynamicVertexBuffer {
+    VertexBufferHandle m_handle;
+    uint32_t m_offset;
+    uint32_t m_size;
+    uint32_t m_startVertex;
+    uint32_t m_numVertices;
+    uint16_t m_stride;
+    VertexLayoutHandle m_layoutHandle;
+};
+
+struct DynamicIndexBuffer {
+    IndexBufferHandle m_handle;
+    uint32_t m_offset;
+    uint32_t m_size;
+    uint32_t m_startIndex;
 };
 
 struct Size {

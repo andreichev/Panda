@@ -9,6 +9,7 @@
 #include "Platform/RendererImpl/OpenGL/RendererOpenGL.hpp"
 #include "RendererI.hpp"
 
+#include <Foundation/PlatformDetection.hpp>
 #include <Foundation/Foundation.hpp>
 #include <Foundation/Logger.hpp>
 #include <Foundation/Semaphore.hpp>
@@ -16,16 +17,17 @@
 
 namespace Miren {
 
-uint32_t maxHandles = 1000;
-
 struct Context {
     Context()
         : m_renderer(nullptr)
-        , m_shadersHandleAlloc(maxHandles)
-        , m_texturesHandleAlloc(maxHandles)
-        , m_vertexLayoutsHandleAlloc(maxHandles)
-        , m_vertexBuffersHandleAlloc(maxHandles)
-        , m_indexBuffersHandleAlloc(maxHandles)
+        , m_shadersHandleAlloc(MAX_SHADERS)
+        , m_texturesHandleAlloc(MAX_TEXTURES)
+        , m_vertexLayoutsHandleAlloc(MAX_BUFFER_LAYOUTS)
+        , m_vertexBuffersHandleAlloc(MAX_VERTEX_BUFFERS)
+        , m_indexBuffersHandleAlloc(MAX_INDEX_BUFFERS)
+        // TODO: - Add reusable vertex buffers
+        // , m_dynamicVertexBuffersHandleAlloc(MAX_DYNAMIC_VERTEX_BUFFERS)
+        // , m_dynamicIndexBuffersHandleAlloc(MAX_DYNAMIC_INDEX_BUFFERS)
         , m_commandQueue(300000)
         , m_rendererSemaphore() {
         m_render = &m_frame[0];
@@ -33,40 +35,52 @@ struct Context {
     }
 
     void init() {
+        MIREN_LOG("MIREN INIT BEGIN");
         m_rendererSemaphore.post();
+#ifdef PLATFORM_DESKTOP
         m_thread.init(renderThread, nullptr, 0, "Render thread");
+#endif
         Foundation::CommandBuffer::Command cmd(RendererCommandType::RendererInit);
         m_commandQueue.write(cmd);
         // m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE, VertexBufferLayoutData());
         // m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
+        MIREN_LOG("MIREN INIT END");
     }
 
+    // Должно быть вызвано из главного потока и не из цикла обновления.
     void shutdown() {
-        DELETE(Foundation::getAllocator(), m_renderer);
+        MIREN_LOG("MIREN SHUTDOWN BEGIN");
+        m_commandQueue.reset();
+        Foundation::CommandBuffer::Command cmd(RendererCommandType::RendererShutdown);
+        m_commandQueue.write(cmd);
+        m_rendererSemaphore.post();
         m_thread.shutdown();
+        MIREN_LOG("MIREN SHUTDOWN END");
     }
 
     static int32_t renderThread(Foundation::Thread *_thread, void *_userData) {
-        while (true) {
-            Miren::renderFrame();
-        }
+        MIREN_LOG("RENDER THREAD BEGIN");
+        while (Miren::renderFrame())
+            ;
+        MIREN_LOG("RENDER THREAD END");
         return 0;
     }
 
-    void rendererExecuteCommands() {
+    bool rendererExecuteCommands() {
         m_commandQueue.finishWriting();
         Foundation::CommandBuffer::Command *command;
         if (m_renderer == nullptr) {
             command = m_commandQueue.read();
             if (command != nullptr) {
-                ASSERT(command->type == RendererCommandType::RendererInit, "First command in command buffer should be RendererInit");
+                CMDBUF_LOG("RENDERER INIT COMMAND");
+                ASSERT(command->type == RendererCommandType::RendererInit, "First command should be RendererInit");
                 m_renderer = NEW(Foundation::getAllocator(), RendererOpenGL);
             }
         }
 
         if (m_renderer == nullptr) {
             m_commandQueue.reset();
-            return;
+            return true;
         }
 
         while ((command = m_commandQueue.read()) != nullptr) {
@@ -74,77 +88,98 @@ struct Context {
                 case RendererCommandType::RendererInit: {
                     break;
                 }
+                case RendererCommandType::RendererShutdown: {
+                    CMDBUF_LOG("RENDERER SHUTDOWN COMMAND");
+                    DELETE(Foundation::getAllocator(), m_renderer);
+                    m_renderer = nullptr;
+                    return false;
+                }
                 case RendererCommandType::CreateShader: {
+                    CMDBUF_LOG("CREATE SHADER COMMAND");
                     const CreateShaderCommand *cmd = static_cast<const CreateShaderCommand *>(command);
                     m_renderer->createShader(cmd->handle, cmd->vertexPath, cmd->fragmentPath);
                     break;
                 }
                 case RendererCommandType::DestroyShader: {
+                    CMDBUF_LOG("DESTROY SHADER COMMAND");
                     const DeleteShaderCommand *cmd = static_cast<const DeleteShaderCommand *>(command);
                     m_renderer->deleteShader(cmd->handle);
                     break;
                 }
                 case RendererCommandType::CreateTextureFromFile: {
+                    CMDBUF_LOG("CREATE TEXTURE FROM FILE COMMAND");
                     const CreateTextureFromFileCommand *cmd = static_cast<const CreateTextureFromFileCommand *>(command);
                     m_renderer->createTextureFromFile(cmd->handle, cmd->path);
                     break;
                 }
                 case RendererCommandType::CreateRGBATextureFromPixelsBuffer: {
+                    CMDBUF_LOG("CREATE TEXTURE FROM PIXELS COMMAND");
                     const CreateRGBATextureFromPixelsCommand *cmd = static_cast<const CreateRGBATextureFromPixelsCommand *>(command);
                     m_renderer->createRGBATextureFromPixels(cmd->handle, cmd->pixels, cmd->width, cmd->height);
                     break;
                 }
                 case RendererCommandType::DestroyTexture: {
+                    CMDBUF_LOG("DESTROY TEXTURE COMMAND");
                     const DeleteTextureCommand *cmd = static_cast<const DeleteTextureCommand *>(command);
                     m_renderer->deleteTexture(cmd->handle);
                     break;
                 }
                 case RendererCommandType::CreateIndexBuffer: {
+                    CMDBUF_LOG("CREATE INDEX BUFFER COMMAND");
                     const CreateIndexBufferCommand *cmd = static_cast<const CreateIndexBufferCommand *>(command);
                     m_renderer->createIndexBuffer(cmd->handle, cmd->indices, cmd->elementType, cmd->count);
                     break;
                 }
                 case RendererCommandType::CreateDynamicIndexBuffer: {
+                    CMDBUF_LOG("CREATE DYNAMIC INDEX BUFFER COMMAND");
                     const CreateDynamicIndexBufferCommand *cmd = static_cast<const CreateDynamicIndexBufferCommand *>(command);
                     m_renderer->createDynamicIndexBuffer(cmd->handle, cmd->indices, cmd->elementType, cmd->count);
                     break;
                 }
                 case RendererCommandType::UpdateDynamicIndexBuffer: {
+                    CMDBUF_LOG("UPDATE DYNAMIC INDEX BUFFER COMMAND");
                     const UpdateDynamicIndexBufferCommand *cmd = static_cast<const UpdateDynamicIndexBufferCommand *>(command);
                     m_renderer->updateDynamicIndexBuffer(cmd->handle, cmd->indices, cmd->count);
                     break;
                 }
                 case RendererCommandType::DestroyIndexBuffer: {
+                    CMDBUF_LOG("DESTROY INDEX BUFFER COMMAND");
                     const DeleteIndexBufferCommand *cmd = static_cast<const DeleteIndexBufferCommand *>(command);
                     m_renderer->deleteIndexBuffer(cmd->handle);
                     break;
                 }
                 case RendererCommandType::CreateVertexBuffer: {
+                    CMDBUF_LOG("CREATE VERTEX BUFFER COMMAND");
                     const CreateVertexBufferCommand *cmd = static_cast<const CreateVertexBufferCommand *>(command);
                     m_renderer->createVertexBuffer(cmd->handle, cmd->data, cmd->size, cmd->layoutHandle);
                     break;
                 }
                 case RendererCommandType::CreateDynamicVertexBuffer: {
+                    CMDBUF_LOG("CREATE DYNAMIC VERTEX BUFFER COMMAND");
                     const CreateDynamicVertexBufferCommand *cmd = static_cast<const CreateDynamicVertexBufferCommand *>(command);
                     m_renderer->createDynamicVertexBuffer(cmd->handle, cmd->data, cmd->size, cmd->layoutHandle);
                     break;
                 }
                 case RendererCommandType::UpdateDynamicVertexBuffer: {
+                    CMDBUF_LOG("UPDATE DYNAMIC VERTEX BUFFER COMMAND");
                     const UpdateDynamicVertexBufferCommand *cmd = static_cast<const UpdateDynamicVertexBufferCommand *>(command);
                     m_renderer->updateDynamicVertexBuffer(cmd->handle, cmd->data, cmd->size);
                     break;
                 }
                 case RendererCommandType::DestroyVertexBuffer: {
+                    CMDBUF_LOG("DESTROY VERTEX BUFFER COMMAND");
                     const DeleteVertexBufferCommand *cmd = static_cast<const DeleteVertexBufferCommand *>(command);
                     m_renderer->deleteVertexBuffer(cmd->handle);
                     break;
                 }
                 case RendererCommandType::CreateVertexLayout: {
+                    CMDBUF_LOG("CREATE VERTEX LAYOUT COMMAND");
                     const CreateVertexLayoutCommand *cmd = static_cast<const CreateVertexLayoutCommand *>(command);
                     m_renderer->createVertexLayout(cmd->handle, cmd->data);
                     break;
                 }
                 case RendererCommandType::DestroyVertexLayout: {
+                    CMDBUF_LOG("DESTROY VERTEX LAYOYT COMMAND");
                     const DeleteVertexLayoutCommand *cmd = static_cast<const DeleteVertexLayoutCommand *>(command);
                     m_renderer->deleteVertexLayout(cmd->handle);
                     break;
@@ -152,18 +187,22 @@ struct Context {
             }
         }
         m_commandQueue.reset();
+        return true;
     }
 
-    void renderFrame() {
+    bool renderFrame() {
         m_rendererSemaphore.wait();
-        if (m_render->getDrawCallsCount() == 0) {
+        MIREN_LOG("RENDER FRAME BEGIN");
+        if (rendererExecuteCommands() == false) {
+            MIREN_LOG("RENDER FRAME END");
             m_rendererSemaphore.post();
-            return;
+            return false;
         }
-        rendererExecuteCommands();
-        if (m_renderer == nullptr) {
+        ASSERT(m_renderer != nullptr, "RENDERER IS NULL");
+        if (m_render->getDrawCallsCount() == 0) {
+            MIREN_LOG("RENDER FRAME END");
             m_rendererSemaphore.post();
-            return;
+            return true;
         }
         m_renderer->clear();
 
@@ -183,7 +222,9 @@ struct Context {
             m_renderer->submit(&draw);
         }
         m_renderer->flip();
+        MIREN_LOG("RENDER FRAME END");
         m_rendererSemaphore.post();
+        return true;
     }
 
     ShaderHandle createShader(const char *vertexPath, const char *fragmentPath) {
@@ -282,43 +323,9 @@ struct Context {
         m_commandQueue.write(cmd);
     }
 
-    TransientIndexBuffer *createTransientIndexBuffer(uint32_t _size) {
-        TransientIndexBuffer *tib = NULL;
+    TransientIndexBuffer *createTransientIndexBuffer(uint32_t _size) {}
 
-        IndexBufferHandle handle = m_indexBuffersHandleAlloc.alloc();
-        CreateDynamicIndexBufferCommand cmd(handle, nullptr, BufferElementType::UnsignedInt, _size / 4);
-        m_commandQueue.write(cmd);
-
-        const uint32_t size = sizeof(TransientIndexBuffer) + _size;
-        tib = (TransientIndexBuffer *)ALLOC(Foundation::getAllocator(), size);
-        tib->data = (uint8_t *)tib + sizeof(TransientIndexBuffer);
-        tib->size = _size;
-        tib->handle = handle;
-
-        return tib;
-    }
-
-    TransientVertexBuffer *createTransientVertexBuffer(uint32_t size, VertexBufferLayoutData layout) {
-        TransientVertexBuffer *tvb = nullptr;
-        VertexBufferHandle handle = m_vertexBuffersHandleAlloc.alloc();
-
-        uint16_t stride = 0;
-        VertexLayoutHandle layoutHandle = createVertexLayout(layout);
-        stride = layout.m_Stride;
-
-        CreateDynamicVertexBufferCommand cmd(handle, nullptr, size, layoutHandle);
-        m_commandQueue.write(cmd);
-
-        tvb = (TransientVertexBuffer *)ALLOC(Foundation::getAllocator(), size);
-        tvb->data = (uint8_t *)tvb + sizeof(TransientVertexBuffer);
-        tvb->size = size;
-        tvb->startVertex = 0;
-        tvb->stride = stride;
-        tvb->handle = handle;
-        tvb->layoutHandle = layoutHandle;
-
-        return tvb;
-    }
+    TransientVertexBuffer *createTransientVertexBuffer(uint32_t size, VertexBufferLayoutData layout) {}
 
     void setState(uint32_t state) {
         m_submit->setState(state);
@@ -375,6 +382,11 @@ private:
     Frame m_frame[2];
     Frame *m_render;
     Frame *m_submit;
+
+    // TODO: - Add reusable buffers:
+    // DynamicIndexBuffer m_dynamicIndexBuffers[MAX_DYNAMIC_INDEX_BUFFERS];
+    // DynamicVertexBuffer m_dynamicVertexBuffers[MAX_DYNAMIC_VERTEX_BUFFERS];
+
     MirenHandleAllocator m_shadersHandleAlloc;
     MirenHandleAllocator m_texturesHandleAlloc;
     MirenHandleAllocator m_vertexLayoutsHandleAlloc;

@@ -42,7 +42,6 @@ public:
         FREE(getAllocator(), m_data);
     }
 
-    uint32_t writeCount = 0;
     template<typename CMD>
     void write(CMD &cmd) {
         static_assert(std::is_base_of<Command, CMD>::value, "Not inherited from Command");
@@ -52,7 +51,6 @@ public:
         write(&cmd, sizeof(CMD));
     }
 
-    uint32_t readCount = 0;
     Command *read() {
         Header &header = readHeader();
         if (header.size == COMMAND_BUFFER_FINISH_KEY) {

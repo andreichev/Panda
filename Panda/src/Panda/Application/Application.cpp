@@ -24,16 +24,23 @@ uint64_t getMillis() {
 }
 
 Application::~Application() {
-    delete m_window;
+    LOG_INFO("APP SHUTDOWN BEGIN");
+    Miren::renderSemaphoreWait();
+    DELETE(Foundation::getAllocator(), m_layerStack);
+#ifdef PLATFORM_DESKTOP
+    Miren::terminate();
+#endif
+    DELETE(Foundation::getAllocator(), m_window);
+    LOG_INFO("APP SHUTDOWN END");
 }
 
 void Application::pushLayer(Layer *layer) {
-    m_layerStack.pushLayer(layer);
+    m_layerStack->pushLayer(layer);
     layer->onAttach();
 }
 
 void Application::pushOverlay(Layer *layer) {
-    m_layerStack.pushOverlay(layer);
+    m_layerStack->pushOverlay(layer);
     layer->onAttach();
 }
 
@@ -49,15 +56,16 @@ Application::Application(ApplicationStartupSettings &settings)
     m_window = createWindow(settings);
     m_window->setEventQueue(&m_eventQueue);
     timeMillis = getMillis();
+    m_layerStack = NEW(Foundation::getAllocator(), LayerStack);
 
 #ifdef PLATFORM_DESKTOP
     Miren::initialize();
 #endif
-
+    Miren::renderSemaphoreWait();
     startBasicGame(settings.startupLevel);
-
     m_ImGuiLayer = new ImGuiLayer();
     pushOverlay(m_ImGuiLayer);
+    Miren::renderSemaphorePost();
 }
 
 void Application::startBasicGame(Level *level) {
@@ -85,17 +93,20 @@ void Application::loop() {
         deltaTimeMillis = 0;
 
         Miren::renderSemaphoreWait();
-        for (Layer *layer : m_layerStack) {
+        // LOG_INFO("APP UPDATE BEGIN");
+        LayerStack &layerStack = *m_layerStack;
+        for (Layer *layer : layerStack) {
             layer->onUpdate(deltaTime);
         }
         m_ImGuiLayer->begin(deltaTime);
-        for (Layer *layer : m_layerStack) {
+        for (Layer *layer : layerStack) {
             layer->onImGuiRender();
         }
         m_ImGuiLayer->end();
         m_window->pollEvents();
         processEvents();
         Miren::frame();
+        // LOG_INFO("APP UPDATE END");
         Miren::renderSemaphorePost();
     }
 }
@@ -113,7 +124,7 @@ void Application::processEvents() {
         } else if (event->type == EventType::WindowClose) {
             close();
         }
-        for (auto it = m_layerStack.rbegin(); it != m_layerStack.rend(); ++it) {
+        for (auto it = m_layerStack->rbegin(); it != m_layerStack->rend(); ++it) {
             if (event->isHandled)
                 break;
             (*it)->onEvent(event);

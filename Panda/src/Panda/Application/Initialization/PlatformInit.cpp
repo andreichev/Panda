@@ -5,6 +5,7 @@
 #include "pndpch.hpp"
 #include "PlatformInit.hpp"
 
+#include <Foundation/Allocator.hpp>
 #include <Foundation/PlatformDetection.hpp>
 
 #ifdef PLATFORM_DESKTOP
@@ -17,9 +18,9 @@ namespace Panda {
 
 Window *createWindow(ApplicationStartupSettings &settings) {
 #ifdef PLATFORM_DESKTOP
-    return new GlfwWindow(settings.windowTitle, settings.windowSize, settings.isFullScreen);
+    return NEW(Foundation::getAllocator(), GlfwWindow)(settings.windowTitle, settings.windowSize, settings.isFullScreen);
 #elif defined(PLATFORM_IOS)
-    return new UIKitWindow();
+    return NEW(Foundation::getAllocator(), UIKitWindow);
 #else
 #    error "Unknown platform"
 #endif

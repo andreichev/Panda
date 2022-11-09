@@ -45,7 +45,7 @@ void submit();
 void submitPrimitives(uint32_t elements);
 // MARK: - Main functions
 /// Process all requests to gpu (from rendering thread)
-void renderFrame();
+bool renderFrame();
 /// Frame processing finished (from app thread). Wait for renderer to finish rendering frame
 void frame();
 

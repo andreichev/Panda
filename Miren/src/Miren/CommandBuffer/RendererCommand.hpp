@@ -14,6 +14,7 @@ namespace Miren {
 
 enum RendererCommandType {
     RendererInit,
+    RendererShutdown,
     CreateShader,
     DestroyShader,
     CreateTextureFromFile,

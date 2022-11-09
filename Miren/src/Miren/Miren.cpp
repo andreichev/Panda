@@ -17,6 +17,7 @@ void initialize() {
 void terminate() {
     s_context->shutdown();
     ALIGNED_DELETE(Foundation::getAllocator(), s_context, CONTEXT_ALIGNMENT);
+    s_context = nullptr;
 }
 
 ShaderHandle createShader(const char *vertexPath, const char *fragmentPath) {
@@ -81,8 +82,8 @@ void deleteVertexLayout(VertexLayoutHandle handle) {
 
 void allocTransientVertexBuffer(TransientVertexBuffer *buffer, int32_t count, const VertexLayoutHandle layoutHandle) {}
 
-void renderFrame() {
-    s_context->renderFrame();
+bool renderFrame() {
+    return s_context->renderFrame();
 }
 
 void frame() {

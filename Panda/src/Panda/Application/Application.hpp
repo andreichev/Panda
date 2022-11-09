@@ -51,7 +51,7 @@ private:
     int thisSecondFramesCount;
     // Ограничение по FPS
     int maximumFps;
-    LayerStack m_layerStack;
+    LayerStack *m_layerStack;
     EventQueue m_eventQueue;
     Window *m_window;
     std::vector<WindowSizeListener *> m_windowSizeListeners;
