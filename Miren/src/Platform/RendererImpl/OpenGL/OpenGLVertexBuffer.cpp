@@ -53,10 +53,10 @@ void OpenGLVertexBuffer::createLayout(VertexBufferLayoutData *data) {
     glGenVertexArrays(1, &layoutId);
     glBindVertexArray(layoutId);
     long pointer = 0;
-    for (int i = 0; i < data->m_ElementsCount; i++) {
+    for (int i = 0; i < data->m_elementsCount; i++) {
         glEnableVertexAttribArray(i);
         int type;
-        switch (data->m_Elements[i].type) {
+        switch (data->m_elements[i].type) {
             case BufferElementType::Float:
                 type = GL_FLOAT;
                 break;
@@ -71,8 +71,8 @@ void OpenGLVertexBuffer::createLayout(VertexBufferLayoutData *data) {
                 break;
         }
         glVertexAttribPointer(
-            i, data->m_Elements[i].count, type, data->m_Elements[i].normalized ? GL_TRUE : GL_FALSE, data->m_Stride, (const void *)pointer);
-        pointer += data->m_Elements[i].count * VertexBufferElement::getSizeOfType(data->m_Elements[i].type);
+            i, data->m_elements[i].count, type, data->m_elements[i].normalized ? GL_TRUE : GL_FALSE, data->m_stride, (const void *)pointer);
+        pointer += data->m_elements[i].count * VertexBufferElement::getSizeOfType(data->m_elements[i].type);
     }
     glBindVertexArray(0);
 }

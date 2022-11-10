@@ -37,61 +37,61 @@ struct VertexBufferElement {
 class VertexBufferLayoutData {
 public:
     VertexBufferLayoutData(const VertexBufferLayoutData &other)
-        : m_Stride(other.m_Stride)
-        , m_ElementsCount(other.m_ElementsCount) {
-        for (size_t i = 0; i < m_ElementsCount; i++) {
-            m_Elements[i] = other.m_Elements[i];
+        : m_stride(other.m_stride)
+        , m_elementsCount(other.m_elementsCount) {
+        for (size_t i = 0; i < m_elementsCount; i++) {
+            m_elements[i] = other.m_elements[i];
         }
     }
 
     VertexBufferLayoutData(const VertexBufferLayoutData &&other) = delete;
 
     VertexBufferLayoutData()
-        : m_Stride(0)
-        , m_ElementsCount(0) {}
+        : m_stride(0)
+        , m_elementsCount(0) {}
 
     virtual ~VertexBufferLayoutData() = default;
 
     void pushFloat(uint32_t count) {
         VertexBufferElement element = {BufferElementType::Float, count, false};
-        m_Elements[m_ElementsCount++] = element;
-        m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::Float);
+        m_elements[m_elementsCount++] = element;
+        m_stride += count * VertexBufferElement::getSizeOfType(BufferElementType::Float);
     }
 
     void pushUInt(uint32_t count) {
         VertexBufferElement element = {BufferElementType::UnsignedInt, count, false};
-        m_Elements[m_ElementsCount++] = element;
-        m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedInt);
+        m_elements[m_elementsCount++] = element;
+        m_stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedInt);
     }
 
     void pushChar(uint32_t count, bool normalized) {
         VertexBufferElement element = {BufferElementType::UnsignedByte, count, normalized};
-        m_Elements[m_ElementsCount++] = element;
-        m_Stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedByte);
+        m_elements[m_elementsCount++] = element;
+        m_stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedByte);
     }
 
     void pushVec3() {
         VertexBufferElement element = {BufferElementType::Float, 3, false};
-        m_Elements[m_ElementsCount++] = element;
-        m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 3;
+        m_elements[m_elementsCount++] = element;
+        m_stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 3;
     }
 
     void pushVec4() {
         VertexBufferElement element = {BufferElementType::Float, 4, false};
-        m_Elements[m_ElementsCount++] = element;
-        m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 4;
+        m_elements[m_elementsCount++] = element;
+        m_stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 4;
     }
 
     void push8BitRGBAColor() {
         VertexBufferElement element = {BufferElementType::UnsignedByte, 4, true};
-        m_Elements[m_ElementsCount++] = element;
-        m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::UnsignedByte) * 4;
+        m_elements[m_elementsCount++] = element;
+        m_stride += VertexBufferElement::getSizeOfType(BufferElementType::UnsignedByte) * 4;
     }
 
     void pushVec2() {
         VertexBufferElement element = {BufferElementType::Float, 2, false};
-        m_Elements[m_ElementsCount++] = element;
-        m_Stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 2;
+        m_elements[m_elementsCount++] = element;
+        m_stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 2;
     }
 
     void pushVector() {
@@ -103,9 +103,9 @@ public:
         pushFloat(1);
     }
 
-    VertexBufferElement m_Elements[MAX_VERTEX_LAYOUT_ELEMENTS];
-    uint32_t m_ElementsCount;
-    uint32_t m_Stride;
+    VertexBufferElement m_elements[MAX_VERTEX_LAYOUT_ELEMENTS];
+    uint32_t m_elementsCount;
+    uint32_t m_stride;
 };
 
 } // namespace Miren
