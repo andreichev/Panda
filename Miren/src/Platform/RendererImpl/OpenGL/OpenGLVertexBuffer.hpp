@@ -4,24 +4,25 @@
 
 #pragma once
 
-#include "Miren/Vertex.hpp"
 #include "Miren/VertexBufferLayoutData.hpp"
+#include "Miren/Base.hpp"
 
 namespace Miren {
 
 class OpenGLVertexBuffer {
 public:
     ~OpenGLVertexBuffer();
-    OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic, VertexBufferLayoutData *layout);
+    OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic);
     void update(void *data, uint32_t size);
     void bind();
     void unbind();
+    void setLayoutHandle(VertexLayoutHandle layoutHandle);
+    VertexLayoutHandle getLayoutHandle();
 
 private:
-    void createLayout(VertexBufferLayoutData *layoutData);
     uint32_t id;
-    uint32_t layoutId;
     bool isDynamic;
+    VertexLayoutHandle m_layoutHandle;
 };
 
 } // namespace Miren

@@ -39,7 +39,8 @@ public:
     virtual void updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) = 0;
     virtual void deleteIndexBuffer(IndexBufferHandle handle) = 0;
     virtual void createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) = 0;
-    virtual void createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) = 0;
+    virtual void createDynamicVertexBuffer(
+        VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE) = 0;
     virtual void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) = 0;
     virtual void deleteVertexBuffer(VertexBufferHandle handle) = 0;
     virtual void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) = 0;

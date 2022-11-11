@@ -108,12 +108,14 @@ void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
 }
 
 void RendererOpenGL::createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
-    vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, false, vertexLayouts[layoutHandle]);
+    vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, false);
+    vertexBuffers[handle]->setLayoutHandle(layoutHandle);
     FREE(Foundation::getAllocator(), data);
 }
 
 void RendererOpenGL::createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
-    vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, true, vertexLayouts[layoutHandle]);
+    vertexBuffers[handle] = new OpenGLVertexBuffer(data, size, true);
+    vertexBuffers[handle]->setLayoutHandle(layoutHandle);
     if (data != nullptr) {
         FREE(Foundation::getAllocator(), data);
     }
@@ -130,7 +132,7 @@ void RendererOpenGL::deleteVertexBuffer(VertexBufferHandle handle) {
 }
 
 void RendererOpenGL::createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) {
-    vertexLayouts[handle] = new VertexBufferLayoutData(layout);
+    vertexLayouts[handle] = new OpenGLVertexLayout(&layout);
 }
 
 void RendererOpenGL::deleteVertexLayout(VertexLayoutHandle handle) {
@@ -179,6 +181,9 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     }
     shaders[draw->m_shader]->bind();
     vertexBuffers[draw->m_vertexBuffer]->bind();
+    VertexLayoutHandle layoutHandle =
+        draw->m_vertexLayout != MIREN_INVALID_HANDLE ? draw->m_vertexLayout : vertexBuffers[draw->m_vertexBuffer]->getLayoutHandle();
+    vertexLayouts[layoutHandle]->bind();
     if (draw->m_isIndexed) {
         indexBuffers[draw->m_indexBuffer]->bind();
         glDrawElements(GL_TRIANGLES, draw->m_numIndices, indexBuffers[draw->m_indexBuffer]->getElementType(), draw->m_indicesOffset);

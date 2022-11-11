@@ -35,7 +35,9 @@ OpenGLIndexBuffer::OpenGLIndexBuffer(void *indices, BufferElementType elementTyp
     }
     glGenBuffers(1, &id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * elementSize, indices, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    if (indices != nullptr) {
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * elementSize, indices, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 

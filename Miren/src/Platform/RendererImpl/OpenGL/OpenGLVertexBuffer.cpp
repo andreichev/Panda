@@ -17,11 +17,10 @@
 namespace Miren {
 
 OpenGLVertexBuffer::~OpenGLVertexBuffer() {
-    glDeleteVertexArrays(1, &layoutId);
     glDeleteBuffers(1, &id);
 }
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic, VertexBufferLayoutData *layout)
+OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic)
     : isDynamic(isDynamic)
     , id(0) {
     glGenBuffers(1, &id);
@@ -29,8 +28,8 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic
     if (data != nullptr) {
         glBufferData(GL_ARRAY_BUFFER, size, data, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
-    createLayout(layout);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    m_layoutHandle = MIREN_INVALID_HANDLE;
 }
 
 void OpenGLVertexBuffer::update(void *data, uint32_t size) {
@@ -43,38 +42,19 @@ void OpenGLVertexBuffer::update(void *data, uint32_t size) {
 }
 
 void OpenGLVertexBuffer::bind() {
-    glBindVertexArray(layoutId);
-}
-void OpenGLVertexBuffer::unbind() {
-    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, id);
 }
 
-void OpenGLVertexBuffer::createLayout(VertexBufferLayoutData *data) {
-    glGenVertexArrays(1, &layoutId);
-    glBindVertexArray(layoutId);
-    long pointer = 0;
-    for (int i = 0; i < data->m_elementsCount; i++) {
-        glEnableVertexAttribArray(i);
-        int type;
-        switch (data->m_elements[i].type) {
-            case BufferElementType::Float:
-                type = GL_FLOAT;
-                break;
-            case BufferElementType::UnsignedInt:
-                type = GL_UNSIGNED_INT;
-                break;
-            case BufferElementType::UnsignedByte:
-                type = GL_UNSIGNED_BYTE;
-                break;
-            default:
-                ASSERT(false, "Buffer element type is undefined");
-                break;
-        }
-        glVertexAttribPointer(
-            i, data->m_elements[i].count, type, data->m_elements[i].normalized ? GL_TRUE : GL_FALSE, data->m_stride, (const void *)pointer);
-        pointer += data->m_elements[i].count * VertexBufferElement::getSizeOfType(data->m_elements[i].type);
-    }
-    glBindVertexArray(0);
+void OpenGLVertexBuffer::unbind() {
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void OpenGLVertexBuffer::setLayoutHandle(VertexLayoutHandle layoutHandle) {
+    m_layoutHandle = layoutHandle;
+}
+
+VertexLayoutHandle OpenGLVertexBuffer::getLayoutHandle() {
+    return m_layoutHandle;
 }
 
 } // namespace Miren

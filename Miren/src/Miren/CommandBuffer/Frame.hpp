@@ -20,6 +20,7 @@ public:
     void setIndexBuffer(IndexBufferHandle handle, void *offset, uint32_t count);
     void setVertexBuffer(VertexBufferHandle handle);
     void setShader(ShaderHandle handle);
+    void setVertexLayout(VertexLayoutHandle handle);
     void setIsIndexed(bool value);
     void setNumberOfElements(uint32_t count);
     void setScissorRect(Rect rect);
@@ -34,6 +35,7 @@ public:
     TransientIndexBuffer *m_transientIb;
     TransientVertexBuffer *m_transientVb;
     uint32_t m_transientVbOffset;
+    uint32_t m_transientIbOffset;
 
 private:
     int m_drawCallsCount;

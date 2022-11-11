@@ -42,8 +42,8 @@ struct Context {
 #endif
         Foundation::CommandBuffer::Command cmd(RendererCommandType::RendererInit);
         m_commandQueue.write(cmd);
-        // m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE, VertexBufferLayoutData());
-        // m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
+        m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE);
+        m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
         MIREN_LOG("MIREN INIT END");
     }
 
@@ -325,7 +325,9 @@ struct Context {
 
     TransientIndexBuffer *createTransientIndexBuffer(uint32_t _size) {}
 
-    TransientVertexBuffer *createTransientVertexBuffer(uint32_t size, VertexBufferLayoutData layout) {}
+    TransientVertexBuffer *createTransientVertexBuffer(uint32_t size) {
+        // VertexBufferHandle vbHandle = createDynamicVertexBuffer()
+    }
 
     void setState(uint32_t state) {
         m_submit->setState(state);
@@ -353,6 +355,10 @@ struct Context {
 
     void setTexture(TextureHandle textureHandle, uint32_t slot) {
         m_submit->setTexture(textureHandle, slot);
+    }
+
+    void setVertexLayout(VertexLayoutHandle handle) {
+        m_submit->setVertexLayout(handle);
     }
 
     void submit() {

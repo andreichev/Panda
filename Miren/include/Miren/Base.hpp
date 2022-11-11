@@ -26,6 +26,8 @@ using IndexBufferHandle = uint16_t;
 using VertexBufferHandle = uint16_t;
 using VertexLayoutHandle = uint16_t;
 
+#define MIREN_INVALID_HANDLE UINT16_MAX
+
 struct TransientIndexBuffer {
     uint8_t *data;
     uint32_t size;

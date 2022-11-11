@@ -27,30 +27,32 @@ struct TextureBinding {
 struct RenderDraw {
     RenderDraw()
         : m_isSubmitted(false)
-        , m_state(MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST)
         , m_isIndexed(true)
+        , m_state(MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST)
         , m_numIndices(0)
         , m_numElemets(0)
-        , m_indicesOffset(nullptr)
-        , m_shader(0)
-        , m_indexBuffer(0)
-        , m_vertexBuffer(0)
         , m_uniformsCount(0)
         , m_textureBindingsCount(0)
+        , m_indicesOffset(nullptr)
+        , m_shader(MIREN_INVALID_HANDLE)
+        , m_indexBuffer(MIREN_INVALID_HANDLE)
+        , m_vertexBuffer(MIREN_INVALID_HANDLE)
+        , m_vertexLayout(MIREN_INVALID_HANDLE)
         , m_scissorRect(Rect::zero()) {}
 
     void reset() {
         m_isSubmitted = false;
-        m_state = MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST;
         m_isIndexed = true;
+        m_state = MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST;
         m_numIndices = 0;
         m_numElemets = 0;
-        m_indicesOffset = nullptr;
-        m_shader = 0;
-        m_indexBuffer = 0;
-        m_vertexBuffer = 0;
         m_uniformsCount = 0;
         m_textureBindingsCount = 0;
+        m_indicesOffset = nullptr;
+        m_shader = MIREN_INVALID_HANDLE;
+        m_indexBuffer = MIREN_INVALID_HANDLE;
+        m_vertexBuffer = MIREN_INVALID_HANDLE;
+        m_vertexLayout = MIREN_INVALID_HANDLE;
         m_scissorRect = Rect::zero();
     }
 
@@ -72,6 +74,7 @@ struct RenderDraw {
     ShaderHandle m_shader;
     IndexBufferHandle m_indexBuffer;
     VertexBufferHandle m_vertexBuffer;
+    VertexLayoutHandle m_vertexLayout;
     uint32_t m_uniformsCount;
     Uniform m_uniformBuffer[MAX_UNIFORMS];
     uint32_t m_textureBindingsCount;

@@ -34,6 +34,11 @@ void Frame::setVertexBuffer(VertexBufferHandle handle) {
     draw.m_vertexBuffer = handle;
 }
 
+void Frame::setVertexLayout(VertexLayoutHandle handle) {
+    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    draw.m_vertexLayout = handle;
+}
+
 void Frame::setShader(ShaderHandle handle) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.m_shader = handle;
@@ -79,6 +84,8 @@ RenderDraw *Frame::getDrawCalls() {
 
 void Frame::reset() {
     m_drawCallsCount = 0;
+    m_transientVbOffset = 0;
+    m_transientIbOffset = 0;
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.reset();
 }

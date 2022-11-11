@@ -22,14 +22,14 @@ IndexBufferHandle createDynamicIndexBuffer(void *indices, BufferElementType elem
 void updateDynamicIndexBuffer(IndexBufferHandle, void *indices, size_t count);
 void deleteIndexBuffer(IndexBufferHandle handle);
 // Only next frame vertex buffer
-void allocTransientVertexBuffer(TransientVertexBuffer *buffer, int32_t count, const VertexLayoutHandle layoutHandle);
+void allocTransientVertexBuffer(TransientVertexBuffer *buffer, int32_t count, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE);
 // Only next frame index buffer
 void allocTransientIndexBuffer(TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType);
+VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data);
 VertexBufferHandle createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle);
-VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle);
+VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE);
 void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size);
 void deleteVertexBuffer(VertexBufferHandle handle);
-VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data);
 void deleteVertexLayout(VertexLayoutHandle handle);
 // MARK: - Encoder setup
 void setState(uint32_t state);
@@ -37,6 +37,7 @@ void setScissorRect(Rect rect);
 void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
 void setVertexBuffer(VertexBufferHandle handle);
 void setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count);
+void setVertexLayout(VertexLayoutHandle handle);
 void setShader(ShaderHandle handle);
 void setTexture(TextureHandle textureHandle, uint32_t slot);
 /// Submit draw call

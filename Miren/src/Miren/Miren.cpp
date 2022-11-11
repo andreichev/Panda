@@ -118,6 +118,10 @@ void setTexture(TextureHandle textureHandle, uint32_t slot) {
     s_context->setTexture(textureHandle, slot);
 }
 
+void setVertexLayout(VertexLayoutHandle handle) {
+    s_context->setVertexLayout(handle);
+}
+
 void submit() {
     s_context->submit();
 }
