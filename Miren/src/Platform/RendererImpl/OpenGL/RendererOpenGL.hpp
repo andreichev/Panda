@@ -39,9 +39,10 @@ public:
     void deleteVertexLayout(VertexLayoutHandle handle) override;
     void setUniform(const Uniform &uniform) override;
     void setTexture(TextureHandle handle, uint32_t slot) override;
-    void submit(RenderDraw *draw) override;
+    void submit(Frame *frame) override;
 
 private:
+    void submit(RenderDraw *draw);
     void checkForErrors();
 
     uint32_t m_vao;

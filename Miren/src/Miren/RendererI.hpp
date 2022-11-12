@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Miren/Base.hpp"
-#include "Miren/CommandBuffer/RenderDraw.hpp"
+#include "Miren/CommandBuffer/Frame.hpp"
 #include "Miren/CommandBuffer/Uniform.hpp"
 #include "Miren/VertexBufferLayoutData.hpp"
 #include "Miren/Vertex.hpp"
@@ -47,7 +47,7 @@ public:
     virtual void deleteVertexLayout(VertexLayoutHandle handle) = 0;
     virtual void setUniform(const Uniform &uniform) = 0;
     virtual void setTexture(TextureHandle handle, uint32_t slot) = 0;
-    virtual void submit(RenderDraw *draw) = 0;
+    virtual void submit(Frame *frame) = 0;
 };
 
 } // namespace Miren

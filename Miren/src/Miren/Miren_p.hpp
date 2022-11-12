@@ -214,22 +214,7 @@ struct Context {
             return true;
         }
         m_renderer->clear();
-
-        for (int i = 0; i < m_render->getDrawCallsCount(); i++) {
-            RenderDraw &draw = m_render->getDrawCalls()[i];
-            if (draw.m_isSubmitted == false) {
-                continue;
-            }
-            for (size_t u = 0; u < draw.m_uniformsCount; u++) {
-                Uniform &uniform = draw.m_uniformBuffer[u];
-                m_renderer->setUniform(uniform);
-            }
-            for (size_t t = 0; t < draw.m_textureBindingsCount; t++) {
-                TextureBinding &textureBinding = draw.m_textureBindings[t];
-                m_renderer->setTexture(textureBinding.m_handle, textureBinding.m_slot);
-            }
-            m_renderer->submit(&draw);
-        }
+        m_renderer->submit(m_render);
         m_renderer->flip();
         MIREN_LOG("RENDER FRAME END");
         m_rendererSemaphore.post();

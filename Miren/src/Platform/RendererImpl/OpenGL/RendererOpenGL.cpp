@@ -155,6 +155,24 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
     textures[handle].bind(slot);
 }
 
+void RendererOpenGL::submit(Frame *frame) {
+    for (int i = 0; i < frame->getDrawCallsCount(); i++) {
+        RenderDraw &draw = frame->getDrawCalls()[i];
+        if (draw.m_isSubmitted == false) {
+            continue;
+        }
+        for (size_t u = 0; u < draw.m_uniformsCount; u++) {
+            Uniform &uniform = draw.m_uniformBuffer[u];
+            setUniform(uniform);
+        }
+        for (size_t t = 0; t < draw.m_textureBindingsCount; t++) {
+            TextureBinding &textureBinding = draw.m_textureBindings[t];
+            setTexture(textureBinding.m_handle, textureBinding.m_slot);
+        }
+        submit(&draw);
+    }
+}
+
 void RendererOpenGL::submit(RenderDraw *draw) {
     // TODO: Capture time
     if (draw->m_state & MIREN_STATE_CULL_FACE) {
