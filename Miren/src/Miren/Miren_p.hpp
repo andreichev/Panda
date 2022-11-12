@@ -44,13 +44,22 @@ struct Context {
         m_commandQueue.write(cmd);
         m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE);
         m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
+        frame();
+        m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE);
+        m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
+        frame();
         MIREN_LOG("MIREN INIT END");
     }
 
     // Должно быть вызвано из главного потока и не из цикла обновления.
     void shutdown() {
         MIREN_LOG("MIREN SHUTDOWN BEGIN");
-        m_commandQueue.reset();
+        destroyTransientVertexBuffer(m_submit->m_transientVb);
+        destroyTransientIndexBuffer(m_submit->m_transientIb);
+        frame();
+        destroyTransientVertexBuffer(m_submit->m_transientVb);
+        destroyTransientIndexBuffer(m_submit->m_transientIb);
+        frame();
         Foundation::CommandBuffer::Command cmd(RendererCommandType::RendererShutdown);
         m_commandQueue.write(cmd);
         m_rendererSemaphore.post();
@@ -292,7 +301,7 @@ struct Context {
         return handle;
     }
 
-    VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+    VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE) {
         VertexBufferHandle handle = m_vertexBuffersHandleAlloc.alloc();
         CreateDynamicVertexBufferCommand cmd(handle, data, size, layoutHandle);
         m_commandQueue.write(cmd);
@@ -323,10 +332,35 @@ struct Context {
         m_commandQueue.write(cmd);
     }
 
-    TransientIndexBuffer *createTransientIndexBuffer(uint32_t _size) {}
+    void destroyTransientVertexBuffer(TransientVertexBuffer &tvb) {
+        deleteVertexBuffer(tvb.handle);
+        ALIGNED_FREE(Foundation::getAllocator(), tvb.data, 16);
+    }
 
-    TransientVertexBuffer *createTransientVertexBuffer(uint32_t size) {
-        // VertexBufferHandle vbHandle = createDynamicVertexBuffer()
+    void destroyTransientIndexBuffer(TransientIndexBuffer &tib) {
+        deleteIndexBuffer(tib.handle);
+        ALIGNED_FREE(Foundation::getAllocator(), tib.data, 16);
+    }
+
+    TransientIndexBuffer createTransientIndexBuffer(uint32_t size) {
+        TransientIndexBuffer tib;
+        tib.data = (uint8_t *)ALIGNED_ALLOC(Foundation::getAllocator(), size, 16);
+        tib.size = size;
+        tib.startIndex = 0;
+        tib.handle = createDynamicIndexBuffer(nullptr, BufferElementType::UnsignedInt, size / 4);
+        tib.elementType = BufferElementType::UnsignedInt;
+        return tib;
+    }
+
+    TransientVertexBuffer createTransientVertexBuffer(uint32_t size) {
+        TransientVertexBuffer tvb;
+        tvb.data = (uint8_t *)ALIGNED_ALLOC(Foundation::getAllocator(), size, 16);
+        tvb.size = size;
+        tvb.startVertex = 0;
+        tvb.stride = 0;
+        tvb.handle = createDynamicVertexBuffer(nullptr, size);
+        tvb.layoutHandle = MIREN_INVALID_HANDLE;
+        return tvb;
     }
 
     void setState(uint32_t state) {

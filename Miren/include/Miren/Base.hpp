@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Config.hpp"
+#include "VertexBufferLayoutData.hpp"
 
 #include <cstdlib>
 
@@ -29,14 +30,27 @@ using VertexLayoutHandle = uint16_t;
 #define MIREN_INVALID_HANDLE UINT16_MAX
 
 struct TransientIndexBuffer {
+    TransientIndexBuffer()
+        : data(nullptr)
+        , size(0)
+        , startIndex(0)
+        , handle(MIREN_INVALID_HANDLE)
+        , elementType(BufferElementType::UnsignedInt) {}
     uint8_t *data;
     uint32_t size;
     uint32_t startIndex;
     IndexBufferHandle handle;
-    bool isIndex16;
+    BufferElementType elementType;
 };
 
 struct TransientVertexBuffer {
+    TransientVertexBuffer()
+        : data(nullptr)
+        , size(0)
+        , startVertex(0)
+        , stride(0)
+        , handle(MIREN_INVALID_HANDLE)
+        , layoutHandle(MIREN_INVALID_HANDLE) {}
     uint8_t *data;
     uint32_t size;
     uint32_t startVertex;
