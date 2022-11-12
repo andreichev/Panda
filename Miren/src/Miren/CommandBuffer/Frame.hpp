@@ -17,8 +17,8 @@ public:
     Frame();
     void beginDrawCall();
     void setState(uint32_t state);
-    void setIndexBuffer(IndexBufferHandle handle, void *offset, uint32_t count);
-    void setVertexBuffer(VertexBufferHandle handle);
+    void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, uint32_t count);
+    void setVertexBuffer(VertexBufferHandle handle, intptr_t offset);
     void setShader(ShaderHandle handle);
     void setVertexLayout(VertexLayoutHandle handle);
     void setIsIndexed(bool value);
@@ -34,8 +34,8 @@ public:
 
     TransientIndexBuffer m_transientIb;
     TransientVertexBuffer m_transientVb;
-    uint32_t m_transientVbOffset;
-    uint32_t m_transientIbOffset;
+    uint32_t m_transientVbSize;
+    uint32_t m_transientIbSize;
 
 private:
     int m_drawCallsCount;

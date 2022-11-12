@@ -33,7 +33,8 @@ struct RenderDraw {
         , m_numElemets(0)
         , m_uniformsCount(0)
         , m_textureBindingsCount(0)
-        , m_indicesOffset(nullptr)
+        , m_indicesOffset(0)
+        , m_verticesOffset(0)
         , m_shader(MIREN_INVALID_HANDLE)
         , m_indexBuffer(MIREN_INVALID_HANDLE)
         , m_vertexBuffer(MIREN_INVALID_HANDLE)
@@ -48,7 +49,8 @@ struct RenderDraw {
         m_numElemets = 0;
         m_uniformsCount = 0;
         m_textureBindingsCount = 0;
-        m_indicesOffset = nullptr;
+        m_indicesOffset = 0;
+        m_verticesOffset = 0;
         m_shader = MIREN_INVALID_HANDLE;
         m_indexBuffer = MIREN_INVALID_HANDLE;
         m_vertexBuffer = MIREN_INVALID_HANDLE;
@@ -68,7 +70,8 @@ struct RenderDraw {
     // Отрисовка по индексам или примитив
     bool m_isIndexed;
     uint32_t m_numIndices;
-    void *m_indicesOffset;
+    intptr_t m_indicesOffset;
+    intptr_t m_verticesOffset;
     // Если примитивы, а не индексы - их количество
     uint32_t m_numElemets;
     ShaderHandle m_shader;

@@ -48,15 +48,11 @@ struct TransientVertexBuffer {
         : data(nullptr)
         , size(0)
         , startVertex(0)
-        , stride(0)
-        , handle(MIREN_INVALID_HANDLE)
-        , layoutHandle(MIREN_INVALID_HANDLE) {}
+        , handle(MIREN_INVALID_HANDLE) {}
     uint8_t *data;
     uint32_t size;
     uint32_t startVertex;
-    uint16_t stride;
     VertexBufferHandle handle;
-    VertexLayoutHandle layoutHandle;
 };
 
 struct DynamicVertexBuffer {

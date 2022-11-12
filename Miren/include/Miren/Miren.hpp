@@ -22,7 +22,7 @@ IndexBufferHandle createDynamicIndexBuffer(void *indices, BufferElementType elem
 void updateDynamicIndexBuffer(IndexBufferHandle, void *indices, size_t count);
 void deleteIndexBuffer(IndexBufferHandle handle);
 // Only next frame vertex buffer
-void allocTransientVertexBuffer(TransientVertexBuffer *buffer, int32_t count, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE);
+void allocTransientVertexBuffer(TransientVertexBuffer *buffer, uint32_t size);
 // Only next frame index buffer
 void allocTransientIndexBuffer(TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType);
 VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data);
@@ -35,8 +35,8 @@ void deleteVertexLayout(VertexLayoutHandle handle);
 void setState(uint32_t state);
 void setScissorRect(Rect rect);
 void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
-void setVertexBuffer(VertexBufferHandle handle);
-void setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count);
+void setVertexBuffer(VertexBufferHandle handle, intptr_t offset = 0);
+void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, size_t count);
 void setVertexLayout(VertexLayoutHandle handle);
 void setShader(ShaderHandle handle);
 void setTexture(TextureHandle textureHandle, uint32_t slot);

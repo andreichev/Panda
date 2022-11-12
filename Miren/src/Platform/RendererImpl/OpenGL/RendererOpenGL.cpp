@@ -156,6 +156,12 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
 }
 
 void RendererOpenGL::submit(Frame *frame) {
+    if (frame->m_transientVbSize > 0) {
+        vertexBuffers[frame->m_transientVb.handle].update(frame->m_transientVb.data, frame->m_transientVbSize);
+    }
+    if (frame->m_transientIbSize > 0) {
+        indexBuffers[frame->m_transientIb.handle].update(frame->m_transientIb.data, frame->m_transientIbSize / 2);
+    }
     for (int i = 0; i < frame->getDrawCallsCount(); i++) {
         RenderDraw &draw = frame->getDrawCalls()[i];
         if (draw.m_isSubmitted == false) {
@@ -198,10 +204,10 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     VertexBufferLayoutData &layout = vertexLayouts[layoutHandle];
     glBindVertexArray(m_vao);
     shaders[draw->m_shader].bind();
-    shaders[draw->m_shader].bindAttributes(layout);
+    shaders[draw->m_shader].bindAttributes(layout, draw->m_verticesOffset);
     if (draw->m_isIndexed) {
         indexBuffers[draw->m_indexBuffer].bind();
-        glDrawElements(GL_TRIANGLES, draw->m_numIndices, indexBuffers[draw->m_indexBuffer].getElementType(), draw->m_indicesOffset);
+        glDrawElements(GL_TRIANGLES, draw->m_numIndices, indexBuffers[draw->m_indexBuffer].getElementType(), (void *)draw->m_indicesOffset);
         indexBuffers[draw->m_indexBuffer].unbind();
     } else {
         // TODO: Add offset value

@@ -6,8 +6,7 @@
 
 bool deviceObjectsCreated = false;
 Miren::ShaderHandle shader;
-Miren::VertexBufferHandle vertexBuffer;
-Miren::IndexBufferHandle indexBuffer;
+Miren::VertexLayoutHandle vertexLayout;
 Miren::TextureHandle fontTexture;
 glm::mat4 projMat(1.f);
 
@@ -61,13 +60,13 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
         const size_t idx_buffer_size = (size_t)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx);
 
         // Upload vertex/index buffers
-        void *vertices = malloc(cmd_list->VtxBuffer.size_in_bytes());
-        memcpy(vertices, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.size_in_bytes());
-        updateDynamicVertexBuffer(vertexBuffer, vertices, cmd_list->VtxBuffer.size_in_bytes());
+        Miren::TransientVertexBuffer tvb;
+        Miren::allocTransientVertexBuffer(&tvb, cmd_list->VtxBuffer.size_in_bytes());
+        memcpy(tvb.data, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.size_in_bytes());
 
-        void *indices = malloc(cmd_list->IdxBuffer.size_in_bytes());
-        memcpy(indices, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.size_in_bytes());
-        updateDynamicIndexBuffer(indexBuffer, indices, cmd_list->IdxBuffer.Size);
+        Miren::TransientIndexBuffer tib;
+        Miren::allocTransientIndexBuffer(&tib, cmd_list->IdxBuffer.size(), Miren::BufferElementType::UnsignedShort);
+        memcpy(tib.data, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.size_in_bytes());
 
         // Will project scissor/clipping rectangles into framebuffer space
         ImVec2 clip_off = draw_data->DisplayPos;         // (0,0) unless using multi-viewports
@@ -91,8 +90,9 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
                 Miren::setShader(shader);
                 TextureHandle texture = (TextureHandle)(intptr_t)cmd->GetTexID();
                 Miren::setTexture(texture, 0);
-                Miren::setVertexBuffer(vertexBuffer);
-                Miren::setIndexBuffer(indexBuffer, (void *)(intptr_t)(cmd->IdxOffset * sizeof(ImDrawIdx)), cmd->ElemCount);
+                Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
+                Miren::setVertexLayout(vertexLayout);
+                Miren::setIndexBuffer(tib.handle, (intptr_t)(cmd->IdxOffset * sizeof(ImDrawIdx)), cmd->ElemCount);
                 Miren::submit();
             }
         }
@@ -127,29 +127,13 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
     layoutData.pushVec2();
     layoutData.pushVec2();
     layoutData.push8BitRGBAColor();
-    VertexLayoutHandle vertexLayout = Miren::createVertexLayout(layoutData);
-
-    // 10 MB vertex buffer
-    size_t vb_size_in_bytes = 10 * 1000 * 1000;
-    void *vertices = malloc(vb_size_in_bytes);
-    memset(vertices, 0, vb_size_in_bytes);
-    vertexBuffer = Miren::createDynamicVertexBuffer(vertices, vb_size_in_bytes, vertexLayout);
-
+    vertexLayout = Miren::createVertexLayout(layoutData);
     ImGui_ImplMiren_CreateFontsTexture();
-
-    // 10 MB index buffer
-    size_t ib_size_in_bytes = 10 * 1000 * 1000;
-    size_t ib_count = ib_size_in_bytes / 2;
-    void *indices = malloc(ib_size_in_bytes);
-    memset(indices, 0, ib_size_in_bytes);
-    indexBuffer = Miren::createDynamicIndexBuffer(indices, BufferElementType::UnsignedShort, ib_count);
 }
 
 IMGUI_IMPL_API void ImGui_ImplMiren_DestroyDeviceObjects() {
     using namespace Miren;
     deleteShader(shader);
-    deleteVertexBuffer(vertexBuffer);
-    deleteIndexBuffer(indexBuffer);
     ImGui_ImplMiren_DestroyFontsTexture();
     deviceObjectsCreated = false;
 }

@@ -80,7 +80,13 @@ void deleteVertexLayout(VertexLayoutHandle handle) {
     s_context->deleteVertexLayout(handle);
 }
 
-void allocTransientVertexBuffer(TransientVertexBuffer *buffer, int32_t count, const VertexLayoutHandle layoutHandle) {}
+void allocTransientVertexBuffer(TransientVertexBuffer *buffer, uint32_t size) {
+    s_context->allocTransientVertexBuffer(buffer, size);
+}
+
+void allocTransientIndexBuffer(TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType) {
+    s_context->allocTransientIndexBuffer(buffer, count, elementType);
+}
 
 bool renderFrame() {
     return s_context->renderFrame();
@@ -98,11 +104,11 @@ void setScissorRect(Rect rect) {
     s_context->setScissorRect(rect);
 }
 
-void setVertexBuffer(VertexBufferHandle handle) {
-    s_context->setVertexBuffer(handle);
+void setVertexBuffer(VertexBufferHandle handle, intptr_t offset) {
+    s_context->setVertexBuffer(handle, offset);
 }
 
-void setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count) {
+void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, size_t count) {
     s_context->setIndexBuffer(handle, offset, count);
 }
 

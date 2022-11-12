@@ -109,8 +109,8 @@ int OpenGLShader::getUniformLocation(const std::string &name) {
     return location;
 }
 
-void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout) {
-    long pointer = 0;
+void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseVertex) {
+    intptr_t pointer = baseVertex;
     for (int i = 0; i < layout.m_elementsCount; i++) {
         glEnableVertexAttribArray(i);
         glVertexAttribDivisor(i, 0);

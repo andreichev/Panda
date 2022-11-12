@@ -22,16 +22,17 @@ void Frame::setState(uint32_t state) {
     draw.m_state = state;
 }
 
-void Frame::setIndexBuffer(IndexBufferHandle handle, void *offset, uint32_t count) {
+void Frame::setIndexBuffer(IndexBufferHandle handle, intptr_t offset, uint32_t count) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.m_indexBuffer = handle;
     draw.m_indicesOffset = offset;
     draw.m_numIndices = count;
 }
 
-void Frame::setVertexBuffer(VertexBufferHandle handle) {
+void Frame::setVertexBuffer(VertexBufferHandle handle, intptr_t offset) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.m_vertexBuffer = handle;
+    draw.m_verticesOffset = offset;
 }
 
 void Frame::setVertexLayout(VertexLayoutHandle handle) {
@@ -84,8 +85,8 @@ RenderDraw *Frame::getDrawCalls() {
 
 void Frame::reset() {
     m_drawCallsCount = 0;
-    m_transientVbOffset = 0;
-    m_transientIbOffset = 0;
+    m_transientVbSize = 0;
+    m_transientIbSize = 0;
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.reset();
 }

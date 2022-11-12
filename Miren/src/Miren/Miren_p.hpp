@@ -332,8 +332,8 @@ struct Context {
         tib.data = (uint8_t *)ALIGNED_ALLOC(Foundation::getAllocator(), size, 16);
         tib.size = size;
         tib.startIndex = 0;
-        tib.handle = createDynamicIndexBuffer(nullptr, BufferElementType::UnsignedInt, size / 4);
-        tib.elementType = BufferElementType::UnsignedInt;
+        tib.handle = createDynamicIndexBuffer(nullptr, BufferElementType::UnsignedShort, size / 2);
+        tib.elementType = BufferElementType::UnsignedShort;
         return tib;
     }
 
@@ -342,10 +342,28 @@ struct Context {
         tvb.data = (uint8_t *)ALIGNED_ALLOC(Foundation::getAllocator(), size, 16);
         tvb.size = size;
         tvb.startVertex = 0;
-        tvb.stride = 0;
         tvb.handle = createDynamicVertexBuffer(nullptr, size);
-        tvb.layoutHandle = MIREN_INVALID_HANDLE;
         return tvb;
+    }
+
+    void allocTransientVertexBuffer(TransientVertexBuffer *buffer, uint32_t size) {
+        uint32_t transientVBOffset = m_submit->m_transientVbSize;
+        buffer->data = &m_submit->m_transientVb.data[transientVBOffset];
+        m_submit->m_transientVbSize += size;
+        buffer->size = size;
+        buffer->startVertex = transientVBOffset;
+        buffer->handle = m_submit->m_transientVb.handle;
+    }
+
+    void allocTransientIndexBuffer(TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType) {
+        uint32_t transientIBOffset = m_submit->m_transientIbSize;
+        uint32_t size = count * VertexBufferElement::getSizeOfType(elementType);
+        buffer->data = &m_submit->m_transientIb.data[transientIBOffset];
+        m_submit->m_transientIbSize += size;
+        buffer->size = size;
+        buffer->startIndex = transientIBOffset;
+        buffer->elementType = elementType;
+        buffer->handle = m_submit->m_transientIb.handle;
     }
 
     void setState(uint32_t state) {
@@ -356,11 +374,11 @@ struct Context {
         m_submit->setScissorRect(rect);
     }
 
-    void setVertexBuffer(VertexBufferHandle handle) {
-        m_submit->setVertexBuffer(handle);
+    void setVertexBuffer(VertexBufferHandle handle, intptr_t offset) {
+        m_submit->setVertexBuffer(handle, offset);
     }
 
-    void setIndexBuffer(IndexBufferHandle handle, void *offset, size_t count) {
+    void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, size_t count) {
         m_submit->setIndexBuffer(handle, offset, count);
     }
 

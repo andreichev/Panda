@@ -20,7 +20,7 @@ public:
     void unbind();
     void setUniformMat4(const char *name, float *value);
     void setUniformInt(const char *name, int value);
-    void bindAttributes(VertexBufferLayoutData &layout);
+    void bindAttributes(VertexBufferLayoutData &layout, intptr_t baseVertex);
 
 private:
     uint32_t m_id;
