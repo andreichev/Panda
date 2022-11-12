@@ -104,6 +104,32 @@ int OpenGLShader::getUniformLocation(const std::string &name) {
     return location;
 }
 
+void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout) {
+    long pointer = 0;
+    for (int i = 0; i < layout.m_elementsCount; i++) {
+        glEnableVertexAttribArray(i);
+        glVertexAttribDivisor(i, 0);
+        int type;
+        switch (layout.m_elements[i].type) {
+            case BufferElementType::Float:
+                type = GL_FLOAT;
+                break;
+            case BufferElementType::UnsignedInt:
+                type = GL_UNSIGNED_INT;
+                break;
+            case BufferElementType::UnsignedByte:
+                type = GL_UNSIGNED_BYTE;
+                break;
+            default:
+                ASSERT(false, "Buffer element type is undefined");
+                break;
+        }
+        glVertexAttribPointer(i, layout.m_elements[i].count, type, layout.m_elements[i].normalized ? GL_TRUE : GL_FALSE, layout.m_stride,
+            (const void *)pointer);
+        pointer += layout.m_elements[i].count * VertexBufferElement::getSizeOfType(layout.m_elements[i].type);
+    }
+}
+
 void OpenGLShader::bind() {
     glUseProgram(m_RendererID);
 }

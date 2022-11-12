@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Miren/VertexBufferLayoutData.hpp"
+
 #include <string>
 #include <unordered_map>
 
@@ -17,6 +19,7 @@ public:
     void unbind();
     void setUniformMat4(const char *name, float *value);
     void setUniformInt(const char *name, int value);
+    void bindAttributes(VertexBufferLayoutData &layout);
 
 private:
     unsigned int m_RendererID;

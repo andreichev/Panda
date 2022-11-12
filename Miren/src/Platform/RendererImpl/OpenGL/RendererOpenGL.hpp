@@ -10,7 +10,6 @@
 #include "OpenGLTexture.hpp"
 #include "OpenGLIndexBuffer.hpp"
 #include "OpenGLVertexBuffer.hpp"
-#include "OpenGLVertexLayout.hpp"
 
 namespace Miren {
 
@@ -45,12 +44,12 @@ public:
 private:
     void checkForErrors();
 
+    uint32_t m_vao;
     GraphicsContext *context;
     OpenGLShader *shaders[1000];
     OpenGLIndexBuffer *indexBuffers[1000];
-    // VertexBufferLayoutData *vertexLayouts[1000];
+    VertexBufferLayoutData vertexLayouts[1000];
     OpenGLVertexBuffer *vertexBuffers[1000];
-    OpenGLVertexLayout *vertexLayouts[1000];
     OpenGLTexture *textures[1000];
 };
 

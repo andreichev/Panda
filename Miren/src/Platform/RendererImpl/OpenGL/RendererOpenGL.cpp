@@ -33,9 +33,12 @@ RendererOpenGL::RendererOpenGL() {
     // glBlendEquation(GL_FUNC_ADD);
     // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
 }
 
 RendererOpenGL::~RendererOpenGL() {
+    glDeleteVertexArrays(1, &m_vao);
     delete context;
 }
 
@@ -132,13 +135,10 @@ void RendererOpenGL::deleteVertexBuffer(VertexBufferHandle handle) {
 }
 
 void RendererOpenGL::createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) {
-    vertexLayouts[handle] = new OpenGLVertexLayout(&layout);
+    vertexLayouts[handle] = layout;
 }
 
-void RendererOpenGL::deleteVertexLayout(VertexLayoutHandle handle) {
-    delete vertexLayouts[handle];
-    vertexLayouts[handle] = nullptr;
-}
+void RendererOpenGL::deleteVertexLayout(VertexLayoutHandle handle) {}
 
 void RendererOpenGL::setUniform(const Uniform &uniform) {
     shaders[uniform.handle]->bind();
@@ -179,11 +179,13 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     } else {
         glDisable(GL_SCISSOR_TEST);
     }
-    shaders[draw->m_shader]->bind();
     vertexBuffers[draw->m_vertexBuffer]->bind();
     VertexLayoutHandle layoutHandle =
         draw->m_vertexLayout != MIREN_INVALID_HANDLE ? draw->m_vertexLayout : vertexBuffers[draw->m_vertexBuffer]->getLayoutHandle();
-    vertexLayouts[layoutHandle]->bind();
+    VertexBufferLayoutData &layout = vertexLayouts[layoutHandle];
+    glBindVertexArray(m_vao);
+    shaders[draw->m_shader]->bind();
+    shaders[draw->m_shader]->bindAttributes(layout);
     if (draw->m_isIndexed) {
         indexBuffers[draw->m_indexBuffer]->bind();
         glDrawElements(GL_TRIANGLES, draw->m_numIndices, indexBuffers[draw->m_indexBuffer]->getElementType(), draw->m_indicesOffset);
@@ -196,6 +198,7 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     shaders[draw->m_shader]->unbind();
     vertexBuffers[draw->m_vertexBuffer]->unbind();
     glDisable(GL_SCISSOR_TEST);
+    glBindVertexArray(0);
 }
 
 const char *getGLErrorStr(GLenum err) {

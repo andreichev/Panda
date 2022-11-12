@@ -36,16 +36,6 @@ struct VertexBufferElement {
 
 class VertexBufferLayoutData {
 public:
-    VertexBufferLayoutData(const VertexBufferLayoutData &other)
-        : m_stride(other.m_stride)
-        , m_elementsCount(other.m_elementsCount) {
-        for (size_t i = 0; i < m_elementsCount; i++) {
-            m_elements[i] = other.m_elements[i];
-        }
-    }
-
-    VertexBufferLayoutData(const VertexBufferLayoutData &&other) = delete;
-
     VertexBufferLayoutData()
         : m_stride(0)
         , m_elementsCount(0) {}
