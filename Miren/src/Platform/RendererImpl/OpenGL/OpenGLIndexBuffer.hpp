@@ -10,22 +10,23 @@ namespace Miren {
 
 class OpenGLIndexBuffer {
 public:
-    OpenGLIndexBuffer(void *indices, BufferElementType elementType, size_t count, bool isDynamic);
-    ~OpenGLIndexBuffer();
+    OpenGLIndexBuffer();
+    void create(void *indices, BufferElementType elementType, size_t count, bool isDynamic);
+    void terminate();
     void update(void *indices, size_t count);
     void bind() const;
     void unbind() const;
     uint32_t getCount() const;
     inline uint32_t getElementType() {
-        return elementType;
+        return m_elementType;
     };
 
 private:
-    uint32_t id;
-    uint32_t count;
-    uint32_t elementType;
-    size_t elementSize;
-    bool isDynamic;
+    uint32_t m_id;
+    uint32_t m_count;
+    uint32_t m_elementType;
+    size_t m_elementSize;
+    bool m_isDynamic;
 };
 
 } // namespace Miren

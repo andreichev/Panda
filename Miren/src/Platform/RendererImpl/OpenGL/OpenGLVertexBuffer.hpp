@@ -11,17 +11,18 @@ namespace Miren {
 
 class OpenGLVertexBuffer {
 public:
-    ~OpenGLVertexBuffer();
-    OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic);
+    OpenGLVertexBuffer();
+    void create(void *data, uint32_t size, bool isDynamic);
     void update(void *data, uint32_t size);
+    void terminate();
     void bind();
     void unbind();
     void setLayoutHandle(VertexLayoutHandle layoutHandle);
     VertexLayoutHandle getLayoutHandle();
 
 private:
-    uint32_t id;
-    bool isDynamic;
+    uint32_t m_id;
+    bool m_isDynamic;
     VertexLayoutHandle m_layoutHandle;
 };
 

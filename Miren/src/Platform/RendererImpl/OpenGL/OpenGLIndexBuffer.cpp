@@ -14,35 +14,45 @@
 
 namespace Miren {
 
-OpenGLIndexBuffer::~OpenGLIndexBuffer() {
-    glDeleteBuffers(1, &id);
-}
+OpenGLIndexBuffer::OpenGLIndexBuffer()
+    : m_id(-1)
+    , m_count(0)
+    , m_elementType(0)
+    , m_elementSize(0)
+    , m_isDynamic(false) {}
 
-OpenGLIndexBuffer::OpenGLIndexBuffer(void *indices, BufferElementType elementType, size_t count, bool isDynamic)
-    : id(0) {
-    this->isDynamic = isDynamic;
-    this->count = count;
+void OpenGLIndexBuffer::create(void *indices, BufferElementType elementType, size_t count, bool isDynamic) {
+    ASSERT(m_id == -1, "INDEX BUFFER ALREADY CREATED");
+    m_isDynamic = isDynamic;
+    m_count = count;
 
     if (elementType == BufferElementType::UnsignedByte) {
-        this->elementType = GL_UNSIGNED_BYTE;
-        this->elementSize = 1;
+        m_elementType = GL_UNSIGNED_BYTE;
+        m_elementSize = 1;
     } else if (elementType == BufferElementType::UnsignedShort) {
-        this->elementType = GL_UNSIGNED_SHORT;
-        this->elementSize = 2;
+        m_elementType = GL_UNSIGNED_SHORT;
+        m_elementSize = 2;
     } else {
-        this->elementType = GL_UNSIGNED_INT;
-        this->elementSize = 4;
+        m_elementType = GL_UNSIGNED_INT;
+        m_elementSize = 4;
     }
-    glGenBuffers(1, &id);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+    glGenBuffers(1, &m_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
     if (indices != nullptr) {
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * elementSize, indices, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * m_elementSize, indices, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
+void OpenGLIndexBuffer::terminate() {
+    ASSERT(m_id != -1, "INDEX BUFFER ALREADY DELETED");
+    glDeleteBuffers(1, &m_id);
+    m_id = -1;
+}
+
 void OpenGLIndexBuffer::bind() const {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+    ASSERT(m_id != -1, "INDEX BUFFER NOT VALID");
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
 }
 
 void OpenGLIndexBuffer::unbind() const {
@@ -50,16 +60,15 @@ void OpenGLIndexBuffer::unbind() const {
 }
 
 uint32_t OpenGLIndexBuffer::getCount() const {
-    return count;
+    ASSERT(m_id != -1, "INDEX BUFFER NOT VALID");
+    return m_count;
 }
 
 void OpenGLIndexBuffer::update(void *indices, size_t count) {
-    if (isDynamic == false) {
-        LOG_ERROR("Невозможно обновить статичный буфер");
-    }
-    this->count = count;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * elementSize, indices, GL_DYNAMIC_DRAW);
+    ASSERT(m_isDynamic != false, "Невозможно обновить статичный буфер");
+    m_count = count;
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * m_elementSize, indices, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 

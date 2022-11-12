@@ -13,8 +13,9 @@ namespace Miren {
 
 class OpenGLShader {
 public:
-    OpenGLShader(const char *vertexPath, const char *fragmentPath);
-    ~OpenGLShader();
+    OpenGLShader();
+    void create(const char *vertexPath, const char *fragmentPath);
+    void terminate();
     void bind();
     void unbind();
     void setUniformMat4(const char *name, float *value);
@@ -22,9 +23,9 @@ public:
     void bindAttributes(VertexBufferLayoutData &layout);
 
 private:
-    unsigned int m_RendererID;
-    std::unordered_map<std::string, int> m_UniformLocationCache;
-    static void checkCompileErrors(unsigned int shader, const std::string &type);
+    uint32_t m_id;
+    std::unordered_map<std::string, int> m_uniformLocationCache;
+    static void checkCompileErrors(uint32_t shader, const std::string &type);
     int getUniformLocation(const std::string &name);
 };
 

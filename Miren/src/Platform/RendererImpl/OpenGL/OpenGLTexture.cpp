@@ -18,10 +18,13 @@
 
 namespace Miren {
 
-OpenGLTexture::OpenGLTexture(void *pixels, int width, int height)
-    : id(0) {
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
+OpenGLTexture::OpenGLTexture()
+    : m_id(-1) {}
+
+void OpenGLTexture::create(void *pixels, uint32_t width, uint32_t height) {
+    ASSERT(m_id == -1, "TEXTURE ALREADY CREATED");
+    glGenTextures(1, &m_id);
+    glBindTexture(GL_TEXTURE_2D, m_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 #ifdef GL_UNPACK_ROW_LENGTH
@@ -30,10 +33,9 @@ OpenGLTexture::OpenGLTexture(void *pixels, int width, int height)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 }
 
-OpenGLTexture::OpenGLTexture(const char *path)
-    : id(0) {
-    glGenTextures(1, &id);
-
+void OpenGLTexture::create(const char *path) {
+    ASSERT(m_id == -1, "TEXTURE ALREADY CREATED");
+    glGenTextures(1, &m_id);
     /* Load image */
     // stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
@@ -52,7 +54,7 @@ OpenGLTexture::OpenGLTexture(const char *path)
     } else {
         format = GL_RGBA;
     }
-    glBindTexture(GL_TEXTURE_2D, id);
+    glBindTexture(GL_TEXTURE_2D, m_id);
 
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
 
@@ -67,13 +69,16 @@ OpenGLTexture::OpenGLTexture(const char *path)
     stbi_image_free(image);
 }
 
-OpenGLTexture::~OpenGLTexture() {
-    glDeleteTextures(1, &id);
+void OpenGLTexture::terminate() {
+    ASSERT(m_id != -1, "TEXTURE ALREADY DELETED");
+    glDeleteTextures(1, &m_id);
+    m_id = -1;
 }
 
 void OpenGLTexture::bind(unsigned int slot) {
+    ASSERT(m_id != -1, "TEXTURE IS NOT CREATED");
     glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, id);
+    glBindTexture(GL_TEXTURE_2D, m_id);
 }
 
 void OpenGLTexture::unbind() {

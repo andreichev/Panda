@@ -20,8 +20,13 @@
 
 namespace Miren {
 
-OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath) {
+OpenGLShader::OpenGLShader()
+    : m_id(-1)
+    , m_uniformLocationCache() {}
+
+void OpenGLShader::create(const char *vertexPath, const char *fragmentPath) {
     // 1. retrieve the vertex/fragment source code from filePath
+    ASSERT(m_id == -1, "PROGRAM ALREADY CREATED");
     std::string vertexCode;
     std::string fragmentCode;
     std::ifstream vShaderFile;
@@ -43,7 +48,7 @@ OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath) {
         // convert stream into string
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
-    } catch (std::ifstream::failure &e) { LOG_ERROR("SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath); }
+    } catch (std::ifstream::failure &e) { ASSERT(false, "SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath); }
     const char *vShaderCode = vertexCode.c_str();
     const char *fShaderCode = fragmentCode.c_str();
     // 2. compile shaders
@@ -60,19 +65,21 @@ OpenGLShader::OpenGLShader(const char *vertexPath, const char *fragmentPath) {
     checkCompileErrors(fragment, "FRAGMENT");
 
     // shader Program
-    m_RendererID = glCreateProgram();
-    glAttachShader(m_RendererID, vertex);
-    glAttachShader(m_RendererID, fragment);
+    m_id = glCreateProgram();
+    glAttachShader(m_id, vertex);
+    glAttachShader(m_id, fragment);
 
-    glLinkProgram(m_RendererID);
-    checkCompileErrors(m_RendererID, "PROGRAM");
+    glLinkProgram(m_id);
+    checkCompileErrors(m_id, "PROGRAM");
     // delete the shaders as they're linked into our program now and no longer necessery
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 }
 
-OpenGLShader::~OpenGLShader() {
-    glDeleteProgram(m_RendererID);
+void OpenGLShader::terminate() {
+    ASSERT(m_id != -1, "PROGRAM ALREADY DELETED");
+    glDeleteProgram(m_id);
+    m_id = -1;
 }
 
 void OpenGLShader::checkCompileErrors(unsigned int shader, const std::string &type) {
@@ -82,25 +89,23 @@ void OpenGLShader::checkCompileErrors(unsigned int shader, const std::string &ty
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            LOG_ERROR("SHADER_COMPILATION_ERROR of type: {}\n{}", type, infoLog);
+            ASSERT(false, "SHADER_COMPILATION_ERROR of type: {}\n{}", type, infoLog);
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            LOG_ERROR("PROGRAM_LINKING_ERROR of type: {}\n{}", type, infoLog);
+            ASSERT(false, "PROGRAM_LINKING_ERROR of type: {}\n{}", type, infoLog);
         }
     }
 }
 int OpenGLShader::getUniformLocation(const std::string &name) {
-    if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end()) {
-        return m_UniformLocationCache[name];
+    if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end()) {
+        return m_uniformLocationCache[name];
     }
-    int location = glGetUniformLocation(m_RendererID, name.c_str());
-    if (location == -1) {
-        LOG_ERROR("SHADER UNIFORM {} not found", name);
-    }
-    m_UniformLocationCache[name] = location;
+    int location = glGetUniformLocation(m_id, name.c_str());
+    ASSERT(location != -1, "SHADER UNIFORM {} not found", name);
+    m_uniformLocationCache[name] = location;
     return location;
 }
 
@@ -131,7 +136,7 @@ void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout) {
 }
 
 void OpenGLShader::bind() {
-    glUseProgram(m_RendererID);
+    glUseProgram(m_id);
 }
 
 void OpenGLShader::unbind() {

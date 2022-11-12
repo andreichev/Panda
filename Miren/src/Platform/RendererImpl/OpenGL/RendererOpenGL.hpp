@@ -46,11 +46,11 @@ private:
 
     uint32_t m_vao;
     GraphicsContext *context;
-    OpenGLShader *shaders[1000];
-    OpenGLIndexBuffer *indexBuffers[1000];
+    OpenGLShader shaders[1000];
+    OpenGLIndexBuffer indexBuffers[1000];
     VertexBufferLayoutData vertexLayouts[1000];
-    OpenGLVertexBuffer *vertexBuffers[1000];
-    OpenGLTexture *textures[1000];
+    OpenGLVertexBuffer vertexBuffers[1000];
+    OpenGLTexture textures[1000];
 };
 
 } // namespace Miren

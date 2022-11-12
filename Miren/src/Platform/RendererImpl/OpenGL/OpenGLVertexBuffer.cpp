@@ -16,15 +16,21 @@
 
 namespace Miren {
 
-OpenGLVertexBuffer::~OpenGLVertexBuffer() {
-    glDeleteBuffers(1, &id);
+OpenGLVertexBuffer::OpenGLVertexBuffer()
+    : m_isDynamic(false)
+    , m_id(-1) {}
+
+void OpenGLVertexBuffer::terminate() {
+    ASSERT(m_id != -1, "VERTEX BUFFER ALREADY DELETED");
+    glDeleteBuffers(1, &m_id);
+    m_id = -1;
 }
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic)
-    : isDynamic(isDynamic)
-    , id(0) {
-    glGenBuffers(1, &id);
-    glBindBuffer(GL_ARRAY_BUFFER, id);
+void OpenGLVertexBuffer::create(void *data, uint32_t size, bool isDynamic) {
+    ASSERT(m_id == -1, "VERTEX BUFFER ALREADY CREATED");
+    m_isDynamic = isDynamic;
+    glGenBuffers(1, &m_id);
+    glBindBuffer(GL_ARRAY_BUFFER, m_id);
     if (data != nullptr) {
         glBufferData(GL_ARRAY_BUFFER, size, data, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
@@ -33,16 +39,16 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, uint32_t size, bool isDynamic
 }
 
 void OpenGLVertexBuffer::update(void *data, uint32_t size) {
-    if (isDynamic == false) {
-        LOG_CRITICAL("Невозможно обновить статичный буфер");
-    }
-    glBindBuffer(GL_ARRAY_BUFFER, id);
+    ASSERT(m_id != -1, "VERTEX BUFFER NOT VALID");
+    ASSERT(m_isDynamic != false, "Невозможно обновить статичный буфер");
+    glBindBuffer(GL_ARRAY_BUFFER, m_id);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void OpenGLVertexBuffer::bind() {
-    glBindBuffer(GL_ARRAY_BUFFER, id);
+    ASSERT(m_id != -1, "VERTEX BUFFER NOT VALID");
+    glBindBuffer(GL_ARRAY_BUFFER, m_id);
 }
 
 void OpenGLVertexBuffer::unbind() {
