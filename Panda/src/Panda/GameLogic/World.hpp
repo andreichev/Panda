@@ -10,11 +10,12 @@
 
 namespace Panda {
 
-class World {
+class World final {
 public:
     World();
     void initialize();
     void update(double deltaTime);
+    void onImGuiRender();
     Foundation::Shared<Entity> instantiateEntity();
     void destroy(Foundation::Shared<Entity> &entity);
     UIView *getUIView();

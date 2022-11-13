@@ -9,11 +9,12 @@
 
 namespace Panda {
 
-class Entity {
+class Entity final {
 public:
     Entity();
     void initialize();
     void update(double deltaTime);
+    void onImGuiRender();
     void addComponent(Foundation::Shared<Component> component);
     void removeComponent(Foundation::Shared<Component> component);
     template<typename T>

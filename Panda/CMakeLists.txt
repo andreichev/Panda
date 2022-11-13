@@ -81,4 +81,4 @@ target_include_directories(Panda PRIVATE ${VENDOR_DIRECTORY}/stb_image)
 
 # Dependencies - Dear ImGui
 target_link_libraries(Panda imgui)
-target_include_directories(Panda PRIVATE ${VENDOR_DIRECTORY}/imgui)
+target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/imgui)

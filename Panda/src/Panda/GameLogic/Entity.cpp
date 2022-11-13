@@ -62,6 +62,19 @@ void Entity::update(double deltaTime) {
     }
 }
 
+void Entity::onImGuiRender() {
+    // Обновить дочерние сущности
+    for (auto &entity : childEntities) {
+        entity->onImGuiRender();
+    }
+    // Обновить все компонеты у этой сущности
+    for (auto &component : components) {
+        if (component->isActive) {
+            component->onImGuiRender();
+        }
+    }
+}
+
 Foundation::Shared<Transform> Entity::getTransform() const {
     return transform;
 }

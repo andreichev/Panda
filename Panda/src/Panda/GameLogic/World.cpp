@@ -16,6 +16,10 @@ void World::update(double deltaTime) {
     uiRoot.render();
 }
 
+void World::onImGuiRender() {
+    root.onImGuiRender();
+}
+
 void World::initialize() {
     root.initialize();
 }

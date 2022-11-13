@@ -10,6 +10,7 @@ class CameraMove : public Panda::Component {
 public:
     void initialize() override;
     void update(double deltaTime) override;
+    void onImGuiRender() override;
 
 private:
     float mouseSpeed = 0.1f;

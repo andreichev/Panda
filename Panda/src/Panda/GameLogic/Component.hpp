@@ -18,6 +18,7 @@ public:
     Entity &getEntity();
     virtual void initialize() = 0;
     virtual void update(double deltaTime) = 0;
+    virtual void onImGuiRender(){};
     bool isActive;
 
 private:
