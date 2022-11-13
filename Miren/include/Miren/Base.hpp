@@ -73,14 +73,14 @@ struct DynamicIndexBuffer {
 };
 
 struct Size {
-    float width;
-    float height;
+    int width;
+    int height;
 
     Size()
         : width(0)
         , height(0) {}
 
-    Size(float width, float height)
+    Size(int width, int height)
         : width(width)
         , height(height) {}
 
@@ -90,14 +90,14 @@ struct Size {
 };
 
 struct Point {
-    float x;
-    float y;
+    int x;
+    int y;
 
     Point()
         : x(0)
         , y(0) {}
 
-    Point(float x, float y)
+    Point(int x, int y)
         : x(x)
         , y(y) {}
 
@@ -114,7 +114,7 @@ struct Rect {
         : origin()
         , size() {}
 
-    Rect(float x, float y, float width, float height)
+    Rect(int x, int y, int width, int height)
         : origin(x, y)
         , size(width, height) {}
 

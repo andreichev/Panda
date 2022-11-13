@@ -357,7 +357,8 @@ struct Context {
 
     void allocTransientIndexBuffer(TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType) {
         uint32_t transientIBOffset = m_submit->m_transientIbSize;
-        uint32_t size = count * VertexBufferElement::getSizeOfType(elementType);
+        uint32_t elementSize = VertexBufferElement::getSizeOfType(elementType);
+        uint32_t size = count * elementSize;
         buffer->data = &m_submit->m_transientIb.data[transientIBOffset];
         m_submit->m_transientIbSize += size;
         buffer->size = size;

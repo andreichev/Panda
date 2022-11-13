@@ -19,6 +19,7 @@ public:
     virtual bool isCursorLocked() = 0;
     virtual void setEventQueue(EventQueue *eventQueue) = 0;
     virtual Size getSize() = 0;
+    virtual Size getDpi() = 0;
 };
 
 } // namespace Panda

@@ -56,10 +56,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
     for (int n = 0; n < draw_data->CmdListsCount; n++) {
         const ImDrawList *cmd_list = draw_data->CmdLists[n];
 
-        const size_t vtx_buffer_size = (size_t)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert);
-        const size_t idx_buffer_size = (size_t)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx);
-
-        // Upload vertex/index buffers
+        // Vertex/index buffers data
         Miren::TransientVertexBuffer tvb;
         Miren::allocTransientVertexBuffer(&tvb, cmd_list->VtxBuffer.size_in_bytes());
         memcpy(tvb.data, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.size_in_bytes());
@@ -83,16 +80,16 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
                 if (clip_max.x <= clip_min.x || clip_max.y <= clip_min.y) {
                     continue;
                 }
-
-                // Miren::setScissorRect(UIRect(clip_min.x, ((float)fb_height - clip_max.y), (clip_max.x - clip_min.x),
-                // (clip_max.y - clip_min.y)));
+                Rect scissorRect = Rect(clip_min.x, ((float)fb_height - clip_max.y), (clip_max.x - clip_min.x), (clip_max.y - clip_min.y));
+                Miren::setScissorRect(scissorRect);
                 Miren::setState(0);
                 Miren::setShader(shader);
                 TextureHandle texture = (TextureHandle)(intptr_t)cmd->GetTexID();
                 Miren::setTexture(texture, 0);
                 Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
                 Miren::setVertexLayout(vertexLayout);
-                Miren::setIndexBuffer(tib.handle, (intptr_t)(cmd->IdxOffset * sizeof(ImDrawIdx)), cmd->ElemCount);
+                uint32_t offset = cmd->IdxOffset * sizeof(ImDrawIdx);
+                Miren::setIndexBuffer(tib.handle, tib.startIndex + offset, cmd->ElemCount);
                 Miren::submit();
             }
         }

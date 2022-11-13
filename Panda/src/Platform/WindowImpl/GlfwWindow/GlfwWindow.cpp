@@ -136,4 +136,10 @@ Size GlfwWindow::getSize() {
     return m_windowSizeBackup;
 }
 
+Size GlfwWindow::getDpi() {
+    float xscale, yscale;
+    glfwGetMonitorContentScale(glfwGetPrimaryMonitor(), &xscale, &yscale);
+    return Size(xscale, yscale);
+}
+
 } // namespace Panda

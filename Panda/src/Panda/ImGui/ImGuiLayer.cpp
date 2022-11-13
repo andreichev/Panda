@@ -31,7 +31,6 @@ void ImGuiLayer::onAttach() {
     float fontSize = 18.0f; // *2.0f;
     std::string fontPath = Miren::PlatformData::get()->getResourcesPath() + "fonts/ProggyTiny.ttf";
     io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize);
-
     // Setup Dear ImGui style
     // ImGui::StyleColorsDark();
     // ImGui::StyleColorsClassic();

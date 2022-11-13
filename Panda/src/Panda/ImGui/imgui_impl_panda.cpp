@@ -346,14 +346,10 @@ IMGUI_IMPL_API void ImGui_ImplPanda_Shutdown() {}
 
 IMGUI_IMPL_API void ImGui_ImplPanda_NewFrame(double deltaTime) {
     ImGuiIO &io = ImGui::GetIO();
-
     using namespace Panda;
-    // Setup display size
-    // const float dpi = (float) ;
-    // io.DisplayFramebufferScale = ImVec2(dpi, dpi);
-
     Application *app = Application::get();
+    Size dpi = app->getWindow()->getDpi();
+    io.DisplayFramebufferScale = ImVec2(dpi.width, dpi.height);
     io.DisplaySize = ImVec2((float)(app->getWindow()->getSize().width), (float)(app->getWindow()->getSize().height));
-
     io.DeltaTime = (float)deltaTime;
 }

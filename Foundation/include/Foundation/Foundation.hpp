@@ -75,4 +75,14 @@ inline void swap(Ty &_a, Ty &_b) {
     _b = tmp;
 }
 
+template<typename Ty>
+inline constexpr Ty min(const Ty &_a, const Ty &_b) {
+    return _a < _b ? _a : _b;
+}
+
+template<typename Ty>
+inline constexpr Ty max(const Ty &_a, const Ty &_b) {
+    return _a > _b ? _a : _b;
+}
+
 } // namespace Foundation

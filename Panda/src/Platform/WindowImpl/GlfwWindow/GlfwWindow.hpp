@@ -22,6 +22,7 @@ public:
     bool isCursorLocked() override;
     void setEventQueue(EventQueue *eventQueue) override;
     Size getSize() override;
+    Size getDpi() override;
 
 private:
     void resetCursorPos();
