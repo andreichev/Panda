@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Allocator.hpp"
+#include "Assert.hpp"
 
-#include <cstddef>
+#include <stdint.h>
 
 namespace Foundation {
 

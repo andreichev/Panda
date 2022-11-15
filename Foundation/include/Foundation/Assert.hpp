@@ -1,3 +1,7 @@
+#pragma once
+
+#include "Logger.hpp"
+
 namespace Foundation {
 
 #define STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)

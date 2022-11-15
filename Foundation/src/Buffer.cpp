@@ -6,7 +6,7 @@ namespace Foundation {
 const Buffer *allocateBuffer(uint32_t size) {
     Buffer *buffer = (Buffer *)ALLOC(getAllocator(), sizeof(Buffer) + size);
     buffer->size = size;
-    buffer->data = (u_int8_t *)buffer + sizeof(Buffer);
+    buffer->data = (uint8_t *)buffer + sizeof(Buffer);
     return buffer;
 }
 

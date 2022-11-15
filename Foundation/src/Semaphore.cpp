@@ -161,7 +161,7 @@ Semaphore::Semaphore() {
 
     // #if PLATFORM_WINRT \
 // ||  PLATFORM_XBOXONE
-    si->m_handle = CreateSemaphoreExW(NULL, 1, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
+    si->m_handle = CreateSemaphoreExW(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
     // #else
     // 		si->m_handle = CreateSemaphoreA(NULL, 0, LONG_MAX, NULL);
     // #endif
