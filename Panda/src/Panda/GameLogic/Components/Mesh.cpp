@@ -79,37 +79,17 @@ void Mesh::update(double deltaTime) {
 }
 
 void Mesh::updateBuffer(const MeshData &data) {
+    ASSERT(isDynamic, "UPDATING AVAILABLE ONLY FOR DYNAMIC MESH");
     indicesCount = data.indicesCount;
-    if (isDynamic) {
-        Miren::updateDynamicVertexBuffer(vertexBufferHandle, data.vertices, sizeof(Miren::Vertex) * data.verticesCount);
-        Miren::updateDynamicIndexBuffer(indexBufferHandle, data.indices, data.indicesCount);
-    } else {
-        Miren::deleteVertexLayout(bufferLayoutHandle);
-        Miren::deleteVertexBuffer(vertexBufferHandle);
-        Miren::deleteIndexBuffer(indexBufferHandle);
-        Miren::VertexBufferLayoutData layoutData;
-        layoutData.pushVector();
-        bufferLayoutHandle = Miren::createVertexLayout(layoutData);
-        vertexBufferHandle = Miren::createVertexBuffer(data.vertices, sizeof(Miren::Vertex) * data.verticesCount, bufferLayoutHandle);
-        indexBufferHandle = Miren::createIndexBuffer(data.indices, Miren::BufferElementType::UnsignedInt, data.indicesCount);
-    }
+    Miren::updateDynamicVertexBuffer(vertexBufferHandle, data.vertices, sizeof(Miren::Vertex) * data.verticesCount);
+    Miren::updateDynamicIndexBuffer(indexBufferHandle, data.indices, data.indicesCount);
 }
 
 void Mesh::updateBuffer(Miren::Vertex *vertices, uint32_t verticesCount, uint32_t *indices, uint32_t _indicesCount) {
+    ASSERT(isDynamic, "UPDATING AVAILABLE ONLY FOR DYNAMIC MESH");
     this->indicesCount = _indicesCount;
-    if (isDynamic) {
-        Miren::updateDynamicVertexBuffer(vertexBufferHandle, vertices, sizeof(Miren::Vertex) * verticesCount);
-        Miren::updateDynamicIndexBuffer(indexBufferHandle, indices, indicesCount);
-    } else {
-        Miren::deleteVertexBuffer(vertexBufferHandle);
-        Miren::deleteIndexBuffer(indexBufferHandle);
-        Miren::deleteVertexLayout(bufferLayoutHandle);
-        Miren::VertexBufferLayoutData layoutData;
-        layoutData.pushVector();
-        bufferLayoutHandle = Miren::createVertexLayout(layoutData);
-        vertexBufferHandle = Miren::createVertexBuffer(vertices, sizeof(Miren::Vertex) * verticesCount, bufferLayoutHandle);
-        indexBufferHandle = Miren::createIndexBuffer(indices, Miren::BufferElementType::UnsignedInt, indicesCount);
-    }
+    Miren::updateDynamicVertexBuffer(vertexBufferHandle, vertices, sizeof(Miren::Vertex) * verticesCount);
+    Miren::updateDynamicIndexBuffer(indexBufferHandle, indices, indicesCount);
 }
 
 void Mesh::updateModelMatrix() {

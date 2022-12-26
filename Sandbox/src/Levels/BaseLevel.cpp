@@ -44,7 +44,7 @@ void BaseLevel::start(Panda::World *world) {
         for (int indexY = 0; indexY < ChunksStorage::SIZE_Y; indexY++) {
             for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {
                 Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(*chunksStorage.get(), indexX, indexY, indexZ, true);
-                Foundation::Shared<Panda::Mesh> mesh = Foundation::makeShared<Panda::Mesh>(meshData, false, texture, baseShader);
+                Foundation::Shared<Panda::Mesh> mesh = Foundation::makeShared<Panda::Mesh>(meshData, true, texture, baseShader);
                 chunksStorage->chunks[indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + indexX * ChunksStorage::SIZE_X + indexZ]
                     .setMesh(mesh.get());
                 chunkEntity->addComponent(mesh);

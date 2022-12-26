@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #if ALLOCATOR_DEBUG
 #    define ALLOC(allocator, size) Foundation::alloc(allocator, _size, 0, __FILE__, __LINE__)
