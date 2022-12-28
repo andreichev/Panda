@@ -76,7 +76,7 @@ struct Context {
         return 0;
     }
 
-    void rendererExecuteCommands(Foundation::CommandBuffer& commandBuffer) {
+    void rendererExecuteCommands(Foundation::CommandBuffer &commandBuffer) {
         Foundation::CommandBuffer::Command *command;
         while ((command = commandBuffer.read()) != nullptr) {
             switch (command->type) {
@@ -184,7 +184,7 @@ struct Context {
     }
 
     void checkIfHasInitCommand() {
-        Foundation::CommandBuffer::Command* command = m_preCommandQueue.read();
+        Foundation::CommandBuffer::Command *command = m_preCommandQueue.read();
         if (command != nullptr) {
             CMDBUF_LOG("RENDERER INIT COMMAND");
             ASSERT(command->type == RendererCommandType::RendererInit, "First command should be RendererInit");
@@ -200,7 +200,7 @@ struct Context {
         if (m_renderer == nullptr) {
             checkIfHasInitCommand();
         }
-        if(m_renderer == nullptr) {
+        if (m_renderer == nullptr) {
             m_preCommandQueue.reset();
             m_postCommandQueue.reset();
             return true;

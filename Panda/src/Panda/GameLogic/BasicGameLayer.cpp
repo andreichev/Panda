@@ -12,13 +12,13 @@ BasicGameLayer::BasicGameLayer(Level *startupLevel) {
 }
 
 void BasicGameLayer::onAttach() {
-    m_world = new World();
+    m_world = NEW(Foundation::getAllocator(), World);
     m_currentLevel->start(m_world);
 }
 
 void BasicGameLayer::onDetach() {
-    delete m_currentLevel;
-    delete m_world;
+    DELETE(Foundation::getAllocator(), m_currentLevel);
+    DELETE(Foundation::getAllocator(), m_world);
 }
 
 void BasicGameLayer::onUpdate(double deltaTime) {
@@ -37,32 +37,32 @@ void BasicGameLayer::onEvent(Event *event) {
         case EventType::WindowClose:
             break;
         case EventType::WindowResize: {
-            const WindowResizeEvent *ev = dynamic_cast<const WindowResizeEvent *>(event);
+            const WindowResizeEvent *ev = static_cast<const WindowResizeEvent *>(event);
             Input::setWindowSize(Size(ev->getWidth(), ev->getHeight()));
             break;
         }
         case EventType::KeyPressed: {
-            const KeyPressedEvent *ev = dynamic_cast<const KeyPressedEvent *>(event);
+            const KeyPressedEvent *ev = static_cast<const KeyPressedEvent *>(event);
             Input::setKeyPressed(ev->key, true);
             break;
         }
         case EventType::KeyReleased: {
-            const KeyReleasedEvent *ev = dynamic_cast<const KeyReleasedEvent *>(event);
+            const KeyReleasedEvent *ev = static_cast<const KeyReleasedEvent *>(event);
             Input::setKeyPressed(ev->key, false);
             break;
         }
         case EventType::MouseMoved: {
-            const MouseMovedEvent *ev = dynamic_cast<const MouseMovedEvent *>(event);
+            const MouseMovedEvent *ev = static_cast<const MouseMovedEvent *>(event);
             Input::postMouseChangedPosition(ev->x, ev->y);
             break;
         }
         case EventType::MouseButtonPressed: {
-            const MouseKeyEvent *ev = dynamic_cast<const MouseKeyEvent *>(event);
+            const MouseKeyEvent *ev = static_cast<const MouseKeyEvent *>(event);
             Input::setMouseButtonPressed(ev->button, true);
             break;
         }
         case EventType::MouseButtonReleased: {
-            const MouseKeyEvent *ev = dynamic_cast<const MouseKeyEvent *>(event);
+            const MouseKeyEvent *ev = static_cast<const MouseKeyEvent *>(event);
             Input::setMouseButtonPressed(ev->button, false);
             break;
         }

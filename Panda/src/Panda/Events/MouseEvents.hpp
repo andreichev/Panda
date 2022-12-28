@@ -8,8 +8,7 @@
 
 namespace Panda {
 
-class MouseMovedEvent : public Event {
-public:
+struct MouseMovedEvent : public Event {
     MouseMovedEvent(int x, int y)
         : Event(EventType::MouseMoved)
         , x(x)
@@ -18,8 +17,7 @@ public:
     int x, y;
 };
 
-class MouseKeyEvent : public Event {
-public:
+struct MouseKeyEvent : public Event {
     MouseKeyEvent(MouseButton button, bool isPressed)
         : Event(isPressed ? EventType::MouseButtonPressed : EventType::MouseButtonReleased)
         , button(button) {}

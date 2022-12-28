@@ -2,7 +2,6 @@
 // Created by Admin on 19.02.2022.
 //
 
-#include "pndpch.hpp"
 #include "EventQueue.hpp"
 #include "KeyEvents.hpp"
 #include "MouseEvents.hpp"
@@ -11,55 +10,48 @@
 namespace Panda {
 
 EventQueue::EventQueue()
-    : events() {}
+    : m_events(30000) {}
 
-EventQueue::~EventQueue() {
-    for (const Event *event = poll(); event != nullptr; event = poll()) {
-        release(event);
-    }
+void EventQueue::finishWriting() {
+    m_events.finishWriting();
 }
 
-void EventQueue::release(const Event *event) {
-    delete event;
+void EventQueue::reset() {
+    m_events.reset();
 }
 
 Event *EventQueue::poll() {
-    if (events.empty()) {
-        return nullptr;
-    }
-    Event *event = events.front();
-    events.pop();
-    return event;
+    return static_cast<Event *>(m_events.read());
 }
 
 void EventQueue::postMouseButtonEvent(MouseButton button, bool pressed) {
-    post(new MouseKeyEvent(button, pressed));
+    MouseKeyEvent event(button, pressed);
+    m_events.write(event);
 }
 
-void EventQueue::postSizeEvent(unsigned int width, unsigned int height) {
-    post(new WindowResizeEvent(width, height));
+void EventQueue::postSizeEvent(uint32_t width, uint32_t height) {
+    WindowResizeEvent event(width, height);
+    m_events.write(event);
 }
 
 void EventQueue::postKeyEvent(Key key, bool down) {
-    Event *ev;
     if (down) {
-        ev = new KeyPressedEvent(key);
+        KeyPressedEvent event(key);
+        m_events.write(event);
     } else {
-        ev = new KeyReleasedEvent(key);
+        KeyReleasedEvent event(key);
+        m_events.write(event);
     }
-    post(ev);
 }
 
-void EventQueue::postMouseEvent(int x, int y) {
-    post(new MouseMovedEvent(x, y));
+void EventQueue::postMouseEvent(uint32_t x, uint32_t y) {
+    MouseMovedEvent event(x, y);
+    m_events.write(event);
 }
 
 void EventQueue::postWindowCloseEvent() {
-    post(new WindowCloseEvent());
-}
-
-void EventQueue::post(Event *event) {
-    events.push(event);
+    WindowCloseEvent event;
+    m_events.write(event);
 }
 
 } // namespace Panda

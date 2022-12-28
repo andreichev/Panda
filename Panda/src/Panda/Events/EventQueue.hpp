@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Foundation/CommandBuffer.hpp"
 #include "Event.hpp"
 #include "Key.hpp"
 
@@ -12,18 +13,17 @@ namespace Panda {
 class EventQueue {
 public:
     EventQueue();
-    ~EventQueue();
-    void release(const Event *event);
+    void finishWriting();
+    void reset();
     void postMouseButtonEvent(MouseButton button, bool pressed);
-    void postSizeEvent(unsigned int width, unsigned int height);
+    void postSizeEvent(uint32_t width, uint32_t height);
     void postKeyEvent(Key key, bool down);
-    void postMouseEvent(int x, int y);
+    void postMouseEvent(uint32_t x, uint32_t y);
     void postWindowCloseEvent();
     Event *poll();
 
 private:
-    void post(Event *event);
-    std::queue<Event *> events;
+    Foundation::CommandBuffer m_events;
 };
 
 } // namespace Panda

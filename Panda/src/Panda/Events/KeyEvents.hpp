@@ -7,8 +7,7 @@
 
 namespace Panda {
 
-class KeyPressedEvent : public Event {
-public:
+struct KeyPressedEvent : public Event {
     KeyPressedEvent(Key key)
         : Event(EventType::KeyPressed)
         , key(key) {}
@@ -16,8 +15,7 @@ public:
     Key key;
 };
 
-class KeyReleasedEvent : public Event {
-public:
+struct KeyReleasedEvent : public Event {
     KeyReleasedEvent(Key key)
         : Event(EventType::KeyReleased)
         , key(key) {}

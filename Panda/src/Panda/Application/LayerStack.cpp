@@ -6,7 +6,7 @@ namespace Panda {
 LayerStack::~LayerStack() {
     for (Layer *layer : m_layers) {
         layer->onDetach();
-        delete layer;
+        DELETE(Foundation::getAllocator(), layer);
     }
 }
 

@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include <Foundation/CommandBuffer.hpp>
+
 namespace Panda {
 
-enum class EventType {
+enum EventType {
     None = 0,
     WindowResize,
     WindowClose,
@@ -20,13 +22,10 @@ enum class EventType {
     // MouseScrolled
 };
 
-class Event {
-public:
-    virtual ~Event() = default;
+struct Event : public Foundation::CommandBuffer::Command {
     Event(EventType type)
-        : type(type) {}
+        : Command(type) {}
 
-    EventType type;
     bool isHandled = false;
 };
 

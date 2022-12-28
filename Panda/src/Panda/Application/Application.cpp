@@ -63,13 +63,13 @@ Application::Application(ApplicationStartupSettings &settings)
 #endif
     Miren::renderSemaphoreWait();
     startBasicGame(settings.startupLevel);
-    m_ImGuiLayer = new ImGuiLayer();
+    m_ImGuiLayer = NEW(Foundation::getAllocator(), ImGuiLayer);
     pushOverlay(m_ImGuiLayer);
     Miren::renderSemaphorePost();
 }
 
 void Application::startBasicGame(Level *level) {
-    pushLayer(new BasicGameLayer(level));
+    pushLayer(NEW(Foundation::getAllocator(), BasicGameLayer)(level));
 }
 
 void Application::loop() {
@@ -116,10 +116,11 @@ Window *Application::getWindow() {
 }
 
 void Application::processEvents() {
+    m_eventQueue.finishWriting();
     Event *event;
     while ((event = m_eventQueue.poll()) != nullptr) {
         if (event->type == EventType::WindowResize) {
-            const WindowResizeEvent *ev = dynamic_cast<const WindowResizeEvent *>(event);
+            const WindowResizeEvent *ev = static_cast<const WindowResizeEvent *>(event);
             windowSizeChanged(Size(ev->getWidth(), ev->getHeight()));
         } else if (event->type == EventType::WindowClose) {
             close();
@@ -129,8 +130,8 @@ void Application::processEvents() {
                 break;
             (*it)->onEvent(event);
         }
-        m_eventQueue.release(event);
     }
+    m_eventQueue.reset();
 }
 
 EventQueue *Application::getEventQueue() {

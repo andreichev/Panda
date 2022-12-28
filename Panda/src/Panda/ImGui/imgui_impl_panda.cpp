@@ -273,7 +273,7 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
         case EventType::WindowClose:
             break;
         case EventType::WindowResize: {
-            const WindowResizeEvent *ev = dynamic_cast<const WindowResizeEvent *>(event);
+            const WindowResizeEvent *ev = static_cast<const WindowResizeEvent *>(event);
             float w = ev->getWidth();
             float h = ev->getHeight();
             io.DisplaySize = ImVec2((float)w, (float)h);
@@ -283,7 +283,7 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             break;
         }
         case EventType::KeyPressed: {
-            const KeyPressedEvent *ev = dynamic_cast<const KeyPressedEvent *>(event);
+            const KeyPressedEvent *ev = static_cast<const KeyPressedEvent *>(event);
             ImGuiKey key = ImGui_ImplPanda_KeyCodeToImGuiKey(ev->key);
             io.AddKeyEvent(key, true);
             io.SetKeyEventNativeData(key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user code)
@@ -291,7 +291,7 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             break;
         }
         case EventType::KeyReleased: {
-            const KeyReleasedEvent *ev = dynamic_cast<const KeyReleasedEvent *>(event);
+            const KeyReleasedEvent *ev = static_cast<const KeyReleasedEvent *>(event);
             ImGuiKey key = ImGui_ImplPanda_KeyCodeToImGuiKey(ev->key);
             io.AddKeyEvent(key, false);
             io.SetKeyEventNativeData(key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user code)
@@ -299,13 +299,13 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             break;
         }
         case EventType::MouseMoved: {
-            const MouseMovedEvent *ev = dynamic_cast<const MouseMovedEvent *>(event);
+            const MouseMovedEvent *ev = static_cast<const MouseMovedEvent *>(event);
             io.AddMousePosEvent((float)ev->x, (float)ev->y);
             event->isHandled = io.WantCaptureMouse;
             break;
         }
         case EventType::MouseButtonPressed: {
-            const MouseKeyEvent *ev = dynamic_cast<const MouseKeyEvent *>(event);
+            const MouseKeyEvent *ev = static_cast<const MouseKeyEvent *>(event);
             int button = static_cast<int>(ev->button);
             if (button >= 0 && button < ImGuiMouseButton_COUNT) {
                 io.AddMouseButtonEvent(button, true);
@@ -314,7 +314,7 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             break;
         }
         case EventType::MouseButtonReleased: {
-            const MouseKeyEvent *ev = dynamic_cast<const MouseKeyEvent *>(event);
+            const MouseKeyEvent *ev = static_cast<const MouseKeyEvent *>(event);
             int button = static_cast<int>(ev->button);
             if (button >= 0 && button < ImGuiMouseButton_COUNT) {
                 io.AddMouseButtonEvent(button, false);
