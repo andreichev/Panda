@@ -8,21 +8,21 @@ namespace Panda {
 
 class WindowResizeEvent : public Event {
 public:
-    WindowResizeEvent(unsigned int width, unsigned int height)
+    WindowResizeEvent(uint16_t width, uint16_t height)
         : Event(EventType::WindowResize)
         , width(width)
         , height(height) {}
 
-    unsigned int getWidth() const {
+    uint16_t getWidth() const {
         return width;
     }
 
-    unsigned int getHeight() const {
+    uint16_t getHeight() const {
         return height;
     }
 
 private:
-    unsigned int width, height;
+    uint16_t width, height;
 };
 
 class WindowCloseEvent : public Event {

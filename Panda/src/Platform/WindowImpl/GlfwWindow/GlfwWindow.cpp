@@ -96,6 +96,10 @@ void GlfwWindow::addEventHandlers() {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->m_eventQueue->postMouseEvent(x, y);
     });
+    glfwSetScrollCallback(m_windowHandle, [](GLFWwindow *windowHandle, double xoffset, double yoffset) {
+        GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+        self->m_eventQueue->postScrollEvent(xoffset, yoffset);
+    });
     glfwSetMouseButtonCallback(m_windowHandle, [](GLFWwindow *windowHandle, int button, int action, int mods) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->m_eventQueue->postMouseButtonEvent(static_cast<MouseButton>(button), action == GLFW_PRESS);

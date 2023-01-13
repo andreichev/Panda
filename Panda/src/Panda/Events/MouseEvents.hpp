@@ -17,6 +17,16 @@ struct MouseMovedEvent : public Event {
     int x, y;
 };
 
+struct MouseScrolledEvent : public Event {
+    MouseScrolledEvent(double xoffset, double yoffset)
+        : Event(EventType::MouseScrolled)
+        , xoffset(xoffset)
+        , yoffset(yoffset) {}
+
+    double xoffset;
+    double yoffset;
+};
+
 struct MouseKeyEvent : public Event {
     MouseKeyEvent(MouseButton button, bool isPressed)
         : Event(isPressed ? EventType::MouseButtonPressed : EventType::MouseButtonReleased)

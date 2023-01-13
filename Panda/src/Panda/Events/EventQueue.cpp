@@ -49,6 +49,11 @@ void EventQueue::postMouseEvent(uint32_t x, uint32_t y) {
     m_events.write(event);
 }
 
+void EventQueue::postScrollEvent(double xoffset, double yoffset) {
+    MouseScrolledEvent event(xoffset, yoffset);
+    m_events.write(event);
+}
+
 void EventQueue::postWindowCloseEvent() {
     WindowCloseEvent event;
     m_events.write(event);

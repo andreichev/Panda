@@ -11,12 +11,12 @@
 #include "Levels/TriangleLevel.hpp"
 
 int startApp(int argc, char **argv) {
-    runPandaApplication(Panda::ApplicationStartupSettings::builder()
-                            .name("ITIS Craft")
-                            .windowTitle("ITIS Craft")
-                            .windowSize({900, 600})
-                            .isFullScreen(false)
-                            .startupLevel(new BaseLevel())
-                            .build());
+    Panda::ApplicationStartupSettings settings;
+    settings.name = "ITIS Craft";
+    settings.windowTitle = "ITIS Craft";
+    settings.windowSize = {900, 600};
+    settings.isFullScreen = false;
+    settings.startupLevel = new BaseLevel();
+    runPandaApplication(settings);
     return 0;
 }

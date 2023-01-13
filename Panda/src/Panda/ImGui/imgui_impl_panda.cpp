@@ -304,6 +304,12 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             event->isHandled = io.WantCaptureMouse;
             break;
         }
+        case EventType::MouseScrolled: {
+            const MouseScrolledEvent *ev = static_cast<const MouseScrolledEvent *>(event);
+            io.AddMouseWheelEvent(ev->xoffset, ev->yoffset);
+            event->isHandled = io.WantCaptureMouse;
+            break;
+        }
         case EventType::MouseButtonPressed: {
             const MouseKeyEvent *ev = static_cast<const MouseKeyEvent *>(event);
             int button = static_cast<int>(ev->button);
