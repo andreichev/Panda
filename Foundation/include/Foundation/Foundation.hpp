@@ -8,10 +8,6 @@
 #include "Assert.hpp"
 #include "Allocator.hpp"
 
-// joke from swift (apple) or js
-#define var auto
-#define let const auto
-
 namespace Foundation {
 
 template<typename T>

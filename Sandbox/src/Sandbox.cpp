@@ -16,7 +16,7 @@ int startApp(int argc, char **argv) {
     settings.windowTitle = "ITIS Craft";
     settings.windowSize = {900, 600};
     settings.isFullScreen = false;
-    settings.startupLevel = new BaseLevel();
+    settings.startupLevel = new CubeLevel();
     runPandaApplication(settings);
     return 0;
 }

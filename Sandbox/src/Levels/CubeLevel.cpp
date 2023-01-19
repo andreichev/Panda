@@ -4,6 +4,8 @@
 
 #include "CubeLevel.hpp"
 
+#include <imgui.h>
+
 class CubeComponent : public Panda::Component {
 public:
     void initialize() override {
@@ -88,6 +90,10 @@ public:
         Miren::setVertexBuffer(vertexBuffer);
         Miren::setIndexBuffer(indexBuffer, 0, 36);
         Miren::submit();
+    }
+
+    void onImGuiRender() override {
+        ImGui::ShowDemoWindow();
     }
 
 private:
