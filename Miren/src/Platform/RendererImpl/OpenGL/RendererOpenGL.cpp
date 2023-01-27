@@ -201,6 +201,7 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     vertexBuffers[draw->m_vertexBuffer].bind();
     VertexLayoutHandle layoutHandle =
         draw->m_vertexLayout != MIREN_INVALID_HANDLE ? draw->m_vertexLayout : vertexBuffers[draw->m_vertexBuffer].getLayoutHandle();
+    PND_ASSERT(layoutHandle != MIREN_INVALID_HANDLE, "Invalid handle");
     VertexBufferLayoutData &layout = vertexLayouts[layoutHandle];
     glBindVertexArray(m_vao);
     shaders[draw->m_shader].bind();
@@ -245,7 +246,7 @@ void RendererOpenGL::checkForErrors() {
         if (GL_NO_ERROR == err)
             break;
         LOG_ERROR("OPENGL: {}", getGLErrorStr(err));
-        ASSERT(false, "OPENGL ERROR");
+        PND_ASSERT(false, "OPENGL ERROR");
     }
 }
 

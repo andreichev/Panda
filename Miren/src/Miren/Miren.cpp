@@ -10,14 +10,18 @@ static Context *s_context = nullptr;
 static const int CONTEXT_ALIGNMENT = 64;
 
 void initialize() {
+    MIREN_LOG("MIREN INIT BEGIN");
+    LOG_INFO("SIZE OF CONTEXT");
+    LOG_INFO(sizeof(Context));
     s_context = ALIGNED_NEW(Foundation::getAllocator(), Context, CONTEXT_ALIGNMENT);
-    s_context->init();
+    MIREN_LOG("MIREN INIT END");
 }
 
 void terminate() {
-    s_context->shutdown();
+    MIREN_LOG("MIREN SHUTDOWN BEGIN");
     ALIGNED_DELETE(Foundation::getAllocator(), s_context, CONTEXT_ALIGNMENT);
     s_context = nullptr;
+    MIREN_LOG("MIREN SHUTDOWN END");
 }
 
 ShaderHandle createShader(const char *vertexPath, const char *fragmentPath) {

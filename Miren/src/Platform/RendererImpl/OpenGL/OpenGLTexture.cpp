@@ -22,7 +22,7 @@ OpenGLTexture::OpenGLTexture()
     : m_id(-1) {}
 
 void OpenGLTexture::create(void *pixels, uint32_t width, uint32_t height) {
-    ASSERT(m_id == -1, "TEXTURE ALREADY CREATED");
+    PND_ASSERT(m_id == -1, "TEXTURE ALREADY CREATED");
     glGenTextures(1, &m_id);
     glBindTexture(GL_TEXTURE_2D, m_id);
 #ifdef GL_UNPACK_ROW_LENGTH
@@ -34,7 +34,7 @@ void OpenGLTexture::create(void *pixels, uint32_t width, uint32_t height) {
 }
 
 void OpenGLTexture::create(const char *path) {
-    ASSERT(m_id == -1, "TEXTURE ALREADY CREATED");
+    PND_ASSERT(m_id == -1, "TEXTURE ALREADY CREATED");
     glGenTextures(1, &m_id);
     /* Load image */
     // stbi_set_flip_vertically_on_load(true);
@@ -70,13 +70,13 @@ void OpenGLTexture::create(const char *path) {
 }
 
 void OpenGLTexture::terminate() {
-    ASSERT(m_id != -1, "TEXTURE ALREADY DELETED");
+    PND_ASSERT(m_id != -1, "TEXTURE ALREADY DELETED");
     glDeleteTextures(1, &m_id);
     m_id = -1;
 }
 
 void OpenGLTexture::bind(unsigned int slot) {
-    ASSERT(m_id != -1, "TEXTURE IS NOT CREATED");
+    PND_ASSERT(m_id != -1, "TEXTURE IS NOT CREATED");
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, m_id);
 }

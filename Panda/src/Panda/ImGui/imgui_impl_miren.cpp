@@ -14,6 +14,7 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_Init() {
     ImGuiIO &io = ImGui::GetIO();
     io.BackendRendererName = "imgui_impl_miren";
     // io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
+    return true;
 }
 
 IMGUI_IMPL_API void ImGui_ImplMiren_Shutdown() {
@@ -126,6 +127,7 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
     layoutData.push8BitRGBAColor();
     vertexLayout = Miren::createVertexLayout(layoutData);
     ImGui_ImplMiren_CreateFontsTexture();
+    return true;
 }
 
 IMGUI_IMPL_API void ImGui_ImplMiren_DestroyDeviceObjects() {

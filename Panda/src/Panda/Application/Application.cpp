@@ -14,7 +14,7 @@ namespace Panda {
 Application *Application::s_instance = nullptr;
 
 Application *Application::get() {
-    ASSERT(s_instance != nullptr, "APP USED BUT NOT INITIALISED");
+    PND_ASSERT(s_instance != nullptr, "APP USED BUT NOT INITIALISED");
     return s_instance;
 }
 

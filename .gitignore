@@ -1,10 +1,11 @@
 # Directories
-**bin/
-**bin-int/
+bin
+bin-int
 
-**cmake-build-debug
-**cmake-build-release
-**build
+cmake-build-debug
+cmake-build-release
+build
+out
 xcode
 
 # Mac os stuff

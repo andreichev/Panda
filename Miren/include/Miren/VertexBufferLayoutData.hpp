@@ -21,15 +21,15 @@ struct VertexBufferElement {
     static size_t getSizeOfType(BufferElementType type) {
         switch (type) {
             case BufferElementType::Float:
-                return 4;
+                return sizeof(float);
             case BufferElementType::UnsignedInt:
-                return 4;
+                return sizeof(unsigned int);
             case BufferElementType::UnsignedShort:
-                return 2;
+                return sizeof(unsigned short);
             case BufferElementType::UnsignedByte:
-                return 1;
+                return sizeof(unsigned char);
         }
-        ASSERT(false, "Vertex buffer element type is undefined");
+        PND_ASSERT(false, "Vertex buffer element type is undefined");
         return 0;
     }
 };
@@ -38,7 +38,8 @@ class VertexBufferLayoutData {
 public:
     VertexBufferLayoutData()
         : m_stride(0)
-        , m_elementsCount(0) {}
+        , m_elementsCount(0)
+        , m_elements() {}
 
     virtual ~VertexBufferLayoutData() = default;
 

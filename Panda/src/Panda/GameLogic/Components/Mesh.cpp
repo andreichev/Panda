@@ -79,14 +79,14 @@ void Mesh::update(double deltaTime) {
 }
 
 void Mesh::updateBuffer(const MeshData &data) {
-    ASSERT(isDynamic, "UPDATING AVAILABLE ONLY FOR DYNAMIC MESH");
+    PND_ASSERT(isDynamic, "UPDATING AVAILABLE ONLY FOR DYNAMIC MESH");
     indicesCount = data.indicesCount;
     Miren::updateDynamicVertexBuffer(vertexBufferHandle, data.vertices, sizeof(Miren::Vertex) * data.verticesCount);
     Miren::updateDynamicIndexBuffer(indexBufferHandle, data.indices, data.indicesCount);
 }
 
 void Mesh::updateBuffer(Miren::Vertex *vertices, uint32_t verticesCount, uint32_t *indices, uint32_t _indicesCount) {
-    ASSERT(isDynamic, "UPDATING AVAILABLE ONLY FOR DYNAMIC MESH");
+    PND_ASSERT(isDynamic, "UPDATING AVAILABLE ONLY FOR DYNAMIC MESH");
     this->indicesCount = _indicesCount;
     Miren::updateDynamicVertexBuffer(vertexBufferHandle, vertices, sizeof(Miren::Vertex) * verticesCount);
     Miren::updateDynamicIndexBuffer(indexBufferHandle, indices, indicesCount);

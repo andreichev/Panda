@@ -50,7 +50,7 @@ Thread::Thread()
     , m_stackSize(0)
     , m_exitCode(0)
     , m_running(false) {
-    STATIC_ASSERT(sizeof(ThreadInternal) <= sizeof(m_internal));
+    PND_STATIC_ASSERT(sizeof(ThreadInternal) <= sizeof(m_internal));
     ThreadInternal *ti = (ThreadInternal *)m_internal;
 #ifdef PLATFORM_WINDOWS
     ti->m_handle = INVALID_HANDLE_VALUE;
@@ -67,7 +67,7 @@ Thread::~Thread() {
 }
 
 bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char *_name) {
-    ASSERT(m_running == false, "Already running!", _name);
+    PND_ASSERT(m_running == false, "Already running!", _name);
 
     m_fn = _fn;
     m_userData = _userData;
@@ -118,7 +118,7 @@ bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char
 }
 
 void Thread::shutdown() {
-    ASSERT(m_running, "Not running!", m_running);
+    PND_ASSERT(m_running, "Not running!", m_running);
     ThreadInternal *ti = (ThreadInternal *)m_internal;
 
 #ifdef PLATFORM_WINDOWS

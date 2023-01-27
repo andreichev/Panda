@@ -165,7 +165,7 @@ Semaphore::Semaphore() {
     // #else
     // 		si->m_handle = CreateSemaphoreA(NULL, 0, LONG_MAX, NULL);
     // #endif
-    ASSERT(NULL != si->m_handle, "Failed to create Semaphore!", nullptr);
+    PND_ASSERT(NULL != si->m_handle, "Failed to create Semaphore!");
 }
 
 Semaphore::~Semaphore() {

@@ -18,6 +18,7 @@
 namespace Miren {
 
 struct Context {
+    // Должно быть вызвано из главного потока и не из цикла обновления.
     Context()
         : m_renderer(nullptr)
         , m_shadersHandleAlloc(MAX_SHADERS)
@@ -25,22 +26,13 @@ struct Context {
         , m_vertexLayoutsHandleAlloc(MAX_BUFFER_LAYOUTS)
         , m_vertexBuffersHandleAlloc(MAX_VERTEX_BUFFERS)
         , m_indexBuffersHandleAlloc(MAX_INDEX_BUFFERS)
-        // TODO: - Add reusable vertex buffers
-        // , m_dynamicVertexBuffersHandleAlloc(MAX_DYNAMIC_VERTEX_BUFFERS)
-        // , m_dynamicIndexBuffersHandleAlloc(MAX_DYNAMIC_INDEX_BUFFERS)
         , m_preCommandQueue(300000)
         , m_postCommandQueue(300000)
         , m_rendererSemaphore() {
+
         m_render = &m_frame[0];
         m_submit = &m_frame[1];
-    }
 
-    void init() {
-        MIREN_LOG("MIREN INIT BEGIN");
-        m_rendererSemaphore.post();
-#ifdef PLATFORM_DESKTOP
-        m_thread.init(renderThread, nullptr, 0, "Render thread");
-#endif
         Foundation::CommandBuffer::Command cmd(RendererCommandType::RendererInit);
         m_preCommandQueue.write(cmd);
         m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE);
@@ -49,12 +41,15 @@ struct Context {
         m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE);
         m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
         frame();
-        MIREN_LOG("MIREN INIT END");
+        // Вызвано из главного потока: можно стартовать поток отрисовки.
+#ifdef PLATFORM_DESKTOP
+        m_thread.init(renderThread, nullptr, 0, "Render thread");
+#endif
+        m_rendererSemaphore.post();
     }
 
     // Должно быть вызвано из главного потока и не из цикла обновления.
-    void shutdown() {
-        MIREN_LOG("MIREN SHUTDOWN BEGIN");
+    ~Context() {
         destroyTransientVertexBuffer(m_submit->m_transientVb);
         destroyTransientIndexBuffer(m_submit->m_transientIb);
         frame();
@@ -65,7 +60,6 @@ struct Context {
         m_postCommandQueue.write(cmd);
         m_rendererSemaphore.post();
         m_thread.shutdown();
-        MIREN_LOG("MIREN SHUTDOWN END");
     }
 
     static int32_t renderThread(Foundation::Thread *_thread, void *_userData) {
@@ -187,7 +181,7 @@ struct Context {
         Foundation::CommandBuffer::Command *command = m_preCommandQueue.read();
         if (command != nullptr) {
             CMDBUF_LOG("RENDERER INIT COMMAND");
-            ASSERT(command->type == RendererCommandType::RendererInit, "First command should be RendererInit");
+            PND_ASSERT(command->type == RendererCommandType::RendererInit, "First command should be RendererInit");
             m_renderer = NEW(Foundation::getAllocator(), RendererOpenGL);
         }
     }

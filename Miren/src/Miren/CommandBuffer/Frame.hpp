@@ -27,7 +27,6 @@ public:
     void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
     void setTexture(TextureHandle textureHandle, uint32_t slot);
     void submitCurrentDrawCall();
-    TransientVertexBuffer *createTransientVertexBuffer(uint32_t size, VertexBufferLayoutData *layout);
     uint32_t getDrawCallsCount();
     RenderDraw *getDrawCalls();
     void reset();

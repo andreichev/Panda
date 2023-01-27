@@ -3,6 +3,7 @@
 //
 
 #include "OpenGLShader.hpp"
+#include "Miren/Base.hpp"
 #include "Miren/PlatformData.hpp"
 
 #include <Foundation/Assert.hpp>
@@ -26,7 +27,7 @@ OpenGLShader::OpenGLShader()
 
 void OpenGLShader::create(const char *vertexPath, const char *fragmentPath) {
     // 1. retrieve the vertex/fragment source code from filePath
-    ASSERT(m_id == -1, "PROGRAM ALREADY CREATED");
+    PND_ASSERT(m_id == -1, "PROGRAM ALREADY CREATED");
     std::string vertexCode;
     std::string fragmentCode;
     std::ifstream vShaderFile;
@@ -48,7 +49,7 @@ void OpenGLShader::create(const char *vertexPath, const char *fragmentPath) {
         // convert stream into string
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
-    } catch (std::ifstream::failure &e) { ASSERT(false, "SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath); }
+    } catch (std::ifstream::failure &e) { PND_ASSERT(false, "SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath); }
     const char *vShaderCode = vertexCode.c_str();
     const char *fShaderCode = fragmentCode.c_str();
     // 2. compile shaders
@@ -77,7 +78,7 @@ void OpenGLShader::create(const char *vertexPath, const char *fragmentPath) {
 }
 
 void OpenGLShader::terminate() {
-    ASSERT(m_id != -1, "PROGRAM ALREADY DELETED");
+    PND_ASSERT(m_id != -1, "PROGRAM ALREADY DELETED");
     glDeleteProgram(m_id);
     m_id = -1;
 }
@@ -89,13 +90,13 @@ void OpenGLShader::checkCompileErrors(unsigned int shader, const std::string &ty
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            ASSERT(false, "SHADER_COMPILATION_ERROR of type: {}\n{}", type, infoLog);
+            PND_ASSERT(false, "SHADER_COMPILATION_ERROR of type: {}\n{}", type, infoLog);
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            ASSERT(false, "PROGRAM_LINKING_ERROR of type: {}\n{}", type, infoLog);
+            PND_ASSERT(false, "PROGRAM_LINKING_ERROR of type: {}\n{}", type, infoLog);
         }
     }
 }
@@ -104,7 +105,7 @@ int OpenGLShader::getUniformLocation(const std::string &name) {
         return m_uniformLocationCache[name];
     }
     int location = glGetUniformLocation(m_id, name.c_str());
-    ASSERT(location != -1, "SHADER UNIFORM {} not found", name);
+    PND_ASSERT(location != -1, "SHADER UNIFORM {} not found", name);
     m_uniformLocationCache[name] = location;
     return location;
 }
@@ -113,7 +114,7 @@ void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseV
     intptr_t pointer = baseVertex;
     for (int i = 0; i < layout.m_elementsCount; i++) {
         glEnableVertexAttribArray(i);
-        glVertexAttribDivisor(i, 0);
+        // glVertexAttribDivisor(i, 0);
         int type;
         switch (layout.m_elements[i].type) {
             case BufferElementType::Float:
@@ -126,7 +127,7 @@ void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseV
                 type = GL_UNSIGNED_BYTE;
                 break;
             default:
-                ASSERT(false, "Buffer element type is undefined");
+                PND_ASSERT(false, "Buffer element type is undefined");
                 break;
         }
         glVertexAttribPointer(i, layout.m_elements[i].count, type, layout.m_elements[i].normalized ? GL_TRUE : GL_FALSE, layout.m_stride,

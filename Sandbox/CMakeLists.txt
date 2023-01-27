@@ -46,6 +46,11 @@ set_target_properties(Sandbox
     RUNTIME_OUTPUT_DIRECTORY ${BIN_DIRECTORY}
 )
 
+set_target_properties(Sandbox
+    PROPERTIES 
+    VS_DEBUGGER_WORKING_DIRECTORY ${BIN_DIRECTORY}
+)
+
 # Dependencies - Foundation
 target_link_libraries(Sandbox Foundation)
 target_include_directories(Sandbox PRIVATE ${FOUNDATION_DIRECTORY}/include)
