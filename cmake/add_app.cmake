@@ -11,7 +11,8 @@ function(add_app APP_NAME SOURCE INCLUDE RESOURCE_FOLDERS)
             MACOSX_PACKAGE_LOCATION "Resources"
             )
 
-    source_group("src" FILES ${SOURCE} ${INCLUDE})
+    # source_group("headers" FILES ${INCLUDE})
+    # source_group("src" FILES ${SOURCE})
     source_group("assets" FILES ${ASSETS})
 
     if (PLATFORM_WIN32 OR PLATFORM_LINUX)
