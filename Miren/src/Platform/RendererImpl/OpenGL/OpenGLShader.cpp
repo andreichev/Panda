@@ -49,7 +49,7 @@ void OpenGLShader::create(const char *vertexPath, const char *fragmentPath) {
         // convert stream into string
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
-    } catch (std::ifstream::failure &e) { PND_ASSERT(false, "SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath); }
+    } catch (std::ifstream::failure &e) { PND_ASSERT_F(false, "SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath); }
     const char *vShaderCode = vertexCode.c_str();
     const char *fShaderCode = fragmentCode.c_str();
     // 2. compile shaders
@@ -90,13 +90,13 @@ void OpenGLShader::checkCompileErrors(unsigned int shader, const std::string &ty
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            PND_ASSERT(false, "SHADER_COMPILATION_ERROR of type: {}\n{}", type, infoLog);
+            PND_ASSERT_F(false, "SHADER_COMPILATION_ERROR of type: {}\n{}", type, infoLog);
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            PND_ASSERT(false, "PROGRAM_LINKING_ERROR of type: {}\n{}", type, infoLog);
+            PND_ASSERT_F(false, "PROGRAM_LINKING_ERROR of type: {}\n{}", type, infoLog);
         }
     }
 }
@@ -105,7 +105,7 @@ int OpenGLShader::getUniformLocation(const std::string &name) {
         return m_uniformLocationCache[name];
     }
     int location = glGetUniformLocation(m_id, name.c_str());
-    PND_ASSERT(location != -1, "SHADER UNIFORM {} not found", name);
+    PND_ASSERT_F(location != -1, "SHADER UNIFORM {} not found", name);
     m_uniformLocationCache[name] = location;
     return location;
 }

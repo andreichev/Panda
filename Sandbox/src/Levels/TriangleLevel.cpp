@@ -35,7 +35,7 @@ void TriangleLevel::start(Panda::World *world) {
     float leftEdge = -0.5f;
     float bottomEdge = -0.5f;
     float *data = new float[8]{rightEdge, topEdge, leftEdge, topEdge, leftEdge, bottomEdge, rightEdge, bottomEdge};
-    uint32_t *indices = new uint32_t[6] {0, 1, 2, 0, 2, 3};
+    uint32_t *indices = new uint32_t[6]{0, 1, 2, 0, 2, 3};
 
     VertexBufferLayoutData layoutData;
     layoutData.pushFloat(2);

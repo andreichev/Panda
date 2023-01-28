@@ -32,11 +32,11 @@ struct SemaphoreInternal {
 #if defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
 
 Semaphore::Semaphore() {
-    STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
+    PND_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
 
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
     si->m_handle = dispatch_semaphore_create(0);
-    ASSERT(NULL != si->m_handle, "dispatch_semaphore_create failed.");
+    PND_ASSERT(NULL != si->m_handle, "dispatch_semaphore_create failed.");
 }
 
 Semaphore::~Semaphore() {

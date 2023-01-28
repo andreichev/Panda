@@ -67,7 +67,7 @@ Thread::~Thread() {
 }
 
 bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char *_name) {
-    PND_ASSERT(m_running == false, "Already running!", _name);
+    PND_ASSERT(m_running == false, "Already running!");
 
     m_fn = _fn;
     m_userData = _userData;
@@ -118,7 +118,7 @@ bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char
 }
 
 void Thread::shutdown() {
-    PND_ASSERT(m_running, "Not running!", m_running);
+    PND_ASSERT(m_running, "Not running!");
     ThreadInternal *ti = (ThreadInternal *)m_internal;
 
 #ifdef PLATFORM_WINDOWS

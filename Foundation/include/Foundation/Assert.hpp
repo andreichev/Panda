@@ -8,12 +8,12 @@ namespace Foundation {
 
 #define PND_ASSERT(_condition, _message)                                                                                                   \
     if (_condition == false) {                                                                                                             \
-        LOG_CRITICAL("CHECK " _message);                                                                                     \
+        LOG_CRITICAL("CHECK " _message);                                                                                                   \
         assert(false);                                                                                                                     \
     }
 
-#define PND_ASSERT_F(_condition, _format, ...)                                                                               \
-    if (_condition == false) {                                                                                                 \
+#define PND_ASSERT_F(_condition, _format, ...)                                                                                             \
+    if (_condition == false) {                                                                                                             \
         LOG_CRITICAL("CHECK " _format, ##__VA_ARGS__);                                                                                     \
         assert(false);                                                                                                                     \
     }
