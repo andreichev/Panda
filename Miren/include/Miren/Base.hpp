@@ -55,23 +55,6 @@ struct TransientVertexBuffer {
     VertexBufferHandle handle;
 };
 
-struct DynamicVertexBuffer {
-    VertexBufferHandle m_handle;
-    uint32_t m_offset;
-    uint32_t m_size;
-    uint32_t m_startVertex;
-    uint32_t m_numVertices;
-    uint16_t m_stride;
-    VertexLayoutHandle m_layoutHandle;
-};
-
-struct DynamicIndexBuffer {
-    IndexBufferHandle m_handle;
-    uint32_t m_offset;
-    uint32_t m_size;
-    uint32_t m_startIndex;
-};
-
 struct Size {
     int width;
     int height;

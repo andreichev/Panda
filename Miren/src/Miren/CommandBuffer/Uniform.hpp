@@ -16,7 +16,7 @@ struct Uniform {
     static uint32_t getSizeOfType(UniformDataType type) {
         switch (type) {
             case UniformDataType::Int:
-                return 4;
+                return sizeof(int);
             case UniformDataType::Mat4:
                 return sizeof(float) * 16;
         }

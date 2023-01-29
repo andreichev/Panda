@@ -56,7 +56,3 @@ void CameraMove::update(double deltaTime) {
         cursorStarted = false;
     }
 }
-
-void CameraMove::onImGuiRender() {
-    ImGui::ShowDemoWindow();
-}

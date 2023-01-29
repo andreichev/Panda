@@ -67,12 +67,10 @@ struct RenderDraw {
     }
 
     bool m_isSubmitted;
-    // Отрисовка по индексам или примитив
     bool m_isIndexed;
     uint32_t m_numIndices;
     intptr_t m_indicesOffset;
     intptr_t m_verticesOffset;
-    // Если примитивы, а не индексы - их количество
     uint32_t m_numElemets;
     ShaderHandle m_shader;
     IndexBufferHandle m_indexBuffer;

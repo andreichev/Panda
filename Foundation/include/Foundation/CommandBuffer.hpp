@@ -86,6 +86,7 @@ private:
     void write(const void *_data, uint32_t _size) {
         memcpy(&m_data[m_pos], _data, _size);
         m_pos += _size;
+        PND_ASSERT(m_pos < m_size, "NEED MORE SPACE FOR BUFFER");
     }
 
     void *read(uint32_t _size) {
