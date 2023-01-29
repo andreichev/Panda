@@ -28,8 +28,9 @@ void ImGuiLayer::onAttach() {
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-    float fontSize = 16.0f; // *2.0f;
-    std::string fontPath = Miren::PlatformData::get()->getResourcesPath() + "fonts/ProggyTiny.ttf";
+    float fontSize = 18.0f;
+    std::string fontPath = Miren::PlatformData::get()->getResourcesPath() + "fonts/Cousine-Regular.ttf";
+    // std::string fontPath = Miren::PlatformData::get()->getResourcesPath() + "fonts/ProggyClean.ttf";
     io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize);
     // Setup Dear ImGui style
     // ImGui::StyleColorsDark();

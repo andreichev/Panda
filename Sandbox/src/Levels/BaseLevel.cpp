@@ -34,8 +34,6 @@ void BaseLevel::start(Panda::World *world) {
     Foundation::Shared<FullScreenToggle> fullScreenToggle = Foundation::makeShared<FullScreenToggle>();
     cameraEntity->addComponent(fullScreenToggle);
 
-    Foundation::Shared<Panda::UIView> view = Foundation::makeShared<Panda::UIView>(Panda::Rect(50, 400, 100, 200));
-    world->getUIView()->addSubview(view);
     world->getUIView()->addSubview(Foundation::makeShared<UICrosshair>());
 
     Foundation::Shared<Panda::Entity> chunkEntity = world->instantiateEntity();

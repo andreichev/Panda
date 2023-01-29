@@ -17,7 +17,7 @@ UIView::UIView(Rect frame)
     : window(Application::get()->getWindow())
     , frame(frame) {
     float *data = new float[12];
-    shaderHandle = Miren::createShader("shaders/ui/uiview/uiview_vertex.glsl", "shaders/ui/uiview/uiview_fragment.glsl");
+    shaderHandle = Miren::createShader("shaders/ui/uiview_vertex.glsl", "shaders/ui/uiview_fragment.glsl");
     Miren::VertexBufferLayoutData layoutData;
     layoutData.pushFloat(2);
     Miren::VertexLayoutHandle vertexLayout = Miren::createVertexLayout(layoutData);
