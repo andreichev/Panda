@@ -8,10 +8,10 @@
 
 namespace Panda {
 
-class UIKitWindow : public Window {
+class PandaWindowIOSImpl : public Window {
 public:
-    UIKitWindow();
-    ~UIKitWindow() override = default;
+    PandaWindowIOSImpl();
+    ~PandaWindowIOSImpl() override = default;
     bool isFullScreen() override;
     void setFullScreen(bool isFullScreen) override;
     void pollEvents() override;
@@ -19,9 +19,11 @@ public:
     bool isCursorLocked() override;
     void setEventQueue(EventQueue *eventQueue) override;
     Size getSize() override;
+    Size getDpi() override;
 
 private:
-    Size size;
+    Size m_size;
+    Size m_dpi;
 };
 
 } // namespace Panda

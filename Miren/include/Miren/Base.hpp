@@ -6,15 +6,15 @@
 #include <cstdlib>
 
 #if MIREN_LOG_ENABLED == 1
-#    define MIREN_LOG(x) LOG_INFO(x)
+#    define MIREN_LOG(...) LOG_INFO(__VA_ARGS__)
 #else
-#    define MIREN_LOG(x)
+#    define MIREN_LOG(...)
 #endif
 
 #if MIREN_CMDBUF_LOG_ENABLED == 1
-#    define CMDBUF_LOG(x) LOG_INFO(x)
+#    define CMDBUF_LOG(...) LOG_INFO(__VA_ARGS__)
 #else
-#    define CMDBUF_LOG(x)
+#    define CMDBUF_LOG(...)
 #endif
 
 namespace Miren {

@@ -11,8 +11,8 @@ static const int CONTEXT_ALIGNMENT = 64;
 
 void initialize() {
     MIREN_LOG("MIREN INIT BEGIN");
-    LOG_INFO("ALLOCATING MIREN CONTEXT, {} BYTES", sizeof(Context));
-    LOG_INFO("FRAME DATA SIZE: {} BYTES", sizeof(Frame));
+    MIREN_LOG("ALLOCATING MIREN CONTEXT, {} BYTES", sizeof(Context));
+    MIREN_LOG("FRAME DATA SIZE: {} BYTES", sizeof(Frame));
     s_context = ALIGNED_NEW(Foundation::getAllocator(), Context, CONTEXT_ALIGNMENT);
     MIREN_LOG("MIREN INIT END");
 }

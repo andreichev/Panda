@@ -5,8 +5,8 @@
 //  Created by Admin on 02.08.2021.
 //
 
-#include "Panda/Application/PlatformData.hpp"
-#include "Panda/Renderer/Miren.hpp"
+#include <Miren/PlatformData.hpp>
+#include <Miren/Miren.hpp>
 
 #import <OpenGLES/ES3/gl.h>
 #import "WonderView.hpp"
@@ -25,7 +25,7 @@
 }
 
 - (instancetype)deinit {
-    Panda::Miren::terminate();
+    Miren::terminate();
 }
 
 - (void)commonInit {
@@ -40,9 +40,9 @@
     CGFloat width = self.frame.size.width * scale;
     CGFloat height = self.frame.size.height * scale;
     printf("UIView initialized, width: %f, height: %f\n", width, height);
-    Panda::PlatformData::get()->layer = self.layer;
-    Panda::PlatformData::get()->nativeWindowHandle = self;
-    Panda::Miren::initialize();
+    Miren::PlatformData::get()->layer = self.layer;
+    Miren::PlatformData::get()->nativeWindowHandle = self;
+    Miren::initialize();
 }
 
 // MARK: - OpenGL stuff
@@ -60,7 +60,7 @@
 }
 
 -(void) displayRefreshed:(CADisplayLink*)displayLink {
-    Panda::Miren::renderFrame();
+    Miren::renderFrame();
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -68,8 +68,8 @@
     if (_eventQueue == NULL) { return; }
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:self];
-    touchLocation.x *= self.contentScaleFactor;
-    touchLocation.y *= self.contentScaleFactor;
+    // touchLocation.x *= self.contentScaleFactor;
+    // touchLocation.y *= self.contentScaleFactor;
     _eventQueue->postMouseEvent(touchLocation.x, touchLocation.y);
     _eventQueue->postMouseButtonEvent(Panda::MouseButton::LEFT, true);
 }
@@ -79,9 +79,10 @@
     if (_eventQueue == NULL) { return; }
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:self];
-    touchLocation.x *= self.contentScaleFactor;
-    touchLocation.y *= self.contentScaleFactor;
-    // TODO: Post mouse released event
+    // touchLocation.x *= self.contentScaleFactor;
+    // touchLocation.y *= self.contentScaleFactor;
+    _eventQueue->postMouseEvent(touchLocation.x, touchLocation.y);
+    _eventQueue->postMouseButtonEvent(Panda::MouseButton::LEFT, false);
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -89,8 +90,8 @@
     if (_eventQueue == NULL) { return; }
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:self];
-    touchLocation.x *= self.contentScaleFactor;
-    touchLocation.y *= self.contentScaleFactor;
+    // touchLocation.x *= self.contentScaleFactor;
+    // touchLocation.y *= self.contentScaleFactor;
 
     _eventQueue->postMouseEvent(touchLocation.x, touchLocation.y);
 }
@@ -100,8 +101,8 @@
     if (_eventQueue == NULL) { return; }
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:self];
-    touchLocation.x *= self.contentScaleFactor;
-    touchLocation.y *= self.contentScaleFactor;
+    // touchLocation.x *= self.contentScaleFactor;
+    // touchLocation.y *= self.contentScaleFactor;
     // TODO: Post mouse released event
 }
 

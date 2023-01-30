@@ -11,7 +11,7 @@
 #ifdef PLATFORM_DESKTOP
 #    include "Platform/WindowImpl/GlfwWindow/GlfwWindow.hpp"
 #elif defined(PLATFORM_IOS)
-#    include "Platform/WindowImpl/UIKitWindow/UIKitWindow.hpp"
+#    include "Platform/WindowImpl/UIKitWindow/PandaWindowIOSImpl.hpp"
 #endif
 
 namespace Panda {
@@ -20,7 +20,7 @@ Window *createWindow(ApplicationStartupSettings &settings) {
 #ifdef PLATFORM_DESKTOP
     return NEW(Foundation::getAllocator(), GlfwWindow)(settings.windowTitle, settings.windowSize, settings.isFullScreen);
 #elif defined(PLATFORM_IOS)
-    return NEW(Foundation::getAllocator(), UIKitWindow);
+    return NEW(Foundation::getAllocator(), PandaWindowIOSImpl);
 #else
 #    error "Unknown platform"
 #endif
