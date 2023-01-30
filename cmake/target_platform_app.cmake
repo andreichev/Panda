@@ -38,7 +38,7 @@ elseif(PLATFORM_MACOS)
         set_target_properties(${TARGET_NAME} PROPERTIES
                 XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.md.${TARGET_NAME}"
                 MACOSX_BUNDLE_INFO_PLIST "${PROJECT_SOURCE_DIR}/native/OSX/Info.plist"
-                XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${PROJECT_SOURCE_DIR}/native/OSX/EnhancedForest.entitlements"
+                # XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${PROJECT_SOURCE_DIR}/native/OSX/Panda.entitlements"
                 XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
                 RESOURCE "${ASSETS}"
                 )
