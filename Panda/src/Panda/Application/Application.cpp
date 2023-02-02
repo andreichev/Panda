@@ -143,6 +143,7 @@ void Application::addWindowSizeListener(WindowSizeListener *listener) {
 }
 
 void Application::windowSizeChanged(Size size) {
+    Miren::setViewport(Miren::Rect(0, 0, size.width, size.height));
     for (auto &listener : m_windowSizeListeners) {
         listener->windowSizeChanged(size);
     }

@@ -35,6 +35,7 @@ public:
     TransientVertexBuffer m_transientVb;
     uint32_t m_transientVbSize;
     uint32_t m_transientIbSize;
+    Rect m_viewport;
 
 private:
     int m_drawCallsCount;

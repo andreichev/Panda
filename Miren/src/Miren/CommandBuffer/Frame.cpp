@@ -87,6 +87,7 @@ void Frame::reset() {
     m_drawCallsCount = 0;
     m_transientVbSize = 0;
     m_transientIbSize = 0;
+    m_viewport = Rect::zero();
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.reset();
 }

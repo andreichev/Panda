@@ -412,6 +412,10 @@ struct Context {
         m_submit->reset();
     }
 
+    void setViewport(Rect& rect) {
+        m_submit->m_viewport = rect;
+    }
+
 private:
     Foundation::Thread m_thread;
     RendererI *m_renderer;

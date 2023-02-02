@@ -156,6 +156,9 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
 }
 
 void RendererOpenGL::submit(Frame *frame) {
+    if (frame->m_viewport.isZero() == false) {
+        glViewport(frame->m_viewport.origin.x, frame->m_viewport.origin.y, frame->m_viewport.size.width, frame->m_viewport.size.height);
+    }
     if (frame->m_transientVbSize > 0) {
         vertexBuffers[frame->m_transientVb.handle].update(frame->m_transientVb.data, frame->m_transientVbSize);
     }

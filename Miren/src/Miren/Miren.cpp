@@ -100,6 +100,10 @@ void frame() {
     s_context->frame();
 }
 
+void setViewport(Rect &rect) {
+    s_context->setViewport(rect);
+}
+
 void setState(uint32_t state) {
     s_context->setState(state);
 }

@@ -40,6 +40,7 @@ void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, size_t count);
 void setVertexLayout(VertexLayoutHandle handle);
 void setShader(ShaderHandle handle);
 void setTexture(TextureHandle textureHandle, uint32_t slot);
+void setViewport(Rect& rect);
 /// Submit draw call
 void submit();
 /// Submit not indexed triangles draw call
