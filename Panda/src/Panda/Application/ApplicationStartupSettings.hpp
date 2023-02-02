@@ -26,7 +26,11 @@ public:
         , isFullScreen(false)
         , startupLevel(nullptr) {}
 
-    ApplicationStartupSettings(const char *name, const char *windowTitle, const Size &windowSize, bool isFullScreen, Level *startupLevel)
+    ApplicationStartupSettings(const char *name,
+        const char *windowTitle,
+        const Size &windowSize,
+        bool isFullScreen,
+        Level *startupLevel)
         : name(name)
         , windowTitle(windowTitle)
         , windowSize(windowSize)

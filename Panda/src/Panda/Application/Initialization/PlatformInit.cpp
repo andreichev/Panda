@@ -18,7 +18,8 @@ namespace Panda {
 
 Window *createWindow(ApplicationStartupSettings &settings) {
 #ifdef PLATFORM_DESKTOP
-    return NEW(Foundation::getAllocator(), GlfwWindow)(settings.windowTitle, settings.windowSize, settings.isFullScreen);
+    return NEW(Foundation::getAllocator(), GlfwWindow)(
+        settings.windowTitle, settings.windowSize, settings.isFullScreen);
 #elif defined(PLATFORM_IOS)
     return NEW(Foundation::getAllocator(), PandaWindowIOSImpl);
 #else

@@ -18,16 +18,19 @@ TextureHandle createTextureFromFile(const char *path);
 TextureHandle createTextureFromPixels(void *pixels, int width, int height);
 void deleteTexture(TextureHandle handle);
 IndexBufferHandle createIndexBuffer(void *indices, BufferElementType elementType, size_t count);
-IndexBufferHandle createDynamicIndexBuffer(void *indices, BufferElementType elementType, size_t count);
+IndexBufferHandle createDynamicIndexBuffer(
+    void *indices, BufferElementType elementType, size_t count);
 void updateDynamicIndexBuffer(IndexBufferHandle, void *indices, size_t count);
 void deleteIndexBuffer(IndexBufferHandle handle);
 // Only next frame vertex buffer
 void allocTransientVertexBuffer(TransientVertexBuffer *buffer, uint32_t size);
 // Only next frame index buffer
-void allocTransientIndexBuffer(TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType);
+void allocTransientIndexBuffer(
+    TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType);
 VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data);
 VertexBufferHandle createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle);
-VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE);
+VertexBufferHandle createDynamicVertexBuffer(
+    void *data, uint32_t size, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE);
 void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size);
 void deleteVertexBuffer(VertexBufferHandle handle);
 void deleteVertexLayout(VertexLayoutHandle handle);
@@ -40,7 +43,7 @@ void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, size_t count);
 void setVertexLayout(VertexLayoutHandle handle);
 void setShader(ShaderHandle handle);
 void setTexture(TextureHandle textureHandle, uint32_t slot);
-void setViewport(Rect& rect);
+void setViewport(Rect &rect);
 /// Submit draw call
 void submit();
 /// Submit not indexed triangles draw call

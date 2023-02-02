@@ -89,7 +89,8 @@ struct CreateIndexBufferCommand : Foundation::CommandBuffer::Command {
     BufferElementType elementType;
     size_t count;
 
-    CreateIndexBufferCommand(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count)
+    CreateIndexBufferCommand(
+        IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count)
         : Command(RendererCommandType::CreateIndexBuffer)
         , handle(handle)
         , indices(indices)
@@ -103,7 +104,8 @@ struct CreateDynamicIndexBufferCommand : Foundation::CommandBuffer::Command {
     BufferElementType elementType;
     size_t count;
 
-    CreateDynamicIndexBufferCommand(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count)
+    CreateDynamicIndexBufferCommand(
+        IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count)
         : Command(RendererCommandType::CreateDynamicIndexBuffer)
         , handle(handle)
         , indices(indices)
@@ -137,7 +139,8 @@ struct CreateVertexBufferCommand : Foundation::CommandBuffer::Command {
     void *data;
     uint32_t size;
 
-    CreateVertexBufferCommand(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle)
+    CreateVertexBufferCommand(
+        VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle)
         : Command(RendererCommandType::CreateVertexBuffer)
         , handle(handle)
         , layoutHandle(layoutHandle)
@@ -151,7 +154,8 @@ struct CreateDynamicVertexBufferCommand : Foundation::CommandBuffer::Command {
     void *data;
     uint32_t size;
 
-    CreateDynamicVertexBufferCommand(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle)
+    CreateDynamicVertexBufferCommand(
+        VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle)
         : Command(RendererCommandType::CreateDynamicVertexBuffer)
         , handle(handle)
         , layoutHandle(layoutHandle)

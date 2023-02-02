@@ -49,7 +49,9 @@ void OpenGLShader::create(const char *vertexPath, const char *fragmentPath) {
         // convert stream into string
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
-    } catch (std::ifstream::failure &e) { PND_ASSERT_F(false, "SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath); }
+    } catch (std::ifstream::failure &e) {
+        PND_ASSERT_F(false, "SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath);
+    }
     const char *vShaderCode = vertexCode.c_str();
     const char *fShaderCode = fragmentCode.c_str();
     // 2. compile shaders
@@ -130,9 +132,14 @@ void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseV
                 PND_ASSERT(false, "Buffer element type is undefined");
                 break;
         }
-        glVertexAttribPointer(i, layout.m_elements[i].count, type, layout.m_elements[i].normalized ? GL_TRUE : GL_FALSE, layout.m_stride,
+        glVertexAttribPointer(i,
+            layout.m_elements[i].count,
+            type,
+            layout.m_elements[i].normalized ? GL_TRUE : GL_FALSE,
+            layout.m_stride,
             (const void *)pointer);
-        pointer += layout.m_elements[i].count * VertexBufferElement::getSizeOfType(layout.m_elements[i].type);
+        pointer += layout.m_elements[i].count *
+                   VertexBufferElement::getSizeOfType(layout.m_elements[i].type);
     }
 }
 

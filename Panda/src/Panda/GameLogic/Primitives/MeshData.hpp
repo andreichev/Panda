@@ -13,7 +13,10 @@ struct MeshData {
     unsigned int *indices;
     unsigned int indicesCount;
 
-    MeshData(Miren::Vertex *vertices, unsigned int verticesCount, unsigned int *indices, unsigned int indicesCount)
+    MeshData(Miren::Vertex *vertices,
+        unsigned int verticesCount,
+        unsigned int *indices,
+        unsigned int indicesCount)
         : vertices(vertices)
         , verticesCount(verticesCount)
         , indices(indices)

@@ -40,6 +40,7 @@
 #    define PLATFORM_DESKTOP
 #endif
 
-#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_LINUX) || defined(PLATFORM_MACOS)
+#if defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_LINUX) ||               \
+    defined(PLATFORM_MACOS)
 #    define PLATFORM_POSIX
 #endif

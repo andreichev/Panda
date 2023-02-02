@@ -67,7 +67,8 @@ void RendererOpenGL::flip() {
     context->flip();
 }
 
-void RendererOpenGL::createShader(ShaderHandle handle, const char *vertexPath, const char *fragmentPath) {
+void RendererOpenGL::createShader(
+    ShaderHandle handle, const char *vertexPath, const char *fragmentPath) {
     shaders[handle].create(vertexPath, fragmentPath);
 }
 
@@ -79,7 +80,8 @@ void RendererOpenGL::createTextureFromFile(TextureHandle handle, const char *pat
     textures[handle].create(path);
 }
 
-void RendererOpenGL::createRGBATextureFromPixels(TextureHandle handle, void *pixels, int width, int height) {
+void RendererOpenGL::createRGBATextureFromPixels(
+    TextureHandle handle, void *pixels, int width, int height) {
     textures[handle].create(pixels, width, height);
     FREE(Foundation::getAllocator(), pixels);
 }
@@ -88,17 +90,20 @@ void RendererOpenGL::deleteTexture(TextureHandle handle) {
     textures[handle].terminate();
 }
 
-void RendererOpenGL::createIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
+void RendererOpenGL::createIndexBuffer(
+    IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
     indexBuffers[handle].create(indices, elementType, count, false);
     FREE(Foundation::getAllocator(), indices);
 }
 
-void RendererOpenGL::createDynamicIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
+void RendererOpenGL::createDynamicIndexBuffer(
+    IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
     indexBuffers[handle].create(indices, elementType, count, true);
     FREE(Foundation::getAllocator(), indices);
 }
 
-void RendererOpenGL::updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) {
+void RendererOpenGL::updateDynamicIndexBuffer(
+    IndexBufferHandle handle, void *indices, size_t count) {
     indexBuffers[handle].update(indices, count);
     if (indices != nullptr) {
         FREE(Foundation::getAllocator(), indices);
@@ -109,13 +114,15 @@ void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
     indexBuffers[handle].terminate();
 }
 
-void RendererOpenGL::createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+void RendererOpenGL::createVertexBuffer(
+    VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     vertexBuffers[handle].create(data, size, false);
     vertexBuffers[handle].setLayoutHandle(layoutHandle);
     FREE(Foundation::getAllocator(), data);
 }
 
-void RendererOpenGL::createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+void RendererOpenGL::createDynamicVertexBuffer(
+    VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     vertexBuffers[handle].create(data, size, true);
     vertexBuffers[handle].setLayoutHandle(layoutHandle);
     if (data != nullptr) {
@@ -123,7 +130,8 @@ void RendererOpenGL::createDynamicVertexBuffer(VertexBufferHandle handle, void *
     }
 }
 
-void RendererOpenGL::updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
+void RendererOpenGL::updateDynamicVertexBuffer(
+    VertexBufferHandle handle, void *data, uint32_t size) {
     vertexBuffers[handle].update(data, size);
     FREE(Foundation::getAllocator(), data);
 }
@@ -142,7 +150,8 @@ void RendererOpenGL::setUniform(const Uniform &uniform) {
     shaders[uniform.handle].bind();
     switch (uniform.type) {
         case UniformDataType::Mat4:
-            shaders[uniform.handle].setUniformMat4(uniform.name, static_cast<float *>(uniform.value));
+            shaders[uniform.handle].setUniformMat4(
+                uniform.name, static_cast<float *>(uniform.value));
             return;
         case UniformDataType::Int:
             shaders[uniform.handle].setUniformInt(uniform.name, (int)(intptr_t)uniform.value);
@@ -157,13 +166,18 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
 
 void RendererOpenGL::submit(Frame *frame) {
     if (frame->m_viewport.isZero() == false) {
-        glViewport(frame->m_viewport.origin.x, frame->m_viewport.origin.y, frame->m_viewport.size.width, frame->m_viewport.size.height);
+        glViewport(frame->m_viewport.origin.x,
+            frame->m_viewport.origin.y,
+            frame->m_viewport.size.width,
+            frame->m_viewport.size.height);
     }
     if (frame->m_transientVbSize > 0) {
-        vertexBuffers[frame->m_transientVb.handle].update(frame->m_transientVb.data, frame->m_transientVbSize);
+        vertexBuffers[frame->m_transientVb.handle].update(
+            frame->m_transientVb.data, frame->m_transientVbSize);
     }
     if (frame->m_transientIbSize > 0) {
-        indexBuffers[frame->m_transientIb.handle].update(frame->m_transientIb.data, frame->m_transientIbSize / 2);
+        indexBuffers[frame->m_transientIb.handle].update(
+            frame->m_transientIb.data, frame->m_transientIbSize / 2);
     }
     for (int i = 0; i < frame->getDrawCallsCount(); i++) {
         RenderDraw &draw = frame->getDrawCalls()[i];
@@ -196,14 +210,17 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     }
     if (draw->m_scissorRect.isZero() == false) {
         glEnable(GL_SCISSOR_TEST);
-        glScissor((int)draw->m_scissorRect.origin.x, (int)draw->m_scissorRect.origin.y, (int)draw->m_scissorRect.size.width,
+        glScissor((int)draw->m_scissorRect.origin.x,
+            (int)draw->m_scissorRect.origin.y,
+            (int)draw->m_scissorRect.size.width,
             (int)draw->m_scissorRect.size.height);
     } else {
         glDisable(GL_SCISSOR_TEST);
     }
     vertexBuffers[draw->m_vertexBuffer].bind();
-    VertexLayoutHandle layoutHandle =
-        draw->m_vertexLayout != MIREN_INVALID_HANDLE ? draw->m_vertexLayout : vertexBuffers[draw->m_vertexBuffer].getLayoutHandle();
+    VertexLayoutHandle layoutHandle = draw->m_vertexLayout != MIREN_INVALID_HANDLE
+                                          ? draw->m_vertexLayout
+                                          : vertexBuffers[draw->m_vertexBuffer].getLayoutHandle();
     PND_ASSERT(layoutHandle != MIREN_INVALID_HANDLE, "Invalid handle");
     VertexBufferLayoutData &layout = vertexLayouts[layoutHandle];
     glBindVertexArray(m_vao);
@@ -211,7 +228,10 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     shaders[draw->m_shader].bindAttributes(layout, draw->m_verticesOffset);
     if (draw->m_isIndexed) {
         indexBuffers[draw->m_indexBuffer].bind();
-        glDrawElements(GL_TRIANGLES, draw->m_numIndices, indexBuffers[draw->m_indexBuffer].getElementType(), (void *)draw->m_indicesOffset);
+        glDrawElements(GL_TRIANGLES,
+            draw->m_numIndices,
+            indexBuffers[draw->m_indexBuffer].getElementType(),
+            (void *)draw->m_indicesOffset);
         indexBuffers[draw->m_indexBuffer].unbind();
     } else {
         // TODO: Add offset value

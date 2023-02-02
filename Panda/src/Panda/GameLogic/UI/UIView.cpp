@@ -17,7 +17,8 @@ UIView::UIView(Rect frame)
     : window(Application::get()->getWindow())
     , frame(frame) {
     float *data = new float[12];
-    shaderHandle = Miren::createShader("shaders/ui/uiview_vertex.glsl", "shaders/ui/uiview_fragment.glsl");
+    shaderHandle =
+        Miren::createShader("shaders/ui/uiview_vertex.glsl", "shaders/ui/uiview_fragment.glsl");
     Miren::VertexBufferLayoutData layoutData;
     layoutData.pushFloat(2);
     Miren::VertexLayoutHandle vertexLayout = Miren::createVertexLayout(layoutData);
@@ -54,8 +55,18 @@ void UIView::layout() {
     float rightEdge = (frame.origin.x + frame.size.width) / windowSize.width;
     float topEdge = 1.f - frame.origin.y / windowSize.height;
     float bottomEdge = 1.f - (frame.origin.y + frame.size.height) / windowSize.height;
-    float *data = new float[12]{
-        rightEdge, topEdge, leftEdge, topEdge, leftEdge, bottomEdge, rightEdge, topEdge, leftEdge, bottomEdge, rightEdge, bottomEdge};
+    float *data = new float[12]{rightEdge,
+        topEdge,
+        leftEdge,
+        topEdge,
+        leftEdge,
+        bottomEdge,
+        rightEdge,
+        topEdge,
+        leftEdge,
+        bottomEdge,
+        rightEdge,
+        bottomEdge};
     for (int i = 0; i < 12; i++) {
         data[i] = data[i] * 2 - 1;
     }

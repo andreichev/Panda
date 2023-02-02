@@ -46,7 +46,8 @@ void CameraMove::update(double deltaTime) {
             deltaY = 0;
         }
         // DeltaX - смещение мыши за реальное время, поэтому умножение на deltaTime не требуется.
-        // Действия в реальном мире не нужно умножать на deltaTime, умножать нужно только действия в игровом мире.
+        // Действия в реальном мире не нужно умножать на deltaTime, умножать нужно только действия в
+        // игровом мире.
         transform->rotate(deltaY * mouseSpeed, deltaX * mouseSpeed, 0.f);
         lastMouseX = mouseX;
         lastMouseY = mouseY;

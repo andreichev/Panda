@@ -29,12 +29,14 @@ private:
 void TriangleLevel::start(Panda::World *world) {
     using namespace Miren;
 
-    ShaderHandle baseShader = createShader("shaders/checker/checker_vertex.glsl", "shaders/checker/checker_fragment.glsl");
+    ShaderHandle baseShader = createShader(
+        "shaders/checker/checker_vertex.glsl", "shaders/checker/checker_fragment.glsl");
     float rightEdge = 0.5f;
     float topEdge = 0.5f;
     float leftEdge = -0.5f;
     float bottomEdge = -0.5f;
-    float *data = new float[8]{rightEdge, topEdge, leftEdge, topEdge, leftEdge, bottomEdge, rightEdge, bottomEdge};
+    float *data = new float[8]{
+        rightEdge, topEdge, leftEdge, topEdge, leftEdge, bottomEdge, rightEdge, bottomEdge};
     uint32_t *indices = new uint32_t[6]{0, 1, 2, 0, 2, 3};
 
     VertexBufferLayoutData layoutData;
@@ -43,7 +45,8 @@ void TriangleLevel::start(Panda::World *world) {
     VertexBufferHandle vertexBuffer = createVertexBuffer(data, sizeof(float) * 8, vertexLayout);
     IndexBufferHandle indexBuffer = createIndexBuffer(indices, BufferElementType::UnsignedInt, 6);
 
-    Foundation::Shared<TriangleRenderer> triangleRenderer = Foundation::makeShared<TriangleRenderer>(vertexBuffer, indexBuffer, baseShader);
+    Foundation::Shared<TriangleRenderer> triangleRenderer =
+        Foundation::makeShared<TriangleRenderer>(vertexBuffer, indexBuffer, baseShader);
 
     Foundation::Shared<Panda::Entity> entity = world->instantiateEntity();
     entity->addComponent(triangleRenderer);

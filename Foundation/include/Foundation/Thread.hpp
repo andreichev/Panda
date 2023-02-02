@@ -10,7 +10,8 @@ class Thread {
 public:
     Thread();
     virtual ~Thread();
-    bool init(ThreadFn _fn, void *_userData = NULL, uint32_t _stackSize = 0, const char *_name = NULL);
+    bool init(
+        ThreadFn _fn, void *_userData = NULL, uint32_t _stackSize = 0, const char *_name = NULL);
     void shutdown();
     bool isRunning() const;
     int32_t getExitCode() const;

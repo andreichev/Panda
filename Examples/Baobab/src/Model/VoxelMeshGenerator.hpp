@@ -9,9 +9,13 @@
 
 class VoxelMeshGenerator {
 public:
-    static Panda::MeshData makeOneChunkMesh(
-        ChunksStorage &chunks, int chunkIndexX, int chunkIndexY, int chunkIndexZ, bool ambientOcclusion);
-    static void addFaceIndices(uint32_t offset, uint32_t &currentIndexNumber, unsigned int *indicesList);
+    static Panda::MeshData makeOneChunkMesh(ChunksStorage &chunks,
+        int chunkIndexX,
+        int chunkIndexY,
+        int chunkIndexZ,
+        bool ambientOcclusion);
+    static void addFaceIndices(
+        uint32_t offset, uint32_t &currentIndexNumber, unsigned int *indicesList);
     static bool isAir(int x, int y, int z, ChunksStorage &chunks);
 
 private:

@@ -34,8 +34,10 @@ ChunksStorage::ChunksStorage() {
                 int voxelIndexX = x % Chunk::SIZE_X;
                 int voxelIndexY = y % Chunk::SIZE_Y;
                 int voxelIndexZ = z % Chunk::SIZE_Z;
-                chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
-                    .data[voxelIndexY * Chunk::SIZE_X * Chunk::SIZE_Z + voxelIndexX * Chunk::SIZE_X + voxelIndexZ]
+                chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+                       chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
+                    .data[voxelIndexY * Chunk::SIZE_X * Chunk::SIZE_Z +
+                          voxelIndexX * Chunk::SIZE_X + voxelIndexZ]
                     .id = id;
             }
         }
@@ -48,8 +50,9 @@ void ChunksStorage::setVoxel(int x, int y, int z, uint8_t id) {
     int chunkIndexX = x / Chunk::SIZE_X;
     int chunkIndexY = y / Chunk::SIZE_Y;
     int chunkIndexZ = z / Chunk::SIZE_Z;
-    chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ].set(
-        x % Chunk::SIZE_X, y % Chunk::SIZE_Y, z % Chunk::SIZE_Z, id);
+    chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+           chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
+        .set(x % Chunk::SIZE_X, y % Chunk::SIZE_Y, z % Chunk::SIZE_Z, id);
 }
 
 Voxel *ChunksStorage::getVoxel(int x, int y, int z) {
@@ -58,8 +61,9 @@ Voxel *ChunksStorage::getVoxel(int x, int y, int z) {
     int chunkIndexX = x / Chunk::SIZE_X;
     int chunkIndexY = y / Chunk::SIZE_Y;
     int chunkIndexZ = z / Chunk::SIZE_Z;
-    return chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ].get(
-        x % Chunk::SIZE_X, y % Chunk::SIZE_Y, z % Chunk::SIZE_Z);
+    return chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+                  chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
+        .get(x % Chunk::SIZE_X, y % Chunk::SIZE_Y, z % Chunk::SIZE_Z);
 }
 
 Chunk *ChunksStorage::getChunk(int x, int y, int z) {
@@ -68,10 +72,12 @@ Chunk *ChunksStorage::getChunk(int x, int y, int z) {
     int chunkIndexX = x / Chunk::SIZE_X;
     int chunkIndexY = y / Chunk::SIZE_Y;
     int chunkIndexZ = z / Chunk::SIZE_Z;
-    return &chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
+    return &chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+                   chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
 }
 
-VoxelRaycastData *ChunksStorage::bresenham3D(float x1, float y1, float z1, float x2, float y2, float z2, int maximumDistance) {
+VoxelRaycastData *ChunksStorage::bresenham3D(
+    float x1, float y1, float z1, float x2, float y2, float z2, int maximumDistance) {
     float t = 0.0f;
     int ix = (int)floor(x1);
     int iy = (int)floor(y1);

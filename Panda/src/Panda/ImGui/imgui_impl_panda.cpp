@@ -286,7 +286,8 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             const KeyPressedEvent *ev = static_cast<const KeyPressedEvent *>(event);
             ImGuiKey key = ImGui_ImplPanda_KeyCodeToImGuiKey(ev->key);
             io.AddKeyEvent(key, true);
-            io.SetKeyEventNativeData(key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user code)
+            io.SetKeyEventNativeData(
+                key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user code)
             event->isHandled = io.WantCaptureKeyboard;
             break;
         }
@@ -294,7 +295,8 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             const KeyReleasedEvent *ev = static_cast<const KeyReleasedEvent *>(event);
             ImGuiKey key = ImGui_ImplPanda_KeyCodeToImGuiKey(ev->key);
             io.AddKeyEvent(key, false);
-            io.SetKeyEventNativeData(key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user code)
+            io.SetKeyEventNativeData(
+                key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user code)
             event->isHandled = io.WantCaptureKeyboard;
             break;
         }
@@ -336,10 +338,12 @@ IMGUI_IMPL_API bool ImGui_ImplPanda_Init() {
     io.BackendPlatformName = "imgui_impl_panda";
 
     // Setup backend capabilities flags
-    // io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
-    // io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
-    // io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;    // We can create multi-viewports on the Platform side (optional)
-    // io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can set io.MouseHoveredViewport correctly (optional, not easy)
+    // io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values
+    // (optional) io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor
+    // io.WantSetMousePos requests (optional, rarely used) io.BackendFlags |=
+    // ImGuiBackendFlags_PlatformHasViewports;    // We can create multi-viewports on the Platform
+    // side (optional) io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport; // We can set
+    // io.MouseHoveredViewport correctly (optional, not easy)
 
     // TODO: - Add pasteboard get and set
     // io.SetClipboardTextFn = [](void*, const char* str) -> void {};
@@ -356,6 +360,7 @@ IMGUI_IMPL_API void ImGui_ImplPanda_NewFrame(double deltaTime) {
     Application *app = Application::get();
     Size dpi = app->getWindow()->getDpi();
     io.DisplayFramebufferScale = ImVec2(dpi.width, dpi.height);
-    io.DisplaySize = ImVec2((float)(app->getWindow()->getSize().width), (float)(app->getWindow()->getSize().height));
+    io.DisplaySize = ImVec2(
+        (float)(app->getWindow()->getSize().width), (float)(app->getWindow()->getSize().height));
     io.DeltaTime = (float)deltaTime;
 }

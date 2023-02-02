@@ -22,17 +22,31 @@ public:
     void setClearColor(float r, float g, float b, float a) override;
     void clear() override;
     void flip() override;
-    void createShader(ShaderHandle handle, const char *vertexPath, const char *fragmentPath) override;
+    void createShader(
+        ShaderHandle handle, const char *vertexPath, const char *fragmentPath) override;
     void deleteShader(ShaderHandle handle) override;
     void createTextureFromFile(TextureHandle handle, const char *path) override;
-    void createRGBATextureFromPixels(TextureHandle handle, void *pixels, int width, int height) override;
+    void createRGBATextureFromPixels(
+        TextureHandle handle, void *pixels, int width, int height) override;
     void deleteTexture(TextureHandle handle) override;
-    void createIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) override;
-    void createDynamicIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) override;
+    void createIndexBuffer(IndexBufferHandle handle,
+        void *indices,
+        BufferElementType elementType,
+        size_t count) override;
+    void createDynamicIndexBuffer(IndexBufferHandle handle,
+        void *indices,
+        BufferElementType elementType,
+        size_t count) override;
     void updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) override;
     void deleteIndexBuffer(IndexBufferHandle handle) override;
-    void createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) override;
-    void createDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) override;
+    void createVertexBuffer(VertexBufferHandle handle,
+        void *data,
+        uint32_t size,
+        VertexLayoutHandle layoutHandle) override;
+    void createDynamicVertexBuffer(VertexBufferHandle handle,
+        void *data,
+        uint32_t size,
+        VertexLayoutHandle layoutHandle) override;
     void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) override;
     void deleteVertexBuffer(VertexBufferHandle handle) override;
     void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) override;

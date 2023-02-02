@@ -48,7 +48,8 @@ IndexBufferHandle createIndexBuffer(void *indices, BufferElementType elementType
     return s_context->createIndexBuffer(indices, elementType, count);
 }
 
-IndexBufferHandle createDynamicIndexBuffer(void *indices, BufferElementType elementType, size_t count) {
+IndexBufferHandle createDynamicIndexBuffer(
+    void *indices, BufferElementType elementType, size_t count) {
     return s_context->createDynamicIndexBuffer(indices, elementType, count);
 }
 
@@ -64,7 +65,8 @@ VertexBufferHandle createVertexBuffer(void *data, uint32_t size, VertexLayoutHan
     return s_context->createVertexBuffer(data, size, layoutHandle);
 }
 
-VertexBufferHandle createDynamicVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+VertexBufferHandle createDynamicVertexBuffer(
+    void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
     return s_context->createDynamicVertexBuffer(data, size, layoutHandle);
 }
 
@@ -88,7 +90,8 @@ void allocTransientVertexBuffer(TransientVertexBuffer *buffer, uint32_t size) {
     s_context->allocTransientVertexBuffer(buffer, size);
 }
 
-void allocTransientIndexBuffer(TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType) {
+void allocTransientIndexBuffer(
+    TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType) {
     s_context->allocTransientIndexBuffer(buffer, count, elementType);
 }
 

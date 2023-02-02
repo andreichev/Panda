@@ -10,14 +10,18 @@ void BlocksCreation::initialize() {
 }
 
 void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ) {
-    Panda::MeshData primitiveMeshData = VoxelMeshGenerator::makeOneChunkMesh(*chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true);
-    chunksStorage->chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
+    Panda::MeshData primitiveMeshData = VoxelMeshGenerator::makeOneChunkMesh(
+        *chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true);
+    chunksStorage
+        ->chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+                 chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
         .getMesh()
         ->updateBuffer(primitiveMeshData);
 }
 
 void BlocksCreation::setVoxel(int x, int y, int z, int8_t id) {
-    if (x < 0 || y < 0 || z < 0 || x >= ChunksStorage::WORLD_SIZE_X || y >= ChunksStorage::WORLD_SIZE_Y || z >= ChunksStorage::WORLD_SIZE_Z)
+    if (x < 0 || y < 0 || z < 0 || x >= ChunksStorage::WORLD_SIZE_X ||
+        y >= ChunksStorage::WORLD_SIZE_Y || z >= ChunksStorage::WORLD_SIZE_Z)
         return;
 
     chunksStorage->setVoxel(x, y, z, id);
@@ -49,7 +53,8 @@ void BlocksCreation::setVoxel(int x, int y, int z, int8_t id) {
 void BlocksCreation::update(double deltaTime) {
     glm::vec4 position = transform->getPosition();
     glm::vec4 target = transform->getFront();
-    VoxelRaycastData *v = chunksStorage->bresenham3D(position.x, position.y, position.z, target.x, target.y, target.z, maximumDistance);
+    VoxelRaycastData *v = chunksStorage->bresenham3D(
+        position.x, position.y, position.z, target.x, target.y, target.z, maximumDistance);
 
     if (v != nullptr && v->voxel != nullptr) {
         if (Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::LEFT)) {

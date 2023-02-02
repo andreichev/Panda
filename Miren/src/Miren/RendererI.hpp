@@ -29,19 +29,28 @@ public:
     virtual void setClearColor(float r, float g, float b, float a) = 0;
     virtual void clear() = 0;
     virtual void flip() = 0;
-    virtual void createShader(ShaderHandle handle, const char *vertexPath, const char *fragmentPath) = 0;
+    virtual void createShader(
+        ShaderHandle handle, const char *vertexPath, const char *fragmentPath) = 0;
     virtual void deleteShader(ShaderHandle handle) = 0;
     virtual void createTextureFromFile(TextureHandle handle, const char *path) = 0;
-    virtual void createRGBATextureFromPixels(TextureHandle handle, void *pixels, int width, int height) = 0;
+    virtual void createRGBATextureFromPixels(
+        TextureHandle handle, void *pixels, int width, int height) = 0;
     virtual void deleteTexture(TextureHandle handle) = 0;
-    virtual void createIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) = 0;
-    virtual void createDynamicIndexBuffer(IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) = 0;
-    virtual void updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) = 0;
+    virtual void createIndexBuffer(
+        IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) = 0;
+    virtual void createDynamicIndexBuffer(
+        IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) = 0;
+    virtual void updateDynamicIndexBuffer(
+        IndexBufferHandle handle, void *indices, size_t count) = 0;
     virtual void deleteIndexBuffer(IndexBufferHandle handle) = 0;
-    virtual void createVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) = 0;
-    virtual void createDynamicVertexBuffer(
-        VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE) = 0;
-    virtual void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) = 0;
+    virtual void createVertexBuffer(
+        VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) = 0;
+    virtual void createDynamicVertexBuffer(VertexBufferHandle handle,
+        void *data,
+        uint32_t size,
+        VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE) = 0;
+    virtual void updateDynamicVertexBuffer(
+        VertexBufferHandle handle, void *data, uint32_t size) = 0;
     virtual void deleteVertexBuffer(VertexBufferHandle handle) = 0;
     virtual void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) = 0;
     virtual void deleteVertexLayout(VertexLayoutHandle handle) = 0;

@@ -5,11 +5,14 @@
 #include "VoxelMeshGenerator.hpp"
 #include "Panda.hpp"
 
-Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
-    ChunksStorage &chunks, int chunkIndexX, int chunkIndexY, int chunkIndexZ, bool ambientOcclusion) {
+Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(ChunksStorage &chunks,
+    int chunkIndexX,
+    int chunkIndexY,
+    int chunkIndexZ,
+    bool ambientOcclusion) {
     using namespace Miren;
-    Chunk &chunk =
-        chunks.chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z + chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
+    Chunk &chunk = chunks.chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+                                 chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
     Vertex *vertices = new Vertex[20000];
     unsigned int *indices = new unsigned int[20000];
     uint32_t verticesCount = 0;
@@ -54,18 +57,34 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
                         // right
                         d = (isAir(x - 1, y, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
                         // top left
-                        e = (isAir(x + 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        e = (isAir(x + 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // top right
-                        f = (isAir(x - 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        f = (isAir(x - 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // bottom left
-                        g = (isAir(x + 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        g = (isAir(x + 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // bottom right
-                        h = (isAir(x - 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        h = (isAir(x - 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                     }
-                    vertices[verticesCount++] = Vertex(x, y, z + 1.0f, u, v + uvSize, light * (1.f - b - d - h));
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y, z + 1.0f, u + uvSize, v + uvSize, light * (1.f - b - c - g)); // 1
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y + 1.0f, z + 1.0f, u + uvSize, v, light * (1.f - a - c - e));   // 2
-                    vertices[verticesCount++] = Vertex(x, y + 1.0f, z + 1.0f, u, v, light * (1.f - a - d - f));                   // 3
+                    vertices[verticesCount++] =
+                        Vertex(x, y, z + 1.0f, u, v + uvSize, light * (1.f - b - d - h));
+                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        y,
+                        z + 1.0f,
+                        u + uvSize,
+                        v + uvSize,
+                        light * (1.f - b - c - g)); // 1
+                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        y + 1.0f,
+                        z + 1.0f,
+                        u + uvSize,
+                        v,
+                        light * (1.f - a - c - e)); // 2
+                    vertices[verticesCount++] =
+                        Vertex(x, y + 1.0f, z + 1.0f, u, v, light * (1.f - a - d - f)); // 3
                 }
                 // Back
                 if (isAir(x, y, z - 1, chunks)) {
@@ -81,18 +100,26 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
                         // left
                         d = (isAir(x + 1, y, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
                         // top right
-                        e = (isAir(x - 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        e = (isAir(x - 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // bottom right
-                        f = (isAir(x - 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        f = (isAir(x - 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // top left
-                        g = (isAir(x + 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        g = (isAir(x + 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // bottom left
-                        h = (isAir(x + 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        h = (isAir(x + 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                     }
-                    vertices[verticesCount++] = Vertex(x, y, z, u + uvSize, v + uvSize, light * (1.f - b - c - f)); // 4
-                    vertices[verticesCount++] = Vertex(x, y + 1.0f, z, u + uvSize, v, light * (1.f - a - c - e));   // 5
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y + 1.0f, z, u, v, light * (1.f - a - d - g));     // 6
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y, z, u, v + uvSize, light * (1.f - b - d - h));   // 7
+                    vertices[verticesCount++] =
+                        Vertex(x, y, z, u + uvSize, v + uvSize, light * (1.f - b - c - f)); // 4
+                    vertices[verticesCount++] =
+                        Vertex(x, y + 1.0f, z, u + uvSize, v, light * (1.f - a - c - e)); // 5
+                    vertices[verticesCount++] =
+                        Vertex(x + 1.0f, y + 1.0f, z, u, v, light * (1.f - a - d - g)); // 6
+                    vertices[verticesCount++] =
+                        Vertex(x + 1.0f, y, z, u, v + uvSize, light * (1.f - b - d - h)); // 7
                 }
                 // Top
                 if (isAir(x, y + 1, z, chunks)) {
@@ -108,18 +135,34 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
                         // front
                         d = (isAir(x, y + 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
                         // left back
-                        e = (isAir(x + 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        e = (isAir(x + 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // left front
-                        f = (isAir(x + 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        f = (isAir(x + 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // right back
-                        g = (isAir(x - 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        g = (isAir(x - 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // right front
-                        h = (isAir(x - 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        h = (isAir(x - 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                     }
-                    vertices[verticesCount++] = Vertex(x, y + 1.0f, z, u, v + uvSize, light * (1.f - b - d - h));                 // 8
-                    vertices[verticesCount++] = Vertex(x, y + 1.0f, z + 1.0f, u + uvSize, v + uvSize, light * (1.f - b - c - g)); // 11
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y + 1.0f, z + 1.0f, u + uvSize, v, light * (1.f - a - c - e));   // 10
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y + 1.0f, z, u, v, light * (1.f - a - d - f));                   // 9
+                    vertices[verticesCount++] =
+                        Vertex(x, y + 1.0f, z, u, v + uvSize, light * (1.f - b - d - h)); // 8
+                    vertices[verticesCount++] = Vertex(x,
+                        y + 1.0f,
+                        z + 1.0f,
+                        u + uvSize,
+                        v + uvSize,
+                        light * (1.f - b - c - g)); // 11
+                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        y + 1.0f,
+                        z + 1.0f,
+                        u + uvSize,
+                        v,
+                        light * (1.f - a - c - e)); // 10
+                    vertices[verticesCount++] =
+                        Vertex(x + 1.0f, y + 1.0f, z, u, v, light * (1.f - a - d - f)); // 9
                 }
                 // Bottom
                 if (isAir(x, y - 1, z, chunks)) {
@@ -135,18 +178,26 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
                         // front
                         d = (isAir(x, y - 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
                         // left back
-                        e = (isAir(x + 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        e = (isAir(x + 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // left front
-                        f = (isAir(x + 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        f = (isAir(x + 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // right back
-                        g = (isAir(x - 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        g = (isAir(x - 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // right front
-                        h = (isAir(x - 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        h = (isAir(x - 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                     }
-                    vertices[verticesCount++] = Vertex(x, y, z, u, v + uvSize, light * (1.f - b - d - h));                 // 12
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y, z, u + uvSize, v + uvSize, light * (1.f - a - d - f)); // 13
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y, z + 1.0f, u + uvSize, v, light * (1.f - a - c - e));   // 14
-                    vertices[verticesCount++] = Vertex(x, y, z + 1.0f, u, v, light * (1.f - b - c - g));                   // 15
+                    vertices[verticesCount++] =
+                        Vertex(x, y, z, u, v + uvSize, light * (1.f - b - d - h)); // 12
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f, y, z, u + uvSize, v + uvSize, light * (1.f - a - d - f)); // 13
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f, y, z + 1.0f, u + uvSize, v, light * (1.f - a - c - e)); // 14
+                    vertices[verticesCount++] =
+                        Vertex(x, y, z + 1.0f, u, v, light * (1.f - b - c - g)); // 15
                 }
                 // Right
                 if (isAir(x - 1, y, z, chunks)) {
@@ -162,18 +213,26 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
                         // back
                         d = (isAir(x - 1, y, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
                         // top front
-                        e = (isAir(x - 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        e = (isAir(x - 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // bottom front
-                        f = (isAir(x - 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        f = (isAir(x - 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // top back
-                        g = (isAir(x - 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        g = (isAir(x - 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // bottom back
-                        h = (isAir(x - 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        h = (isAir(x - 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                     }
-                    vertices[verticesCount++] = Vertex(x, y, z, u, v + uvSize, light * (1.f - b - d - h));                 // 16
-                    vertices[verticesCount++] = Vertex(x, y, z + 1.0f, u + uvSize, v + uvSize, light * (1.f - b - c - f)); // 17
-                    vertices[verticesCount++] = Vertex(x, y + 1.0f, z + 1.0f, u + uvSize, v, light * (1.f - a - c - e));   // 18
-                    vertices[verticesCount++] = Vertex(x, y + 1.0f, z, u, v, light * (1.f - a - d - g));                   // 19
+                    vertices[verticesCount++] =
+                        Vertex(x, y, z, u, v + uvSize, light * (1.f - b - d - h)); // 16
+                    vertices[verticesCount++] = Vertex(
+                        x, y, z + 1.0f, u + uvSize, v + uvSize, light * (1.f - b - c - f)); // 17
+                    vertices[verticesCount++] = Vertex(
+                        x, y + 1.0f, z + 1.0f, u + uvSize, v, light * (1.f - a - c - e)); // 18
+                    vertices[verticesCount++] =
+                        Vertex(x, y + 1.0f, z, u, v, light * (1.f - a - d - g)); // 19
                 }
                 // Left
                 if (isAir(x + 1, y, z, chunks)) {
@@ -189,18 +248,26 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
                         // back
                         d = (isAir(x + 1, y, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
                         // top front
-                        e = (isAir(x + 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        e = (isAir(x + 1, y + 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // top back
-                        f = (isAir(x + 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        f = (isAir(x + 1, y + 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // bottom front
-                        g = (isAir(x + 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        g = (isAir(x + 1, y - 1, z + 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                         // bottom back
-                        h = (isAir(x + 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) * ambientOcclusionFactor;
+                        h = (isAir(x + 1, y - 1, z - 1, chunks) ? 0.0f : 1.0f) *
+                            ambientOcclusionFactor;
                     }
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y, z, u + uvSize, v + uvSize, light * (1.f - b - d - h)); // 20
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y + 1.0f, z, u + uvSize, v, light * (1.f - a - d - f));   // 23
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y + 1.0f, z + 1.0f, u, v, light * (1.f - a - c - e));     // 22
-                    vertices[verticesCount++] = Vertex(x + 1.0f, y, z + 1.0f, u, v + uvSize, light * (1.f - b - c - g));   // 21
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f, y, z, u + uvSize, v + uvSize, light * (1.f - b - d - h)); // 20
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f, y + 1.0f, z, u + uvSize, v, light * (1.f - a - d - f)); // 23
+                    vertices[verticesCount++] =
+                        Vertex(x + 1.0f, y + 1.0f, z + 1.0f, u, v, light * (1.f - a - c - e)); // 22
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f, y, z + 1.0f, u, v + uvSize, light * (1.f - b - c - g)); // 21
                 }
             }
         }
@@ -211,7 +278,8 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
     return Panda::MeshData(vertices, verticesCount, indices, indicesCount);
 }
 
-void VoxelMeshGenerator::addFaceIndices(uint32_t offset, uint32_t &indicesCount, unsigned int *indices) {
+void VoxelMeshGenerator::addFaceIndices(
+    uint32_t offset, uint32_t &indicesCount, unsigned int *indices) {
     indices[indicesCount++] = offset;
     indices[indicesCount++] = offset + 1;
     indices[indicesCount++] = offset + 2;

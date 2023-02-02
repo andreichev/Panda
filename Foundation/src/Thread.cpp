@@ -75,7 +75,8 @@ bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char
 
     ThreadInternal *ti = (ThreadInternal *)m_internal;
 #ifdef PLATFORM_WINDOWS
-    ti->m_handle = ::CreateThread(NULL, m_stackSize, (LPTHREAD_START_ROUTINE)ti->threadFunc, this, 0, NULL);
+    ti->m_handle =
+        ::CreateThread(NULL, m_stackSize, (LPTHREAD_START_ROUTINE)ti->threadFunc, this, 0, NULL);
     if (ti->m_handle == nullptr) {
         return false;
     }
@@ -156,10 +157,11 @@ void Thread::setThreadName(const char *_name) {
 #elif defined(PLATFORM_WINDOWS)
     // Try to use the new thread naming API from Win10 Creators update onwards if we have it
     typedef HRESULT(WINAPI * SetThreadDescriptionProc)(HANDLE, PCWSTR);
-    SetThreadDescriptionProc SetThreadDescription =
-        (SetThreadDescriptionProc)::GetProcAddress((HMODULE)GetModuleHandleA("Kernel32.dll"), "SetThreadDescription");
+    SetThreadDescriptionProc SetThreadDescription = (SetThreadDescriptionProc)::GetProcAddress(
+        (HMODULE)GetModuleHandleA("Kernel32.dll"), "SetThreadDescription");
     // SetThreadDescriptionProc SetThreadDescription =
-    //     dlsym<SetThreadDescriptionProc>((void *)GetModuleHandleA("Kernel32.dll"), "SetThreadDescription");
+    //     dlsym<SetThreadDescriptionProc>((void *)GetModuleHandleA("Kernel32.dll"),
+    //     "SetThreadDescription");
 
     if (NULL != SetThreadDescription) {
         uint32_t length = (uint32_t)strlen(_name) + 1;

@@ -9,7 +9,8 @@ float interpolate(float v1, float v2, float blend) {
     return (v2 - v1) * blend + v1;
 }
 
-void PerlinNoise::generate2D(int seedValue, int octaves, float bias, float *values, int width, int height) {
+void PerlinNoise::generate2D(
+    int seedValue, int octaves, float bias, float *values, int width, int height) {
     std::srand(seedValue);
     float *seed = new float[width * height];
     for (int i = 0; i < width * height; i++) {
@@ -35,8 +36,10 @@ void PerlinNoise::generate2D(int seedValue, int octaves, float bias, float *valu
                 float blendX = (float)(x - sampleX1) / (float)(dist);
                 float blendY = (float)(y - sampleY1) / (float)(dist);
 
-                float sampleT = interpolate(seed[sampleY1 * width + sampleX1], seed[sampleY1 * width + sampleX2], blendX);
-                float sampleB = interpolate(seed[sampleY2 * width + sampleX1], seed[sampleY2 * width + sampleX2], blendX);
+                float sampleT = interpolate(
+                    seed[sampleY1 * width + sampleX1], seed[sampleY1 * width + sampleX2], blendX);
+                float sampleB = interpolate(
+                    seed[sampleY2 * width + sampleX1], seed[sampleY2 * width + sampleX2], blendX);
                 values[x * width + y] += (blendY * (sampleB - sampleT) + sampleT) * scale;
 
                 scaleAccumulation += scale;

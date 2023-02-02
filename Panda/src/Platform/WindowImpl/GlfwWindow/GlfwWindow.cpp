@@ -72,12 +72,25 @@ void GlfwWindow::setFullScreen(bool isFullScreen) {
     // Get the resolution of the primary monitor
     const GLFWvidmode *vidmode = glfwGetVideoMode(monitorHandle);
     if (isFullScreen) {
-        glfwSetWindowMonitor(m_windowHandle, monitorHandle, 0, 0, vidmode->width, vidmode->height, vidmode->refreshRate);
+        glfwSetWindowMonitor(m_windowHandle,
+            monitorHandle,
+            0,
+            0,
+            vidmode->width,
+            vidmode->height,
+            vidmode->refreshRate);
     } else {
-        glfwSetWindowMonitor(m_windowHandle, nullptr, 0, 0, m_windowSizeBackup.width, m_windowSizeBackup.height, vidmode->refreshRate);
+        glfwSetWindowMonitor(m_windowHandle,
+            nullptr,
+            0,
+            0,
+            m_windowSizeBackup.width,
+            m_windowSizeBackup.height,
+            vidmode->refreshRate);
         // Center the window
-        glfwSetWindowPos(
-            m_windowHandle, (vidmode->width - m_windowSizeBackup.width) / 2, (vidmode->height - m_windowSizeBackup.height) / 2);
+        glfwSetWindowPos(m_windowHandle,
+            (vidmode->width - m_windowSizeBackup.width) / 2,
+            (vidmode->height - m_windowSizeBackup.height) / 2);
     }
 }
 
@@ -88,22 +101,27 @@ void GlfwWindow::addEventHandlers() {
         self->m_windowSizeBackup = Size(width, height);
         self->m_eventQueue->postSizeEvent(width, height);
     });
-    glfwSetKeyCallback(m_windowHandle, [](GLFWwindow *windowHandle, int key, int scancode, int action, int mods) {
-        GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
-        self->m_eventQueue->postKeyEvent(static_cast<Key>(key), action == GLFW_PRESS || action == GLFW_REPEAT);
-    });
+    glfwSetKeyCallback(
+        m_windowHandle, [](GLFWwindow *windowHandle, int key, int scancode, int action, int mods) {
+            GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+            self->m_eventQueue->postKeyEvent(
+                static_cast<Key>(key), action == GLFW_PRESS || action == GLFW_REPEAT);
+        });
     glfwSetCursorPosCallback(m_windowHandle, [](GLFWwindow *windowHandle, double x, double y) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->m_eventQueue->postMouseEvent(x, y);
     });
-    glfwSetScrollCallback(m_windowHandle, [](GLFWwindow *windowHandle, double xoffset, double yoffset) {
-        GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
-        self->m_eventQueue->postScrollEvent(xoffset, yoffset);
-    });
-    glfwSetMouseButtonCallback(m_windowHandle, [](GLFWwindow *windowHandle, int button, int action, int mods) {
-        GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
-        self->m_eventQueue->postMouseButtonEvent(static_cast<MouseButton>(button), action == GLFW_PRESS);
-    });
+    glfwSetScrollCallback(
+        m_windowHandle, [](GLFWwindow *windowHandle, double xoffset, double yoffset) {
+            GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+            self->m_eventQueue->postScrollEvent(xoffset, yoffset);
+        });
+    glfwSetMouseButtonCallback(
+        m_windowHandle, [](GLFWwindow *windowHandle, int button, int action, int mods) {
+            GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+            self->m_eventQueue->postMouseButtonEvent(
+                static_cast<MouseButton>(button), action == GLFW_PRESS);
+        });
     glfwSetWindowCloseCallback(m_windowHandle, [](GLFWwindow *windowHandle) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->m_eventQueue->postWindowCloseEvent();
@@ -121,7 +139,8 @@ bool GlfwWindow::isCursorLocked() {
 void GlfwWindow::toggleCursorLock() {
     m_isCursorLocked = m_isCursorLocked == false;
     resetCursorPos();
-    glfwSetInputMode(m_windowHandle, GLFW_CURSOR, m_isCursorLocked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(
+        m_windowHandle, GLFW_CURSOR, m_isCursorLocked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }
 
 void GlfwWindow::resetCursorPos() {

@@ -6,5 +6,6 @@
 
 class PerlinNoise {
 public:
-    static void generate2D(int seedValue, int octaves, float bias, float *values, int width, int height);
+    static void generate2D(
+        int seedValue, int octaves, float bias, float *values, int width, int height);
 };

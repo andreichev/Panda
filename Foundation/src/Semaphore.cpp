@@ -55,7 +55,8 @@ void Semaphore::post(uint32_t _count) {
 bool Semaphore::wait(int32_t _msecs) {
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
 
-    dispatch_time_t dt = 0 > _msecs ? DISPATCH_TIME_FOREVER : dispatch_time(DISPATCH_TIME_NOW, int64_t(_msecs) * 1000000);
+    dispatch_time_t dt = 0 > _msecs ? DISPATCH_TIME_FOREVER
+                                    : dispatch_time(DISPATCH_TIME_NOW, int64_t(_msecs) * 1000000);
     return !dispatch_semaphore_wait(si->m_handle, dt);
 }
 

@@ -44,7 +44,8 @@ static void ImGui_ImplMiren_SetProjMat(ImDrawData *draw_data, int fb_width, int 
 IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
     using namespace Miren;
 
-    // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
+    // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates !=
+    // framebuffer coordinates)
     int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
     int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
     if (fb_width <= 0 || fb_height <= 0) {
@@ -63,12 +64,14 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
         memcpy(tvb.data, cmd_list->VtxBuffer.Data, cmd_list->VtxBuffer.size_in_bytes());
 
         Miren::TransientIndexBuffer tib;
-        Miren::allocTransientIndexBuffer(&tib, cmd_list->IdxBuffer.size(), Miren::BufferElementType::UnsignedShort);
+        Miren::allocTransientIndexBuffer(
+            &tib, cmd_list->IdxBuffer.size(), Miren::BufferElementType::UnsignedShort);
         memcpy(tib.data, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.size_in_bytes());
 
         // Will project scissor/clipping rectangles into framebuffer space
-        ImVec2 clip_off = draw_data->DisplayPos;         // (0,0) unless using multi-viewports
-        ImVec2 clip_scale = draw_data->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
+        ImVec2 clip_off = draw_data->DisplayPos; // (0,0) unless using multi-viewports
+        ImVec2 clip_scale =
+            draw_data->FramebufferScale; // (1,1) unless using retina display which are often (2,2)
 
         const ImDrawCmd *cmd = cmd_list->CmdBuffer.begin();
         const ImDrawCmd *cmdEnd = cmd_list->CmdBuffer.end();
@@ -76,12 +79,17 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
             if (cmd->UserCallback != NULL) {
                 cmd->UserCallback(cmd_list, cmd);
             } else {
-                ImVec2 clip_min((cmd->ClipRect.x - clip_off.x) * clip_scale.x, (cmd->ClipRect.y - clip_off.y) * clip_scale.y);
-                ImVec2 clip_max((cmd->ClipRect.z - clip_off.x) * clip_scale.x, (cmd->ClipRect.w - clip_off.y) * clip_scale.y);
+                ImVec2 clip_min((cmd->ClipRect.x - clip_off.x) * clip_scale.x,
+                    (cmd->ClipRect.y - clip_off.y) * clip_scale.y);
+                ImVec2 clip_max((cmd->ClipRect.z - clip_off.x) * clip_scale.x,
+                    (cmd->ClipRect.w - clip_off.y) * clip_scale.y);
                 if (clip_max.x <= clip_min.x || clip_max.y <= clip_min.y) {
                     continue;
                 }
-                Rect scissorRect = Rect(clip_min.x, ((float)fb_height - clip_max.y), (clip_max.x - clip_min.x), (clip_max.y - clip_min.y));
+                Rect scissorRect = Rect(clip_min.x,
+                    ((float)fb_height - clip_max.y),
+                    (clip_max.x - clip_min.x),
+                    (clip_max.y - clip_min.y));
                 Miren::setScissorRect(scissorRect);
                 Miren::setState(0);
                 Miren::setShader(shader);
@@ -119,7 +127,8 @@ IMGUI_IMPL_API void ImGui_ImplMiren_DestroyFontsTexture() {
 
 IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
     using namespace Miren;
-    shader = Miren::createShader("shaders/imgui/imgui_vertex.glsl", "shaders/imgui/imgui_fragment.glsl");
+    shader =
+        Miren::createShader("shaders/imgui/imgui_vertex.glsl", "shaders/imgui/imgui_fragment.glsl");
 
     VertexBufferLayoutData layoutData;
     layoutData.pushVec2();
