@@ -1,5 +1,7 @@
 #include "Renderer2D.hpp"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace Panda {
 
 Renderer2D::DrawData Renderer2D::s_drawData;
@@ -36,29 +38,35 @@ void Renderer2D::begin() {
 }
 
 void Renderer2D::drawRect(RectData rect) {
+    glm::mat4 identity = glm::mat4(1.0f);
+    glm::vec3 position = glm::vec3(rect.origin.x, rect.origin.y, 0.f);
+    glm::vec3 scale = glm::vec3(rect.size.width, rect.size.height, 1.f);
+    glm::mat4 transform = glm::translate(identity, position) * glm::scale(identity, scale);
+    drawRect(transform, rect);
+}
+
+void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     uint32_t &verticesCount = s_drawData.verticesCount;
-    s_drawData.vertices[verticesCount].pos = rect.origin;
-    s_drawData.vertices[verticesCount].color = rect.color;
-    verticesCount++;
-    s_drawData.vertices[verticesCount].pos = Point(rect.origin.x, rect.origin.y + rect.size.height);
-    s_drawData.vertices[verticesCount].color = rect.color;
-    verticesCount++;
-    s_drawData.vertices[verticesCount].pos =
-        Point(rect.origin.x + rect.size.width, rect.origin.y + rect.size.height);
-    s_drawData.vertices[verticesCount].color = rect.color;
-    verticesCount++;
-    s_drawData.vertices[verticesCount].pos = Point(rect.origin.x + rect.size.width, rect.origin.y);
-    s_drawData.vertices[verticesCount].color = rect.color;
-    verticesCount++;
-    s_drawData.vbSize += sizeof(Vertex) * 4;
-    
+    Vertex vertices[] = {Vertex(Point(0, 0), rect.color),
+        Vertex(Point(0, 1), rect.color),
+        Vertex(Point(1, 1), rect.color),
+        Vertex(Point(1, 0), rect.color)};
+    for (Vertex &v : vertices) {
+        glm::vec4 pos = transform * glm::vec4(v.pos.x, v.pos.y, 0.f, 1.f);
+        s_drawData.vertices[verticesCount].pos = Point(pos.x, pos.y);
+        s_drawData.vertices[verticesCount].color = v.color;
+        verticesCount++;
+    }
+
     uint32_t &indicesCount = s_drawData.indicesCount;
+    s_drawData.indices[indicesCount++] = 0;
     s_drawData.indices[indicesCount++] = 2;
     s_drawData.indices[indicesCount++] = 1;
     s_drawData.indices[indicesCount++] = 0;
-    s_drawData.indices[indicesCount++] = 2;
-    s_drawData.indices[indicesCount++] = 0;
     s_drawData.indices[indicesCount++] = 3;
+    s_drawData.indices[indicesCount++] = 2;
+
+    s_drawData.vbSize += sizeof(Vertex) * 4;
     s_drawData.ibSize += sizeof(uint16_t) * 6;
 }
 

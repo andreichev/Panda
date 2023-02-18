@@ -10,11 +10,16 @@ namespace Panda {
 #define MAX_INDICES_COUNT 2000
 
 struct RectData {
-    RectData() {}
+    RectData()
+        : origin()
+        , size()
+        , color()
+        , rotation(0) {}
 
     Point origin;
     Size size;
     Color color;
+    float rotation;
 };
 
 struct OrthoProjData {
@@ -30,7 +35,16 @@ public:
     static void terminate();
 
 private:
+    static void drawRect(glm::mat4 &transform, RectData rect);
+
     struct Vertex {
+        Vertex(Point pos, Color color)
+            : pos(pos)
+            , color(color) {}
+
+        Vertex()
+            : pos()
+            , color() {}
         Point pos;
         Color color;
     };
