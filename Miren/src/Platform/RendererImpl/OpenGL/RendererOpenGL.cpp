@@ -99,7 +99,9 @@ void RendererOpenGL::createIndexBuffer(
 void RendererOpenGL::createDynamicIndexBuffer(
     IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
     indexBuffers[handle].create(indices, elementType, count, true);
-    FREE(Foundation::getAllocator(), indices);
+    if (indices != nullptr) {
+        FREE(Foundation::getAllocator(), indices);
+    }
 }
 
 void RendererOpenGL::updateDynamicIndexBuffer(
@@ -133,7 +135,9 @@ void RendererOpenGL::createDynamicVertexBuffer(
 void RendererOpenGL::updateDynamicVertexBuffer(
     VertexBufferHandle handle, void *data, uint32_t size) {
     vertexBuffers[handle].update(data, size);
-    FREE(Foundation::getAllocator(), data);
+    if (data != nullptr) {
+        FREE(Foundation::getAllocator(), data);
+    }
 }
 
 void RendererOpenGL::deleteVertexBuffer(VertexBufferHandle handle) {
