@@ -38,14 +38,14 @@ private:
     static void drawRect(glm::mat4 &transform, RectData rect);
 
     struct Vertex {
-        Vertex(Point pos, Color color)
+        Vertex(glm::vec3 pos, Color color)
             : pos(pos)
             , color(color) {}
 
         Vertex()
             : pos()
             , color() {}
-        Point pos;
+        glm::vec3 pos;
         Color color;
     };
 

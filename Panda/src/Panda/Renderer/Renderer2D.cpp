@@ -17,7 +17,7 @@ void Renderer2D::init() {
         "shaders/renderer2d/renderer2d_vertex.glsl", "shaders/renderer2d/renderer2d_fragment.glsl");
     Miren::VertexBufferLayoutData layoutData;
     // Position
-    layoutData.pushVec2();
+    layoutData.pushVec3();
     // Color
     layoutData.pushVec4();
     s_drawData.layout = Miren::createVertexLayout(layoutData);
@@ -41,30 +41,33 @@ void Renderer2D::drawRect(RectData rect) {
     glm::mat4 identity = glm::mat4(1.0f);
     glm::vec3 position = glm::vec3(rect.origin.x, rect.origin.y, 0.f);
     glm::vec3 scale = glm::vec3(rect.size.width, rect.size.height, 1.f);
-    glm::mat4 transform = glm::translate(identity, position) * glm::scale(identity, scale);
+    glm::mat4 transform =
+        glm::translate(identity, position) *
+        glm::rotate(identity, glm::radians(rect.rotation), glm::vec3(0.0f, 0.0f, 1.0f)) *
+        glm::scale(identity, scale);
     drawRect(transform, rect);
 }
 
 void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
+    uint16_t indicesOffset = s_drawData.verticesCount;
     uint32_t &verticesCount = s_drawData.verticesCount;
-    Vertex vertices[] = {Vertex(Point(0, 0), rect.color),
-        Vertex(Point(0, 1), rect.color),
-        Vertex(Point(1, 1), rect.color),
-        Vertex(Point(1, 0), rect.color)};
-    for (Vertex &v : vertices) {
-        glm::vec4 pos = transform * glm::vec4(v.pos.x, v.pos.y, 0.f, 1.f);
-        s_drawData.vertices[verticesCount].pos = Point(pos.x, pos.y);
-        s_drawData.vertices[verticesCount].color = v.color;
+    glm::vec4 positions[4];
+    positions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+	positions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
+	positions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
+	positions[3] = { -0.5f,  0.5f, 0.0f, 1.0f }; 
+    for (glm::vec4& pos : positions) {
+        s_drawData.vertices[verticesCount].pos = transform * pos;
+        s_drawData.vertices[verticesCount].color = rect.color;
         verticesCount++;
     }
-
     uint32_t &indicesCount = s_drawData.indicesCount;
-    s_drawData.indices[indicesCount++] = 0;
-    s_drawData.indices[indicesCount++] = 2;
-    s_drawData.indices[indicesCount++] = 1;
-    s_drawData.indices[indicesCount++] = 0;
-    s_drawData.indices[indicesCount++] = 3;
-    s_drawData.indices[indicesCount++] = 2;
+    s_drawData.indices[indicesCount++] = indicesOffset + 0;
+    s_drawData.indices[indicesCount++] = indicesOffset + 1;
+    s_drawData.indices[indicesCount++] = indicesOffset + 2;
+    s_drawData.indices[indicesCount++] = indicesOffset + 2;
+    s_drawData.indices[indicesCount++] = indicesOffset + 3;
+    s_drawData.indices[indicesCount++] = indicesOffset + 0;
 
     s_drawData.vbSize += sizeof(Vertex) * 4;
     s_drawData.ibSize += sizeof(uint16_t) * 6;
@@ -75,7 +78,7 @@ void Renderer2D::end() {
     float R = 100;
     float T = 0;
     float B = 100;
-    s_drawData.projMat = glm::ortho(L, R, B, T);
+    s_drawData.projMat = glm::ortho(L, R, B, T, -1.f, 1.f);
     Miren::setUniform(
         s_drawData.shader, "ProjMtx", &s_drawData.projMat, Miren::UniformDataType::Mat4);
 
