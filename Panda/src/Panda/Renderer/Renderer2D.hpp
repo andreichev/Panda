@@ -22,10 +22,6 @@ struct RectData {
     float rotation;
 };
 
-struct OrthoProjData {
-    Size screenSize;
-};
-
 class Renderer2D {
 public:
     static void init();

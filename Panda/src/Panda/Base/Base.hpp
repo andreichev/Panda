@@ -27,6 +27,10 @@ struct Point {
         : x(0)
         , y(0) {}
 
+    Point(glm::vec2 p)
+        : x(p.x)
+        , y(p.y) {}
+
     Point(float x, float y)
         : x(x)
         , y(y) {}
@@ -68,6 +72,12 @@ struct Color {
         , g(0)
         , b(0)
         , a(1) {}
+
+    Color(glm::vec4 c)
+        : r(c.x)
+        , g(c.y)
+        , b(c.z)
+        , a(c.w) {}
 
     Color(float r, float g, float b, float a)
         : r(r)

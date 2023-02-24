@@ -52,11 +52,11 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     uint16_t indicesOffset = s_drawData.verticesCount;
     uint32_t &verticesCount = s_drawData.verticesCount;
     glm::vec4 positions[4];
-    positions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-	positions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
-	positions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
-	positions[3] = { -0.5f,  0.5f, 0.0f, 1.0f }; 
-    for (glm::vec4& pos : positions) {
+    positions[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
+    positions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
+    positions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
+    positions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
+    for (glm::vec4 &pos : positions) {
         s_drawData.vertices[verticesCount].pos = transform * pos;
         s_drawData.vertices[verticesCount].color = rect.color;
         verticesCount++;
@@ -75,9 +75,9 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
 
 void Renderer2D::end() {
     float L = 0;
-    float R = 100;
+    float R = 600;
     float T = 0;
-    float B = 100;
+    float B = 600;
     s_drawData.projMat = glm::ortho(L, R, B, T, -1.f, 1.f);
     Miren::setUniform(
         s_drawData.shader, "ProjMtx", &s_drawData.projMat, Miren::UniformDataType::Mat4);

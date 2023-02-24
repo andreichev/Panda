@@ -4,6 +4,7 @@
 
 #include "ExampleLevel.hpp"
 #include "Panda/Renderer/Renderer2D.hpp"
+#include "Panda/GameLogic/Components/ParticleSystem.hpp"
 
 #include <imgui.h>
 
@@ -36,6 +37,24 @@ public:
         rect3.size = Panda::Size(10, 10);
         Panda::Renderer2D::drawRect(rect3);
 
+        if (Panda::Input::isMouseButtonPressed(Panda::MouseButton::LEFT)) {
+            for (int i = 0; i < 2; i++) {
+                Panda::ParticleProps particleProps;
+
+                particleProps.colorBegin = {254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f};
+                particleProps.colorEnd = {254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f};
+                particleProps.sizeBegin = 30.f, particleProps.sizeVariation = 0.3f;
+                particleProps.sizeEnd = 0.0f;
+                particleProps.lifeTime = 1.0f;
+                particleProps.velocity = {0.0f, 0.0f};
+                particleProps.velocityVariation = {200.0f, 200.0f};
+                particleProps.position = {
+                    Panda::Input::getMousePositionX(), Panda::Input::getMousePositionY()};
+
+                m_particleSystem->emit(particleProps);
+            }
+        }
+
         if (Panda::Input::isKeyJustPressed(Panda::Key::ESCAPE)) {
             Panda::Application::get()->close();
         }
@@ -45,7 +64,12 @@ public:
         // ImGui::ShowDemoWindow();
     }
 
+    void setParticleSysyem(Foundation::Shared<Panda::ParticleSystem> particleSystem) {
+        m_particleSystem = particleSystem;
+    }
+
 private:
+    Foundation::Shared<Panda::ParticleSystem> m_particleSystem;
     float degree = 0.f;
     float colorFactor = 0.f;
 };
@@ -53,6 +77,10 @@ private:
 void ExampleLevel::start(Panda::World *world) {
     using namespace Miren;
     Foundation::Shared<Panda::Entity> entity = world->instantiateEntity();
+    Foundation::Shared<Panda::ParticleSystem> particle =
+        Foundation::makeShared<Panda::ParticleSystem>();
     Foundation::Shared<ExampleRenderer> dummy = Foundation::makeShared<ExampleRenderer>();
     entity->addComponent(dummy);
+    entity->addComponent(particle);
+    dummy->setParticleSysyem(particle);
 }

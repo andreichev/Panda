@@ -6,7 +6,7 @@
 #include "Panda/Application/Initialization/PlatformInit.hpp"
 #include "Panda/GameLogic/BasicGameLayer.hpp"
 #include "Panda/Events/WindowEvents.hpp"
-#include "Panda/Renderer/Renderer2D.hpp"
+#include "Panda/Base/Random.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -28,7 +28,6 @@ uint64_t getMillis() {
 Application::~Application() {
     LOG_INFO("APP SHUTDOWN BEGIN");
     Miren::renderSemaphoreWait();
-    Renderer2D::terminate();
     DELETE(Foundation::getAllocator(), m_layerStack);
 #ifdef PLATFORM_DESKTOP
     Miren::terminate();
@@ -65,7 +64,7 @@ Application::Application(ApplicationStartupSettings &settings)
     Miren::initialize();
 #endif
     Miren::renderSemaphoreWait();
-    Renderer2D::init();
+    Random::init();
     startBasicGame(settings.startupLevel);
     m_ImGuiLayer = NEW(Foundation::getAllocator(), ImGuiLayer);
     pushOverlay(m_ImGuiLayer);
@@ -98,12 +97,10 @@ void Application::loop() {
 
         Miren::renderSemaphoreWait();
         // LOG_INFO("APP UPDATE BEGIN");
-        Renderer2D::begin();
         LayerStack &layerStack = *m_layerStack;
         for (Layer *layer : layerStack) {
             layer->onUpdate(deltaTime);
         }
-        Renderer2D::end();
         m_ImGuiLayer->begin(deltaTime);
         for (Layer *layer : layerStack) {
             layer->onImGuiRender();

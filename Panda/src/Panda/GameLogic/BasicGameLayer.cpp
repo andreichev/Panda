@@ -3,6 +3,7 @@
 #include "Panda/Events/KeyEvents.hpp"
 #include "Panda/Events/MouseEvents.hpp"
 #include "Panda/GameLogic/Input.hpp"
+#include "Panda/Renderer/Renderer2D.hpp"
 #include <imgui.h>
 
 namespace Panda {
@@ -12,6 +13,7 @@ BasicGameLayer::BasicGameLayer(Level *startupLevel) {
 }
 
 void BasicGameLayer::onAttach() {
+    Renderer2D::init();
     m_world = NEW(Foundation::getAllocator(), World);
     m_currentLevel->start(m_world);
 }
@@ -19,10 +21,13 @@ void BasicGameLayer::onAttach() {
 void BasicGameLayer::onDetach() {
     DELETE(Foundation::getAllocator(), m_currentLevel);
     DELETE(Foundation::getAllocator(), m_world);
+    Renderer2D::terminate();
 }
 
 void BasicGameLayer::onUpdate(double deltaTime) {
+    Renderer2D::begin();
     m_world->update(deltaTime);
+    Renderer2D::end();
     Input::update();
 }
 
