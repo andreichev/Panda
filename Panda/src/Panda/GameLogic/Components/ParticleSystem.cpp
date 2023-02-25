@@ -7,9 +7,7 @@
 
 namespace Panda {
 
-ParticleSystem::ParticleSystem() {
-    m_particlePool.resize(1000);
-}
+ParticleSystem::ParticleSystem() {}
 
 void ParticleSystem::initialize() {}
 
@@ -60,7 +58,12 @@ void ParticleSystem::emit(const ParticleProps &particleProps) {
         particleProps.sizeBegin + particleProps.sizeVariation * (Random::getFloat() - 0.5f);
     particle.sizeEnd = particleProps.sizeEnd;
 
-    m_poolIndex = --m_poolIndex % m_particlePool.size();
+    if (m_poolIndex == 0) {
+        m_poolIndex = MAX_PARTICLES - 1;
+    } else {
+        m_poolIndex--;
+    }
+    LOG_INFO(m_poolIndex);
 }
 
 } // namespace Panda

@@ -4,6 +4,8 @@
 
 namespace Panda {
 
+#define MAX_PARTICLES 1000
+
 struct ParticleProps {
     glm::vec2 position;
     glm::vec2 velocity, velocityVariation;
@@ -34,8 +36,8 @@ private:
 
         bool active = false;
     };
-    std::vector<Particle> m_particlePool;
-    uint32_t m_poolIndex = 999;
+    Particle m_particlePool[MAX_PARTICLES];
+    uint32_t m_poolIndex = MAX_PARTICLES - 1;
 };
 
 } // namespace Panda
