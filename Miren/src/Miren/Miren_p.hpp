@@ -367,6 +367,8 @@ struct Context {
         uint32_t transientVBOffset = m_submit->m_transientVbSize;
         buffer->data = &m_submit->m_transientVb.data[transientVBOffset];
         m_submit->m_transientVbSize += size;
+        PND_ASSERT(
+            m_submit->m_transientVbSize < TRANSIENT_VERTEX_BUFFER_SIZE, "INCREASE DEFAULT VB SIZE");
         buffer->size = size;
         buffer->startVertex = transientVBOffset;
         buffer->handle = m_submit->m_transientVb.handle;
@@ -379,6 +381,8 @@ struct Context {
         uint32_t size = count * elementSize;
         buffer->data = &m_submit->m_transientIb.data[transientIBOffset];
         m_submit->m_transientIbSize += size;
+        PND_ASSERT(
+            m_submit->m_transientIbSize < TRANSIENT_INDEX_BUFFER_SIZE, "INCREASE DEFAULT IB SIZE");
         buffer->size = size;
         buffer->startIndex = transientIBOffset;
         buffer->elementType = elementType;

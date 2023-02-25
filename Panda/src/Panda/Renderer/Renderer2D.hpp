@@ -6,8 +6,8 @@
 
 namespace Panda {
 
-#define MAX_VERTICES_COUNT 3000
-#define MAX_INDICES_COUNT 2000
+#define MAX_VERTICES_COUNT 10000
+#define MAX_INDICES_COUNT 16000
 
 struct RectData {
     RectData()

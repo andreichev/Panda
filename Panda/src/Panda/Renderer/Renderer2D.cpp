@@ -71,6 +71,8 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
 
     s_drawData.vbSize += sizeof(Vertex) * 4;
     s_drawData.ibSize += sizeof(uint16_t) * 6;
+    PND_ASSERT(verticesCount < MAX_VERTICES_COUNT, "VERTICES LIMIT REACHED");
+    PND_ASSERT(indicesCount < MAX_INDICES_COUNT, "INDICES LIMIT REACHED");
 }
 
 void Renderer2D::end() {
