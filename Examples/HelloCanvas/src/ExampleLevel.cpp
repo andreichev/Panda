@@ -40,14 +40,13 @@ public:
         if (Panda::Input::isMouseButtonPressed(Panda::MouseButton::LEFT)) {
             for (int i = 0; i < 5; i++) {
                 Panda::ParticleProps particleProps;
-
-                particleProps.colorBegin =
-                    glm::vec4(254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f);
-                particleProps.colorEnd = glm::vec4(254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f);
-                particleProps.sizeBegin = 30.f;
+    
+                particleProps.colorBegin = glm::vec4(0.0f, 0.0f, 0.9f, 1.0f);
+                particleProps.colorEnd = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+                particleProps.sizeBegin = 40.f;
                 particleProps.sizeVariation = 0.3f;
                 particleProps.sizeEnd = 0.0f;
-                particleProps.lifeTime = 5.0f;
+                particleProps.lifeTime = 2.0f;
                 particleProps.velocity = glm::vec2(0.0f, 0.0f);
                 particleProps.velocityVariation = glm::vec2(200.0f, 200.0f);
                 particleProps.position =
@@ -62,7 +61,7 @@ public:
     }
 
     void onImGuiRender() override {
-        ImGui::ShowDemoWindow();
+        // ImGui::ShowDemoWindow();
     }
 
     void setParticleSysyem(Foundation::Shared<Panda::ParticleSystem> particleSystem) {

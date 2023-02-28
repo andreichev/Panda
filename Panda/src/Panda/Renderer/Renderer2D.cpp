@@ -77,9 +77,9 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
 
 void Renderer2D::end() {
     float L = 0;
-    float R = 600;
+    float R = 844;
     float T = 0;
-    float B = 600;
+    float B = 390;
     s_drawData.projMat = glm::ortho(L, R, B, T, -1.f, 1.f);
     Miren::setUniform(
         s_drawData.shader, "ProjMtx", &s_drawData.projMat, Miren::UniformDataType::Mat4);

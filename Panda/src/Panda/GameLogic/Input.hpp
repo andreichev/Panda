@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Panda/Events/Event.hpp"
 #include "Panda/Events/Key.hpp"
 #include "Panda/Base/Base.hpp"
 
@@ -13,12 +14,6 @@ class Window;
 
 class Input {
 public:
-    // POST EVENTS
-    static void setKeyPressed(Key key, bool state);
-    static void setMouseButtonPressed(MouseButton mouseButton, bool state);
-    static void windowSizeChanged(Size size);
-    static void postMouseChangedPosition(int x, int y);
-    static void setWindowSize(Size size);
     // GET INPUT DATA
     static bool isKeyPressed(Key key);
     static bool isKeyJustPressed(Key key);
@@ -27,9 +22,17 @@ public:
     static int getMousePositionX();
     static int getMousePositionY();
     static Size getWindowSize();
-    static void update();
+    static void onEvent(Event* event);
+    static void nextFrame();
 
 private:
+     // POST EVENTS
+    static void setKeyPressed(Key key, bool state);
+    static void setMouseButtonPressed(MouseButton mouseButton, bool state);
+    static void windowSizeChanged(Size size);
+    static void postMouseChangedPosition(int x, int y);
+    static void setWindowSize(Size size);
+
     static uint32_t frame;
     // Состояния клавиш
     static bool keys[1024];

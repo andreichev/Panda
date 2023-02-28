@@ -3,6 +3,9 @@
 //
 
 #include "Input.hpp"
+#include "Panda/Events/WindowEvents.hpp"
+#include "Panda/Events/KeyEvents.hpp"
+#include "Panda/Events/MouseEvents.hpp"
 
 namespace Panda {
 
@@ -14,6 +17,45 @@ uint32_t Input::framesMouseButtons[4];
 Size Input::windowSize;
 int Input::mousePositionX;
 int Input::mousePositionY;
+
+void Input::onEvent(Event* event) {
+switch (event->type) {
+        case EventType::None:
+            break;
+        case EventType::WindowClose:
+            break;
+        case EventType::WindowResize: {
+            const WindowResizeEvent *ev = static_cast<const WindowResizeEvent *>(event);
+            Input::setWindowSize(Size(ev->getWidth(), ev->getHeight()));
+            break;
+        }
+        case EventType::KeyPressed: {
+            const KeyPressedEvent *ev = static_cast<const KeyPressedEvent *>(event);
+            Input::setKeyPressed(ev->key, true);
+            break;
+        }
+        case EventType::KeyReleased: {
+            const KeyReleasedEvent *ev = static_cast<const KeyReleasedEvent *>(event);
+            Input::setKeyPressed(ev->key, false);
+            break;
+        }
+        case EventType::MouseMoved: {
+            const MouseMovedEvent *ev = static_cast<const MouseMovedEvent *>(event);
+            Input::postMouseChangedPosition(ev->x, ev->y);
+            break;
+        }
+        case EventType::MouseButtonPressed: {
+            const MouseKeyEvent *ev = static_cast<const MouseKeyEvent *>(event);
+            Input::setMouseButtonPressed(ev->button, true);
+            break;
+        }
+        case EventType::MouseButtonReleased: {
+            const MouseKeyEvent *ev = static_cast<const MouseKeyEvent *>(event);
+            Input::setMouseButtonPressed(ev->button, false);
+            break;
+        }
+    }
+}
 
 void Input::setKeyPressed(Key key, bool state) {
     keys[(int)key] = state;
@@ -62,7 +104,7 @@ Size Input::getWindowSize() {
     return windowSize;
 }
 
-void Input::update() {
+void Input::nextFrame() {
     frame++;
 }
 

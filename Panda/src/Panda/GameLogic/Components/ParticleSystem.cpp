@@ -63,7 +63,6 @@ void ParticleSystem::emit(const ParticleProps &particleProps) {
     } else {
         m_poolIndex--;
     }
-    LOG_INFO(m_poolIndex);
 }
 
 } // namespace Panda

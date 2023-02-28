@@ -11,7 +11,7 @@ int startApp(int argc, char **argv) {
     Panda::ApplicationStartupSettings settings;
     settings.name = "Hello canvas";
     settings.windowTitle = "Hello canvas";
-    settings.windowSize = {600, 600};
+    settings.windowSize = {844, 390};
     settings.isFullScreen = false;
     settings.startupLevel = new ExampleLevel();
     runPandaApplication(settings);
