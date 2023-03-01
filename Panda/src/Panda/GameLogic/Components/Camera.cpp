@@ -8,6 +8,8 @@
 #include "Panda/Application/Application.hpp"
 #include "Panda/GameLogic/Entity.hpp"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace Panda {
 
 Camera::Camera()
@@ -15,6 +17,10 @@ Camera::Camera()
     , shader(0)
     , fieldOfView(70.f)
     , windowSize(Application::get()->getWindow()->getSize())
+    , rotationMatrix(1.f)
+    , front(0.f)
+    , up(0.f)
+    , right(0.f)
     , target(1.f)
     , view(1.f)
     , projection(1.f) {
@@ -30,6 +36,7 @@ void Camera::initialize() {
     transform = getEntity().getTransform();
     transform->addDelegate(this);
     Application::get()->addWindowSizeListener(this);
+    updateVectors();
 }
 
 void Camera::update(double deltaTime) {
@@ -55,12 +62,25 @@ void Camera::updateProjectionMatrix() {
     Miren::setUniform(shader, "projection", &projection[0][0], Miren::UniformDataType::Mat4);
 }
 
+void Camera::updateVectors() {
+    glm::vec3 rotation = transform->getRotation();
+    rotationMatrix = glm::mat4(1.f);
+    rotationMatrix =
+        glm::rotate(rotationMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    rotationMatrix =
+        glm::rotate(rotationMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    rotationMatrix =
+        glm::rotate(rotationMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    rotationMatrix = glm::transpose(rotationMatrix);
+    front = rotationMatrix * glm::vec4(0.f, 0.f, -1.f, 1.f);
+    right = rotationMatrix * glm::vec4(1.f, 0.f, 0.f, 1.f);
+    up = rotationMatrix * glm::vec4(0.f, 1.f, 0.f, 1.f);
+}
+
 void Camera::updateViewMatrix() {
-    glm::vec3 position = transform->getPosition();
-    glm::vec3 front = transform->getFront();
-    glm::vec3 up = transform->getUp();
+    glm::vec4 position = transform->getPosition();
     target = position + front;
-    view = glm::lookAt(glm::vec3(position), target, up);
+    view = glm::lookAt(glm::vec3(position), target, glm::vec3(up));
     Miren::setUniform(shader, "view", &view[0][0], Miren::UniformDataType::Mat4);
 }
 
@@ -74,6 +94,7 @@ void Camera::windowSizeChanged(Size size) {
 // MARK: - Transform Delegate
 
 void Camera::transformChanged(glm::vec4 position, glm::vec3 rotation) {
+    updateVectors();
     updateViewMatrix();
 }
 

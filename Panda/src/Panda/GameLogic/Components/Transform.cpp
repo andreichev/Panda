@@ -10,15 +10,9 @@ namespace Panda {
 Transform::Transform()
     : rotation()
     , position()
-    , rotationMatrix()
-    , delegates()
-    , front()
-    , up()
-    , right() {}
+    , delegates() {}
 
-void Transform::initialize() {
-    updateVectors();
-}
+void Transform::initialize() {}
 
 void Transform::update(double deltaTime) {}
 
@@ -31,7 +25,6 @@ void Transform::setRotation(glm::vec3 rot) {
         return;
     }
     rotation = rot;
-    updateVectors();
     transformUpdated();
 }
 
@@ -40,22 +33,7 @@ void Transform::rotate(float x, float y, float z) {
         return;
     }
     rotation += glm::vec3(x, y, z);
-    updateVectors();
     transformUpdated();
-}
-
-void Transform::updateVectors() {
-    rotationMatrix = glm::mat4(1.f);
-    rotationMatrix =
-        glm::rotate(rotationMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    rotationMatrix =
-        glm::rotate(rotationMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    rotationMatrix =
-        glm::rotate(rotationMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    rotationMatrix = glm::transpose(rotationMatrix);
-    front = rotationMatrix * glm::vec4(0.f, 0.f, -1.f, 1.f);
-    right = rotationMatrix * glm::vec4(1.f, 0.f, 0.f, 1.f);
-    up = rotationMatrix * glm::vec4(0.f, 1.f, 0.f, 1.f);
 }
 
 void Transform::transformUpdated() {
@@ -72,27 +50,12 @@ void Transform::translate(float x, float y, float z) {
     transformUpdated();
 }
 
-void Transform::translate(Direction direction, float value) {
-    switch (direction) {
-        case Direction::Forward:
-            position += front * value;
-            break;
-        case Direction::Backward:
-            position -= front * value;
-            break;
-        case Direction::Left:
-            position -= right * value;
-            break;
-        case Direction::Right:
-            position += right * value;
-            break;
-        case Direction::Up:
-            position += up * value;
-            break;
-        case Direction::Down:
-            position -= up * value;
-            break;
+void Transform::translate(glm::vec3 offset) {
+    if (offset.x == 0 && offset.y == 0 && offset.z == 0) {
+        return;
     }
+    position += glm::vec4(offset, 1.f);
+    // position += offset;
     transformUpdated();
 }
 
@@ -105,7 +68,6 @@ void Transform::setPosition(glm::vec4 pos) {
         return;
     }
     position = pos;
-    updateVectors();
     transformUpdated();
 }
 
@@ -115,18 +77,6 @@ void Transform::addDelegate(TransformDelegate *delegate) {
 
 void Transform::removeDelegate(TransformDelegate *delegate) {
     delegates.erase(std::find(delegates.begin(), delegates.end(), delegate));
-}
-
-glm::vec4 Transform::getUp() {
-    return up;
-}
-
-glm::vec4 Transform::getFront() {
-    return front;
-}
-
-glm::vec4 Transform::getRight() {
-    return right;
 }
 
 glm::vec4 Transform::getPosition() {

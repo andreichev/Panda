@@ -6,13 +6,13 @@
 #include "Model/VoxelMeshGenerator.hpp"
 
 void BlocksCreation::initialize() {
-    transform = getEntity().getTransform();
+    m_transform = getEntity().getTransform();
 }
 
 void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ) {
     Panda::MeshData primitiveMeshData = VoxelMeshGenerator::makeOneChunkMesh(
-        *chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true);
-    chunksStorage
+        *m_chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true);
+    m_chunksStorage
         ->chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                  chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
         .getMesh()
@@ -24,7 +24,7 @@ void BlocksCreation::setVoxel(int x, int y, int z, int8_t id) {
         y >= ChunksStorage::WORLD_SIZE_Y || z >= ChunksStorage::WORLD_SIZE_Z)
         return;
 
-    chunksStorage->setVoxel(x, y, z, id);
+    m_chunksStorage->setVoxel(x, y, z, id);
     int chunkIndexX = x / Chunk::SIZE_X;
     int chunkIndexY = y / Chunk::SIZE_Y;
     int chunkIndexZ = z / Chunk::SIZE_Z;
@@ -51,10 +51,10 @@ void BlocksCreation::setVoxel(int x, int y, int z, int8_t id) {
 }
 
 void BlocksCreation::update(double deltaTime) {
-    glm::vec4 position = transform->getPosition();
-    glm::vec4 target = transform->getFront();
-    VoxelRaycastData *v = chunksStorage->bresenham3D(
-        position.x, position.y, position.z, target.x, target.y, target.z, maximumDistance);
+    glm::vec4 position = m_transform->getPosition();
+    glm::vec3 target = m_camera->getFront();
+    VoxelRaycastData *v = m_chunksStorage->bresenham3D(
+        position.x, position.y, position.z, target.x, target.y, target.z, MAXIMUM_DISTANCE);
 
     if (v != nullptr && v->voxel != nullptr) {
         if (Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::LEFT)) {
@@ -72,5 +72,9 @@ void BlocksCreation::update(double deltaTime) {
 }
 
 void BlocksCreation::setChunksStorage(Foundation::Shared<ChunksStorage> storage) {
-    this->chunksStorage = storage;
+    m_chunksStorage = storage;
+}
+
+void BlocksCreation::setCamera(Foundation::Shared<Panda::Camera> camera) {
+    m_camera = camera;
 }

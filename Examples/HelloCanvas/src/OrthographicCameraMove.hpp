@@ -15,6 +15,7 @@ public:
     inline void setCamera(Foundation::Shared<Panda::OrthographicCamera> camera) {
         m_camera = camera;
     }
+
 private:
     Foundation::Shared<Panda::OrthographicCamera> m_camera;
     Foundation::Shared<Panda::Transform> m_transform;

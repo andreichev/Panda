@@ -4,38 +4,38 @@
 
 #include "CameraMove.hpp"
 
+#include <glm/glm.hpp>
 #include <imgui.h>
 
 void CameraMove::initialize() {
-    transform = getEntity().getTransform();
-    window = Panda::Application::get()->getWindow();
+    m_transform = getEntity().getTransform();
+    m_window = Panda::Application::get()->getWindow();
 }
 
 void CameraMove::update(double deltaTime) {
-    float speed = moveSpeed * deltaTime;
+    float speed = m_moveSpeed * deltaTime;
     static float lastMouseX = Panda::Input::getMousePositionX();
     static float lastMouseY = Panda::Input::getMousePositionY();
     static bool cursorStarted = false;
-
     if (Panda::Input::isKeyPressed(Panda::Key::W)) {
-        transform->translate(Panda::Direction::Forward, speed);
+        m_transform->translate(m_camera->getFront() * speed);
     }
     if (Panda::Input::isKeyPressed(Panda::Key::S)) {
-        transform->translate(Panda::Direction::Backward, speed);
+        m_transform->translate(-m_camera->getFront() * speed);
     }
     if (Panda::Input::isKeyPressed(Panda::Key::A)) {
-        transform->translate(Panda::Direction::Left, speed);
+        m_transform->translate(-m_camera->getRight() * speed);
     }
     if (Panda::Input::isKeyPressed(Panda::Key::D)) {
-        transform->translate(Panda::Direction::Right, speed);
+        m_transform->translate(m_camera->getRight() * speed);
     }
     if (Panda::Input::isKeyPressed(Panda::Key::SPACE)) {
-        transform->translate(Panda::Direction::Up, speed);
+        m_transform->translate(m_camera->getUp() * speed);
     }
     if (Panda::Input::isKeyPressed(Panda::Key::LEFT_SHIFT)) {
-        transform->translate(Panda::Direction::Down, speed);
+        m_transform->translate(-m_camera->getUp() * speed);
     }
-    if (window->isCursorLocked()) {
+    if (m_window->isCursorLocked()) {
         float mouseX = Panda::Input::getMousePositionX();
         float mouseY = Panda::Input::getMousePositionY();
         float deltaX = mouseX - lastMouseX;
@@ -48,16 +48,18 @@ void CameraMove::update(double deltaTime) {
         // DeltaX - смещение мыши за реальное время, поэтому умножение на deltaTime не требуется.
         // Действия в реальном мире не нужно умножать на deltaTime, умножать нужно только действия в
         // игровом мире.
-        transform->rotate(deltaY * mouseSpeed, deltaX * mouseSpeed, 0.f);
+        // if(deltaX > 0.f || deltaY > 0.f) {
+        m_transform->rotate(deltaY * m_mouseSpeed, deltaX * m_mouseSpeed, 0.f);
+        // }
         lastMouseX = mouseX;
         lastMouseY = mouseY;
     }
     if (Panda::Input::isKeyJustPressed(Panda::Key::TAB)) {
-        window->toggleCursorLock();
+        m_window->toggleCursorLock();
         cursorStarted = false;
     }
 }
 
 void CameraMove::onImGuiRender() {
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
 }

@@ -23,7 +23,9 @@ void BaseLevel::start(Panda::World *world) {
     cameraEntity->addComponent(camera);
     camera->setFieldOfView(60.f);
     camera->setShader(baseShader);
-    cameraEntity->addComponent(Foundation::makeShared<CameraMove>());
+    Foundation::Shared<CameraMove> cameraMove = Foundation::makeShared<CameraMove>();
+    cameraMove->setCamera(camera);
+    cameraEntity->addComponent(cameraMove);
     cameraEntity->getTransform()->translate(ChunksStorage::WORLD_SIZE_X / 2,
         ChunksStorage::WORLD_SIZE_Y / 4,
         ChunksStorage::WORLD_SIZE_Z / 2);
@@ -31,6 +33,7 @@ void BaseLevel::start(Panda::World *world) {
 
     Foundation::Shared<BlocksCreation> blocksCreation = Foundation::makeShared<BlocksCreation>();
     blocksCreation->setChunksStorage(chunksStorage);
+    blocksCreation->setCamera(camera);
     cameraEntity->addComponent(blocksCreation);
 
     Foundation::Shared<FullScreenToggle> fullScreenToggle =

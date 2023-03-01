@@ -52,7 +52,7 @@ public:
             float x = Panda::Input::getMousePositionX();
             float y = Panda::Input::getMousePositionY();
             Panda::Point coord = m_camera->screenCoordToWorld(Panda::Point(x, y));
-		    particleProps.position = glm::vec2(coord.x, coord.y);
+            particleProps.position = glm::vec2(coord.x, coord.y);
             for (int i = 0; i < 5; i++) {
                 m_particleSystem->emit(particleProps);
             }
@@ -91,7 +91,8 @@ void ExampleLevel::start(Panda::World *world) {
     Foundation::Shared<Panda::ParticleSystem> particle =
         Foundation::makeShared<Panda::ParticleSystem>();
     Foundation::Shared<ExampleRenderer> dummy = Foundation::makeShared<ExampleRenderer>();
-    Foundation::Shared<OrthographicCameraMove> cameraMove = Foundation::makeShared<OrthographicCameraMove>();
+    Foundation::Shared<OrthographicCameraMove> cameraMove =
+        Foundation::makeShared<OrthographicCameraMove>();
     entity->addComponent(dummy);
     entity->addComponent(particle);
     entity->addComponent(camera);

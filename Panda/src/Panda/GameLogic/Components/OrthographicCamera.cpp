@@ -14,7 +14,9 @@ OrthographicCamera::OrthographicCamera()
     , m_aspectRatio(1.0f)
     , m_zoom(1.0f)
     , m_transform(nullptr) {
-    LOG_INFO("Orthographic camera created, viewport size: {}, {}", m_screenSize.width, m_screenSize.height);
+    LOG_INFO("Orthographic camera created, viewport size: {}, {}",
+        m_screenSize.width,
+        m_screenSize.height);
 }
 
 OrthographicCamera::~OrthographicCamera() {
@@ -55,10 +57,10 @@ Point OrthographicCamera::screenCoordToWorld(Point coord) {
     float x = coord.x;
     float y = coord.y;
     auto bounds = getBounds();
-	auto pos = m_transform->getPosition();
-	x = (x / m_screenSize.width) * bounds.getWidth() - bounds.getWidth() * 0.5f;
-	y = bounds.getHeight() * 0.5f - (y / m_screenSize.height) * bounds.getHeight();
-	return Point( x + pos.x, y + pos.y );
+    auto pos = m_transform->getPosition();
+    x = (x / m_screenSize.width) * bounds.getWidth() - bounds.getWidth() * 0.5f;
+    y = bounds.getHeight() * 0.5f - (y / m_screenSize.height) * bounds.getHeight();
+    return Point(x + pos.x, y + pos.y);
 }
 
 // MARK: - Window size delegate
