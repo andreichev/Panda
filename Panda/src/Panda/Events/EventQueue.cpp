@@ -44,7 +44,7 @@ void EventQueue::postKeyEvent(Key key, bool down) {
     }
 }
 
-void EventQueue::postMouseEvent(uint32_t x, uint32_t y) {
+void EventQueue::postMouseEvent(double x, double y) {
     MouseMovedEvent event(x, y);
     m_events.write(event);
 }

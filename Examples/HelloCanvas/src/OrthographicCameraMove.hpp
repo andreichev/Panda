@@ -19,7 +19,8 @@ public:
 private:
     Foundation::Shared<Panda::OrthographicCamera> m_camera;
     Foundation::Shared<Panda::Transform> m_transform;
-    float m_cameraTranslationSpeed = 5.0f;
+    float m_cameraTranslationSpeed = 1.0f;
     float m_cameraRotationSpeed = 180.0f;
+    double m_zoom;
     bool m_rotation;
 };

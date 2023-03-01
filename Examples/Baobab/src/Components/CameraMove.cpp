@@ -14,8 +14,8 @@ void CameraMove::initialize() {
 
 void CameraMove::update(double deltaTime) {
     float speed = m_moveSpeed * deltaTime;
-    static float lastMouseX = Panda::Input::getMousePositionX();
-    static float lastMouseY = Panda::Input::getMousePositionY();
+    static double lastMouseX = Panda::Input::getMousePositionX();
+    static double lastMouseY = Panda::Input::getMousePositionY();
     static bool cursorStarted = false;
     if (Panda::Input::isKeyPressed(Panda::Key::W)) {
         m_transform->translate(m_camera->getFront() * speed);
@@ -36,10 +36,10 @@ void CameraMove::update(double deltaTime) {
         m_transform->translate(-m_camera->getUp() * speed);
     }
     if (m_window->isCursorLocked()) {
-        float mouseX = Panda::Input::getMousePositionX();
-        float mouseY = Panda::Input::getMousePositionY();
-        float deltaX = mouseX - lastMouseX;
-        float deltaY = mouseY - lastMouseY;
+        double mouseX = Panda::Input::getMousePositionX();
+        double mouseY = Panda::Input::getMousePositionY();
+        double deltaX = mouseX - lastMouseX;
+        double deltaY = mouseY - lastMouseY;
         if (cursorStarted == false) {
             cursorStarted = true;
             deltaX = 0;
@@ -48,9 +48,7 @@ void CameraMove::update(double deltaTime) {
         // DeltaX - смещение мыши за реальное время, поэтому умножение на deltaTime не требуется.
         // Действия в реальном мире не нужно умножать на deltaTime, умножать нужно только действия в
         // игровом мире.
-        // if(deltaX > 0.f || deltaY > 0.f) {
         m_transform->rotate(deltaY * m_mouseSpeed, deltaX * m_mouseSpeed, 0.f);
-        // }
         lastMouseX = mouseX;
         lastMouseY = mouseY;
     }

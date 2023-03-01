@@ -18,7 +18,7 @@ public:
     void postMouseButtonEvent(MouseButton button, bool pressed);
     void postSizeEvent(uint32_t width, uint32_t height);
     void postKeyEvent(Key key, bool down);
-    void postMouseEvent(uint32_t x, uint32_t y);
+    void postMouseEvent(double x, double y);
     void postScrollEvent(double xoffset, double yoffset);
     void postWindowCloseEvent();
     Event *poll();

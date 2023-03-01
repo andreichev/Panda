@@ -4,9 +4,12 @@
 
 #include "OrthographicCameraMove.hpp"
 
+#include <Foundation/Foundation.hpp>
+
 void OrthographicCameraMove::initialize() {
     m_transform = getEntity().getTransform();
     m_rotation = true;
+    m_zoom = 1.0;
 }
 
 void OrthographicCameraMove::update(double deltaTime) {
@@ -61,7 +64,15 @@ void OrthographicCameraMove::update(double deltaTime) {
             m_transform->setRotation(cameraRotation);
         }
     }
-    // m_cameraTranslationSpeed = m_zoom;
+
+    double scroll = Input::getMouseScrollY();
+    if (scroll != 0) {
+        m_zoom += scroll;
+        m_zoom = Foundation::min(m_zoom, 10.0);
+        m_zoom = Foundation::max(m_zoom, 1.0);
+        m_camera->setZoomLevel(m_zoom);
+    }
+    m_cameraTranslationSpeed = m_zoom;
 }
 
 void OrthographicCameraMove::onImGuiRender() {}

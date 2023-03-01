@@ -9,12 +9,12 @@
 namespace Panda {
 
 struct MouseMovedEvent : public Event {
-    MouseMovedEvent(int x, int y)
+    MouseMovedEvent(double x, double y)
         : Event(EventType::MouseMoved)
         , x(x)
         , y(y) {}
 
-    int x, y;
+    double x, y;
 };
 
 struct MouseScrolledEvent : public Event {

@@ -19,8 +19,10 @@ public:
     static bool isKeyJustPressed(Key key);
     static bool isMouseButtonPressed(MouseButton mouseButton);
     static bool isMouseButtonJustPressed(MouseButton mouseButton);
-    static int getMousePositionX();
-    static int getMousePositionY();
+    static double getMousePositionX();
+    static double getMousePositionY();
+    static double getMouseScrollX();
+    static double getMouseScrollY();
     static Size getWindowSize();
     static void onEvent(Event *event);
     static void nextFrame();
@@ -30,7 +32,8 @@ private:
     static void setKeyPressed(Key key, bool state);
     static void setMouseButtonPressed(MouseButton mouseButton, bool state);
     static void windowSizeChanged(Size size);
-    static void postMouseChangedPosition(int x, int y);
+    static void postMouseChangedPosition(double x, double y);
+    static void postScrollEvent(double x, double y);
     static void setWindowSize(Size size);
 
     static uint32_t frame;
@@ -43,8 +46,10 @@ private:
     // Номера кадров при нажатии мыши
     static uint32_t framesMouseButtons[4];
     static Size windowSize;
-    static int mousePositionX;
-    static int mousePositionY;
+    static double mousePositionX;
+    static double mousePositionY;
+    static double mouseScrollX;
+    static double mouseScrollY;
 };
 
 } // namespace Panda

@@ -15,8 +15,10 @@ uint32_t Input::framesKeys[1024];
 bool Input::mouseButtons[8];
 uint32_t Input::framesMouseButtons[4];
 Size Input::windowSize;
-int Input::mousePositionX;
-int Input::mousePositionY;
+double Input::mousePositionX;
+double Input::mousePositionY;
+double Input::mouseScrollX = 0;
+double Input::mouseScrollY = 0;
 
 void Input::onEvent(Event *event) {
     switch (event->type) {
@@ -54,6 +56,11 @@ void Input::onEvent(Event *event) {
             Input::setMouseButtonPressed(ev->button, false);
             break;
         }
+        case EventType::MouseScrolled: {
+            const MouseScrolledEvent *ev = static_cast<const MouseScrolledEvent *>(event);
+            Input::postScrollEvent(ev->xoffset, ev->yoffset);
+            break;
+        }
     }
 }
 
@@ -83,17 +90,30 @@ bool Input::isMouseButtonJustPressed(MouseButton mouseButton) {
     return mouseButtons[(int)mouseButton] && framesMouseButtons[(int)mouseButton] == frame;
 }
 
-int Input::getMousePositionX() {
+double Input::getMousePositionX() {
     return mousePositionX;
 }
 
-int Input::getMousePositionY() {
+double Input::getMousePositionY() {
     return mousePositionY;
 }
 
-void Input::postMouseChangedPosition(int x, int y) {
+double Input::getMouseScrollX() {
+    return mouseScrollX;
+}
+
+double Input::getMouseScrollY() {
+    return mouseScrollY;
+}
+
+void Input::postMouseChangedPosition(double x, double y) {
     mousePositionX = x;
     mousePositionY = y;
+}
+
+void Input::postScrollEvent(double x, double y) {
+    mouseScrollX = x;
+    mouseScrollY = y;
 }
 
 void Input::setWindowSize(Size size) {
@@ -106,6 +126,8 @@ Size Input::getWindowSize() {
 
 void Input::nextFrame() {
     frame++;
+    mouseScrollX = 0;
+    mouseScrollY = 0;
 }
 
 } // namespace Panda
