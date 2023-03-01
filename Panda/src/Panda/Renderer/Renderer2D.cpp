@@ -75,14 +75,14 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     PND_ASSERT(indicesCount < MAX_INDICES_COUNT, "INDICES LIMIT REACHED");
 }
 
-void Renderer2D::end() {
-    float L = 0;
-    float R = 844;
-    float T = 0;
-    float B = 390;
-    s_drawData.projMat = glm::ortho(L, R, B, T, -1.f, 1.f);
-    Miren::setUniform(
-        s_drawData.shader, "ProjMtx", &s_drawData.projMat, Miren::UniformDataType::Mat4);
+void Renderer2D::end(OrthographicCamera *camera) {
+    if (s_drawData.verticesCount == 0) {
+        return;
+    }
+    Miren::setUniform(s_drawData.shader,
+        "ProjViewMtx",
+        (void *)&camera->getViewProjectionMatrix(),
+        Miren::UniformDataType::Mat4);
 
     Miren::TransientVertexBuffer tvb;
     Miren::allocTransientVertexBuffer(&tvb, s_drawData.vbSize);

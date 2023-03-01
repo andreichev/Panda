@@ -9,7 +9,8 @@ namespace Panda {
 
 World::World()
     : root()
-    , uiRoot() {}
+    , uiRoot()
+    , m_orthographicCamera(nullptr) {}
 
 void World::update(double deltaTime) {
     root.update(deltaTime);
@@ -39,6 +40,10 @@ void World::destroy(Foundation::Shared<Entity> &entity) {
 
 UIView *World::getUIView() {
     return &uiRoot;
+}
+
+void World::setOrthographicCamera(Foundation::Shared<OrthographicCamera> camera) {
+    m_orthographicCamera = camera;
 }
 
 } // namespace Panda

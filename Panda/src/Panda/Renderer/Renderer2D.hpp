@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
+#include "Panda/GameLogic/Components/OrthographicCamera.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -27,7 +28,7 @@ public:
     static void init();
     static void begin();
     static void drawRect(RectData rect);
-    static void end();
+    static void end(OrthographicCamera *camera);
     static void terminate();
 
 private:

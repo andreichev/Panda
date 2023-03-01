@@ -19,12 +19,14 @@ public:
     // ------- Rotation -------
     void rotate(float x, float y, float z);
     glm::vec3 getRotation();
-    // ------- Position -------
     void setRotation(float x, float y, float z);
+    void setRotation(glm::vec3 rot);
+    // ------- Position -------
     void translate(Direction direction, float value);
     void translate(float x, float y, float z);
     glm::vec4 getPosition();
     void setPosition(float x, float y, float z);
+    void setPosition(glm::vec4 pos);
     // ------------------------
     glm::vec4 getUp();
     glm::vec4 getFront();

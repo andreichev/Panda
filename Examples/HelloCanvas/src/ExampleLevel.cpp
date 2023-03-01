@@ -5,6 +5,8 @@
 #include "ExampleLevel.hpp"
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/GameLogic/Components/ParticleSystem.hpp"
+#include "Panda/GameLogic/Components/OrthographicCamera.hpp"
+#include "OrthographicCameraMove.hpp"
 
 #include <imgui.h>
 
@@ -20,37 +22,38 @@ public:
         }
         Panda::RectData rect1;
         rect1.color = Panda::Color(1.0f, 0.5f, colorFactor, 1.f);
-        rect1.origin = Panda::Point(30, 30);
-        rect1.size = Panda::Size(40, 20);
+        rect1.origin = Panda::Point(0.3f, -0.5f);
+        rect1.size = Panda::Size(0.4f, 0.2f);
         rect1.rotation = degree;
         Panda::Renderer2D::drawRect(rect1);
 
         Panda::RectData rect2;
         rect2.color = Panda::Color(1.0f, 0.f, 0.f, 1.f);
-        rect2.origin = Panda::Point(60, 60);
-        rect2.size = Panda::Size(10, 10);
+        rect2.origin = Panda::Point(0.6f, 0.6f);
+        rect2.size = Panda::Size(0.1f, 0.1f);
         Panda::Renderer2D::drawRect(rect2);
 
         Panda::RectData rect3;
         rect3.color = Panda::Color(0.f, 0.f, 1.f, 1.f);
-        rect3.origin = Panda::Point(10, 80);
-        rect3.size = Panda::Size(10, 10);
+        rect3.origin = Panda::Point(0.1f, 0.8f);
+        rect3.size = Panda::Size(0.1f, 0.1f);
         Panda::Renderer2D::drawRect(rect3);
 
         if (Panda::Input::isMouseButtonPressed(Panda::MouseButton::LEFT)) {
+            Panda::ParticleProps particleProps;
+            particleProps.colorBegin = glm::vec4(0.0f, 0.0f, 0.9f, 1.0f);
+            particleProps.colorEnd = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+            particleProps.sizeBegin = 0.1f;
+            particleProps.sizeVariation = 0.1f;
+            particleProps.sizeEnd = 0.0f;
+            particleProps.lifeTime = 2.0f;
+            particleProps.velocity = glm::vec2(0.0f, 0.0f);
+            particleProps.velocityVariation = glm::vec2(0.7f, 0.7f);
+            float x = Panda::Input::getMousePositionX();
+            float y = Panda::Input::getMousePositionY();
+            Panda::Point coord = m_camera->screenCoordToWorld(Panda::Point(x, y));
+		    particleProps.position = glm::vec2(coord.x, coord.y);
             for (int i = 0; i < 5; i++) {
-                Panda::ParticleProps particleProps;
-    
-                particleProps.colorBegin = glm::vec4(0.0f, 0.0f, 0.9f, 1.0f);
-                particleProps.colorEnd = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-                particleProps.sizeBegin = 40.f;
-                particleProps.sizeVariation = 0.3f;
-                particleProps.sizeEnd = 0.0f;
-                particleProps.lifeTime = 2.0f;
-                particleProps.velocity = glm::vec2(0.0f, 0.0f);
-                particleProps.velocityVariation = glm::vec2(200.0f, 200.0f);
-                particleProps.position =
-                    glm::vec2(Panda::Input::getMousePositionX(), Panda::Input::getMousePositionY());
                 m_particleSystem->emit(particleProps);
             }
         }
@@ -68,19 +71,32 @@ public:
         m_particleSystem = particleSystem;
     }
 
+    void setCamera(Foundation::Shared<Panda::OrthographicCamera> camera) {
+        m_camera = camera;
+    }
+
 private:
     Foundation::Shared<Panda::ParticleSystem> m_particleSystem;
+    Foundation::Shared<Panda::OrthographicCamera> m_camera;
     float degree = 0.f;
     float colorFactor = 0.f;
 };
 
 void ExampleLevel::start(Panda::World *world) {
     using namespace Miren;
+    Foundation::Shared<Panda::OrthographicCamera> camera =
+        Foundation::makeShared<Panda::OrthographicCamera>();
+    world->setOrthographicCamera(camera);
     Foundation::Shared<Panda::Entity> entity = world->instantiateEntity();
     Foundation::Shared<Panda::ParticleSystem> particle =
         Foundation::makeShared<Panda::ParticleSystem>();
     Foundation::Shared<ExampleRenderer> dummy = Foundation::makeShared<ExampleRenderer>();
+    Foundation::Shared<OrthographicCameraMove> cameraMove = Foundation::makeShared<OrthographicCameraMove>();
     entity->addComponent(dummy);
     entity->addComponent(particle);
+    entity->addComponent(camera);
+    entity->addComponent(cameraMove);
+    cameraMove->setCamera(camera);
     dummy->setParticleSysyem(particle);
+    dummy->setCamera(camera);
 }

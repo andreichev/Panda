@@ -18,8 +18,8 @@ Size Input::windowSize;
 int Input::mousePositionX;
 int Input::mousePositionY;
 
-void Input::onEvent(Event* event) {
-switch (event->type) {
+void Input::onEvent(Event *event) {
+    switch (event->type) {
         case EventType::None:
             break;
         case EventType::WindowClose:

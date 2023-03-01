@@ -23,12 +23,14 @@ void Transform::initialize() {
 void Transform::update(double deltaTime) {}
 
 void Transform::setRotation(float x, float y, float z) {
-    if (rotation.x == x && rotation.y == y && rotation.z == z) {
+    setRotation(glm::vec3(x, y, z));
+}
+
+void Transform::setRotation(glm::vec3 rot) {
+    if (rotation == rot) {
         return;
     }
-    rotation.x = x;
-    rotation.y = y;
-    rotation.z = z;
+    rotation = rot;
     updateVectors();
     transformUpdated();
 }
@@ -95,12 +97,14 @@ void Transform::translate(Direction direction, float value) {
 }
 
 void Transform::setPosition(float x, float y, float z) {
-    if (position.x == x && position.y == y && position.z == z) {
+    setPosition(glm::vec4(x, y, z, 1.0f));
+}
+
+void Transform::setPosition(glm::vec4 pos) {
+    if (position == pos) {
         return;
     }
-    position.x = x;
-    position.y = y;
-    position.z = z;
+    position = pos;
     updateVectors();
     transformUpdated();
 }

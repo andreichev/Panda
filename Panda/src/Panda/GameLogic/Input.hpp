@@ -22,11 +22,11 @@ public:
     static int getMousePositionX();
     static int getMousePositionY();
     static Size getWindowSize();
-    static void onEvent(Event* event);
+    static void onEvent(Event *event);
     static void nextFrame();
 
 private:
-     // POST EVENTS
+    // POST EVENTS
     static void setKeyPressed(Key key, bool state);
     static void setMouseButtonPressed(MouseButton mouseButton, bool state);
     static void windowSizeChanged(Size size);
