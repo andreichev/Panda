@@ -59,5 +59,5 @@ void CameraMove::update(double deltaTime) {
 }
 
 void CameraMove::onImGuiRender() {
-    // ImGui::ShowDemoWindow();
+    ImGui::ShowDemoWindow();
 }
