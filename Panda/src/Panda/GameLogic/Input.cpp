@@ -15,8 +15,8 @@ uint32_t Input::framesKeys[1024];
 bool Input::mouseButtons[8];
 uint32_t Input::framesMouseButtons[4];
 Size Input::windowSize;
-double Input::mousePositionX;
-double Input::mousePositionY;
+double Input::mousePositionX = 0;
+double Input::mousePositionY = 0;
 double Input::mouseScrollX = 0;
 double Input::mouseScrollY = 0;
 

@@ -67,7 +67,7 @@ void OrthographicCameraMove::update(double deltaTime) {
 
     double scroll = Input::getMouseScrollY();
     if (scroll != 0) {
-        m_zoom += scroll;
+        m_zoom -= scroll * 0.15f;
         m_zoom = Foundation::min(m_zoom, 10.0);
         m_zoom = Foundation::max(m_zoom, 1.0);
         m_camera->setZoomLevel(m_zoom);

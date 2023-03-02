@@ -4,13 +4,38 @@
 
 namespace Panda {
 
-Renderer2D::DrawData Renderer2D::s_drawData;
+struct Vertex {
+    Vertex(glm::vec3 pos, Color color)
+        : pos(pos)
+        , color(color) {}
+
+    Vertex()
+        : pos()
+        , color() {}
+    glm::vec3 pos;
+    Color color;
+};
+
+struct DrawData {
+    Renderer2D::Statistics stats;
+    glm::mat4 projMat;
+    Miren::ShaderHandle shader;
+    Miren::VertexLayoutHandle layout;
+    Vertex *vertices;
+    uint32_t verticesCount;
+    uint16_t *indices;
+    uint32_t indicesCount;
+    uint32_t vbSize;
+    uint32_t ibSize;
+};
+
+static DrawData s_drawData;
 
 void Renderer2D::init() {
     s_drawData.vbSize = 0;
     s_drawData.indicesCount = 0;
-    s_drawData.vertices = (Renderer2D::Vertex *)ALLOC(
-        Foundation::getAllocator(), sizeof(Renderer2D::Vertex) * MAX_VERTICES_COUNT);
+    s_drawData.vertices =
+        (Vertex *)ALLOC(Foundation::getAllocator(), sizeof(Vertex) * MAX_VERTICES_COUNT);
     s_drawData.indices =
         (uint16_t *)ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
     s_drawData.shader = Miren::createShader(
@@ -31,6 +56,8 @@ void Renderer2D::terminate() {
 }
 
 void Renderer2D::begin() {
+    s_drawData.stats.quadCount = 0;
+    s_drawData.stats.drawCalls = 0;
     s_drawData.verticesCount = 0;
     s_drawData.vbSize = 0;
     s_drawData.indicesCount = 0;
@@ -73,6 +100,11 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     s_drawData.ibSize += sizeof(uint16_t) * 6;
     PND_ASSERT(verticesCount < MAX_VERTICES_COUNT, "VERTICES LIMIT REACHED");
     PND_ASSERT(indicesCount < MAX_INDICES_COUNT, "INDICES LIMIT REACHED");
+    s_drawData.stats.quadCount += 1;
+}
+
+Renderer2D::Statistics Renderer2D::getStats() {
+    return s_drawData.stats;
 }
 
 void Renderer2D::end(OrthographicCamera *camera) {
