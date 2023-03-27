@@ -160,6 +160,9 @@ void RendererOpenGL::setUniform(const Uniform &uniform) {
         case UniformDataType::Int:
             shaders[uniform.handle].setUniformInt(uniform.name, (int)(intptr_t)uniform.value);
             return;
+        case UniformDataType::IntArray:
+            shaders[uniform.handle].setUniformIntArray(uniform.name, (int *)uniform.value);
+            return;
     }
     LOG_ERROR("UIFORM TYPE IS UNDEFINED");
 }
@@ -188,6 +191,7 @@ void RendererOpenGL::submit(Frame *frame) {
         if (draw.m_isSubmitted == false) {
             continue;
         }
+        shaders[draw.m_shader].bind();
         for (size_t u = 0; u < draw.m_uniformsCount; u++) {
             Uniform &uniform = draw.m_uniformBuffer[u];
             setUniform(uniform);
@@ -228,7 +232,6 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     PND_ASSERT(layoutHandle != MIREN_INVALID_HANDLE, "Invalid handle");
     VertexBufferLayoutData &layout = vertexLayouts[layoutHandle];
     glBindVertexArray(m_vao);
-    shaders[draw->m_shader].bind();
     shaders[draw->m_shader].bindAttributes(layout, draw->m_verticesOffset);
     if (draw->m_isIndexed) {
         indexBuffers[draw->m_indexBuffer].bind();

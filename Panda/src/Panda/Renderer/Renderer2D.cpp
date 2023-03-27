@@ -5,22 +5,33 @@
 namespace Panda {
 
 struct Vertex {
-    Vertex(glm::vec3 pos, Color color)
+    Vertex(glm::vec3 pos, glm::vec2 textureCoords, float textureIndex, Color color)
         : pos(pos)
+        , textureCoords(textureCoords)
+        , textureIndex(textureIndex)
         , color(color) {}
 
     Vertex()
         : pos()
+        , textureCoords()
+        , textureIndex(0)
         , color() {}
+
     glm::vec3 pos;
+    glm::vec2 textureCoords;
+    float textureIndex;
     Color color;
 };
 
-struct DrawData {
+struct DrawCallData {
     Renderer2D::Statistics stats;
     glm::mat4 projMat;
     Miren::ShaderHandle shader;
+    Foundation::Shared<Texture> whiteTexture;
     Miren::VertexLayoutHandle layout;
+    Foundation::Shared<Texture> textures[MAX_TEXTURE_SLOTS];
+    int samplers[MAX_TEXTURE_SLOTS];
+    uint32_t textureSlotIndex;
     Vertex *vertices;
     uint32_t verticesCount;
     uint16_t *indices;
@@ -29,7 +40,7 @@ struct DrawData {
     uint32_t ibSize;
 };
 
-static DrawData s_drawData;
+static DrawCallData s_drawData;
 
 void Renderer2D::init() {
     s_drawData.vbSize = 0;
@@ -43,9 +54,23 @@ void Renderer2D::init() {
     Miren::VertexBufferLayoutData layoutData;
     // Position
     layoutData.pushVec3();
+    // Texture coordinates
+    layoutData.pushVec2();
+    // Texture Index
+    layoutData.pushFloat(1);
     // Color
     layoutData.pushVec4();
     s_drawData.layout = Miren::createVertexLayout(layoutData);
+    s_drawData.textureSlotIndex = 1;
+    uint32_t *whiteTextureData = (uint32_t *)ALLOC(Foundation::getAllocator(), sizeof(uint32_t));
+    *whiteTextureData = 0xffffffff;
+    s_drawData.whiteTexture = Foundation::makeShared<Texture>((uint8_t *)whiteTextureData, 1, 1);
+    s_drawData.textures[0] = s_drawData.whiteTexture;
+    for (uint32_t i = 0; i < MAX_TEXTURE_SLOTS; i++) {
+        s_drawData.samplers[i] = i;
+    }
+    Miren::setUniform(
+        s_drawData.shader, "u_textures", s_drawData.samplers, Miren::UniformDataType::IntArray);
 }
 
 void Renderer2D::terminate() {
@@ -62,6 +87,7 @@ void Renderer2D::begin() {
     s_drawData.vbSize = 0;
     s_drawData.indicesCount = 0;
     s_drawData.ibSize = 0;
+    s_drawData.textureSlotIndex = 1;
 }
 
 void Renderer2D::drawRect(RectData rect) {
@@ -83,9 +109,33 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     positions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
     positions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
     positions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
-    for (glm::vec4 &pos : positions) {
-        s_drawData.vertices[verticesCount].pos = transform * pos;
+    glm::vec2 textureCoords[4];
+    textureCoords[0] = {0.0f, 0.0f};
+    textureCoords[1] = {1.0f, 0.0f};
+    textureCoords[2] = {1.0f, 1.0f};
+    textureCoords[3] = {0.0f, 1.0f};
+
+    float textureIndex = 0.0f;
+    if (rect.texture != nullptr) {
+        for (uint32_t i = 1; i < s_drawData.textureSlotIndex; i++) {
+            if (*s_drawData.textures[i] == *rect.texture) {
+                textureIndex = (float)i;
+                break;
+            }
+        }
+        if (textureIndex == 0.0f) {
+            // TODO: Check if next batch is needed
+            textureIndex = (float)s_drawData.textureSlotIndex;
+            s_drawData.textures[s_drawData.textureSlotIndex] = rect.texture;
+            s_drawData.textureSlotIndex++;
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        s_drawData.vertices[verticesCount].pos = transform * positions[i];
+        s_drawData.vertices[verticesCount].textureIndex = textureIndex;
         s_drawData.vertices[verticesCount].color = rect.color;
+        s_drawData.vertices[verticesCount].textureCoords = textureCoords[i];
         verticesCount++;
     }
     uint32_t &indicesCount = s_drawData.indicesCount;
@@ -111,8 +161,9 @@ void Renderer2D::end(OrthographicCamera *camera) {
     if (s_drawData.verticesCount == 0) {
         return;
     }
+    Miren::setShader(s_drawData.shader);
     Miren::setUniform(s_drawData.shader,
-        "ProjViewMtx",
+        "projViewMtx",
         (void *)&camera->getViewProjectionMatrix(),
         Miren::UniformDataType::Mat4);
 
@@ -126,10 +177,12 @@ void Renderer2D::end(OrthographicCamera *camera) {
     memcpy(tib.data, s_drawData.indices, s_drawData.ibSize);
 
     Miren::setState(0);
+    for (int i = 0; i < s_drawData.textureSlotIndex; i++) {
+        Miren::setTexture(s_drawData.textures[i]->getHandle(), i);
+    }
     Miren::setVertexLayout(s_drawData.layout);
     Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
     Miren::setIndexBuffer(tib.handle, tib.startIndex, s_drawData.indicesCount);
-    Miren::setShader(s_drawData.shader);
     Miren::submit();
 }
 

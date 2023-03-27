@@ -19,7 +19,7 @@
 
 namespace Miren {
 
-enum class UniformDataType { Int, Mat4 };
+enum class UniformDataType { Int, Mat4, IntArray };
 
 using ShaderHandle = uint16_t;
 using TextureHandle = uint16_t;

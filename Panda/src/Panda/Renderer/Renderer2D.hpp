@@ -2,6 +2,7 @@
 
 #include "Panda/Base/Base.hpp"
 #include "Panda/GameLogic/Components/OrthographicCamera.hpp"
+#include "Panda/Renderer/Texture.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -9,6 +10,7 @@ namespace Panda {
 
 #define MAX_VERTICES_COUNT 10000
 #define MAX_INDICES_COUNT 16000
+#define MAX_TEXTURE_SLOTS 16
 
 class Renderer2D {
 public:
@@ -17,12 +19,14 @@ public:
             : origin()
             , size()
             , color()
+            , texture(nullptr)
             , rotation(0) {}
 
         Point origin;
         Size size;
         Color color;
         float rotation;
+        Foundation::Shared<Texture> texture;
     };
 
     struct Statistics {

@@ -12,7 +12,9 @@
 
 class ExampleRenderer : public Panda::Component {
 public:
-    void initialize() override {}
+    void initialize() override {
+        m_texture = Foundation::makeShared<Panda::Texture>("textures/arbuz1.png");
+    }
 
     void update(double deltaTime) override {
         degree += 60 * deltaTime;
@@ -25,6 +27,7 @@ public:
         rect1.origin = Panda::Point(0.3f, -0.5f);
         rect1.size = Panda::Size(0.4f, 0.2f);
         rect1.rotation = degree;
+        rect1.texture = m_texture;
         Panda::Renderer2D::drawRect(rect1);
 
         Panda::Renderer2D::RectData rect2;
@@ -65,6 +68,7 @@ public:
 
     void onImGuiRender() override {
         ImGui::Begin("Renderer2D statistics");
+        ImGui::Text("FPS: %d", Panda::Application::get()->fps);
         auto stats = Panda::Renderer2D::getStats();
         ImGui::Text("Quads count: %d", stats.quadCount);
         ImGui::Text("Vertices count: %d", stats.getTotalVertexCount());
@@ -84,6 +88,7 @@ public:
 private:
     Foundation::Shared<Panda::ParticleSystem> m_particleSystem;
     Foundation::Shared<Panda::OrthographicCamera> m_camera;
+    Foundation::Shared<Panda::Texture> m_texture;
     float degree = 0.f;
     float colorFactor = 0.f;
 };

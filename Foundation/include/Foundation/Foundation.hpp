@@ -42,7 +42,7 @@ template<typename T, typename... Args>
 constexpr Shared<T> makeShared(Args &&...args) {
     AllocatorI *alloc = getAllocator();
     T *ptr = NEW(alloc, T)(std::forward<Args>(args)...);
-    auto deleter = [alloc](T *ptr) { FREE(alloc, ptr); };
+    auto deleter = [alloc](T *ptr) { DELETE(alloc, ptr); };
     return std::shared_ptr<T>(ptr, deleter);
 }
 
@@ -60,7 +60,7 @@ template<typename T, typename... Args>
 constexpr Shared<T> makeWeak(Args &&...args) {
     AllocatorI *alloc = getAllocator();
     T *ptr = NEW(alloc, T)(std::forward<Args>(args)...);
-    auto deleter = [alloc](T *ptr) { FREE(alloc, ptr); };
+    auto deleter = [alloc](T *ptr) { DELETE(alloc, ptr); };
     return std::weak_ptr<T>(ptr, deleter);
 }
 
