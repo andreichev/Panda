@@ -2,10 +2,10 @@
 // Created by Admin on 19.02.2022.
 //
 
-#include "EventQueue.hpp"
-#include "KeyEvents.hpp"
-#include "MouseEvents.hpp"
-#include "WindowEvents.hpp"
+#include "Panda/Events/EventQueue.hpp"
+#include "Panda/Events/KeyEvents.hpp"
+#include "Panda/Events/MouseEvents.hpp"
+#include "Panda/Events/WindowEvents.hpp"
 
 namespace Panda {
 

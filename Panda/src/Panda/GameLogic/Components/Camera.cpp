@@ -3,7 +3,7 @@
 //
 
 #include "pndpch.hpp"
-#include "Camera.hpp"
+#include "Panda/GameLogic/Components/Camera.hpp"
 
 #include "Panda/Application/Application.hpp"
 #include "Panda/GameLogic/Entity.hpp"

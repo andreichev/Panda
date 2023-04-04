@@ -2,7 +2,9 @@
 // Created by Admin on 22.01.2022.
 //
 
-#include "Application.hpp"
+#include "pndpch.hpp"
+
+#include "Panda/Application/Application.hpp"
 #include "Panda/Application/Initialization/PlatformInit.hpp"
 #include "Panda/GameLogic/BasicGameLayer.hpp"
 #include "Panda/Events/WindowEvents.hpp"

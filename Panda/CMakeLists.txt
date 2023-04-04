@@ -7,7 +7,7 @@ endif ()
 set(CMAKE_CXX_STANDARD 14)
 
 file(GLOB_RECURSE SOURCES src/Panda/*.cpp)
-file(GLOB_RECURSE INCLUDE src/Panda/*.hpp)
+file(GLOB_RECURSE INCLUDE src/Panda/*.hpp include/Panda/*.hpp)
 
 # Entry point realization binding
 if (DESKTOP)
@@ -38,6 +38,7 @@ add_library(Panda STATIC "${SOURCES}" "${INCLUDE}" "${RESOURCE_FOLDERS}")
 target_precompile_headers(Panda PRIVATE src/pndpch.hpp)
 
 target_include_directories(Panda PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(Panda PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 if (DESKTOP)
     # Dependencies - GLFW, only for Desktop :)
@@ -65,15 +66,13 @@ endif ()
 
 # Dependencies - Foundation
 target_link_libraries(Panda Foundation)
-target_include_directories(Panda PRIVATE ${FOUNDATION_DIRECTORY}/include)
 
 # Dependencies - Miren
 target_link_libraries(Panda Miren)
-target_include_directories(Panda PRIVATE ${MIREN_DIRECTORY}/include)
 
 # Dependencies - GLM
 target_link_libraries(Panda glm)
-target_include_directories(Panda PRIVATE ${VENDOR_DIRECTORY}/glm)
+target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/glm)
 
 # Dependencies - stb_image
 target_link_libraries(Panda stb_image)

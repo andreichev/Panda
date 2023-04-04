@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include "Foundation/CommandBuffer.hpp"
-#include "Event.hpp"
-#include "Key.hpp"
+#include "Panda/Events/Event.hpp"
+#include "Panda/Events/Key.hpp"
+
+#include <Foundation/CommandBuffer.hpp>
 
 namespace Panda {
 

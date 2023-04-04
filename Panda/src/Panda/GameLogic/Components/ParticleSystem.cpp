@@ -1,4 +1,4 @@
-#include "ParticleSystem.hpp"
+#include "Panda/GameLogic/Components/ParticleSystem.hpp"
 
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Base/Random.hpp"

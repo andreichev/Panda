@@ -3,7 +3,7 @@
 //
 
 #include "pndpch.hpp"
-#include "Entity.hpp"
+#include "Panda/GameLogic/Entity.hpp"
 
 namespace Panda {
 

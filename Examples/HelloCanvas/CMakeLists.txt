@@ -50,14 +50,5 @@ set_target_properties(HelloCanvas
     VS_DEBUGGER_WORKING_DIRECTORY ${BIN_DIRECTORY}
 )
 
-# Dependencies - Foundation
-target_link_libraries(HelloCanvas Foundation)
-target_include_directories(HelloCanvas PRIVATE ${FOUNDATION_DIRECTORY}/include)
-
-# Dependencies - Miren
-target_link_libraries(HelloCanvas Miren)
-target_include_directories(HelloCanvas PRIVATE ${MIREN_DIRECTORY}/include)
-
 # Dependencies - Panda
 target_link_libraries(HelloCanvas Panda)
-target_include_directories(HelloCanvas PRIVATE ${PANDA_DIRECTORY}/src)

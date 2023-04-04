@@ -1,4 +1,4 @@
-#include "OrthographicCamera.hpp"
+#include "Panda/GameLogic/Components/OrthographicCamera.hpp"
 
 #include "Panda/Application/Application.hpp"
 #include <glm/gtc/matrix_transform.hpp>

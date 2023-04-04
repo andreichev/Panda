@@ -61,4 +61,4 @@ target_include_directories(Baobab PRIVATE ${MIREN_DIRECTORY}/include)
 
 # Dependencies - Panda
 target_link_libraries(Baobab Panda)
-target_include_directories(Baobab PRIVATE ${PANDA_DIRECTORY}/src)
+target_include_directories(Baobab PRIVATE ${PANDA_DIRECTORY}/include)

@@ -30,7 +30,7 @@ endif ()
 add_library(Miren STATIC "${SOURCES}" "${INCLUDE}")
 
 target_include_directories(Miren PRIVATE ${PROJECT_SOURCE_DIR}/src)
-target_include_directories(Miren PRIVATE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(Miren PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 if (DESKTOP)
     # Dependencies - GLFW, only for Desktop :)
@@ -54,7 +54,7 @@ endif ()
 
 # Dependencies - Foundation
 target_link_libraries(Miren Foundation)
-target_include_directories(Miren PRIVATE ${FOUNDATION_DIRECTORY}/include)
+target_include_directories(Miren PUBLIC ${FOUNDATION_DIRECTORY}/include)
 
 # Dependencies - GLM
 target_link_libraries(Miren glm)

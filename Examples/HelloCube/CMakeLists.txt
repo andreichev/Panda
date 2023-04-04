@@ -50,14 +50,5 @@ set_target_properties(HelloCube
     VS_DEBUGGER_WORKING_DIRECTORY ${BIN_DIRECTORY}
 )
 
-# Dependencies - Foundation
-target_link_libraries(HelloCube Foundation)
-target_include_directories(HelloCube PRIVATE ${FOUNDATION_DIRECTORY}/include)
-
-# Dependencies - Miren
-target_link_libraries(HelloCube Miren)
-target_include_directories(HelloCube PRIVATE ${MIREN_DIRECTORY}/include)
-
 # Dependencies - Panda
 target_link_libraries(HelloCube Panda)
-target_include_directories(HelloCube PRIVATE ${PANDA_DIRECTORY}/src)

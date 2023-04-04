@@ -50,14 +50,5 @@ set_target_properties(HelloTriangle
     VS_DEBUGGER_WORKING_DIRECTORY ${BIN_DIRECTORY}
 )
 
-# Dependencies - Foundation
-target_link_libraries(HelloTriangle Foundation)
-target_include_directories(HelloTriangle PRIVATE ${FOUNDATION_DIRECTORY}/include)
-
-# Dependencies - Miren
-target_link_libraries(HelloTriangle Miren)
-target_include_directories(HelloTriangle PRIVATE ${MIREN_DIRECTORY}/include)
-
 # Dependencies - Panda
 target_link_libraries(HelloTriangle Panda)
-target_include_directories(HelloTriangle PRIVATE ${PANDA_DIRECTORY}/src)

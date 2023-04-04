@@ -2,8 +2,8 @@
 // Created by Admin on 19.02.2022.
 //
 
-#include "Event.hpp"
-#include "Key.hpp"
+#include "Panda/Events/Event.hpp"
+#include "Panda/Events/Key.hpp"
 
 namespace Panda {
 

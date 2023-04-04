@@ -2,7 +2,7 @@
 // Created by Admin on 12.02.2022.
 //
 #include "pndpch.hpp"
-#include "Mesh.hpp"
+#include "Panda/GameLogic/Components/Mesh.hpp"
 
 #include <utility>
 

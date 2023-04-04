@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Event.hpp"
+#include "Panda/Events/Event.hpp"
 
 namespace Panda {
 

@@ -2,7 +2,7 @@
 // Created by Admin on 05.02.2022.
 //
 
-#include "Input.hpp"
+#include "Panda/GameLogic/Input.hpp"
 #include "Panda/Events/WindowEvents.hpp"
 #include "Panda/Events/KeyEvents.hpp"
 #include "Panda/Events/MouseEvents.hpp"
