@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Miren/Miren.hpp>
+#include <cstdlib>
 
 namespace Panda {
 class Texture {
@@ -9,7 +10,7 @@ public:
         m_handle = Miren::createTextureFromFile(path);
         LOG_INFO("CREATED TEXTURE, path: {}", path);
     }
-    Texture(uint8_t *data, uint32_t width, u_int32_t height) {
+    Texture(uint8_t *data, uint32_t width, uint32_t height) {
         m_handle = Miren::createTextureFromPixels(data, width, height);
         LOG_INFO("CREATED TEXTURE, w: {}, h: {}", width, height);
     }

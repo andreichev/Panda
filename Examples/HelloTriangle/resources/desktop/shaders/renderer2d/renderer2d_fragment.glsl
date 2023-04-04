@@ -6,7 +6,7 @@ in vec2 fragTexCoord;
 
 out vec4 outColor;
 
-uniform sampler2D u_textures[16];
+uniform sampler2D u_textures[8];
 
 void main() {
     outColor = fragColor;
@@ -20,13 +20,5 @@ void main() {
         case  5: outColor *= texture(u_textures[ 5], fragTexCoord.st); break;
         case  6: outColor *= texture(u_textures[ 6], fragTexCoord.st); break;
         case  7: outColor *= texture(u_textures[ 7], fragTexCoord.st); break;
-        case  8: outColor *= texture(u_textures[ 8], fragTexCoord.st); break;
-        case  9: outColor *= texture(u_textures[ 9], fragTexCoord.st); break;
-        case 10: outColor *= texture(u_textures[10], fragTexCoord.st); break;
-        case 11: outColor *= texture(u_textures[11], fragTexCoord.st); break;
-        case 12: outColor *= texture(u_textures[12], fragTexCoord.st); break;
-        case 13: outColor *= texture(u_textures[13], fragTexCoord.st); break;
-        case 14: outColor *= texture(u_textures[14], fragTexCoord.st); break;
-        case 15: outColor *= texture(u_textures[15], fragTexCoord.st); break;
     }
 }

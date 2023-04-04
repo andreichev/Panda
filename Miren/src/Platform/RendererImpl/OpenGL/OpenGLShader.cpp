@@ -160,7 +160,7 @@ void OpenGLShader::setUniformInt(const char *name, int value) {
 }
 
 void OpenGLShader::setUniformIntArray(const char *name, int *value) {
-    glUniform1iv(getUniformLocation(name), 16, value);
+    glUniform1iv(getUniformLocation(name), 8, value);
 }
 
 } // namespace Miren

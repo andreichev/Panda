@@ -10,7 +10,7 @@ namespace Panda {
 
 #define MAX_VERTICES_COUNT 10000
 #define MAX_INDICES_COUNT 16000
-#define MAX_TEXTURE_SLOTS 16
+#define MAX_TEXTURE_SLOTS 8
 
 class Renderer2D {
 public:
