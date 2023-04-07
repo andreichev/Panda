@@ -65,7 +65,7 @@ elseif(PLATFORM_IOS)
 
         add_executable(${TARGET_NAME} MACOSX_BUNDLE ${SOURCE} ${INCLUDE} ${ASSETS})
 
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum iOS deployment version")
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0" CACHE STRING "Minimum iOS deployment version")
 
         set_target_properties(${TARGET_NAME} PROPERTIES
                 XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.md.${TARGET_NAME}"

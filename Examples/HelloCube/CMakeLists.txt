@@ -12,15 +12,16 @@ file(GLOB_RECURSE INCLUDE
         )
 
 file(GLOB RESOURCE_FOLDERS
-        resources/common/*
+        resources/*
+        ${PANDA_DIRECTORY}/resources/common/*
         )
 
 if (DESKTOP)
-    file(GLOB RESOURCE_DESKTOP_FOLDERS resources/desktop/*)
-    list (APPEND RESOURCE_FOLDERS "${RESOURCE_DESKTOP_FOLDERS}")
+    file(GLOB RESOURCE_ADDITIONAL_FOLDERS ${PANDA_DIRECTORY}/resources/desktop/*)
+    list(APPEND RESOURCE_FOLDERS "${RESOURCE_ADDITIONAL_FOLDERS}")
 elseif(PLATFORM_IOS)
-    file(GLOB RESOURCE_IOS_FOLDERS resources/ios/*)
-    list (APPEND RESOURCE_FOLDERS "${RESOURCE_IOS_FOLDERS}")
+    file(GLOB RESOURCE_ADDITIONAL_FOLDERS ${PANDA_DIRECTORY}/resources/ios/*)
+    list(APPEND RESOURCE_FOLDERS "${RESOURCE_ADDITIONAL_FOLDERS}")
 endif()
 
 list(FILTER RESOURCE_FOLDERS EXCLUDE REGEX "\\.DS_Store")
