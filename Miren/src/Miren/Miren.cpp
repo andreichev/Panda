@@ -24,6 +24,18 @@ void terminate() {
     MIREN_LOG("MIREN SHUTDOWN END");
 }
 
+FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification) {
+    return s_context->createFrameBuffer(specification);
+}
+
+void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) {
+    s_context->resizeFrameBuffer(handle, width, height);
+}
+
+void deleteFrameBuffer(FrameBufferHandle handle) {
+    s_context->deleteFrameBuffer(handle);
+}
+
 ShaderHandle createShader(const char *vertexPath, const char *fragmentPath) {
     return s_context->createShader(vertexPath, fragmentPath);
 }
@@ -99,8 +111,8 @@ bool renderFrame() {
     return s_context->renderFrame();
 }
 
-void frame() {
-    s_context->frame();
+uint32_t frame() {
+    return s_context->frame();
 }
 
 void setViewport(Rect &rect) {

@@ -67,6 +67,19 @@ void RendererOpenGL::flip() {
     context->flip();
 }
 
+void RendererOpenGL::createFrameBuffer(
+    FrameBufferHandle handle, FrameBufferSpecification specification) {
+    frameBuffers[handle].create(specification);
+}
+
+void RendererOpenGL::resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) {
+    frameBuffers[handle].resize(width, height);
+}
+
+void RendererOpenGL::deleteFrameBuffer(FrameBufferHandle handle) {
+    frameBuffers[handle].terminate();
+}
+
 void RendererOpenGL::createShader(
     ShaderHandle handle, const char *vertexPath, const char *fragmentPath) {
     shaders[handle].create(vertexPath, fragmentPath);
@@ -191,21 +204,22 @@ void RendererOpenGL::submit(Frame *frame) {
         if (draw.m_isSubmitted == false) {
             continue;
         }
-        shaders[draw.m_shader].bind();
-        for (size_t u = 0; u < draw.m_uniformsCount; u++) {
-            Uniform &uniform = draw.m_uniformBuffer[u];
-            setUniform(uniform);
-        }
-        for (size_t t = 0; t < draw.m_textureBindingsCount; t++) {
-            TextureBinding &textureBinding = draw.m_textureBindings[t];
-            setTexture(textureBinding.m_handle, textureBinding.m_slot);
-        }
         submit(&draw);
     }
 }
 
 void RendererOpenGL::submit(RenderDraw *draw) {
     // TODO: Capture time
+    if (draw->m_frameBuffer != MIREN_INVALID_HANDLE) {}
+    shaders[draw->m_shader].bind();
+    for (size_t u = 0; u < draw->m_uniformsCount; u++) {
+        Uniform &uniform = draw->m_uniformBuffer[u];
+        setUniform(uniform);
+    }
+    for (size_t t = 0; t < draw->m_textureBindingsCount; t++) {
+        TextureBinding &textureBinding = draw->m_textureBindings[t];
+        setTexture(textureBinding.m_handle, textureBinding.m_slot);
+    }
     if (draw->m_state & MIREN_STATE_CULL_FACE) {
         glEnable(GL_CULL_FACE);
     } else {

@@ -19,15 +19,50 @@
 
 namespace Miren {
 
-enum class UniformDataType { Int, Mat4, IntArray };
-
 using ShaderHandle = uint16_t;
 using TextureHandle = uint16_t;
 using IndexBufferHandle = uint16_t;
+using FrameBufferHandle = uint16_t;
 using VertexBufferHandle = uint16_t;
 using VertexLayoutHandle = uint16_t;
 
 #define MIREN_INVALID_HANDLE UINT16_MAX
+
+enum class UniformDataType { Int, Mat4, IntArray };
+
+enum class FrameBufferTextureFormat {
+    None = 0,
+    // Color
+    RGBA8,
+    RED_INTEGER,
+    // Depth/stencil
+    DEPTH24STENCIL8,
+    // Defaults
+    Depth = DEPTH24STENCIL8
+};
+
+struct FrameBufferAttachmentSpecification {
+    FrameBufferAttachmentSpecification(FrameBufferTextureFormat format)
+        : format(format) {}
+
+    FrameBufferTextureFormat format;
+};
+
+struct FrameBufferSpecification {
+    FrameBufferSpecification(std::vector<FrameBufferAttachmentSpecification> attachments,
+        int samples,
+        uint32_t width,
+        uint32_t height)
+        : attachments(attachments)
+        , samples(samples)
+        , width(width)
+        , height(height) {}
+
+    std::vector<FrameBufferAttachmentSpecification> attachments;
+    int samples;
+    uint32_t width;
+    uint32_t height;
+};
 
 struct TransientIndexBuffer {
     TransientIndexBuffer()

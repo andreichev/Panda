@@ -33,7 +33,7 @@ public:
         Panda::Renderer2D::RectData rect2;
         rect2.color = Panda::Color(1.0f, 0.f, 0.f, 1.f);
         rect2.origin = Panda::Point(0.6f, 0.6f);
-        rect2.size = Panda::Size(0.1f, 0.1f);
+        rect2.size = Panda::Size(0.2f, 0.2f);
         Panda::Renderer2D::drawRect(rect2);
 
         Panda::Renderer2D::RectData rect3;

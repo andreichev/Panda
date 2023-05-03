@@ -12,6 +12,9 @@ namespace Miren {
 void initialize();
 void terminate();
 // MARK: - Command buffer
+FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification);
+void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height);
+void deleteFrameBuffer(FrameBufferHandle handle);
 ShaderHandle createShader(const char *vertexPath, const char *fragmentPath);
 void deleteShader(ShaderHandle handle);
 TextureHandle createTextureFromFile(const char *path);
@@ -51,8 +54,9 @@ void submitPrimitives(uint32_t elements);
 // MARK: - Main functions
 /// Process all requests to gpu (from rendering thread)
 bool renderFrame();
-/// Frame processing finished (from app thread). Wait for renderer to finish rendering frame
-void frame();
+/// Frame processing finished (from app thread). Wait for renderer to finish rendering frame.
+/// Returns frame number
+uint32_t frame();
 
 void renderSemaphoreWait();
 void renderSemaphorePost();

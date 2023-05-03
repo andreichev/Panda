@@ -15,6 +15,9 @@ namespace Miren {
 enum RendererCommandType {
     RendererInit,
     RendererShutdown,
+    CreateFrameBuffer,
+    ResizeFrameBuffer,
+    DestroyFrameBuffer,
     CreateShader,
     DestroyShader,
     CreateTextureFromFile,
@@ -30,6 +33,36 @@ enum RendererCommandType {
     DestroyVertexBuffer,
     CreateVertexLayout,
     DestroyVertexLayout
+};
+
+struct CreateFrameBufferCommand : Foundation::CommandBuffer::Command {
+    FrameBufferHandle handle;
+    FrameBufferSpecification spec;
+
+    CreateFrameBufferCommand(FrameBufferHandle handle, FrameBufferSpecification spec)
+        : Command(RendererCommandType::CreateFrameBuffer)
+        , handle(handle)
+        , spec(spec) {}
+};
+
+struct ResizeFrameBufferCommand : Foundation::CommandBuffer::Command {
+    FrameBufferHandle handle;
+    uint32_t width;
+    uint32_t height;
+
+    ResizeFrameBufferCommand(FrameBufferHandle handle, uint32_t width, uint32_t height)
+        : Command(RendererCommandType::ResizeFrameBuffer)
+        , handle(handle)
+        , width(width)
+        , height(height) {}
+};
+
+struct DeleteFrameBufferCommand : Foundation::CommandBuffer::Command {
+    FrameBufferHandle handle;
+
+    DeleteFrameBufferCommand(FrameBufferHandle handle)
+        : Command(RendererCommandType::DestroyFrameBuffer)
+        , handle(handle) {}
 };
 
 struct CreateShaderCommand : Foundation::CommandBuffer::Command {

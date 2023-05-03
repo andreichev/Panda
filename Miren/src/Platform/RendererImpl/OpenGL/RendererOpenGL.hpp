@@ -6,6 +6,7 @@
 
 #include "Miren/RendererI.hpp"
 #include "Miren/GraphicsContext.hpp"
+#include "OpenGLFrameBuffer.hpp"
 #include "OpenGLShader.hpp"
 #include "OpenGLTexture.hpp"
 #include "OpenGLIndexBuffer.hpp"
@@ -22,6 +23,10 @@ public:
     void setClearColor(float r, float g, float b, float a) override;
     void clear() override;
     void flip() override;
+    void createFrameBuffer(
+        FrameBufferHandle handle, FrameBufferSpecification specification) override;
+    void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) override;
+    void deleteFrameBuffer(FrameBufferHandle handle) override;
     void createShader(
         ShaderHandle handle, const char *vertexPath, const char *fragmentPath) override;
     void deleteShader(ShaderHandle handle) override;
@@ -61,6 +66,7 @@ private:
 
     uint32_t m_vao;
     GraphicsContext *context;
+    OpenGLFrameBuffer frameBuffers[1000];
     OpenGLShader shaders[1000];
     OpenGLIndexBuffer indexBuffers[1000];
     VertexBufferLayoutData vertexLayouts[1000];

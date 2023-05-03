@@ -45,6 +45,11 @@ void Frame::setShader(ShaderHandle handle) {
     draw.m_shader = handle;
 }
 
+void Frame::setFrameBuffer(FrameBufferHandle handle) {
+    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    draw.m_frameBuffer = handle;
+}
+
 void Frame::setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.addUniform(handle, name, value, type);

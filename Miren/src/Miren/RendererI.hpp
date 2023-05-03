@@ -29,6 +29,10 @@ public:
     virtual void setClearColor(float r, float g, float b, float a) = 0;
     virtual void clear() = 0;
     virtual void flip() = 0;
+    virtual void createFrameBuffer(
+        FrameBufferHandle handle, FrameBufferSpecification specification) = 0;
+    virtual void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) = 0;
+    virtual void deleteFrameBuffer(FrameBufferHandle handle) = 0;
     virtual void createShader(
         ShaderHandle handle, const char *vertexPath, const char *fragmentPath) = 0;
     virtual void deleteShader(ShaderHandle handle) = 0;

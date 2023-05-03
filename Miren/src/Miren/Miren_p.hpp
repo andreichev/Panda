@@ -21,6 +21,8 @@ struct Context {
     // Должно быть вызвано из главного потока и не из цикла обновления.
     Context()
         : m_renderer(nullptr)
+        , m_frameNumber(0)
+        , m_frameBuffersHandleAlloc(MAX_FRAME_BUFFERS)
         , m_shadersHandleAlloc(MAX_SHADERS)
         , m_texturesHandleAlloc(MAX_TEXTURES)
         , m_vertexLayoutsHandleAlloc(MAX_BUFFER_LAYOUTS)
@@ -82,6 +84,27 @@ struct Context {
                     DELETE(Foundation::getAllocator(), m_renderer);
                     m_renderer = nullptr;
                     return;
+                }
+                case RendererCommandType::CreateFrameBuffer: {
+                    CMDBUF_LOG("CREATE FRAME BUFFER COMMAND");
+                    const CreateFrameBufferCommand *cmd =
+                        static_cast<const CreateFrameBufferCommand *>(command);
+                    m_renderer->createFrameBuffer(cmd->handle, cmd->spec);
+                    break;
+                }
+                case RendererCommandType::ResizeFrameBuffer: {
+                    CMDBUF_LOG("RESIZE FRAME BUFFER COMMAND");
+                    const ResizeFrameBufferCommand *cmd =
+                        static_cast<const ResizeFrameBufferCommand *>(command);
+                    m_renderer->resizeFrameBuffer(cmd->handle, cmd->width, cmd->height);
+                    break;
+                }
+                case RendererCommandType::DestroyFrameBuffer: {
+                    CMDBUF_LOG("DESTROY FRAME BUFFER COMMAND");
+                    const DeleteFrameBufferCommand *cmd =
+                        static_cast<const DeleteFrameBufferCommand *>(command);
+                    m_renderer->deleteFrameBuffer(cmd->handle);
+                    break;
                 }
                 case RendererCommandType::CreateShader: {
                     CMDBUF_LOG("CREATE SHADER COMMAND");
@@ -232,6 +255,24 @@ struct Context {
         MIREN_LOG("RENDER FRAME END");
         m_rendererSemaphore.post();
         return m_renderer != nullptr;
+    }
+
+    FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification) {
+        FrameBufferHandle handle = m_frameBuffersHandleAlloc.alloc();
+        CreateFrameBufferCommand cmd(handle, specification);
+        m_preCommandQueue.write(cmd);
+        return handle;
+    }
+
+    void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) {
+        ResizeFrameBufferCommand cmd(handle, width, height);
+        m_preCommandQueue.write(cmd);
+    }
+
+    void deleteFrameBuffer(FrameBufferHandle handle) {
+        m_frameBuffersHandleAlloc.free(handle);
+        DeleteFrameBufferCommand cmd(handle);
+        m_postCommandQueue.write(cmd);
     }
 
     ShaderHandle createShader(const char *vertexPath, const char *fragmentPath) {
@@ -437,9 +478,10 @@ struct Context {
         Foundation::swap(m_render, m_submit);
     }
 
-    void frame() {
+    uint32_t frame() {
         swap();
         m_submit->reset();
+        return m_frameNumber++;
     }
 
     void setViewport(Rect &rect) {
@@ -452,11 +494,13 @@ private:
     Frame m_frame[2];
     Frame *m_render;
     Frame *m_submit;
+    uint32_t m_frameNumber;
 
     // TODO: - Add reusable buffers:
     // DynamicIndexBuffer m_dynamicIndexBuffers[MAX_DYNAMIC_INDEX_BUFFERS];
     // DynamicVertexBuffer m_dynamicVertexBuffers[MAX_DYNAMIC_VERTEX_BUFFERS];
 
+    MirenHandleAllocator m_frameBuffersHandleAlloc;
     MirenHandleAllocator m_shadersHandleAlloc;
     MirenHandleAllocator m_texturesHandleAlloc;
     MirenHandleAllocator m_vertexLayoutsHandleAlloc;

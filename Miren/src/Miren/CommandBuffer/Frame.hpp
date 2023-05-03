@@ -19,6 +19,7 @@ public:
     void setState(uint32_t state);
     void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, uint32_t count);
     void setVertexBuffer(VertexBufferHandle handle, intptr_t offset);
+    void setFrameBuffer(FrameBufferHandle handle);
     void setShader(ShaderHandle handle);
     void setVertexLayout(VertexLayoutHandle handle);
     void setIsIndexed(bool value);

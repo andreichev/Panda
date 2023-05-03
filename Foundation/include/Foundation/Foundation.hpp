@@ -7,6 +7,7 @@
 #include "Logger.hpp"
 #include "Assert.hpp"
 #include "Allocator.hpp"
+#include "Vector.hpp"
 
 namespace Foundation {
 
