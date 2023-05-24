@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Miren/Base.hpp"
+
 #include <vector>
 
 namespace Miren {
