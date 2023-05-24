@@ -6,6 +6,7 @@
 
 #include "Logger.hpp"
 #include "Assert.hpp"
+#include "Memory.hpp"
 #include "Allocator.hpp"
 #include "Vector.hpp"
 

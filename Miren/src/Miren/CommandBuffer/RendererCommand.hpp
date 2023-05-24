@@ -20,8 +20,7 @@ enum RendererCommandType {
     DestroyFrameBuffer,
     CreateShader,
     DestroyShader,
-    CreateTextureFromFile,
-    CreateRGBATextureFromPixelsBuffer,
+    CreateTexture,
     DestroyTexture,
     CreateIndexBuffer,
     CreateDynamicIndexBuffer,
@@ -66,15 +65,15 @@ struct DeleteFrameBufferCommand : Foundation::CommandBuffer::Command {
 };
 
 struct CreateShaderCommand : Foundation::CommandBuffer::Command {
-    const char *vertexPath;
-    const char *fragmentPath;
+    const char * vertexCode;
+    const char * fragmentCode;
     ShaderHandle handle;
 
-    CreateShaderCommand(ShaderHandle handle, const char *vertexPath, const char *fragmentPath)
+    CreateShaderCommand(ShaderHandle handle, const char *vertexCode, const char *fragmentCode)
         : Command(RendererCommandType::CreateShader)
         , handle(handle)
-        , vertexPath(vertexPath)
-        , fragmentPath(fragmentPath) {}
+        , vertexCode(vertexCode)
+        , fragmentCode(fragmentCode) {}
 };
 
 struct DeleteShaderCommand : Foundation::CommandBuffer::Command {
@@ -85,27 +84,14 @@ struct DeleteShaderCommand : Foundation::CommandBuffer::Command {
         , handle(handle) {}
 };
 
-struct CreateTextureFromFileCommand : Foundation::CommandBuffer::Command {
-    const char *path;
+struct CreateTextureCommand : Foundation::CommandBuffer::Command {
     TextureHandle handle;
+    TextureCreate create;
 
-    CreateTextureFromFileCommand(TextureHandle handle, const char *path)
-        : Command(RendererCommandType::CreateTextureFromFile)
+    CreateTextureCommand(TextureHandle handle, TextureCreate create)
+        : Command(RendererCommandType::CreateTexture)
         , handle(handle)
-        , path(path) {}
-};
-
-struct CreateRGBATextureFromPixelsCommand : Foundation::CommandBuffer::Command {
-    void *pixels;
-    int width, height;
-    TextureHandle handle;
-
-    CreateRGBATextureFromPixelsCommand(TextureHandle handle, void *pixels, int width, int height)
-        : Command(RendererCommandType::CreateRGBATextureFromPixelsBuffer)
-        , handle(handle)
-        , pixels(pixels)
-        , width(width)
-        , height(height) {}
+        , create(create) {}
 };
 
 struct DeleteTextureCommand : Foundation::CommandBuffer::Command {

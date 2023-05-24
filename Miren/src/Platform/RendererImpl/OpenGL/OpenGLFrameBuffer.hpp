@@ -14,13 +14,8 @@ public:
 
 private:
     void checkStatus();
-    void reset();
-    void attachTexture(
-        FrameBufferAttachmentSpecification &spec, int samples, uint32_t width, uint32_t height);
 
-    FrameBufferSpecification *specification;
-    std::vector<uint32_t> m_colorAttachments;
-    uint32_t m_depthAttachment;
+    FrameBufferSpecification specification;
     uint32_t m_id;
 };
 

@@ -1,4 +1,5 @@
 #include "imgui_impl_miren.hpp"
+#include "Panda/Assets/AssetLoader.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -116,7 +117,13 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateFontsTexture() {
     memcpy(texture, pixels, textureSize);
 
     using namespace Miren;
-    fontTexture = createTextureFromPixels(texture, width, height);
+    TextureCreate create;
+    create.m_data = Foundation::Memory(texture);
+    create.m_format = TextureFormat::RGBA8;
+    create.m_width = width;
+    create.m_height = height;
+    create.m_numMips = 0;
+    fontTexture = createTexture(create);
     io.Fonts->SetTexID((ImTextureID)(intptr_t)fontTexture);
     return true;
 }
@@ -127,8 +134,9 @@ IMGUI_IMPL_API void ImGui_ImplMiren_DestroyFontsTexture() {
 
 IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
     using namespace Miren;
-    shader =
-        Miren::createShader("shaders/imgui/imgui_vertex.glsl", "shaders/imgui/imgui_fragment.glsl");
+    Panda::ShaderAsset shaderAsset = Panda::AssetLoader::loadShader(
+        "shaders/imgui/imgui_vertex.glsl", "shaders/imgui/imgui_fragment.glsl");
+    shader = Miren::createShader(shaderAsset.vertexCode, shaderAsset.fragmentCode);
 
     VertexBufferLayoutData layoutData;
     layoutData.pushVec2();

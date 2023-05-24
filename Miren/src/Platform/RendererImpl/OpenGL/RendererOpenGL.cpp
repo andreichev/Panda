@@ -19,7 +19,10 @@
 
 namespace Miren {
 
+RendererOpenGL *RendererOpenGL::s_instance;
+
 RendererOpenGL::RendererOpenGL() {
+    s_instance = this;
 #ifdef PLATFORM_IOS
     context = NEW(Foundation::getAllocator(), GlesContext);
 #elif defined(PLATFORM_DESKTOP)
@@ -40,6 +43,7 @@ RendererOpenGL::RendererOpenGL() {
 RendererOpenGL::~RendererOpenGL() {
     glDeleteVertexArrays(1, &m_vao);
     DELETE(Foundation::getAllocator(), context);
+    s_instance = nullptr;
 }
 
 RendererType RendererOpenGL::getRendererType() const {
@@ -81,22 +85,16 @@ void RendererOpenGL::deleteFrameBuffer(FrameBufferHandle handle) {
 }
 
 void RendererOpenGL::createShader(
-    ShaderHandle handle, const char *vertexPath, const char *fragmentPath) {
-    shaders[handle].create(vertexPath, fragmentPath);
+    ShaderHandle handle, const char *vertexCode, const char *fragmentCode) {
+    shaders[handle].create(vertexCode, fragmentCode);
 }
 
 void RendererOpenGL::deleteShader(ShaderHandle handle) {
     shaders[handle].terminate();
 }
 
-void RendererOpenGL::createTextureFromFile(TextureHandle handle, const char *path) {
-    textures[handle].create(path);
-}
-
-void RendererOpenGL::createRGBATextureFromPixels(
-    TextureHandle handle, void *pixels, int width, int height) {
-    textures[handle].create(pixels, width, height);
-    FREE(Foundation::getAllocator(), pixels);
+void RendererOpenGL::createTexture(TextureHandle handle, const TextureCreate &create) {
+    textures[handle].create(create);
 }
 
 void RendererOpenGL::deleteTexture(TextureHandle handle) {

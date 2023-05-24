@@ -4,6 +4,7 @@
 #include <imgui.h>
 
 #include "Panda/Application/Application.hpp"
+#include "Panda/Assets/AssetLoader.hpp"
 
 #include <Miren/PlatformData.hpp>
 
@@ -29,8 +30,7 @@ void ImGuiLayer::onAttach() {
     // ImGuiConfigFlags_ViewportsNoMerge;
 
     float fontSize = 18.0f;
-    std::string fontPath =
-        Miren::PlatformData::get()->getResourcesPath() + "fonts/Cousine-Regular.ttf";
+    std::string fontPath = AssetLoader::getResourcesPath() + "fonts/Cousine-Regular.ttf";
     // std::string fontPath = Miren::PlatformData::get()->getResourcesPath() +
     // "fonts/ProggyClean.ttf";
     io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize);

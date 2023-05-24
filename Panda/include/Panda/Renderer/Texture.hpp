@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Panda/Assets/AssetLoader.hpp"
+
 #include <Miren/Miren.hpp>
 #include <cstdlib>
 
@@ -7,11 +9,19 @@ namespace Panda {
 class Texture {
 public:
     Texture(const char *path) {
-        m_handle = Miren::createTextureFromFile(path);
+        TextureAsset asset = AssetLoader::loadTexure(path);
+        m_handle = Miren::createTexture(asset.getMirenTextureCreate());
         LOG_INFO("CREATED TEXTURE, path: {}", path);
     }
+
     Texture(uint8_t *data, uint32_t width, uint32_t height) {
-        m_handle = Miren::createTextureFromPixels(data, width, height);
+        Miren::TextureCreate create;
+        create.m_data = Foundation::Memory(data);
+        create.m_format = Miren::TextureFormat::RGBA8;
+        create.m_numMips = 0;
+        create.m_width = width;
+        create.m_height = height;
+        m_handle = Miren::createTexture(create);
         LOG_INFO("CREATED TEXTURE, w: {}, h: {}", width, height);
     }
     ~Texture() {

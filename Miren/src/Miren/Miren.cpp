@@ -36,20 +36,16 @@ void deleteFrameBuffer(FrameBufferHandle handle) {
     s_context->deleteFrameBuffer(handle);
 }
 
-ShaderHandle createShader(const char *vertexPath, const char *fragmentPath) {
-    return s_context->createShader(vertexPath, fragmentPath);
+ShaderHandle createShader(const char *vertexCode, const char *fragmentCode) {
+    return s_context->createShader(vertexCode, fragmentCode);
 }
 
 void deleteShader(ShaderHandle handle) {
     s_context->deleteShader(handle);
 }
 
-TextureHandle createTextureFromFile(const char *path) {
-    return s_context->createTextureFromFile(path);
-}
-
-TextureHandle createTextureFromPixels(void *pixels, int width, int height) {
-    return s_context->createTextureFromPixels(pixels, width, height);
+TextureHandle createTexture(TextureCreate create) {
+    return s_context->createTexture(create);
 }
 
 void deleteTexture(TextureHandle handle) {

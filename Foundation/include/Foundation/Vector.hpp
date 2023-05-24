@@ -3,7 +3,7 @@
 #include "Allocator.hpp"
 #include "Assert.hpp"
 
-#include <stdint.h>
+#include <cstdlib>
 
 namespace Foundation {
 

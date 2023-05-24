@@ -11,12 +11,4 @@ PlatformData *PlatformData::get() {
     return &platformData;
 }
 
-void PlatformData::setResourcesPath(std::string path) {
-    resourcesPath = path + "/";
-}
-
-std::string &PlatformData::getResourcesPath() {
-    return resourcesPath;
-}
-
 } // namespace Miren

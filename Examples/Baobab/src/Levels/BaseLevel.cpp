@@ -13,8 +13,9 @@
 
 void BaseLevel::start(Panda::World *world) {
     // Panda::Miren::setClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    baseShader =
-        Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
+    Panda::ShaderAsset shaderAsset = Panda::AssetLoader::loadShader(
+        "shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
+    baseShader = Miren::createShader(shaderAsset.vertexCode, shaderAsset.fragmentCode);
     LOG_INFO("WORLD GENERATION STARTED");
     chunksStorage = Foundation::makeShared<ChunksStorage>();
     LOG_INFO("WORLD GENERATED");
@@ -43,7 +44,8 @@ void BaseLevel::start(Panda::World *world) {
     world->getUIView()->addSubview(Foundation::makeShared<UICrosshair>());
 
     Foundation::Shared<Panda::Entity> chunkEntity = world->instantiateEntity();
-    texture = Miren::createTextureFromFile("textures/Texture.png");
+    Panda::TextureAsset textureAsset = Panda::AssetLoader::loadTexure("textures/Texture.png");
+    texture = Miren::createTexture(textureAsset.getMirenTextureCreate());
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
         for (int indexY = 0; indexY < ChunksStorage::SIZE_Y; indexY++) {
             for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {

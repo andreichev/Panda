@@ -15,10 +15,9 @@ void terminate();
 FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification);
 void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height);
 void deleteFrameBuffer(FrameBufferHandle handle);
-ShaderHandle createShader(const char *vertexPath, const char *fragmentPath);
+ShaderHandle createShader(const char *vertexCode, const char *fragmentCode);
 void deleteShader(ShaderHandle handle);
-TextureHandle createTextureFromFile(const char *path);
-TextureHandle createTextureFromPixels(void *pixels, int width, int height);
+TextureHandle createTexture(TextureCreate create);
 void deleteTexture(TextureHandle handle);
 IndexBufferHandle createIndexBuffer(void *indices, BufferElementType elementType, size_t count);
 IndexBufferHandle createDynamicIndexBuffer(

@@ -29,8 +29,10 @@ private:
 void TriangleLevel::start(Panda::World *world) {
     using namespace Miren;
 
-    ShaderHandle baseShader = createShader(
+    Panda::ShaderAsset shaderAsset = Panda::AssetLoader::loadShader(
         "shaders/checker/checker_vertex.glsl", "shaders/checker/checker_fragment.glsl");
+    ShaderHandle baseShader = createShader(shaderAsset.vertexCode, shaderAsset.fragmentCode);
+
     float rightEdge = 0.5f;
     float topEdge = 0.5f;
     float leftEdge = -0.5f;

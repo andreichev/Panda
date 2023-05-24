@@ -110,7 +110,7 @@ struct Context {
                     CMDBUF_LOG("CREATE SHADER COMMAND");
                     const CreateShaderCommand *cmd =
                         static_cast<const CreateShaderCommand *>(command);
-                    m_renderer->createShader(cmd->handle, cmd->vertexPath, cmd->fragmentPath);
+                    m_renderer->createShader(cmd->handle, cmd->vertexCode, cmd->fragmentCode);
                     break;
                 }
                 case RendererCommandType::DestroyShader: {
@@ -120,19 +120,11 @@ struct Context {
                     m_renderer->deleteShader(cmd->handle);
                     break;
                 }
-                case RendererCommandType::CreateTextureFromFile: {
-                    CMDBUF_LOG("CREATE TEXTURE FROM FILE COMMAND");
-                    const CreateTextureFromFileCommand *cmd =
-                        static_cast<const CreateTextureFromFileCommand *>(command);
-                    m_renderer->createTextureFromFile(cmd->handle, cmd->path);
-                    break;
-                }
-                case RendererCommandType::CreateRGBATextureFromPixelsBuffer: {
-                    CMDBUF_LOG("CREATE TEXTURE FROM PIXELS COMMAND");
-                    const CreateRGBATextureFromPixelsCommand *cmd =
-                        static_cast<const CreateRGBATextureFromPixelsCommand *>(command);
-                    m_renderer->createRGBATextureFromPixels(
-                        cmd->handle, cmd->pixels, cmd->width, cmd->height);
+                case RendererCommandType::CreateTexture: {
+                    CMDBUF_LOG("CREATE TEXTURE COMMAND");
+                    const CreateTextureCommand *cmd =
+                        static_cast<const CreateTextureCommand *>(command);
+                    m_renderer->createTexture(cmd->handle, cmd->create);
                     break;
                 }
                 case RendererCommandType::DestroyTexture: {
@@ -275,9 +267,9 @@ struct Context {
         m_postCommandQueue.write(cmd);
     }
 
-    ShaderHandle createShader(const char *vertexPath, const char *fragmentPath) {
+    ShaderHandle createShader(const char *vertexCode, const char *fragmentCode) {
         ShaderHandle handle = m_shadersHandleAlloc.alloc();
-        CreateShaderCommand cmd(handle, vertexPath, fragmentPath);
+        CreateShaderCommand cmd(handle, vertexCode, fragmentCode);
         m_preCommandQueue.write(cmd);
         return handle;
     }
@@ -288,16 +280,9 @@ struct Context {
         m_postCommandQueue.write(cmd);
     }
 
-    TextureHandle createTextureFromFile(const char *path) {
+    TextureHandle createTexture(TextureCreate create) {
         TextureHandle handle = m_texturesHandleAlloc.alloc();
-        CreateTextureFromFileCommand cmd(handle, path);
-        m_preCommandQueue.write(cmd);
-        return handle;
-    }
-
-    TextureHandle createTextureFromPixels(void *pixels, int width, int height) {
-        TextureHandle handle = m_texturesHandleAlloc.alloc();
-        CreateRGBATextureFromPixelsCommand cmd(handle, pixels, width, height);
+        CreateTextureCommand cmd(handle, create);
         m_preCommandQueue.write(cmd);
         return handle;
     }

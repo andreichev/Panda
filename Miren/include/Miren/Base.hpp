@@ -3,6 +3,7 @@
 #include "Config.hpp"
 #include "VertexBufferLayoutData.hpp"
 
+#include <Foundation/Foundation.hpp>
 #include <cstdlib>
 
 #if MIREN_LOG_ENABLED == 1
@@ -28,40 +29,38 @@ using VertexLayoutHandle = uint16_t;
 
 #define MIREN_INVALID_HANDLE UINT16_MAX
 
-enum class UniformDataType { Int, Mat4, IntArray };
-
-enum class FrameBufferTextureFormat {
+enum TextureFormat {
     None = 0,
     // Color
+    RGB8,
     RGBA8,
     RED_INTEGER,
     // Depth/stencil
-    DEPTH24STENCIL8,
-    // Defaults
-    Depth = DEPTH24STENCIL8
+    DEPTH24STENCIL8
 };
 
-struct FrameBufferAttachmentSpecification {
-    FrameBufferAttachmentSpecification(FrameBufferTextureFormat format)
-        : format(format) {}
+struct TextureCreate {
+    TextureFormat m_format;
+    uint16_t m_width;
+    uint16_t m_height;
+    uint8_t m_numMips;
+    Foundation::Memory m_data;
+};
 
-    FrameBufferTextureFormat format;
+enum class UniformDataType { Int, Mat4, IntArray };
+
+struct FrameBufferAttachment {
+    FrameBufferAttachment(TextureHandle handle)
+        : handle(handle) {}
+
+    TextureHandle handle;
 };
 
 struct FrameBufferSpecification {
-    FrameBufferSpecification(std::vector<FrameBufferAttachmentSpecification> attachments,
-        int samples,
-        uint32_t width,
-        uint32_t height)
-        : attachments(attachments)
-        , samples(samples)
-        , width(width)
-        , height(height) {}
+    FrameBufferSpecification(std::vector<FrameBufferAttachment> attachments)
+        : attachments(attachments) {}
 
-    std::vector<FrameBufferAttachmentSpecification> attachments;
-    int samples;
-    uint32_t width;
-    uint32_t height;
+    std::vector<FrameBufferAttachment> attachments;
 };
 
 struct TransientIndexBuffer {

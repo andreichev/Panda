@@ -12,14 +12,9 @@ namespace Miren {
 class PlatformData {
 public:
     static PlatformData *get();
-    void setResourcesPath(std::string path);
-    std::string &getResourcesPath();
     void *layer;
     void *nativeWindowHandle;
     void *renderingContext;
-
-private:
-    std::string resourcesPath;
 };
 
 } // namespace Miren

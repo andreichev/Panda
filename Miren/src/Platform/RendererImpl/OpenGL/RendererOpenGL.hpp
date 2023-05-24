@@ -28,11 +28,9 @@ public:
     void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) override;
     void deleteFrameBuffer(FrameBufferHandle handle) override;
     void createShader(
-        ShaderHandle handle, const char *vertexPath, const char *fragmentPath) override;
+        ShaderHandle handle, const char *vertexCode, const char *fragmentCode) override;
     void deleteShader(ShaderHandle handle) override;
-    void createTextureFromFile(TextureHandle handle, const char *path) override;
-    void createRGBATextureFromPixels(
-        TextureHandle handle, void *pixels, int width, int height) override;
+    void createTexture(TextureHandle handle, const TextureCreate &create) override;
     void deleteTexture(TextureHandle handle) override;
     void createIndexBuffer(IndexBufferHandle handle,
         void *indices,
@@ -59,6 +57,11 @@ public:
     void setUniform(const Uniform &uniform) override;
     void setTexture(TextureHandle handle, uint32_t slot) override;
     void submit(Frame *frame) override;
+
+    static RendererOpenGL *s_instance;
+    OpenGLTexture &getTexture(TextureHandle handle) {
+        return textures[handle];
+    }
 
 private:
     void submit(RenderDraw *draw);

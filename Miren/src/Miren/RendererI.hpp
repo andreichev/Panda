@@ -34,11 +34,9 @@ public:
     virtual void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) = 0;
     virtual void deleteFrameBuffer(FrameBufferHandle handle) = 0;
     virtual void createShader(
-        ShaderHandle handle, const char *vertexPath, const char *fragmentPath) = 0;
+        ShaderHandle handle, const char *vertexCode, const char *fragmentCode) = 0;
     virtual void deleteShader(ShaderHandle handle) = 0;
-    virtual void createTextureFromFile(TextureHandle handle, const char *path) = 0;
-    virtual void createRGBATextureFromPixels(
-        TextureHandle handle, void *pixels, int width, int height) = 0;
+    virtual void createTexture(TextureHandle handle, const TextureCreate &create) = 0;
     virtual void deleteTexture(TextureHandle handle) = 0;
     virtual void createIndexBuffer(
         IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) = 0;

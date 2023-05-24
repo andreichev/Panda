@@ -58,9 +58,11 @@ public:
         vertexBuffer = Miren::createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
         indexBuffer = Miren::createIndexBuffer(indices, Miren::BufferElementType::UnsignedInt, 36);
 
-        texture = Miren::createTextureFromFile("textures/arbuz1.png");
-        shader =
-            Miren::createShader("shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
+        Panda::TextureAsset textureAsset = Panda::AssetLoader::loadTexure("textures/arbuz1.png");
+        texture = Miren::createTexture(textureAsset.getMirenTextureCreate());
+        Panda::ShaderAsset shaderAsset = Panda::AssetLoader::loadShader(
+            "shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
+        shader = Miren::createShader(shaderAsset.vertexCode, shaderAsset.fragmentCode);
         Miren::setShader(shader);
 
         Panda::Size windowSize = Panda::Application::get()->getWindow()->getSize();

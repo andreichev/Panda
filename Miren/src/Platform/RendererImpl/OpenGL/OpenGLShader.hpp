@@ -14,7 +14,7 @@ namespace Miren {
 class OpenGLShader {
 public:
     OpenGLShader();
-    void create(const char *vertexPath, const char *fragmentPath);
+    void create(const char *vertexCode, const char *fragmentCode);
     void terminate();
     void bind();
     void unbind();

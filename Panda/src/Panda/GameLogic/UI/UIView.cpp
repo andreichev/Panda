@@ -1,4 +1,5 @@
 #include "pndpch.hpp"
+#include "Panda/Assets/AssetLoader.hpp"
 #include "Panda/GameLogic/UI/UIView.hpp"
 #include "Panda/Application/Application.hpp"
 
@@ -17,8 +18,9 @@ UIView::UIView(Rect frame)
     : window(Application::get()->getWindow())
     , frame(frame) {
     float *data = new float[12];
-    shaderHandle =
-        Miren::createShader("shaders/ui/uiview_vertex.glsl", "shaders/ui/uiview_fragment.glsl");
+    ShaderAsset shaderAsset =
+        AssetLoader::loadShader("shaders/ui/uiview_vertex.glsl", "shaders/ui/uiview_fragment.glsl");
+    shaderHandle = Miren::createShader(shaderAsset.vertexCode, shaderAsset.fragmentCode);
     Miren::VertexBufferLayoutData layoutData;
     layoutData.pushFloat(2);
     Miren::VertexLayoutHandle vertexLayout = Miren::createVertexLayout(layoutData);

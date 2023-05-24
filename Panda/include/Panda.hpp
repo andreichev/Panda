@@ -10,6 +10,9 @@
 #include "Panda/Application/ApplicationStartupSettings.hpp"
 #include "Panda/Application/Layer.hpp"
 
+// Assets
+#include "Panda/Assets/AssetLoader.hpp"
+
 // Game logic
 #include "Panda/GameLogic/Entity.hpp"
 #include "Panda/GameLogic/Level.hpp"

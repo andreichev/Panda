@@ -49,8 +49,9 @@ void Renderer2D::init() {
         (Vertex *)ALLOC(Foundation::getAllocator(), sizeof(Vertex) * MAX_VERTICES_COUNT);
     s_drawData.indices =
         (uint16_t *)ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
-    s_drawData.shader = Miren::createShader(
+    Panda::ShaderAsset shaderAsset = Panda::AssetLoader::loadShader(
         "shaders/renderer2d/renderer2d_vertex.glsl", "shaders/renderer2d/renderer2d_fragment.glsl");
+    s_drawData.shader = Miren::createShader(shaderAsset.vertexCode, shaderAsset.fragmentCode);
     Miren::VertexBufferLayoutData layoutData;
     // Position
     layoutData.pushVec3();
