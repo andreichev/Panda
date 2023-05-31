@@ -60,8 +60,8 @@ ShaderAsset AssetLoader::loadShader(
     } catch (std::ifstream::failure &e) {
         PND_ASSERT_F(false, "SHADER::FILE {} or {} NOT SUCCESFULLY READ", vertexPath, fragmentPath);
     }
-    char* vCode = (char*) malloc(vertexCode.size() + 1);
-    char* fCode = (char*) malloc(fragmentCode.size() + 1);
+    char *vCode = (char *)malloc(vertexCode.size() + 1);
+    char *fCode = (char *)malloc(fragmentCode.size() + 1);
     memcpy(vCode, vertexCode.c_str(), vertexCode.size() + 1);
     memcpy(fCode, fragmentCode.c_str(), fragmentCode.size() + 1);
     return {vCode, fCode};

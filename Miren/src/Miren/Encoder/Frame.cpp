@@ -60,23 +60,14 @@ void Frame::setTexture(TextureHandle textureHandle, uint32_t slot) {
     draw.setTexture(textureHandle, slot);
 }
 
-void Frame::setIsIndexed(bool value) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
-    draw.m_isIndexed = value;
-}
-
-void Frame::setNumberOfElements(uint32_t count) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
-    draw.m_numElemets = count;
-}
-
 void Frame::setScissorRect(Rect rect) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.m_scissorRect = rect;
 }
 
-void Frame::submitCurrentDrawCall() {
+void Frame::submitCurrentDrawCall(ViewId id) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    draw.m_viewId = id;
     draw.m_isSubmitted = true;
 }
 
@@ -92,7 +83,6 @@ void Frame::reset() {
     m_drawCallsCount = 0;
     m_transientVbSize = 0;
     m_transientIbSize = 0;
-    m_viewport = Rect::zero();
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.reset();
 }

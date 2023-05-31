@@ -111,8 +111,12 @@ uint32_t frame() {
     return s_context->frame();
 }
 
-void setViewport(Rect &rect) {
-    s_context->setViewport(rect);
+void setViewClear(ViewId id, uint32_t color) {
+    s_context->setViewClear(id, color);
+}
+
+void setViewport(ViewId id, Rect &rect) {
+    s_context->setViewport(id, rect);
 }
 
 void setState(uint32_t state) {
@@ -147,12 +151,12 @@ void setVertexLayout(VertexLayoutHandle handle) {
     s_context->setVertexLayout(handle);
 }
 
-void submit() {
-    s_context->submit();
+void setFrameBuffer(FrameBufferHandle frameBuffer) {
+    s_context->setFrameBuffer(frameBuffer);
 }
 
-void submitPrimitives(uint32_t elements) {
-    s_context->submitPrimitives(elements);
+void submit(ViewId id) {
+    s_context->submit(id);
 }
 
 void renderSemaphoreWait() {

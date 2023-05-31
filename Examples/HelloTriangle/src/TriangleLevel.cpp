@@ -17,7 +17,7 @@ public:
         Miren::setShader(m_shader);
         Miren::setVertexBuffer(m_vertexBuffer);
         Miren::setIndexBuffer(m_indexBuffer, 0, 6);
-        Miren::submit();
+        Miren::submit(0);
     }
 
 private:

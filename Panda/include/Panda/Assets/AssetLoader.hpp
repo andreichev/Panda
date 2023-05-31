@@ -24,8 +24,8 @@ struct TextureAsset {
 };
 
 struct ShaderAsset {
-    const char * vertexCode;
-    const char * fragmentCode;
+    const char *vertexCode;
+    const char *fragmentCode;
 };
 
 class AssetLoader {

@@ -100,7 +100,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
                 Miren::setVertexLayout(vertexLayout);
                 uint32_t offset = cmd->IdxOffset * sizeof(ImDrawIdx);
                 Miren::setIndexBuffer(tib.handle, tib.startIndex + offset, cmd->ElemCount);
-                Miren::submit();
+                Miren::submit(0);
             }
         }
     }

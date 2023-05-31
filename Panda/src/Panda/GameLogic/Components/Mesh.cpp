@@ -91,7 +91,7 @@ void Mesh::update(double deltaTime) {
     Miren::setTexture(textureHandle, 0);
     Miren::setVertexBuffer(vertexBufferHandle);
     Miren::setIndexBuffer(indexBufferHandle, 0, indicesCount);
-    Miren::submit();
+    Miren::submit(0);
 }
 
 void Mesh::updateBuffer(const MeshData &data) {

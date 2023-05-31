@@ -27,14 +27,13 @@ struct TextureBinding {
 struct RenderDraw {
     RenderDraw()
         : m_isSubmitted(false)
-        , m_isIndexed(true)
         , m_state(MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST)
         , m_numIndices(0)
-        , m_numElemets(0)
         , m_uniformsCount(0)
         , m_textureBindingsCount(0)
         , m_indicesOffset(0)
         , m_verticesOffset(0)
+        , m_viewId(0)
         , m_frameBuffer(MIREN_INVALID_HANDLE)
         , m_shader(MIREN_INVALID_HANDLE)
         , m_indexBuffer(MIREN_INVALID_HANDLE)
@@ -44,14 +43,13 @@ struct RenderDraw {
 
     void reset() {
         m_isSubmitted = false;
-        m_isIndexed = true;
         m_state = MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST;
         m_numIndices = 0;
-        m_numElemets = 0;
         m_uniformsCount = 0;
         m_textureBindingsCount = 0;
         m_indicesOffset = 0;
         m_verticesOffset = 0;
+        m_viewId = 0;
         m_shader = MIREN_INVALID_HANDLE;
         m_frameBuffer = MIREN_INVALID_HANDLE;
         m_indexBuffer = MIREN_INVALID_HANDLE;
@@ -69,11 +67,9 @@ struct RenderDraw {
     }
 
     bool m_isSubmitted;
-    bool m_isIndexed;
     uint32_t m_numIndices;
     intptr_t m_indicesOffset;
     intptr_t m_verticesOffset;
-    uint32_t m_numElemets;
     ShaderHandle m_shader;
     FrameBufferHandle m_frameBuffer;
     IndexBufferHandle m_indexBuffer;
@@ -84,6 +80,7 @@ struct RenderDraw {
     uint32_t m_textureBindingsCount;
     TextureBinding m_textureBindings[MAX_TEXTURE_BINDINGS];
     Rect m_scissorRect;
+    ViewId m_viewId;
     uint32_t m_state;
 };
 

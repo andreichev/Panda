@@ -97,7 +97,7 @@ public:
 
         Miren::setVertexBuffer(vertexBuffer);
         Miren::setIndexBuffer(indexBuffer, 0, 36);
-        Miren::submit();
+        Miren::submit(0);
     }
 
     void onImGuiRender() override {

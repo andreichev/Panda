@@ -19,9 +19,6 @@ public:
     RendererOpenGL();
     ~RendererOpenGL() override;
     RendererType getRendererType() const override;
-    void setViewportSize(Size size) override;
-    void setClearColor(float r, float g, float b, float a) override;
-    void clear() override;
     void flip() override;
     void createFrameBuffer(
         FrameBufferHandle handle, FrameBufferSpecification specification) override;
@@ -56,7 +53,7 @@ public:
     void deleteVertexLayout(VertexLayoutHandle handle) override;
     void setUniform(const Uniform &uniform) override;
     void setTexture(TextureHandle handle, uint32_t slot) override;
-    void submit(Frame *frame) override;
+    void submit(Frame *frame, View *views) override;
 
     static RendererOpenGL *s_instance;
     OpenGLTexture &getTexture(TextureHandle handle) {
@@ -64,6 +61,7 @@ public:
     }
 
 private:
+    void viewChanged(View &view);
     void submit(RenderDraw *draw);
     void checkForErrors();
 

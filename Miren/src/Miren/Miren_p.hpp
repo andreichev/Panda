@@ -1,8 +1,9 @@
 #pragma once
 
-#include "CommandBuffer/RendererCommand.hpp"
-#include "CommandBuffer/Frame.hpp"
-#include "CommandBuffer/RenderDraw.hpp"
+#include "Encoder/RendererCommand.hpp"
+#include "Encoder/Frame.hpp"
+#include "Encoder/View.hpp"
+#include "Encoder/RenderDraw.hpp"
 #include "Miren/Miren.hpp"
 #include "MirenHandleAllocator.hpp"
 #include "MirenStates.hpp"
@@ -237,8 +238,7 @@ struct Context {
         }
         rendererExecuteCommands(m_preCommandQueue);
         if (m_render->getDrawCallsCount() != 0) {
-            m_renderer->clear();
-            m_renderer->submit(m_render);
+            m_renderer->submit(m_render, m_views);
             m_renderer->flip();
         }
         rendererExecuteCommands(m_postCommandQueue);
@@ -447,15 +447,12 @@ struct Context {
         m_submit->setVertexLayout(handle);
     }
 
-    void submit() {
-        m_submit->submitCurrentDrawCall();
-        m_submit->beginDrawCall();
+    void setFrameBuffer(FrameBufferHandle frameBuffer) {
+        m_submit->setFrameBuffer(frameBuffer);
     }
 
-    void submitPrimitives(uint32_t elements) {
-        m_submit->setIsIndexed(false);
-        m_submit->setNumberOfElements(elements);
-        m_submit->submitCurrentDrawCall();
+    void submit(ViewId id) {
+        m_submit->submitCurrentDrawCall(id);
         m_submit->beginDrawCall();
     }
 
@@ -469,8 +466,12 @@ struct Context {
         return m_frameNumber++;
     }
 
-    void setViewport(Rect &rect) {
-        m_submit->m_viewport = rect;
+    void setViewport(ViewId id, Rect &rect) {
+        m_views[id].m_viewport = rect;
+    }
+
+    void setViewClear(ViewId id, uint32_t color) {
+        m_views[id].m_clearColor = color;
     }
 
 private:
@@ -479,6 +480,7 @@ private:
     Frame m_frame[2];
     Frame *m_render;
     Frame *m_submit;
+    View m_views[MAX_VIEWS];
     uint32_t m_frameNumber;
 
     // TODO: - Add reusable buffers:

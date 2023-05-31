@@ -54,19 +54,6 @@ RendererType RendererOpenGL::getRendererType() const {
 #endif
 }
 
-void RendererOpenGL::setViewportSize(Size size) {
-    glViewport(0, 0, size.width, size.height);
-}
-
-void RendererOpenGL::setClearColor(float r, float g, float b, float a) {
-    LOG_INFO("CLEAR COLOR: {}, {}, {}, {}", r, g, b, a);
-    glClearColor(r, g, b, a);
-}
-
-void RendererOpenGL::clear() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
 void RendererOpenGL::flip() {
     context->flip();
 }
@@ -182,13 +169,7 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
     textures[handle].bind(slot);
 }
 
-void RendererOpenGL::submit(Frame *frame) {
-    if (frame->m_viewport.isZero() == false) {
-        glViewport(frame->m_viewport.origin.x,
-            frame->m_viewport.origin.y,
-            frame->m_viewport.size.width,
-            frame->m_viewport.size.height);
-    }
+void RendererOpenGL::submit(Frame *frame, View *views) {
     if (frame->m_transientVbSize > 0) {
         vertexBuffers[frame->m_transientVb.handle].update(
             frame->m_transientVb.data, frame->m_transientVbSize);
@@ -197,18 +178,43 @@ void RendererOpenGL::submit(Frame *frame) {
         indexBuffers[frame->m_transientIb.handle].update(
             frame->m_transientIb.data, frame->m_transientIbSize / 2);
     }
+    ViewId viewId = -1;
     for (int i = 0; i < frame->getDrawCallsCount(); i++) {
         RenderDraw &draw = frame->getDrawCalls()[i];
         if (draw.m_isSubmitted == false) {
             continue;
         }
+        if (draw.m_frameBuffer != MIREN_INVALID_HANDLE) {
+            frameBuffers[draw.m_frameBuffer].bind();
+        } else {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+        if (draw.m_viewId != viewId) {
+            viewId = draw.m_viewId;
+            viewChanged(views[viewId]);
+        }
         submit(&draw);
     }
 }
 
+void RendererOpenGL::viewChanged(View &view) {
+    if (view.m_viewport.isZero() == false) {
+        glViewport(view.m_viewport.origin.x,
+            view.m_viewport.origin.y,
+            view.m_viewport.size.width,
+            view.m_viewport.size.height);
+    }
+    uint32_t rgba = view.m_clearColor;
+    uint8_t r = rgba >> 24;
+    uint8_t g = rgba >> 16;
+    uint8_t b = rgba >> 8;
+    uint8_t a = rgba >> 0;
+    glClearColor((r) / 255.f, (g) / 255.f, (b) / 255.f, (a) / 255.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 void RendererOpenGL::submit(RenderDraw *draw) {
     // TODO: Capture time
-    if (draw->m_frameBuffer != MIREN_INVALID_HANDLE) {}
     shaders[draw->m_shader].bind();
     for (size_t u = 0; u < draw->m_uniformsCount; u++) {
         Uniform &uniform = draw->m_uniformBuffer[u];
@@ -245,17 +251,12 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     VertexBufferLayoutData &layout = vertexLayouts[layoutHandle];
     glBindVertexArray(m_vao);
     shaders[draw->m_shader].bindAttributes(layout, draw->m_verticesOffset);
-    if (draw->m_isIndexed) {
-        indexBuffers[draw->m_indexBuffer].bind();
-        glDrawElements(GL_TRIANGLES,
-            draw->m_numIndices,
-            indexBuffers[draw->m_indexBuffer].getElementType(),
-            (void *)draw->m_indicesOffset);
-        indexBuffers[draw->m_indexBuffer].unbind();
-    } else {
-        // TODO: Add offset value
-        glDrawArrays(GL_TRIANGLES, 0, draw->m_numElemets);
-    }
+    indexBuffers[draw->m_indexBuffer].bind();
+    glDrawElements(GL_TRIANGLES,
+        draw->m_numIndices,
+        indexBuffers[draw->m_indexBuffer].getElementType(),
+        (void *)draw->m_indicesOffset);
+    indexBuffers[draw->m_indexBuffer].unbind();
     checkForErrors();
     shaders[draw->m_shader].unbind();
     vertexBuffers[draw->m_vertexBuffer].unbind();

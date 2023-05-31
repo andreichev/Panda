@@ -27,7 +27,7 @@ public:
     void setScissorRect(Rect rect);
     void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
     void setTexture(TextureHandle textureHandle, uint32_t slot);
-    void submitCurrentDrawCall();
+    void submitCurrentDrawCall(ViewId id);
     uint32_t getDrawCallsCount();
     RenderDraw *getDrawCalls();
     void reset();
@@ -36,7 +36,6 @@ public:
     TransientVertexBuffer m_transientVb;
     uint32_t m_transientVbSize;
     uint32_t m_transientIbSize;
-    Rect m_viewport;
 
 private:
     int m_drawCallsCount;

@@ -12,11 +12,13 @@ public:
     void create(FrameBufferSpecification specification);
     void terminate();
     void resize(uint32_t width, uint32_t height);
+    void bind();
+    void unbind();
 
 private:
     void checkStatus();
 
-    FrameBufferSpecification specification;
+    FrameBufferSpecification spec;
     uint32_t m_id;
 };
 

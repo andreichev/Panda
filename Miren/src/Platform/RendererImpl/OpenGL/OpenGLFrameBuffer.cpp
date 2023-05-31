@@ -26,15 +26,15 @@ void OpenGLFrameBuffer::checkStatus() {
 }
 
 OpenGLFrameBuffer::OpenGLFrameBuffer()
-    : specification({})
+    : spec()
     , m_id(-1) {}
 
 void OpenGLFrameBuffer::create(FrameBufferSpecification specification) {
     PND_ASSERT(m_id == -1, "FRAMEBUFFER ALREADY CREATED");
-    this->specification = specification;
-    glCreateFramebuffers(1, &m_id);
+    // this->specification = specification;
+    glGenFramebuffers(1, &m_id);
     glBindFramebuffer(GL_FRAMEBUFFER, m_id);
-    for (int i = 0; i < specification.attachments.size(); i++) {
+    for (int i = 0; i < specification.num; i++) {
         FrameBufferAttachment &attach = specification.attachments[i];
         OpenGLTexture &texture = RendererOpenGL::s_instance->getTexture(attach.handle);
         int attachmentType;
@@ -47,6 +47,14 @@ void OpenGLFrameBuffer::create(FrameBufferSpecification specification) {
         glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, textureId, 0);
     }
     checkStatus();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void OpenGLFrameBuffer::bind() {
+    glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+}
+
+void OpenGLFrameBuffer::unbind() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

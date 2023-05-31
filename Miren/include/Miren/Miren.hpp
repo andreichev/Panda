@@ -37,6 +37,8 @@ void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t s
 void deleteVertexBuffer(VertexBufferHandle handle);
 void deleteVertexLayout(VertexLayoutHandle handle);
 // MARK: - Encoder setup
+void setViewClear(ViewId id, uint32_t color);
+void setViewport(ViewId id, Rect &rect);
 void setState(uint32_t state);
 void setScissorRect(Rect rect);
 void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
@@ -45,11 +47,9 @@ void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, size_t count);
 void setVertexLayout(VertexLayoutHandle handle);
 void setShader(ShaderHandle handle);
 void setTexture(TextureHandle textureHandle, uint32_t slot);
-void setViewport(Rect &rect);
+void setFrameBuffer(FrameBufferHandle frameBuffer);
 /// Submit draw call
-void submit();
-/// Submit not indexed triangles draw call
-void submitPrimitives(uint32_t elements);
+void submit(ViewId id);
 // MARK: - Main functions
 /// Process all requests to gpu (from rendering thread)
 bool renderFrame();

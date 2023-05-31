@@ -20,6 +20,7 @@
 
 namespace Miren {
 
+using ViewId = uint16_t;
 using ShaderHandle = uint16_t;
 using TextureHandle = uint16_t;
 using IndexBufferHandle = uint16_t;
@@ -50,6 +51,9 @@ struct TextureCreate {
 enum class UniformDataType { Int, Mat4, IntArray };
 
 struct FrameBufferAttachment {
+    FrameBufferAttachment()
+        : handle(MIREN_INVALID_HANDLE) {}
+
     FrameBufferAttachment(TextureHandle handle)
         : handle(handle) {}
 
@@ -57,10 +61,21 @@ struct FrameBufferAttachment {
 };
 
 struct FrameBufferSpecification {
-    FrameBufferSpecification(std::vector<FrameBufferAttachment> attachments)
-        : attachments(attachments) {}
+    FrameBufferSpecification()
+        : attachments()
+        , num(0) {}
 
-    std::vector<FrameBufferAttachment> attachments;
+    FrameBufferSpecification(FrameBufferAttachment *_attachments, uint32_t num)
+        : attachments()
+        , num(num) {
+        PND_ASSERT(num <= MAX_FRAMEBUFFER_ATTACHMENTS, "MAX ATTACHMENTS NUMBER EXCEEDED");
+        for (int i = 0; i < num; i++) {
+            attachments[i] = _attachments[i];
+        }
+    }
+
+    FrameBufferAttachment attachments[MAX_FRAMEBUFFER_ATTACHMENTS];
+    uint32_t num;
 };
 
 struct TransientIndexBuffer {

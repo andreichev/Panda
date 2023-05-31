@@ -78,7 +78,7 @@ void UIView::layout() {
 void UIView::draw() {
     Miren::setShader(shaderHandle);
     Miren::setVertexBuffer(vertexBufferHandle);
-    Miren::submitPrimitives(6);
+    // Miren::submitPrimitives(6);
 }
 
 void UIView::windowSizeChanged(Size size) {

@@ -41,6 +41,8 @@ struct DrawCallData {
 };
 
 static DrawCallData s_drawData;
+Miren::FrameBufferHandle Renderer2D::s_frameBuffer = MIREN_INVALID_HANDLE;
+Miren::FrameBufferHandle Renderer2D::s_viewId = 0;
 
 void Renderer2D::init() {
     s_drawData.vbSize = 0;
@@ -184,7 +186,18 @@ void Renderer2D::end(OrthographicCamera *camera) {
     Miren::setVertexLayout(s_drawData.layout);
     Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
     Miren::setIndexBuffer(tib.handle, tib.startIndex, s_drawData.indicesCount);
-    Miren::submit();
+    if (s_frameBuffer != MIREN_INVALID_HANDLE) {
+        Miren::setFrameBuffer(s_frameBuffer);
+    }
+    Miren::submit(s_viewId);
+}
+
+void Renderer2D::setFrameBuffer(Miren::FrameBufferHandle frameBuffer) {
+    s_frameBuffer = frameBuffer;
+}
+
+void Renderer2D::setViewId(Miren::ViewId id) {
+    s_viewId = id;
 }
 
 } // namespace Panda

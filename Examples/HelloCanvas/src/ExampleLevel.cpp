@@ -14,7 +14,21 @@ class ExampleRenderer : public Panda::Component {
 public:
     void initialize() override {
         m_texture = Foundation::makeShared<Panda::Texture>("textures/arbuz1.png");
+        Miren::TextureCreate create;
+        create.m_data = Foundation::Memory(nullptr);
+        create.m_format = Miren::TextureFormat::RGBA8;
+        create.m_width = 900;
+        create.m_height = 600;
+        colorAttachment = Miren::createTexture(create);
+        create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
+        Miren::TextureHandle depthAttachment = Miren::createTexture(create);
+        Miren::FrameBufferAttachment attachments[] = {colorAttachment, depthAttachment};
+        Miren::FrameBufferSpecification spec(attachments, 2);
+        frameBuffer = Miren::createFrameBuffer(spec);
+        Miren::setViewClear(sceneViewId, 0x111111ff);
     }
+
+    ~ExampleRenderer() {}
 
     void update(double deltaTime) override {
         degree += 60 * deltaTime;
@@ -22,6 +36,10 @@ public:
         if (colorFactor >= 1.f) {
             colorFactor = 0.f;
         }
+
+        Panda::Renderer2D::setFrameBuffer(frameBuffer);
+        Panda::Renderer2D::setViewId(sceneViewId);
+
         Panda::Renderer2D::RectData rect1;
         rect1.color = Panda::Color(1.0f, 0.5f, colorFactor, 1.f);
         rect1.origin = Panda::Point(0.3f, -0.5f);
@@ -74,6 +92,7 @@ public:
         ImGui::Text("Vertices count: %d", stats.getTotalVertexCount());
         ImGui::Text("Indices count: %d", stats.getTotalIndexCount());
         ImGui::Text("Draw calls: %d", stats.drawCalls);
+        ImGui::Image((void *)colorAttachment, ImVec2(300, 200), ImVec2(0, 1), ImVec2(1, 0));
         ImGui::End();
     }
 
@@ -89,6 +108,9 @@ private:
     Foundation::Shared<Panda::ParticleSystem> m_particleSystem;
     Foundation::Shared<Panda::OrthographicCamera> m_camera;
     Foundation::Shared<Panda::Texture> m_texture;
+    Miren::FrameBufferHandle frameBuffer;
+    Miren::TextureHandle colorAttachment;
+    Miren::ViewId sceneViewId = 1;
     float degree = 0.f;
     float colorFactor = 0.f;
 };

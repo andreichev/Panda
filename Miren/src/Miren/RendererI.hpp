@@ -5,8 +5,9 @@
 #pragma once
 
 #include "Miren/Base.hpp"
-#include "Miren/CommandBuffer/Frame.hpp"
-#include "Miren/CommandBuffer/Uniform.hpp"
+#include "Miren/Encoder/View.hpp"
+#include "Miren/Encoder/Frame.hpp"
+#include "Miren/Encoder/Uniform.hpp"
 #include "Miren/VertexBufferLayoutData.hpp"
 #include "Miren/Vertex.hpp"
 
@@ -25,9 +26,6 @@ class RendererI {
 public:
     virtual ~RendererI() = default;
     virtual RendererType getRendererType() const = 0;
-    virtual void setViewportSize(Size size) = 0;
-    virtual void setClearColor(float r, float g, float b, float a) = 0;
-    virtual void clear() = 0;
     virtual void flip() = 0;
     virtual void createFrameBuffer(
         FrameBufferHandle handle, FrameBufferSpecification specification) = 0;
@@ -58,7 +56,7 @@ public:
     virtual void deleteVertexLayout(VertexLayoutHandle handle) = 0;
     virtual void setUniform(const Uniform &uniform) = 0;
     virtual void setTexture(TextureHandle handle, uint32_t slot) = 0;
-    virtual void submit(Frame *frame) = 0;
+    virtual void submit(Frame *frame, View *views) = 0;
 };
 
 } // namespace Miren

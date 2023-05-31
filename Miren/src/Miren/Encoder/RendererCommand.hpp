@@ -65,8 +65,8 @@ struct DeleteFrameBufferCommand : Foundation::CommandBuffer::Command {
 };
 
 struct CreateShaderCommand : Foundation::CommandBuffer::Command {
-    const char * vertexCode;
-    const char * fragmentCode;
+    const char *vertexCode;
+    const char *fragmentCode;
     ShaderHandle handle;
 
     CreateShaderCommand(ShaderHandle handle, const char *vertexCode, const char *fragmentCode)
