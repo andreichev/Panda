@@ -115,7 +115,7 @@ void setViewClear(ViewId id, uint32_t color) {
     s_context->setViewClear(id, color);
 }
 
-void setViewport(ViewId id, Rect &rect) {
+void setViewport(ViewId id, Rect rect) {
     s_context->setViewport(id, rect);
 }
 

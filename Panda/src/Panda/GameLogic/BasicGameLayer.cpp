@@ -23,9 +23,7 @@ void BasicGameLayer::onDetach() {
 void BasicGameLayer::onUpdate(double deltaTime) {
     Renderer2D::begin();
     m_world->update(deltaTime);
-    if (m_world->getOrthographicCamera() != nullptr) {
-        Renderer2D::end(m_world->getOrthographicCamera().get());
-    }
+    Renderer2D::end();
     Input::nextFrame();
 }
 

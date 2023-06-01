@@ -466,7 +466,7 @@ struct Context {
         return m_frameNumber++;
     }
 
-    void setViewport(ViewId id, Rect &rect) {
+    void setViewport(ViewId id, Rect rect) {
         m_views[id].m_viewport = rect;
     }
 

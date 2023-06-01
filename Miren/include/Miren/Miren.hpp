@@ -38,7 +38,7 @@ void deleteVertexBuffer(VertexBufferHandle handle);
 void deleteVertexLayout(VertexLayoutHandle handle);
 // MARK: - Encoder setup
 void setViewClear(ViewId id, uint32_t color);
-void setViewport(ViewId id, Rect &rect);
+void setViewport(ViewId id, Rect rect);
 void setState(uint32_t state);
 void setScissorRect(Rect rect);
 void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);

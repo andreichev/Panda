@@ -43,6 +43,7 @@ struct DrawCallData {
 static DrawCallData s_drawData;
 Miren::FrameBufferHandle Renderer2D::s_frameBuffer = MIREN_INVALID_HANDLE;
 Miren::FrameBufferHandle Renderer2D::s_viewId = 0;
+Foundation::Shared<OrthographicCamera> Renderer2D::s_camera = nullptr;
 
 void Renderer2D::init() {
     s_drawData.vbSize = 0;
@@ -160,14 +161,14 @@ Renderer2D::Statistics Renderer2D::getStats() {
     return s_drawData.stats;
 }
 
-void Renderer2D::end(OrthographicCamera *camera) {
-    if (s_drawData.verticesCount == 0) {
+void Renderer2D::end() {
+    if (s_drawData.verticesCount == 0 || s_camera == nullptr) {
         return;
     }
     Miren::setShader(s_drawData.shader);
     Miren::setUniform(s_drawData.shader,
         "projViewMtx",
-        (void *)&camera->getViewProjectionMatrix(),
+        (void *)&s_camera->getViewProjectionMatrix(),
         Miren::UniformDataType::Mat4);
 
     Miren::TransientVertexBuffer tvb;
@@ -198,6 +199,10 @@ void Renderer2D::setFrameBuffer(Miren::FrameBufferHandle frameBuffer) {
 
 void Renderer2D::setViewId(Miren::ViewId id) {
     s_viewId = id;
+}
+
+void Renderer2D::setCamera(Foundation::Shared<OrthographicCamera> camera) {
+    s_camera = camera;
 }
 
 } // namespace Panda
