@@ -8,6 +8,7 @@
 
 #include "Panda/Base/Base.hpp"
 #include "Panda/GameLogic/Level.hpp"
+#include "Panda/Application/Layer.hpp"
 
 namespace Panda {
 
@@ -18,24 +19,28 @@ public:
     Size windowSize;
     bool isFullScreen;
     Level *startupLevel;
+    Layer *startupLayer;
 
     ApplicationStartupSettings()
         : name("Panda Sandbox App")
         , windowTitle("Panda")
         , windowSize(Size(600, 400))
         , isFullScreen(false)
-        , startupLevel(nullptr) {}
+        , startupLevel(nullptr)
+        , startupLayer(nullptr) {}
 
     ApplicationStartupSettings(const char *name,
         const char *windowTitle,
         const Size &windowSize,
         bool isFullScreen,
-        Level *startupLevel)
+        Level *startupLevel,
+        Layer *startupLayer)
         : name(name)
         , windowTitle(windowTitle)
         , windowSize(windowSize)
         , isFullScreen(isFullScreen)
-        , startupLevel(startupLevel) {}
+        , startupLevel(startupLevel)
+        , startupLayer(startupLayer) {}
 };
 
 } // namespace Panda

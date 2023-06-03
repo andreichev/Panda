@@ -9,6 +9,8 @@
 #include "Panda/GameLogic/BasicGameLayer.hpp"
 #include "Panda/Events/WindowEvents.hpp"
 #include "Panda/Base/Random.hpp"
+#include "Panda/Renderer/Renderer2D.hpp"
+#include "Panda/GameLogic/Input.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -31,6 +33,7 @@ Application::~Application() {
     LOG_INFO("APP SHUTDOWN BEGIN");
     Miren::renderSemaphoreWait();
     DELETE(Foundation::getAllocator(), m_layerStack);
+    Renderer2D::terminate();
 #ifdef PLATFORM_DESKTOP
     Miren::terminate();
 #endif
@@ -67,7 +70,12 @@ Application::Application(ApplicationStartupSettings &settings)
 #endif
     Miren::renderSemaphoreWait();
     Random::init();
-    startBasicGame(settings.startupLevel);
+    Renderer2D::init();
+    if (settings.startupLevel != nullptr) {
+        startBasicGame(settings.startupLevel);
+    } else if (settings.startupLayer != nullptr) {
+        pushLayer(settings.startupLayer);
+    }
     m_ImGuiLayer = NEW(Foundation::getAllocator(), ImGuiLayer);
     pushOverlay(m_ImGuiLayer);
     Miren::renderSemaphorePost();
@@ -99,6 +107,7 @@ void Application::loop() {
 
         Miren::renderSemaphoreWait();
         // LOG_INFO("APP UPDATE BEGIN");
+        Renderer2D::begin();
         LayerStack &layerStack = *m_layerStack;
         for (Layer *layer : layerStack) {
             layer->onUpdate(deltaTime);
@@ -109,6 +118,8 @@ void Application::loop() {
         }
         m_ImGuiLayer->end();
         m_window->pollEvents();
+        Renderer2D::end();
+        Input::nextFrame();
         processEvents();
         Miren::frame();
         // LOG_INFO("APP UPDATE END");
@@ -134,6 +145,9 @@ void Application::processEvents() {
             if (event->isHandled)
                 break;
             (*it)->onEvent(event);
+        }
+        if (event->isHandled == false) {
+            Input::onEvent(event);
         }
     }
     m_eventQueue.reset();

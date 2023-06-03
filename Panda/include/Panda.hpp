@@ -22,7 +22,7 @@
 #include "Panda/GameLogic/Components/Camera.hpp"
 
 // Renderer stuff
-#include <Miren/Miren.hpp>
+#include <Panda/Renderer/Renderer2D.hpp>
 #include <Miren/Vertex.hpp>
 
 // Third party
