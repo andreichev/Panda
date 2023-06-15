@@ -10,25 +10,21 @@ OrthographicCamera::OrthographicCamera()
     , m_viewMatrix(1.0f)
     , m_viewProjectionMatrix(1.0f)
     , m_bounds()
-    , m_screenSize(Application::get()->getWindow()->getSize())
+    , m_screenSize(200, 300)
     , m_aspectRatio(1.0f)
     , m_zoom(1.0f)
     , m_transform(nullptr) {
-    LOG_INFO("Orthographic camera created, viewport size: {}, {}",
-        m_screenSize.width,
-        m_screenSize.height);
+    LOG_INFO("Orthographic camera created");
 }
 
 OrthographicCamera::~OrthographicCamera() {
     m_transform->removeDelegate(this);
-    Application::get()->removeWindowSizeListener(this);
 }
 
 void OrthographicCamera::initialize() {
     m_transform = getEntity().getTransform();
     m_transform->addDelegate(this);
-    Application::get()->addWindowSizeListener(this);
-    windowSizeChanged(m_screenSize);
+    updateViewportSize(m_screenSize);
 }
 
 void OrthographicCamera::updateProjectionMatrix() {
@@ -65,7 +61,7 @@ Point OrthographicCamera::screenCoordToWorld(Point coord) {
 
 // MARK: - Window size delegate
 
-void OrthographicCamera::windowSizeChanged(Size size) {
+void OrthographicCamera::updateViewportSize(Size size) {
     m_screenSize = size;
     m_aspectRatio = size.width / size.height;
     m_bounds = {-m_aspectRatio * m_zoom, m_aspectRatio * m_zoom, -m_zoom, m_zoom};

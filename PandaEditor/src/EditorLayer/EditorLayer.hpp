@@ -17,9 +17,13 @@ public:
     void onEvent(Event *event) override;
 
 private:
+    void initializeWorld();
+
+    Panda::World *m_world;
     Miren::FrameBufferHandle m_frameBuffer;
     Miren::ViewId m_sceneViewId = 1;
     Miren::TextureHandle m_colorAttachment;
+    Foundation::Shared<Panda::OrthographicCamera> m_camera;
     Panda::Size m_viewportPanelSize;
 };
 

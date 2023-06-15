@@ -18,7 +18,7 @@ struct OrthographicCameraBounds {
     }
 };
 
-class OrthographicCamera : public Component, WindowSizeListener, TransformDelegate {
+class OrthographicCamera : public Component, TransformDelegate {
 public:
     OrthographicCamera();
     ~OrthographicCamera() override;
@@ -41,11 +41,11 @@ public:
     }
     void setZoomLevel(float level);
 
+    void updateViewportSize(Size size);
     Point screenCoordToWorld(Point coord);
 
     // MARK: - Delegate
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
-    void windowSizeChanged(Size size) override;
 
 private:
     void updateProjectionMatrix();

@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Panda/GameLogic/Entity.hpp"
-#include "Panda/GameLogic/Components/OrthographicCamera.hpp"
 #include "Panda/Window/Window.hpp"
 #include "Panda/GameLogic/UI/UIView.hpp"
 

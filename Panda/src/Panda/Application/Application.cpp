@@ -112,13 +112,13 @@ void Application::loop() {
         for (Layer *layer : layerStack) {
             layer->onUpdate(deltaTime);
         }
+        Renderer2D::end();
         m_ImGuiLayer->begin(deltaTime);
         for (Layer *layer : layerStack) {
             layer->onImGuiRender();
         }
         m_ImGuiLayer->end();
         m_window->pollEvents();
-        Renderer2D::end();
         Input::nextFrame();
         processEvents();
         Miren::frame();

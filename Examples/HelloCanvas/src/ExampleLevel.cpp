@@ -10,10 +10,35 @@
 #include <Panda/GameLogic/Components/ParticleSystem.hpp>
 #include <Panda/GameLogic/Components/OrthographicCamera.hpp>
 
+class CameraSizeObserver : public Panda::Component, Panda::WindowSizeListener {
+public:
+    void initialize() override {
+        Panda::Application::get()->addWindowSizeListener(this);
+    }
+
+    ~CameraSizeObserver() {
+        Panda::Application::get()->removeWindowSizeListener(this);
+    }
+
+    void update(double deltaTime) override {}
+
+    void windowSizeChanged(Panda::Size size) override {
+        m_camera->updateViewportSize(size);
+    }
+
+    void setCamera(Foundation::Shared<Panda::OrthographicCamera> camera) {
+        m_camera = camera;
+    }
+
+private:
+    Foundation::Shared<Panda::OrthographicCamera> m_camera;
+};
+
 class ExampleRenderer : public Panda::Component {
 public:
     void initialize() override {
         m_texture = Foundation::makeShared<Panda::Texture>("textures/arbuz1.png");
+        // m_camera->updateViewportSize(Panda::Application::get()->getWindow()->getSize());
     }
 
     ~ExampleRenderer() {}
@@ -98,11 +123,15 @@ void ExampleLevel::start(Panda::World *world) {
     Foundation::Shared<ExampleRenderer> dummy = Foundation::makeShared<ExampleRenderer>();
     Foundation::Shared<OrthographicCameraMove> cameraMove =
         Foundation::makeShared<OrthographicCameraMove>();
+    Foundation::Shared<CameraSizeObserver> cameraSizeObserver =
+        Foundation::makeShared<CameraSizeObserver>();
     entity->addComponent(dummy);
     entity->addComponent(particle);
     entity->addComponent(camera);
     entity->addComponent(cameraMove);
+    entity->addComponent(cameraSizeObserver);
     cameraMove->setCamera(camera);
+    cameraSizeObserver->setCamera(camera);
     dummy->setParticleSysyem(particle);
     dummy->setCamera(camera);
 }
