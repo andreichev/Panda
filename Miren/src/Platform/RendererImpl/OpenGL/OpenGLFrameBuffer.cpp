@@ -1,13 +1,7 @@
 #include "OpenGLFrameBuffer.hpp"
 #include "RendererOpenGL.hpp"
 
-#include <Foundation/PlatformDetection.hpp>
-
-#ifdef PLATFORM_IOS
-#    include <OpenGLES/ES3/gl.h>
-#elif defined(PLATFORM_DESKTOP)
-#    include <glad/glad.h>
-#endif
+#include "OpenGLBase.hpp"
 
 namespace Miren {
 
@@ -32,8 +26,8 @@ OpenGLFrameBuffer::OpenGLFrameBuffer()
 void OpenGLFrameBuffer::create(FrameBufferSpecification specification) {
     PND_ASSERT(m_id == -1, "FRAMEBUFFER ALREADY CREATED");
     // this->specification = specification;
-    glGenFramebuffers(1, &m_id);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+    GL_CALL(glGenFramebuffers(1, &m_id));
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, m_id));
     for (int i = 0; i < specification.num; i++) {
         FrameBufferAttachment &attach = specification.attachments[i];
         OpenGLTexture &texture = RendererOpenGL::s_instance->getTexture(attach.handle);
@@ -44,18 +38,19 @@ void OpenGLFrameBuffer::create(FrameBufferSpecification specification) {
             attachmentType = GL_COLOR_ATTACHMENT0 + i;
         }
         GLuint textureId = texture.getId();
-        glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, textureId, 0);
+        GL_CALL(
+            glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, textureId, 0));
     }
     checkStatus();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
 void OpenGLFrameBuffer::bind() {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, m_id));
 }
 
 void OpenGLFrameBuffer::unbind() {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
 void OpenGLFrameBuffer::resize(uint32_t width, uint32_t height) {
@@ -64,8 +59,8 @@ void OpenGLFrameBuffer::resize(uint32_t width, uint32_t height) {
 
 void OpenGLFrameBuffer::terminate() {
     PND_ASSERT(m_id != -1, "FRAMEBUFFER ALREADY DELETED");
-    glDeleteFramebuffers(1, &m_id);
-    m_id = 0;
+    GL_CALL(glDeleteFramebuffers(1, &m_id));
+    m_id = -1;
 }
 
 } // namespace Miren

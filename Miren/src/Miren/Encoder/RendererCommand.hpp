@@ -16,11 +16,11 @@ enum RendererCommandType {
     RendererInit,
     RendererShutdown,
     CreateFrameBuffer,
-    ResizeFrameBuffer,
     DestroyFrameBuffer,
     CreateShader,
     DestroyShader,
     CreateTexture,
+    ResizeTexture,
     DestroyTexture,
     CreateIndexBuffer,
     CreateDynamicIndexBuffer,
@@ -42,18 +42,6 @@ struct CreateFrameBufferCommand : Foundation::CommandBuffer::Command {
         : Command(RendererCommandType::CreateFrameBuffer)
         , handle(handle)
         , spec(spec) {}
-};
-
-struct ResizeFrameBufferCommand : Foundation::CommandBuffer::Command {
-    FrameBufferHandle handle;
-    uint32_t width;
-    uint32_t height;
-
-    ResizeFrameBufferCommand(FrameBufferHandle handle, uint32_t width, uint32_t height)
-        : Command(RendererCommandType::ResizeFrameBuffer)
-        , handle(handle)
-        , width(width)
-        , height(height) {}
 };
 
 struct DeleteFrameBufferCommand : Foundation::CommandBuffer::Command {
@@ -92,6 +80,18 @@ struct CreateTextureCommand : Foundation::CommandBuffer::Command {
         : Command(RendererCommandType::CreateTexture)
         , handle(handle)
         , create(create) {}
+};
+
+struct ResizeTextureCommand : Foundation::CommandBuffer::Command {
+    TextureHandle handle;
+    uint32_t width;
+    uint32_t height;
+
+    ResizeTextureCommand(TextureHandle handle, uint32_t width, uint32_t height)
+        : Command(RendererCommandType::ResizeTexture)
+        , handle(handle)
+        , width(width)
+        , height(height) {}
 };
 
 struct DeleteTextureCommand : Foundation::CommandBuffer::Command {

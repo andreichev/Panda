@@ -12,6 +12,7 @@ class OpenGLTexture {
 public:
     OpenGLTexture();
     void create(const TextureCreate &create);
+    void resize(uint32_t width, uint32_t height);
     void terminate();
     void bind(uint32_t slot);
     void unbind();
@@ -20,11 +21,11 @@ public:
     }
 
     inline TextureFormat getFormat() {
-        return m_format;
+        return m_create.m_format;
     }
 
 private:
-    TextureFormat m_format;
+    TextureCreate m_create;
     uint32_t m_id;
 };
 

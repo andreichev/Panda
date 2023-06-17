@@ -48,12 +48,10 @@ public:
     static void resetStats();
     static Statistics getStats();
     static void terminate();
-    static void setFrameBuffer(Miren::FrameBufferHandle frameBuffer);
     static void setViewId(Miren::ViewId id);
     static void setCamera(Foundation::Shared<OrthographicCamera> camera);
 
 private:
-    static Miren::FrameBufferHandle s_frameBuffer;
     static Miren::ViewId s_viewId;
     static Foundation::Shared<OrthographicCamera> s_camera;
     static void drawRect(glm::mat4 &transform, RectData rect);

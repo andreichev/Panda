@@ -6,7 +6,9 @@
 
 class TriangleRenderer : public Panda::Component {
 public:
-    TriangleRenderer(int mVertexBuffer, int mIndexBuffer, int mShader)
+    TriangleRenderer(Miren::VertexBufferHandle mVertexBuffer,
+        Miren::IndexBufferHandle mIndexBuffer,
+        Miren::ShaderHandle mShader)
         : m_vertexBuffer(mVertexBuffer)
         , m_indexBuffer(mIndexBuffer)
         , m_shader(mShader) {}

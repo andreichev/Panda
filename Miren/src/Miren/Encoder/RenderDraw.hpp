@@ -34,7 +34,6 @@ struct RenderDraw {
         , m_indicesOffset(0)
         , m_verticesOffset(0)
         , m_viewId(0)
-        , m_frameBuffer(MIREN_INVALID_HANDLE)
         , m_shader(MIREN_INVALID_HANDLE)
         , m_indexBuffer(MIREN_INVALID_HANDLE)
         , m_vertexBuffer(MIREN_INVALID_HANDLE)
@@ -51,7 +50,6 @@ struct RenderDraw {
         m_verticesOffset = 0;
         m_viewId = 0;
         m_shader = MIREN_INVALID_HANDLE;
-        m_frameBuffer = MIREN_INVALID_HANDLE;
         m_indexBuffer = MIREN_INVALID_HANDLE;
         m_vertexBuffer = MIREN_INVALID_HANDLE;
         m_vertexLayout = MIREN_INVALID_HANDLE;
@@ -71,7 +69,6 @@ struct RenderDraw {
     intptr_t m_indicesOffset;
     intptr_t m_verticesOffset;
     ShaderHandle m_shader;
-    FrameBufferHandle m_frameBuffer;
     IndexBufferHandle m_indexBuffer;
     VertexBufferHandle m_vertexBuffer;
     VertexLayoutHandle m_vertexLayout;

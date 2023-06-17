@@ -6,15 +6,7 @@
 #include "Miren/Base.hpp"
 #include "Miren/PlatformData.hpp"
 
-#include <Foundation/Assert.hpp>
-#include <Foundation/Logger.hpp>
-#include <Foundation/PlatformDetection.hpp>
-
-#ifdef PLATFORM_IOS
-#    include <OpenGLES/ES3/gl.h>
-#elif defined(PLATFORM_DESKTOP)
-#    include <glad/glad.h>
-#endif
+#include "OpenGLBase.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -32,28 +24,28 @@ void OpenGLShader::create(const char *vertexCode, const char *fragmentCode) {
     vertex = glCreateShader(GL_VERTEX_SHADER);
     // LOG_INFO("\n\nVERTEX CODE: {}\n\n", vertexCode);
     // LOG_INFO("\n\nFRAGMENT CODE: {}\n\n", fragmentCode);
-    glShaderSource(vertex, 1, &vertexCode, nullptr);
-    glCompileShader(vertex);
+    GL_CALL(glShaderSource(vertex, 1, &vertexCode, nullptr));
+    GL_CALL(glCompileShader(vertex));
     checkCompileErrors(vertex, "VERTEX");
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fragmentCode, nullptr);
-    glCompileShader(fragment);
+    GL_CALL(glShaderSource(fragment, 1, &fragmentCode, nullptr));
+    GL_CALL(glCompileShader(fragment));
     checkCompileErrors(fragment, "FRAGMENT");
     // shader Program
     m_id = glCreateProgram();
-    glAttachShader(m_id, vertex);
-    glAttachShader(m_id, fragment);
-    glLinkProgram(m_id);
+    GL_CALL(glAttachShader(m_id, vertex));
+    GL_CALL(glAttachShader(m_id, fragment));
+    GL_CALL(glLinkProgram(m_id));
     checkCompileErrors(m_id, "PROGRAM");
     // delete the shaders as they're linked into our program now and no longer necessery
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
+    GL_CALL(glDeleteShader(vertex));
+    GL_CALL(glDeleteShader(fragment));
 }
 
 void OpenGLShader::terminate() {
     PND_ASSERT(m_id != -1, "PROGRAM ALREADY DELETED");
-    glDeleteProgram(m_id);
+    GL_CALL(glDeleteProgram(m_id));
     m_id = -1;
 }
 
@@ -87,7 +79,7 @@ int OpenGLShader::getUniformLocation(const std::string &name) {
 void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseVertex) {
     intptr_t pointer = baseVertex;
     for (int i = 0; i < layout.m_elementsCount; i++) {
-        glEnableVertexAttribArray(i);
+        GL_CALL(glEnableVertexAttribArray(i));
         // glVertexAttribDivisor(i, 0);
         int type;
         switch (layout.m_elements[i].type) {
@@ -104,35 +96,35 @@ void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseV
                 PND_ASSERT(false, "Buffer element type is undefined");
                 break;
         }
-        glVertexAttribPointer(i,
+        GL_CALL(glVertexAttribPointer(i,
             layout.m_elements[i].count,
             type,
             layout.m_elements[i].normalized ? GL_TRUE : GL_FALSE,
             layout.m_stride,
-            (const void *)pointer);
+            (const void *)pointer));
         pointer += layout.m_elements[i].count *
                    VertexBufferElement::getSizeOfType(layout.m_elements[i].type);
     }
 }
 
 void OpenGLShader::bind() {
-    glUseProgram(m_id);
+    GL_CALL(glUseProgram(m_id));
 }
 
 void OpenGLShader::unbind() {
-    glUseProgram(0);
+    GL_CALL(glUseProgram(0));
 }
 
 void OpenGLShader::setUniformMat4(const char *name, float *value) {
-    glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, value);
+    GL_CALL(glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, value));
 }
 
 void OpenGLShader::setUniformInt(const char *name, int value) {
-    glUniform1i(getUniformLocation(name), value);
+    GL_CALL(glUniform1i(getUniformLocation(name), value));
 }
 
 void OpenGLShader::setUniformIntArray(const char *name, int *value) {
-    glUniform1iv(getUniformLocation(name), 8, value);
+    GL_CALL(glUniform1iv(getUniformLocation(name), 8, value));
 }
 
 } // namespace Miren

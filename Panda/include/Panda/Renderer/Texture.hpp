@@ -33,7 +33,7 @@ public:
     }
 
     bool operator==(const Texture &o) {
-        return o.m_handle == m_handle;
+        return o.m_handle.id == m_handle.id;
     }
 
 private:

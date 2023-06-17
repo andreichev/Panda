@@ -94,7 +94,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
                 Miren::setScissorRect(scissorRect);
                 Miren::setState(0);
                 Miren::setShader(shader);
-                TextureHandle texture = (TextureHandle)(intptr_t)cmd->GetTexID();
+                TextureHandle texture = TextureHandle((intptr_t)cmd->GetTexID());
                 Miren::setTexture(texture, 0);
                 Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
                 Miren::setVertexLayout(vertexLayout);
@@ -124,7 +124,7 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateFontsTexture() {
     create.m_height = height;
     create.m_numMips = 0;
     fontTexture = createTexture(create);
-    io.Fonts->SetTexID((ImTextureID)(intptr_t)fontTexture);
+    io.Fonts->SetTexID((ImTextureID)(intptr_t)fontTexture.id);
     return true;
 }
 

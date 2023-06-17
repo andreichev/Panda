@@ -4,13 +4,7 @@
 
 #include "OpenGLIndexBuffer.hpp"
 
-#include <Foundation/PlatformDetection.hpp>
-
-#ifdef PLATFORM_IOS
-#    include <OpenGLES/ES3/gl.h>
-#elif defined(PLATFORM_DESKTOP)
-#    include <glad/glad.h>
-#endif
+#include "OpenGLBase.hpp"
 
 namespace Miren {
 
@@ -37,20 +31,20 @@ void OpenGLIndexBuffer::create(
         m_elementType = GL_UNSIGNED_INT;
         m_elementSize = sizeof(unsigned int);
     }
-    glGenBuffers(1, &m_id);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
+    GL_CALL(glGenBuffers(1, &m_id));
+    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id));
     if (indices != nullptr) {
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+        GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER,
             count * m_elementSize,
             indices,
-            isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+            isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
     }
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
 void OpenGLIndexBuffer::terminate() {
     PND_ASSERT(m_id != -1, "INDEX BUFFER ALREADY DELETED");
-    glDeleteBuffers(1, &m_id);
+    GL_CALL(glDeleteBuffers(1, &m_id));
     m_id = -1;
 }
 

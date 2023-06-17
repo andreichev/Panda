@@ -5,7 +5,7 @@
 #include "Encoder/View.hpp"
 #include "Encoder/RenderDraw.hpp"
 #include "Miren/Miren.hpp"
-#include "MirenHandleAllocator.hpp"
+#include "HandleAllocator.hpp"
 #include "MirenStates.hpp"
 #include "Platform/RendererImpl/OpenGL/RendererOpenGL.hpp"
 #include "RendererI.hpp"
@@ -93,13 +93,6 @@ struct Context {
                     m_renderer->createFrameBuffer(cmd->handle, cmd->spec);
                     break;
                 }
-                case RendererCommandType::ResizeFrameBuffer: {
-                    CMDBUF_LOG("RESIZE FRAME BUFFER COMMAND");
-                    const ResizeFrameBufferCommand *cmd =
-                        static_cast<const ResizeFrameBufferCommand *>(command);
-                    m_renderer->resizeFrameBuffer(cmd->handle, cmd->width, cmd->height);
-                    break;
-                }
                 case RendererCommandType::DestroyFrameBuffer: {
                     CMDBUF_LOG("DESTROY FRAME BUFFER COMMAND");
                     const DeleteFrameBufferCommand *cmd =
@@ -126,6 +119,13 @@ struct Context {
                     const CreateTextureCommand *cmd =
                         static_cast<const CreateTextureCommand *>(command);
                     m_renderer->createTexture(cmd->handle, cmd->create);
+                    break;
+                }
+                case RendererCommandType::ResizeTexture: {
+                    CMDBUF_LOG("CREATE TEXTURE COMMAND");
+                    const ResizeTextureCommand *cmd =
+                        static_cast<const ResizeTextureCommand *>(command);
+                    m_renderer->resizeTexture(cmd->handle, cmd->width, cmd->height);
                     break;
                 }
                 case RendererCommandType::DestroyTexture: {
@@ -249,6 +249,15 @@ struct Context {
         return m_renderer != nullptr;
     }
 
+    void freeAllHandles(Frame *frame) {
+        frame->free(&m_frameBuffersHandleAlloc);
+        frame->free(&m_shadersHandleAlloc);
+        frame->free(&m_texturesHandleAlloc);
+        frame->free(&m_vertexLayoutsHandleAlloc);
+        frame->free(&m_vertexBuffersHandleAlloc);
+        frame->free(&m_indexBuffersHandleAlloc);
+    }
+
     FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification) {
         FrameBufferHandle handle = m_frameBuffersHandleAlloc.alloc();
         CreateFrameBufferCommand cmd(handle, specification);
@@ -256,13 +265,8 @@ struct Context {
         return handle;
     }
 
-    void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) {
-        ResizeFrameBufferCommand cmd(handle, width, height);
-        m_preCommandQueue.write(cmd);
-    }
-
     void deleteFrameBuffer(FrameBufferHandle handle) {
-        m_frameBuffersHandleAlloc.free(handle);
+        m_submit->queueFree(handle);
         DeleteFrameBufferCommand cmd(handle);
         m_postCommandQueue.write(cmd);
     }
@@ -275,7 +279,7 @@ struct Context {
     }
 
     void deleteShader(ShaderHandle handle) {
-        m_shadersHandleAlloc.free(handle);
+        m_submit->queueFree(handle);
         DeleteShaderCommand cmd(handle);
         m_postCommandQueue.write(cmd);
     }
@@ -287,8 +291,13 @@ struct Context {
         return handle;
     }
 
+    void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) {
+        ResizeTextureCommand cmd(handle, width, height);
+        m_preCommandQueue.write(cmd);
+    }
+
     void deleteTexture(TextureHandle handle) {
-        m_texturesHandleAlloc.free(handle);
+        m_submit->queueFree(handle);
         DeleteTextureCommand cmd(handle);
         m_postCommandQueue.write(cmd);
     }
@@ -315,7 +324,7 @@ struct Context {
     }
 
     void deleteIndexBuffer(IndexBufferHandle handle) {
-        m_indexBuffersHandleAlloc.free(handle);
+        m_submit->queueFree(handle);
         DeleteIndexBufferCommand cmd(handle);
         m_postCommandQueue.write(cmd);
     }
@@ -342,7 +351,7 @@ struct Context {
     }
 
     void deleteVertexBuffer(VertexBufferHandle handle) {
-        m_vertexBuffersHandleAlloc.free(handle);
+        m_submit->queueFree(handle);
         DeleteVertexBufferCommand cmd(handle);
         m_postCommandQueue.write(cmd);
     }
@@ -355,7 +364,7 @@ struct Context {
     }
 
     void deleteVertexLayout(VertexLayoutHandle handle) {
-        m_vertexLayoutsHandleAlloc.free(handle);
+        m_submit->queueFree(handle);
         DeleteVertexLayoutCommand cmd(handle);
         m_postCommandQueue.write(cmd);
     }
@@ -447,10 +456,6 @@ struct Context {
         m_submit->setVertexLayout(handle);
     }
 
-    void setFrameBuffer(FrameBufferHandle frameBuffer) {
-        m_submit->setFrameBuffer(frameBuffer);
-    }
-
     void submit(ViewId id) {
         m_submit->submitCurrentDrawCall(id);
         m_submit->beginDrawCall();
@@ -461,6 +466,7 @@ struct Context {
     }
 
     uint32_t frame() {
+        freeAllHandles(m_submit);
         swap();
         m_submit->reset();
         return m_frameNumber++;
@@ -472,6 +478,10 @@ struct Context {
 
     void setViewClear(ViewId id, uint32_t color) {
         m_views[id].m_clearColor = color;
+    }
+
+    void setViewFrameBuffer(ViewId id, FrameBufferHandle frameBuffer) {
+        m_views[id].m_frameBuffer = frameBuffer;
     }
 
 private:
@@ -487,12 +497,12 @@ private:
     // DynamicIndexBuffer m_dynamicIndexBuffers[MAX_DYNAMIC_INDEX_BUFFERS];
     // DynamicVertexBuffer m_dynamicVertexBuffers[MAX_DYNAMIC_VERTEX_BUFFERS];
 
-    MirenHandleAllocator m_frameBuffersHandleAlloc;
-    MirenHandleAllocator m_shadersHandleAlloc;
-    MirenHandleAllocator m_texturesHandleAlloc;
-    MirenHandleAllocator m_vertexLayoutsHandleAlloc;
-    MirenHandleAllocator m_vertexBuffersHandleAlloc;
-    MirenHandleAllocator m_indexBuffersHandleAlloc;
+    HandleAllocator<FrameBufferHandle> m_frameBuffersHandleAlloc;
+    HandleAllocator<ShaderHandle> m_shadersHandleAlloc;
+    HandleAllocator<TextureHandle> m_texturesHandleAlloc;
+    HandleAllocator<VertexLayoutHandle> m_vertexLayoutsHandleAlloc;
+    HandleAllocator<VertexBufferHandle> m_vertexBuffersHandleAlloc;
+    HandleAllocator<IndexBufferHandle> m_indexBuffersHandleAlloc;
     Foundation::CommandBuffer m_preCommandQueue;
     Foundation::CommandBuffer m_postCommandQueue;
 

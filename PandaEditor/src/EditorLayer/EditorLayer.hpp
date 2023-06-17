@@ -18,9 +18,11 @@ public:
 
 private:
     void initializeWorld();
+    void updateViewportSize(Size size);
 
     Panda::World *m_world;
-    Miren::FrameBufferHandle m_frameBuffer;
+    Miren::FrameBufferHandle m_sceneFB;
+    Miren::FrameBufferSpecification m_sceneFbSpecification;
     Miren::ViewId m_sceneViewId = 1;
     Miren::TextureHandle m_colorAttachment;
     Foundation::Shared<Panda::OrthographicCamera> m_camera;

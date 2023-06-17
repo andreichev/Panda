@@ -29,12 +29,12 @@ public:
     virtual void flip() = 0;
     virtual void createFrameBuffer(
         FrameBufferHandle handle, FrameBufferSpecification specification) = 0;
-    virtual void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) = 0;
     virtual void deleteFrameBuffer(FrameBufferHandle handle) = 0;
     virtual void createShader(
         ShaderHandle handle, const char *vertexCode, const char *fragmentCode) = 0;
     virtual void deleteShader(ShaderHandle handle) = 0;
     virtual void createTexture(TextureHandle handle, const TextureCreate &create) = 0;
+    virtual void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) = 0;
     virtual void deleteTexture(TextureHandle handle) = 0;
     virtual void createIndexBuffer(
         IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) = 0;

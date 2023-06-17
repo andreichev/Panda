@@ -22,12 +22,12 @@ public:
     void flip() override;
     void createFrameBuffer(
         FrameBufferHandle handle, FrameBufferSpecification specification) override;
-    void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) override;
     void deleteFrameBuffer(FrameBufferHandle handle) override;
     void createShader(
         ShaderHandle handle, const char *vertexCode, const char *fragmentCode) override;
     void deleteShader(ShaderHandle handle) override;
     void createTexture(TextureHandle handle, const TextureCreate &create) override;
+    void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) override;
     void deleteTexture(TextureHandle handle) override;
     void createIndexBuffer(IndexBufferHandle handle,
         void *indices,
@@ -57,7 +57,7 @@ public:
 
     static RendererOpenGL *s_instance;
     OpenGLTexture &getTexture(TextureHandle handle) {
-        return textures[handle];
+        return textures[handle.id];
     }
 
 private:

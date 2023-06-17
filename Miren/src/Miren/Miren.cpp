@@ -6,6 +6,8 @@
 
 namespace Miren {
 
+// MARK: - PUBLIC METHODS IMPL
+
 static Context *s_context = nullptr;
 static const int CONTEXT_ALIGNMENT = 64;
 
@@ -28,10 +30,6 @@ FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification) {
     return s_context->createFrameBuffer(specification);
 }
 
-void resizeFrameBuffer(FrameBufferHandle handle, uint32_t width, uint32_t height) {
-    s_context->resizeFrameBuffer(handle, width, height);
-}
-
 void deleteFrameBuffer(FrameBufferHandle handle) {
     s_context->deleteFrameBuffer(handle);
 }
@@ -46,6 +44,10 @@ void deleteShader(ShaderHandle handle) {
 
 TextureHandle createTexture(TextureCreate create) {
     return s_context->createTexture(create);
+}
+
+void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) {
+    s_context->resizeTexture(handle, width, height);
 }
 
 void deleteTexture(TextureHandle handle) {
@@ -119,6 +121,10 @@ void setViewport(ViewId id, Rect rect) {
     s_context->setViewport(id, rect);
 }
 
+void setViewFrameBuffer(ViewId id, FrameBufferHandle frameBuffer) {
+    s_context->setViewFrameBuffer(id, frameBuffer);
+}
+
 void setState(uint32_t state) {
     s_context->setState(state);
 }
@@ -149,10 +155,6 @@ void setTexture(TextureHandle textureHandle, uint32_t slot) {
 
 void setVertexLayout(VertexLayoutHandle handle) {
     s_context->setVertexLayout(handle);
-}
-
-void setFrameBuffer(FrameBufferHandle frameBuffer) {
-    s_context->setFrameBuffer(frameBuffer);
 }
 
 void submit(ViewId id) {

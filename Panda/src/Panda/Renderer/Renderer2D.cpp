@@ -41,8 +41,7 @@ struct DrawCallData {
 };
 
 static DrawCallData s_drawData;
-Miren::FrameBufferHandle Renderer2D::s_frameBuffer = MIREN_INVALID_HANDLE;
-Miren::FrameBufferHandle Renderer2D::s_viewId = 0;
+Miren::ViewId Renderer2D::s_viewId = 0;
 Foundation::Shared<OrthographicCamera> Renderer2D::s_camera = nullptr;
 
 void Renderer2D::init() {
@@ -187,14 +186,7 @@ void Renderer2D::end() {
     Miren::setVertexLayout(s_drawData.layout);
     Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
     Miren::setIndexBuffer(tib.handle, tib.startIndex, s_drawData.indicesCount);
-    if (s_frameBuffer != MIREN_INVALID_HANDLE) {
-        Miren::setFrameBuffer(s_frameBuffer);
-    }
     Miren::submit(s_viewId);
-}
-
-void Renderer2D::setFrameBuffer(Miren::FrameBufferHandle frameBuffer) {
-    s_frameBuffer = frameBuffer;
 }
 
 void Renderer2D::setViewId(Miren::ViewId id) {

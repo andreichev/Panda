@@ -45,11 +45,6 @@ void Frame::setShader(ShaderHandle handle) {
     draw.m_shader = handle;
 }
 
-void Frame::setFrameBuffer(FrameBufferHandle handle) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
-    draw.m_frameBuffer = handle;
-}
-
 void Frame::setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.addUniform(handle, name, value, type);
@@ -79,10 +74,76 @@ RenderDraw *Frame::getDrawCalls() {
     return m_drawCalls;
 }
 
+void Frame::queueFree(FrameBufferHandle handle) {
+    m_frameBuffersFreeHandle.queue(handle);
+}
+
+void Frame::queueFree(ShaderHandle handle) {
+    m_shadersFreeHandle.queue(handle);
+}
+
+void Frame::queueFree(TextureHandle handle) {
+    m_texturesFreeHandle.queue(handle);
+}
+
+void Frame::queueFree(VertexBufferHandle handle) {
+    m_vertexBuffersFreeHandle.queue(handle);
+}
+
+void Frame::queueFree(VertexLayoutHandle handle) {
+    m_vertexLayoutsFreeHandle.queue(handle);
+}
+
+void Frame::queueFree(IndexBufferHandle handle) {
+    m_indexBuffersFreeHandle.queue(handle);
+}
+
+void Frame::free(HandleAllocator<FrameBufferHandle> *allocator) {
+    for (int i = 0; i < m_frameBuffersFreeHandle.getNumQueued(); i++) {
+        allocator->free(m_frameBuffersFreeHandle.get(i));
+    }
+}
+
+void Frame::free(HandleAllocator<ShaderHandle> *allocator) {
+    for (int i = 0; i < m_shadersFreeHandle.getNumQueued(); i++) {
+        allocator->free(m_shadersFreeHandle.get(i));
+    }
+}
+
+void Frame::free(HandleAllocator<TextureHandle> *allocator) {
+    for (int i = 0; i < m_texturesFreeHandle.getNumQueued(); i++) {
+        allocator->free(m_texturesFreeHandle.get(i));
+    }
+}
+
+void Frame::free(HandleAllocator<VertexBufferHandle> *allocator) {
+    for (int i = 0; i < m_vertexBuffersFreeHandle.getNumQueued(); i++) {
+        allocator->free(m_vertexBuffersFreeHandle.get(i));
+    }
+}
+
+void Frame::free(HandleAllocator<VertexLayoutHandle> *allocator) {
+    for (int i = 0; i < m_vertexLayoutsFreeHandle.getNumQueued(); i++) {
+        allocator->free(m_vertexLayoutsFreeHandle.get(i));
+    }
+}
+
+void Frame::free(HandleAllocator<IndexBufferHandle> *allocator) {
+    for (int i = 0; i < m_indexBuffersFreeHandle.getNumQueued(); i++) {
+        allocator->free(m_indexBuffersFreeHandle.get(i));
+    }
+}
+
 void Frame::reset() {
     m_drawCallsCount = 0;
     m_transientVbSize = 0;
     m_transientIbSize = 0;
+    m_frameBuffersFreeHandle.reset();
+    m_shadersFreeHandle.reset();
+    m_texturesFreeHandle.reset();
+    m_vertexLayoutsFreeHandle.reset();
+    m_vertexBuffersFreeHandle.reset();
+    m_indexBuffersFreeHandle.reset();
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.reset();
 }

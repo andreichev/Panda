@@ -4,55 +4,49 @@
 
 #include "OpenGLVertexBuffer.hpp"
 
-#include <Foundation/Assert.hpp>
-#include <Foundation/Logger.hpp>
-#include <Foundation/PlatformDetection.hpp>
-
-#ifdef PLATFORM_IOS
-#    include <OpenGLES/ES3/gl.h>
-#elif defined(PLATFORM_DESKTOP)
-#    include <glad/glad.h>
-#endif
+#include "OpenGLBase.hpp"
 
 namespace Miren {
 
 OpenGLVertexBuffer::OpenGLVertexBuffer()
     : m_isDynamic(false)
-    , m_id(-1) {}
+    , m_id(-1)
+    , m_layoutHandle(MIREN_INVALID_HANDLE) {}
 
 void OpenGLVertexBuffer::terminate() {
     PND_ASSERT(m_id != -1, "VERTEX BUFFER ALREADY DELETED");
-    glDeleteBuffers(1, &m_id);
+    GL_CALL(glDeleteBuffers(1, &m_id));
     m_id = -1;
 }
 
 void OpenGLVertexBuffer::create(void *data, uint32_t size, bool isDynamic) {
     PND_ASSERT(m_id == -1, "VERTEX BUFFER ALREADY CREATED");
     m_isDynamic = isDynamic;
-    glGenBuffers(1, &m_id);
-    glBindBuffer(GL_ARRAY_BUFFER, m_id);
+    GL_CALL(glGenBuffers(1, &m_id));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, m_id));
     if (data != nullptr) {
-        glBufferData(GL_ARRAY_BUFFER, size, data, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        GL_CALL(glBufferData(
+            GL_ARRAY_BUFFER, size, data, isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
     }
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
     m_layoutHandle = MIREN_INVALID_HANDLE;
 }
 
 void OpenGLVertexBuffer::update(void *data, uint32_t size) {
     PND_ASSERT(m_id != -1, "VERTEX BUFFER NOT VALID");
     PND_ASSERT(m_isDynamic != false, "Невозможно обновить статичный буфер");
-    glBindBuffer(GL_ARRAY_BUFFER, m_id);
-    glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, m_id));
+    GL_CALL(glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
 void OpenGLVertexBuffer::bind() {
     PND_ASSERT(m_id != -1, "VERTEX BUFFER NOT VALID");
-    glBindBuffer(GL_ARRAY_BUFFER, m_id);
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, m_id));
 }
 
 void OpenGLVertexBuffer::unbind() {
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
 void OpenGLVertexBuffer::setLayoutHandle(VertexLayoutHandle layoutHandle) {

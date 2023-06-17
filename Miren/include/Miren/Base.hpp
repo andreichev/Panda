@@ -18,17 +18,26 @@
 #    define CMDBUF_LOG(...)
 #endif
 
+#define MIREN_INVALID_HANDLE UINT16_MAX
+
 namespace Miren {
 
-using ViewId = uint16_t;
-using ShaderHandle = uint16_t;
-using TextureHandle = uint16_t;
-using IndexBufferHandle = uint16_t;
-using FrameBufferHandle = uint16_t;
-using VertexBufferHandle = uint16_t;
-using VertexLayoutHandle = uint16_t;
+#define MIREN_HANDLE(name)                                                                         \
+    struct name {                                                                                  \
+        name(uint16_t id)                                                                          \
+            : id(id) {}                                                                            \
+        name()                                                                                     \
+            : id(MIREN_INVALID_HANDLE) {}                                                          \
+        uint16_t id;                                                                               \
+    };
 
-#define MIREN_INVALID_HANDLE UINT16_MAX
+using ViewId = uint16_t;
+MIREN_HANDLE(ShaderHandle)
+MIREN_HANDLE(TextureHandle)
+MIREN_HANDLE(IndexBufferHandle)
+MIREN_HANDLE(FrameBufferHandle)
+MIREN_HANDLE(VertexBufferHandle)
+MIREN_HANDLE(VertexLayoutHandle)
 
 enum TextureFormat {
     None = 0,
@@ -46,6 +55,13 @@ struct TextureCreate {
     uint16_t m_height;
     uint8_t m_numMips;
     Foundation::Memory m_data;
+
+    TextureCreate()
+        : m_format(TextureFormat::None)
+        , m_width(1)
+        , m_height(1)
+        , m_numMips(1)
+        , m_data(nullptr) {}
 };
 
 enum class UniformDataType { Int, Mat4, IntArray };

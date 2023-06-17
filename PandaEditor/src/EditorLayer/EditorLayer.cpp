@@ -29,17 +29,17 @@ void EditorLayer::onAttach() {
     create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
     Miren::TextureHandle depthAttachment = Miren::createTexture(create);
     Miren::FrameBufferAttachment attachments[] = {m_colorAttachment, depthAttachment};
-    Miren::FrameBufferSpecification spec(attachments, 2);
-    m_frameBuffer = Miren::createFrameBuffer(spec);
+    m_sceneFbSpecification = Miren::FrameBufferSpecification(attachments, 2);
+    m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewport(m_sceneViewId,
         Miren::Rect(
             0, 0, m_viewportPanelSize.width * dpi.width, m_viewportPanelSize.height * dpi.height));
     Miren::setViewport(
         0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height));
-    Miren::setViewClear(m_sceneViewId, 0x111111ff);
+    Miren::setViewClear(m_sceneViewId, 0x12212bff);
     m_camera->updateViewportSize(m_viewportPanelSize);
     Renderer2D::setCamera(m_camera);
-    Renderer2D::setFrameBuffer(m_frameBuffer);
+    Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
     Renderer2D::setViewId(m_sceneViewId);
 }
 
@@ -53,13 +53,13 @@ void EditorLayer::onUpdate(double deltaTime) {
     Renderer2D::RectData rect2;
     rect2.color = Color(1.0f, 0.f, 0.f, 1.f);
     rect2.origin = Point(0.6f, 0.6f);
-    rect2.size = Size(0.2f, 0.2f);
+    rect2.size = Size(1.f, 1.f);
     Renderer2D::drawRect(rect2);
 
     Renderer2D::RectData rect3;
-    rect3.color = Color(0.f, 0.f, 1.f, 1.f);
+    rect3.color = Color(1.f, 0.f, 1.f, 1.f);
     rect3.origin = Point(0.1f, 0.8f);
-    rect3.size = Size(0.1f, 0.1f);
+    rect3.size = Size(5.0f, 5.0f);
     Renderer2D::drawRect(rect3);
 
     if (Input::isKeyJustPressed(Key::ESCAPE)) {
@@ -109,8 +109,11 @@ void EditorLayer::onImGuiRender() {
 
     ImGui::Begin("Viewport");
     ImVec2 viewportSpace = ImGui::GetContentRegionAvail();
-    m_camera->updateViewportSize({viewportSpace.x, viewportSpace.y});
-    ImGui::Image((void *)(uintptr_t)m_colorAttachment,
+    if (viewportSpace.x != m_viewportPanelSize.width ||
+        viewportSpace.y != m_viewportPanelSize.height) {
+        updateViewportSize({viewportSpace.x, viewportSpace.y});
+    }
+    ImGui::Image((void *)(uintptr_t)m_colorAttachment.id,
         ImVec2(m_viewportPanelSize.width, m_viewportPanelSize.height),
         ImVec2(0, 1),
         ImVec2(1, 0));
@@ -118,6 +121,18 @@ void EditorLayer::onImGuiRender() {
 
     // DOCKSPACE
     ImGui::End();
+}
+
+void EditorLayer::updateViewportSize(Size size) {
+    m_viewportPanelSize = size;
+    m_camera->updateViewportSize(size);
+    Size dpi = Application::get()->getWindow()->getDpi();
+    Miren::setViewport(
+        m_sceneViewId, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height));
+    Miren::resizeTexture(m_sceneFbSpecification.attachments[0].handle, size.width, size.height);
+    Miren::deleteFrameBuffer(m_sceneFB);
+    m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
+    Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
 }
 
 void EditorLayer::onEvent(Event *event) {
