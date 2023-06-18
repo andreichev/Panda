@@ -22,6 +22,9 @@ public:
     void startBasicGame(Level *level);
     void pushLayer(Layer *layer);
     void pushOverlay(Layer *layer);
+    ImGuiLayer *getImGuiLayer() {
+        return m_ImGuiLayer;
+    }
     void processEvents();
     Window *getWindow();
     void addWindowSizeListener(WindowSizeListener *listener);

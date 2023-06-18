@@ -13,6 +13,12 @@ public:
     OpenGLTexture();
     void create(const TextureCreate &create);
     void resize(uint32_t width, uint32_t height);
+    uint16_t getWidth() {
+        return m_create.m_width;
+    }
+    uint16_t getHeight() {
+        return m_create.m_height;
+    }
     void terminate();
     void bind(uint32_t slot);
     void unbind();

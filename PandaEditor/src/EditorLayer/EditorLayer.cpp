@@ -1,4 +1,5 @@
 #include "EditorLayer.hpp"
+#include "Components/OrthographicCameraMove.hpp"
 
 #include <imgui.h>
 
@@ -12,7 +13,11 @@ void EditorLayer::initializeWorld() {
         m_camera = Foundation::makeShared<OrthographicCamera>();
     }
     Foundation::Shared<Entity> cameraEntity = m_world->instantiateEntity();
+    Foundation::Shared<OrthographicCameraMove> move =
+        Foundation::makeShared<OrthographicCameraMove>();
+    move->setCamera(m_camera);
     cameraEntity->addComponent(m_camera);
+    cameraEntity->addComponent(move);
 }
 
 void EditorLayer::onAttach() {
@@ -58,8 +63,8 @@ void EditorLayer::onUpdate(double deltaTime) {
 
     Renderer2D::RectData rect3;
     rect3.color = Color(1.f, 0.f, 1.f, 1.f);
-    rect3.origin = Point(0.1f, 0.8f);
-    rect3.size = Size(5.0f, 5.0f);
+    rect3.origin = Point(0.0f, 0.0f);
+    rect3.size = Size(1.0f, 1.0f);
     Renderer2D::drawRect(rect3);
 
     if (Input::isKeyJustPressed(Key::ESCAPE)) {
@@ -113,6 +118,8 @@ void EditorLayer::onImGuiRender() {
         viewportSpace.y != m_viewportPanelSize.height) {
         updateViewportSize({viewportSpace.x, viewportSpace.y});
     }
+    bool viewportHovered = ImGui::IsWindowHovered();
+    Application::get()->getImGuiLayer()->setBlockEvents(!viewportHovered);
     ImGui::Image((void *)(uintptr_t)m_colorAttachment.id,
         ImVec2(m_viewportPanelSize.width, m_viewportPanelSize.height),
         ImVec2(0, 1),
@@ -129,7 +136,14 @@ void EditorLayer::updateViewportSize(Size size) {
     Size dpi = Application::get()->getWindow()->getDpi();
     Miren::setViewport(
         m_sceneViewId, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height));
-    Miren::resizeTexture(m_sceneFbSpecification.attachments[0].handle, size.width, size.height);
+    // COLOR ATTACHMENT
+    Miren::resizeTexture(m_sceneFbSpecification.attachments[0].handle,
+        size.width * dpi.width,
+        size.height * dpi.height);
+    // DEPTH ATTACHMENT
+    Miren::resizeTexture(m_sceneFbSpecification.attachments[1].handle,
+        size.width * dpi.width,
+        size.height * dpi.height);
     Miren::deleteFrameBuffer(m_sceneFB);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);

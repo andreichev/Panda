@@ -122,7 +122,7 @@ struct Context {
                     break;
                 }
                 case RendererCommandType::ResizeTexture: {
-                    CMDBUF_LOG("CREATE TEXTURE COMMAND");
+                    CMDBUF_LOG("RESIZE TEXTURE COMMAND");
                     const ResizeTextureCommand *cmd =
                         static_cast<const ResizeTextureCommand *>(command);
                     m_renderer->resizeTexture(cmd->handle, cmd->width, cmd->height);
