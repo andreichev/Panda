@@ -2,98 +2,43 @@
 // Created by Admin on 09.02.2022.
 //
 
-#include "pndpch.hpp"
 #include "Panda/GameLogic/Entity.hpp"
 
 namespace Panda {
 
-Entity::Entity()
-    : parentEntity(nullptr)
-    , transform(Foundation::makeShared<Transform>()) {
-    Transform transform1;
-    addComponent(transform);
+Entity::Entity(entt::registry *registry, id_t id)
+    : m_registry(registry)
+    , m_id(id) {}
+
+Transform &Entity::getTransform() {
+    return getComponent<Transform>();
 }
 
-void Entity::addComponent(Foundation::Shared<Component> component) {
-    component->setEntity(this);
-    components.push_back(component);
-    component->initialize();
+void Entity::addChildEntity(Entity entity) {
+    RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
+    RelationshipComponent &otherRelationship = entity.getComponent<RelationshipComponent>();
+
+    otherRelationship.parentHandle = m_id;
+    thisRelationship.children.push_back(entity.m_id);
 }
 
-void Entity::removeComponent(Foundation::Shared<Component> component) {
-    components.erase(find(components.begin(), components.end(), component));
+void Entity::removeChildEntity(Entity entity) {
+    RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
+    RelationshipComponent &otherRelationship = entity.getComponent<RelationshipComponent>();
+
+    std::remove(thisRelationship.children.begin(), thisRelationship.children.end(), entity.m_id);
+    otherRelationship.parentHandle = -1;
 }
 
-template<typename T>
-Foundation::Shared<T> Entity::getComponentWithType() {
-    auto &it = find_if(components.begin(), components.end(), [](const auto &item) {
-        if (dynamic_cast<T>(item) != nullptr) {
-            return true;
-        }
-        return false;
-    });
-    if (it == components.end()) {
-        return nullptr;
-    }
-    return *it;
+void Entity::removeFromParent() {
+    RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
+    Entity parent = Entity(m_registry, thisRelationship.parentHandle);
+    parent.removeChildEntity(*this);
 }
 
-void Entity::initialize() {
-    for (auto &entity : childEntities) {
-        entity->initialize();
-    }
-    for (auto &component : components) {
-        if (component->isActive) {
-            component->initialize();
-        }
-    }
-}
-
-void Entity::update(double deltaTime) {
-    // Обновить дочерние сущности
-    for (auto &entity : childEntities) {
-        entity->update(deltaTime);
-    }
-    // Обновить все компонеты у этой сущности
-    for (auto &component : components) {
-        if (component->isActive) {
-            component->update(deltaTime);
-        }
-    }
-}
-
-void Entity::onImGuiRender() {
-    // Обновить дочерние сущности
-    for (auto &entity : childEntities) {
-        entity->onImGuiRender();
-    }
-    // Обновить все компонеты у этой сущности
-    for (auto &component : components) {
-        if (component->isActive) {
-            component->onImGuiRender();
-        }
-    }
-}
-
-Foundation::Shared<Transform> Entity::getTransform() const {
-    return transform;
-}
-
-void Entity::addChildEntity(Foundation::Shared<Entity> &entity) {
-    entity->parentEntity = this;
-    childEntities.push_back(entity);
-}
-
-void Entity::removeEntity(Foundation::Shared<Entity> &entity) {
-    childEntities.erase(find(childEntities.begin(), childEntities.end(), entity));
-}
-
-Entity *Entity::getParent() {
-    return parentEntity;
-}
-
-std::vector<Foundation::Shared<Entity>> &Entity::getChildEntities() {
-    return childEntities;
+Entity Entity::getParent() {
+    RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
+    return Entity(m_registry, thisRelationship.parentHandle);
 }
 
 } // namespace Panda

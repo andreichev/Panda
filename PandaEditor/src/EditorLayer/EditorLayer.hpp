@@ -25,7 +25,7 @@ private:
     Miren::FrameBufferSpecification m_sceneFbSpecification;
     Miren::ViewId m_sceneViewId = 1;
     Miren::TextureHandle m_colorAttachment;
-    Foundation::Shared<Panda::OrthographicCamera> m_camera;
+    Panda::OrthographicCamera *m_camera;
     Panda::Size m_viewportPanelSize;
 };
 

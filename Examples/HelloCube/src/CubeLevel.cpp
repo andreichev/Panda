@@ -6,7 +6,7 @@
 
 #include <imgui.h>
 
-class CubeComponent : public Panda::Component {
+class CubeComponent final : public Panda::NativeScript {
 public:
     void initialize() override {
         using namespace Miren;
@@ -43,6 +43,7 @@ public:
             Vertex(1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f)   // 21
         };
 
+        // clang-format off
         auto indices = new uint32_t[36]{
             0, 1, 2, 2, 3, 0,       // Front
             4, 5, 6, 6, 7, 4,       // Back
@@ -51,6 +52,7 @@ public:
             16, 17, 18, 18, 19, 16, // Left
             20, 21, 22, 22, 23, 20  // Right
         };
+        // clang-format on
 
         Miren::VertexBufferLayoutData layoutData;
         layoutData.pushVector();
@@ -120,7 +122,6 @@ private:
 void CubeLevel::start(Panda::World *world) {
     LOG_INFO("CUBE LEVEL STARTED!");
 
-    Foundation::Shared<Panda::Entity> entity = world->instantiateEntity();
-    Foundation::Shared<CubeComponent> cube = Foundation::makeShared<CubeComponent>();
-    entity->addComponent(cube);
+    Panda::Entity entity = world->instantiateEntity();
+    entity.addNativeScript<CubeComponent>();
 }

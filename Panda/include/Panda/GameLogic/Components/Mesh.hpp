@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Panda/GameLogic/Component.hpp"
+#include "Panda/GameLogic/NativeScript.hpp"
 #include "Panda/GameLogic/Components/TransformDelegate.hpp"
 #include "Panda/GameLogic/Primitives/MeshData.hpp"
 
@@ -14,7 +14,7 @@ namespace Panda {
 
 class Transform;
 
-class Mesh : public Component, TransformDelegate {
+class Mesh : public NativeScript, TransformDelegate {
 public:
     ~Mesh() override;
     Mesh(const MeshData &primitiveMeshData,
@@ -47,7 +47,7 @@ private:
     Miren::VertexBufferHandle vertexBufferHandle;
     glm::mat4 model;
     uint32_t indicesCount;
-    Foundation::Shared<Transform> transform;
+    Transform *transform;
     const bool isDynamic;
 };
 

@@ -12,10 +12,6 @@ Transform::Transform()
     , position()
     , delegates() {}
 
-void Transform::initialize() {}
-
-void Transform::update(double deltaTime) {}
-
 void Transform::setRotation(float x, float y, float z) {
     setRotation(glm::vec3(x, y, z));
 }

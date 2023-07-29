@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panda/GameLogic/Component.hpp"
+#include "Panda/GameLogic/NativeScript.hpp"
 
 namespace Panda {
 
@@ -14,7 +14,7 @@ struct ParticleProps {
     float lifeTime = 1.0f;
 };
 
-class ParticleSystem : public Component {
+class ParticleSystem : public NativeScript {
 public:
     ParticleSystem();
     ~ParticleSystem() = default;

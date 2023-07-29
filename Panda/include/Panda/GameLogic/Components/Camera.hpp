@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Panda/GameLogic/Component.hpp"
+#include "Panda/GameLogic/NativeScript.hpp"
 #include "Panda/Events/WindowSizeListener.hpp"
 #include "Transform.hpp"
 #include "TransformDelegate.hpp"
@@ -13,7 +13,7 @@
 
 namespace Panda {
 
-class Camera : public Component, WindowSizeListener, TransformDelegate {
+class Camera : public NativeScript, WindowSizeListener, TransformDelegate {
 public:
     Camera();
     ~Camera() override;
@@ -40,7 +40,7 @@ private:
     void updateViewMatrix();
 
     Size windowSize;
-    Foundation::Shared<Transform> transform;
+    Transform *transform;
     glm::mat4 rotationMatrix;
     glm::vec4 front;
     glm::vec4 up;

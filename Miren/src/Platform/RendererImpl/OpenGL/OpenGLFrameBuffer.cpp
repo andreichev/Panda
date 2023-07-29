@@ -53,10 +53,6 @@ void OpenGLFrameBuffer::unbind() {
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
-void OpenGLFrameBuffer::resize(uint32_t width, uint32_t height) {
-    // TODO: Implement
-}
-
 void OpenGLFrameBuffer::terminate() {
     PND_ASSERT(m_id != -1, "FRAMEBUFFER ALREADY DELETED");
     GL_CALL(glDeleteFramebuffers(1, &m_id));

@@ -4,7 +4,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-DPROFILE)
 endif ()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 file(GLOB_RECURSE SOURCES src/Panda/*.cpp)
 file(GLOB_RECURSE INCLUDE src/Panda/*.hpp include/Panda/*.hpp)
@@ -77,6 +77,10 @@ target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/glm)
 # Dependencies - stb_image
 target_link_libraries(Panda stb_image)
 target_include_directories(Panda PRIVATE ${VENDOR_DIRECTORY}/stb_image)
+
+# Dependencies - entt
+target_link_libraries(Panda entt)
+target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/entt/include)
 
 # Dependencies - Dear ImGui
 target_link_libraries(Panda imgui)

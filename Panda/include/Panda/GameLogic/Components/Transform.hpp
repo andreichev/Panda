@@ -4,16 +4,13 @@
 
 #pragma once
 
-#include "Panda/GameLogic/Component.hpp"
 #include "TransformDelegate.hpp"
 
 namespace Panda {
 
-class Transform : public Component {
+struct Transform {
 public:
     Transform();
-    void initialize() override;
-    void update(double deltaTime) override;
     // ------- Rotation -------
     glm::vec3 getRotation();
     void rotate(float x, float y, float z);

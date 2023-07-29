@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panda/GameLogic/Component.hpp"
+#include "Panda/GameLogic/NativeScript.hpp"
 #include "Panda/Events/WindowSizeListener.hpp"
 #include "Panda/GameLogic/Components/Transform.hpp"
 
@@ -18,7 +18,7 @@ struct OrthographicCameraBounds {
     }
 };
 
-class OrthographicCamera : public Component, TransformDelegate {
+class OrthographicCamera : public NativeScript, TransformDelegate {
 public:
     OrthographicCamera();
     ~OrthographicCamera() override;
@@ -58,7 +58,7 @@ private:
     Size m_screenSize;
     float m_aspectRatio;
     float m_zoom;
-    Foundation::Shared<Transform> m_transform;
+    Transform *m_transform;
 };
 
 } // namespace Panda

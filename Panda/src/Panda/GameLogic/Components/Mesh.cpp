@@ -81,7 +81,7 @@ Mesh::~Mesh() {
 }
 
 void Mesh::initialize() {
-    transform = getEntity().getTransform();
+    transform = &getEntity().getTransform();
     transform->addDelegate(this);
 }
 

@@ -4,7 +4,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-DPROFILE)
 endif ()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 file(GLOB_RECURSE SOURCES src/Miren/*.cpp)
 file(GLOB_RECURSE INCLUDE src/Miren/*.hpp include/Miren/*.hpp)

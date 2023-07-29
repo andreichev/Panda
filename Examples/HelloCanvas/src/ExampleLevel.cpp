@@ -10,7 +10,7 @@
 #include <Panda/GameLogic/Components/ParticleSystem.hpp>
 #include <Panda/GameLogic/Components/OrthographicCamera.hpp>
 
-class CameraSizeObserver : public Panda::Component, Panda::WindowSizeListener {
+class CameraSizeObserver : public Panda::NativeScript, Panda::WindowSizeListener {
 public:
     void initialize() override {
         Panda::Application::get()->addWindowSizeListener(this);
@@ -26,19 +26,19 @@ public:
         m_camera->updateViewportSize(size);
     }
 
-    void setCamera(Foundation::Shared<Panda::OrthographicCamera> camera) {
+    void setCamera(Panda::OrthographicCamera *camera) {
         m_camera = camera;
     }
 
 private:
-    Foundation::Shared<Panda::OrthographicCamera> m_camera;
+    Panda::OrthographicCamera *m_camera;
 };
 
-class ExampleRenderer : public Panda::Component {
+class ExampleRenderer : public Panda::NativeScript {
 public:
     void initialize() override {
         m_texture = Foundation::makeShared<Panda::Texture>("textures/arbuz1.png");
-        // m_camera->updateViewportSize(Panda::Application::get()->getWindow()->getSize());
+        m_camera->updateViewportSize(Panda::Application::get()->getWindow()->getSize());
     }
 
     ~ExampleRenderer() {}
@@ -96,17 +96,17 @@ public:
 
     void onImGuiRender() override {}
 
-    void setParticleSysyem(Foundation::Shared<Panda::ParticleSystem> particleSystem) {
+    void setParticleSystem(Panda::ParticleSystem *particleSystem) {
         m_particleSystem = particleSystem;
     }
 
-    void setCamera(Foundation::Shared<Panda::OrthographicCamera> camera) {
+    void setCamera(Panda::OrthographicCamera *camera) {
         m_camera = camera;
     }
 
 private:
-    Foundation::Shared<Panda::ParticleSystem> m_particleSystem;
-    Foundation::Shared<Panda::OrthographicCamera> m_camera;
+    Panda::ParticleSystem *m_particleSystem;
+    Panda::OrthographicCamera *m_camera;
     Foundation::Shared<Panda::Texture> m_texture;
     float degree = 0.f;
     float colorFactor = 0.f;
@@ -114,24 +114,15 @@ private:
 
 void ExampleLevel::start(Panda::World *world) {
     using namespace Miren;
-    Foundation::Shared<Panda::OrthographicCamera> camera =
-        Foundation::makeShared<Panda::OrthographicCamera>();
-    Panda::Renderer2D::setCamera(camera);
-    Foundation::Shared<Panda::Entity> entity = world->instantiateEntity();
-    Foundation::Shared<Panda::ParticleSystem> particle =
-        Foundation::makeShared<Panda::ParticleSystem>();
-    Foundation::Shared<ExampleRenderer> dummy = Foundation::makeShared<ExampleRenderer>();
-    Foundation::Shared<OrthographicCameraMove> cameraMove =
-        Foundation::makeShared<OrthographicCameraMove>();
-    Foundation::Shared<CameraSizeObserver> cameraSizeObserver =
-        Foundation::makeShared<CameraSizeObserver>();
-    entity->addComponent(dummy);
-    entity->addComponent(particle);
-    entity->addComponent(camera);
-    entity->addComponent(cameraMove);
-    entity->addComponent(cameraSizeObserver);
-    cameraMove->setCamera(camera);
-    cameraSizeObserver->setCamera(camera);
-    dummy->setParticleSysyem(particle);
-    dummy->setCamera(camera);
+    Panda::Entity entity = world->instantiateEntity();
+    Panda::OrthographicCamera &camera = entity.addNativeScript<Panda::OrthographicCamera>();
+    Panda::Renderer2D::setCamera(&camera);
+    Panda::ParticleSystem &particle = entity.addNativeScript<Panda::ParticleSystem>();
+    ExampleRenderer &dummy = entity.addNativeScript<ExampleRenderer>();
+    OrthographicCameraMove &cameraMove = entity.addNativeScript<OrthographicCameraMove>();
+    CameraSizeObserver &cameraSizeObserver = entity.addNativeScript<CameraSizeObserver>();
+    cameraMove.setCamera(&camera);
+    cameraSizeObserver.setCamera(&camera);
+    dummy.setParticleSystem(&particle);
+    dummy.setCamera(&camera);
 }

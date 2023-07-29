@@ -6,18 +6,16 @@
 namespace Panda {
 
 EditorLayer::EditorLayer()
-    : m_viewportPanelSize(300, 200) {}
+    : m_viewportPanelSize(300, 200)
+    , m_camera(nullptr) {}
 
 void EditorLayer::initializeWorld() {
     if (m_camera == nullptr) {
-        m_camera = Foundation::makeShared<OrthographicCamera>();
+        Entity cameraEntity = m_world->instantiateEntity();
+        m_camera = &cameraEntity.addNativeScript<OrthographicCamera>();
+        OrthographicCameraMove &move = cameraEntity.addNativeScript<OrthographicCameraMove>();
+        move.setCamera(m_camera);
     }
-    Foundation::Shared<Entity> cameraEntity = m_world->instantiateEntity();
-    Foundation::Shared<OrthographicCameraMove> move =
-        Foundation::makeShared<OrthographicCameraMove>();
-    move->setCamera(m_camera);
-    cameraEntity->addComponent(m_camera);
-    cameraEntity->addComponent(move);
 }
 
 void EditorLayer::onAttach() {

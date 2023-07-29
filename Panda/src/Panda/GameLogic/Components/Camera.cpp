@@ -33,7 +33,7 @@ Camera::~Camera() {
 }
 
 void Camera::initialize() {
-    transform = getEntity().getTransform();
+    transform = &getEntity().getTransform();
     transform->addDelegate(this);
     Application::get()->addWindowSizeListener(this);
     updateVectors();

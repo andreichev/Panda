@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 project("Panda")
 
@@ -10,6 +10,7 @@ add_subdirectory(Vendor/glad)
 add_subdirectory(Vendor/glm)
 add_subdirectory(Vendor/stb_image)
 add_subdirectory(Vendor/imgui)
+add_subdirectory(Vendor/entt)
 
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
 

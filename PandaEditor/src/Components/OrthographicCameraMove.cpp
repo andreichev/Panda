@@ -9,7 +9,7 @@
 namespace Panda {
 
 void OrthographicCameraMove::initialize() {
-    m_transform = getEntity().getTransform();
+    m_transform = &getEntity().getTransform();
     m_rotation = true;
     m_zoom = 1.0;
 }

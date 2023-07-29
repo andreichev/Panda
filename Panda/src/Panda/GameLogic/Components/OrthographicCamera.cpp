@@ -22,7 +22,7 @@ OrthographicCamera::~OrthographicCamera() {
 }
 
 void OrthographicCamera::initialize() {
-    m_transform = getEntity().getTransform();
+    m_transform = &getEntity().getTransform();
     m_transform->addDelegate(this);
     updateViewportSize(m_screenSize);
 }

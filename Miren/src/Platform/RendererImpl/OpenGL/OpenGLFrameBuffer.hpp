@@ -11,7 +11,6 @@ public:
     OpenGLFrameBuffer();
     void create(FrameBufferSpecification specification);
     void terminate();
-    void resize(uint32_t width, uint32_t height);
     void bind();
     void unbind();
 

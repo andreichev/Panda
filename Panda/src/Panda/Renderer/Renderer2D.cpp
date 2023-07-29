@@ -42,7 +42,7 @@ struct DrawCallData {
 
 static DrawCallData s_drawData;
 Miren::ViewId Renderer2D::s_viewId = 0;
-Foundation::Shared<OrthographicCamera> Renderer2D::s_camera = nullptr;
+OrthographicCamera *Renderer2D::s_camera = nullptr;
 
 void Renderer2D::init() {
     s_drawData.vbSize = 0;
@@ -79,6 +79,10 @@ void Renderer2D::init() {
 void Renderer2D::terminate() {
     Miren::deleteShader(s_drawData.shader);
     Miren::deleteVertexLayout(s_drawData.layout);
+    for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i) {
+        s_drawData.textures[i] = nullptr;
+    }
+    s_drawData.whiteTexture = nullptr;
     FREE(Foundation::getAllocator(), s_drawData.vertices);
     FREE(Foundation::getAllocator(), s_drawData.indices);
 }
@@ -193,7 +197,7 @@ void Renderer2D::setViewId(Miren::ViewId id) {
     s_viewId = id;
 }
 
-void Renderer2D::setCamera(Foundation::Shared<OrthographicCamera> camera) {
+void Renderer2D::setCamera(OrthographicCamera *camera) {
     s_camera = camera;
 }
 

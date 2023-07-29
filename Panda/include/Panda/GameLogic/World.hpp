@@ -8,21 +8,28 @@
 #include "Panda/Window/Window.hpp"
 #include "Panda/GameLogic/UI/UIView.hpp"
 
+#include <entt/entt.hpp>
+
 namespace Panda {
 
 class World final {
 public:
     World();
+    ~World();
     void initialize();
     void update(double deltaTime);
     void onImGuiRender();
-    Foundation::Shared<Entity> instantiateEntity();
-    void destroy(Foundation::Shared<Entity> &entity);
+    Entity instantiateEntity();
+    void destroy(Entity entity);
     UIView *getUIView();
+    inline bool isRunning() {
+        return m_isRunning;
+    }
 
 private:
-    Entity root;
-    UIView uiRoot;
+    bool m_isRunning;
+    entt::registry m_registry;
+    UIView m_uiRoot;
 };
 
 } // namespace Panda

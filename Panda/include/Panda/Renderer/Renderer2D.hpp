@@ -45,15 +45,14 @@ public:
     static void begin();
     static void drawRect(RectData rect);
     static void end();
-    static void resetStats();
     static Statistics getStats();
     static void terminate();
     static void setViewId(Miren::ViewId id);
-    static void setCamera(Foundation::Shared<OrthographicCamera> camera);
+    static void setCamera(OrthographicCamera *camera);
 
 private:
     static Miren::ViewId s_viewId;
-    static Foundation::Shared<OrthographicCamera> s_camera;
+    static OrthographicCamera *s_camera;
     static void drawRect(glm::mat4 &transform, RectData rect);
 };
 

@@ -4,6 +4,8 @@
 
 namespace Panda {
 
+using id_t = uint64_t;
+
 struct Size {
     float width;
     float height;
