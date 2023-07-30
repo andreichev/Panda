@@ -13,81 +13,81 @@
 namespace Panda {
 
 Camera::Camera()
-    : transform(nullptr)
-    , shader(0)
-    , fieldOfView(70.f)
-    , windowSize(Application::get()->getWindow()->getSize())
-    , rotationMatrix(1.f)
-    , front(0.f)
-    , up(0.f)
-    , right(0.f)
-    , target(1.f)
-    , view(1.f)
-    , projection(1.f) {
-    LOG_INFO("Camera created, viewport size: {}, {}", windowSize.width, windowSize.height);
+    : m_transform(nullptr)
+    , m_shader(0)
+    , m_fieldOfView(70.f)
+    , m_windowSize(Application::get()->getWindow()->getSize())
+    , m_rotationMatrix(1.f)
+    , m_front(0.f)
+    , m_up(0.f)
+    , m_right(0.f)
+    , m_target(1.f)
+    , m_view(1.f)
+    , m_projection(1.f) {
+    LOG_INFO("Camera created, viewport size: {}, {}", m_windowSize.width, m_windowSize.height);
 }
 
 Camera::~Camera() {
-    transform->removeDelegate(this);
+    m_transform->removeDelegate(this);
     Application::get()->removeWindowSizeListener(this);
 }
 
 void Camera::initialize() {
-    transform = &getEntity().getTransform();
-    transform->addDelegate(this);
+    m_transform = &getEntity().getTransform();
+    m_transform->addDelegate(this);
     Application::get()->addWindowSizeListener(this);
     updateVectors();
-}
-
-void Camera::update(double deltaTime) {
-    Miren::setUniform(shader, "view", &view[0][0], Miren::UniformDataType::Mat4);
-    Miren::setUniform(shader, "projection", &projection[0][0], Miren::UniformDataType::Mat4);
-}
-
-void Camera::setShader(Miren::ShaderHandle _shader) {
-    this->shader = _shader;
     updateProjectionMatrix();
     updateViewMatrix();
 }
 
+void Camera::update(double deltaTime) {
+    Miren::setUniform(m_shader, "view", &m_view[0][0], Miren::UniformDataType::Mat4);
+    Miren::setUniform(m_shader, "projection", &m_projection[0][0], Miren::UniformDataType::Mat4);
+}
+
+void Camera::setShader(Miren::ShaderHandle _shader) {
+    m_shader = _shader;
+}
+
 void Camera::setFieldOfView(float degrees) {
-    this->fieldOfView = degrees;
+    m_fieldOfView = degrees;
 }
 
 void Camera::updateProjectionMatrix() {
-    projection = glm::perspective<float>(glm::radians(fieldOfView),
-        (float)windowSize.width / (float)windowSize.height,
+    m_projection = glm::perspective<float>(glm::radians(m_fieldOfView),
+        (float)m_windowSize.width / (float)m_windowSize.height,
         0.1f,
         1000.0f);
-    Miren::setUniform(shader, "projection", &projection[0][0], Miren::UniformDataType::Mat4);
+    Miren::setUniform(m_shader, "projection", &m_projection[0][0], Miren::UniformDataType::Mat4);
 }
 
 void Camera::updateVectors() {
-    glm::vec3 rotation = transform->getRotation();
-    rotationMatrix = glm::mat4(1.f);
-    rotationMatrix =
-        glm::rotate(rotationMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    rotationMatrix =
-        glm::rotate(rotationMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    rotationMatrix =
-        glm::rotate(rotationMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    rotationMatrix = glm::transpose(rotationMatrix);
-    front = rotationMatrix * glm::vec4(0.f, 0.f, -1.f, 1.f);
-    right = rotationMatrix * glm::vec4(1.f, 0.f, 0.f, 1.f);
-    up = rotationMatrix * glm::vec4(0.f, 1.f, 0.f, 1.f);
+    glm::vec3 rotation = m_transform->getRotation();
+    m_rotationMatrix = glm::mat4(1.f);
+    m_rotationMatrix =
+        glm::rotate(m_rotationMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    m_rotationMatrix =
+        glm::rotate(m_rotationMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_rotationMatrix =
+        glm::rotate(m_rotationMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    m_rotationMatrix = glm::transpose(m_rotationMatrix);
+    m_front = m_rotationMatrix * glm::vec4(0.f, 0.f, -1.f, 1.f);
+    m_right = m_rotationMatrix * glm::vec4(1.f, 0.f, 0.f, 1.f);
+    m_up = m_rotationMatrix * glm::vec4(0.f, 1.f, 0.f, 1.f);
 }
 
 void Camera::updateViewMatrix() {
-    glm::vec4 position = transform->getPosition();
-    target = position + front;
-    view = glm::lookAt(glm::vec3(position), target, glm::vec3(up));
-    Miren::setUniform(shader, "view", &view[0][0], Miren::UniformDataType::Mat4);
+    glm::vec4 position = m_transform->getPosition();
+    m_target = position + m_front;
+    m_view = glm::lookAt(glm::vec3(position), m_target, glm::vec3(m_up));
+    Miren::setUniform(m_shader, "view", &m_view[0][0], Miren::UniformDataType::Mat4);
 }
 
 // MARK: - Window size delegate
 
 void Camera::windowSizeChanged(Size size) {
-    windowSize = size;
+    m_windowSize = size;
     updateProjectionMatrix();
 }
 

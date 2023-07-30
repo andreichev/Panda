@@ -19,8 +19,8 @@ public:
     void setMesh(Panda::Mesh *mesh);
     void set(int x, int y, int z, char id);
     Voxel *get(int x, int y, int z);
-    Voxel *data;
+    Voxel *m_data;
 
 private:
-    Panda::Mesh *mesh;
+    Panda::Mesh *m_mesh;
 };

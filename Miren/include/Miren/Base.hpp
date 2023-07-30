@@ -29,6 +29,9 @@ namespace Miren {
         name()                                                                                     \
             : id(MIREN_INVALID_HANDLE) {}                                                          \
         uint16_t id;                                                                               \
+        bool isValid() {                                                                           \
+            return id != MIREN_INVALID_HANDLE;                                                     \
+        }                                                                                          \
     };
 
 using ViewId = uint16_t;

@@ -8,7 +8,7 @@
 #include <imgui.h>
 
 void CameraMove::initialize() {
-    m_transform = getEntity().getTransform();
+    m_transform = &getEntity().getTransform();
     m_window = Panda::Application::get()->getWindow();
 }
 
@@ -40,7 +40,7 @@ void CameraMove::update(double deltaTime) {
         double mouseY = Panda::Input::getMousePositionY();
         double deltaX = mouseX - lastMouseX;
         double deltaY = mouseY - lastMouseY;
-        if (cursorStarted == false) {
+        if (!cursorStarted) {
             cursorStarted = true;
             deltaX = 0;
             deltaY = 0;
@@ -59,5 +59,7 @@ void CameraMove::update(double deltaTime) {
 }
 
 void CameraMove::onImGuiRender() {
-    ImGui::ShowDemoWindow();
+    ImGui::Begin("One");
+    ImGui::Text("TEST STRING");
+    ImGui::End();
 }

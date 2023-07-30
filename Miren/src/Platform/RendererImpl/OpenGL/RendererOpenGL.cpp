@@ -192,7 +192,7 @@ void RendererOpenGL::setUniform(const Uniform &uniform) {
             shaders[uniform.handle.id].setUniformIntArray(uniform.name, (int *)uniform.value);
             return;
     }
-    LOG_ERROR("UIFORM TYPE IS UNDEFINED");
+    LOG_ERROR("UNIFORM TYPE IS UNDEFINED");
 }
 
 void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
@@ -211,7 +211,7 @@ void RendererOpenGL::submit(Frame *frame, View *views) {
     ViewId viewId = -1;
     for (int i = 0; i < frame->getDrawCallsCount(); i++) {
         RenderDraw &draw = frame->getDrawCalls()[i];
-        if (draw.m_isSubmitted == false) {
+        if (!draw.m_isSubmitted) {
             continue;
         }
         if (draw.m_viewId != viewId) {
@@ -223,12 +223,12 @@ void RendererOpenGL::submit(Frame *frame, View *views) {
 }
 
 void RendererOpenGL::viewChanged(View &view) {
-    if (view.m_frameBuffer.id != MIREN_INVALID_HANDLE) {
+    if (view.m_frameBuffer.isValid()) {
         frameBuffers[view.m_frameBuffer.id].bind();
     } else {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
-    if (view.m_viewport.isZero() == false) {
+    if (!view.m_viewport.isZero()) {
         GL_CALL(glViewport(view.m_viewport.origin.x,
             view.m_viewport.origin.y,
             view.m_viewport.size.width,
@@ -264,7 +264,7 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     } else {
         GL_CALL(glDisable(GL_DEPTH_TEST));
     }
-    if (draw->m_scissorRect.isZero() == false) {
+    if (!draw->m_scissorRect.isZero()) {
         GL_CALL(glEnable(GL_SCISSOR_TEST));
         GL_CALL(glScissor((int)draw->m_scissorRect.origin.x,
             (int)draw->m_scissorRect.origin.y,

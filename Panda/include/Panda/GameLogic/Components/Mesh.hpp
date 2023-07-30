@@ -17,19 +17,21 @@ class Transform;
 class Mesh : public NativeScript, TransformDelegate {
 public:
     ~Mesh() override;
-    Mesh(const MeshData &primitiveMeshData,
+    Mesh();
+    void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
+    void initialize() override;
+    void reset();
+    void create(const MeshData &primitiveMeshData,
         bool isDynamic,
         Miren::TextureHandle texture,
         Miren::ShaderHandle shader);
-    Mesh(Miren::Vertex *vertices,
+    void create(Miren::Vertex *vertices,
         unsigned int verticesCount,
         unsigned int *indices,
         unsigned int indicesCount,
         bool isDynamic,
         Miren::TextureHandle texture,
         Miren::ShaderHandle shader);
-    void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
-    void initialize() override;
     void update(double deltaTime) override;
     void updateBuffer(const MeshData &data);
     void updateBuffer(Miren::Vertex *vertices,
@@ -40,15 +42,15 @@ public:
 private:
     void updateModelMatrix();
 
-    Miren::TextureHandle textureHandle;
-    Miren::ShaderHandle shaderHandle;
-    Miren::VertexLayoutHandle bufferLayoutHandle;
-    Miren::IndexBufferHandle indexBufferHandle;
-    Miren::VertexBufferHandle vertexBufferHandle;
-    glm::mat4 model;
-    uint32_t indicesCount;
-    Transform *transform;
-    const bool isDynamic;
+    Miren::TextureHandle m_textureHandle;
+    Miren::ShaderHandle m_shaderHandle;
+    Miren::VertexLayoutHandle m_bufferLayoutHandle;
+    Miren::IndexBufferHandle m_indexBufferHandle;
+    Miren::VertexBufferHandle m_vertexBufferHandle;
+    glm::mat4 m_model;
+    uint32_t m_indicesCount;
+    Transform *m_transform;
+    bool m_isDynamic;
 };
 
 } // namespace Panda

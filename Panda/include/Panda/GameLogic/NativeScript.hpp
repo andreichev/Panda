@@ -14,7 +14,7 @@ class NativeScript {
 public:
     NativeScript()
         : m_entity(nullptr, -1)
-        , isActive(true) {}
+        , m_isActive(true) {}
 
     virtual ~NativeScript() = default;
 
@@ -32,7 +32,7 @@ public:
 
     virtual void onImGuiRender(){};
 
-    bool isActive;
+    bool m_isActive;
 
 private:
     Entity m_entity;

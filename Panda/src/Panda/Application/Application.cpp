@@ -86,7 +86,7 @@ void Application::startBasicGame(Level *level) {
 }
 
 void Application::loop() {
-    while (isApplicationShouldClose == false) {
+    while (!isApplicationShouldClose) {
         uint64_t lastTime = timeMillis;
         timeMillis = getMillis();
         deltaTimeMillis += timeMillis - lastTime;

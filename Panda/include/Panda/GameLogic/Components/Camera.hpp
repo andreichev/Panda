@@ -22,13 +22,13 @@ public:
     void setFieldOfView(float degrees);
     void update(double deltaTime) override;
     inline glm::vec4 getFront() const {
-        return front;
+        return m_front;
     }
     inline glm::vec4 getUp() const {
-        return up;
+        return m_up;
     }
     inline glm::vec4 getRight() const {
-        return right;
+        return m_right;
     }
     // MARK: - Delegate
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
@@ -39,17 +39,17 @@ private:
     void updateProjectionMatrix();
     void updateViewMatrix();
 
-    Size windowSize;
-    Transform *transform;
-    glm::mat4 rotationMatrix;
-    glm::vec4 front;
-    glm::vec4 up;
-    glm::vec4 right;
-    glm::vec3 target;
-    glm::mat4 view;
-    glm::mat4 projection;
-    Miren::ShaderHandle shader;
-    float fieldOfView;
+    Size m_windowSize;
+    Transform *m_transform;
+    glm::mat4 m_rotationMatrix;
+    glm::vec4 m_front;
+    glm::vec4 m_up;
+    glm::vec4 m_right;
+    glm::vec3 m_target;
+    glm::mat4 m_view;
+    glm::mat4 m_projection;
+    Miren::ShaderHandle m_shader;
+    float m_fieldOfView;
 };
 
 } // namespace Panda

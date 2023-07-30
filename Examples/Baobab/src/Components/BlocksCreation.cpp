@@ -6,7 +6,7 @@
 #include "Model/VoxelMeshGenerator.hpp"
 
 void BlocksCreation::initialize() {
-    m_transform = getEntity().getTransform();
+    m_transform = &getEntity().getTransform();
 }
 
 void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ) {
@@ -75,6 +75,6 @@ void BlocksCreation::setChunksStorage(Foundation::Shared<ChunksStorage> storage)
     m_chunksStorage = storage;
 }
 
-void BlocksCreation::setCamera(Foundation::Shared<Panda::Camera> camera) {
+void BlocksCreation::setCamera(Panda::Camera *camera) {
     m_camera = camera;
 }

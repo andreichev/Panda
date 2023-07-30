@@ -36,8 +36,8 @@ ChunksStorage::ChunksStorage() {
                 int voxelIndexZ = z % Chunk::SIZE_Z;
                 chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                        chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
-                    .data[voxelIndexY * Chunk::SIZE_X * Chunk::SIZE_Z +
-                          voxelIndexX * Chunk::SIZE_X + voxelIndexZ]
+                    .m_data[voxelIndexY * Chunk::SIZE_X * Chunk::SIZE_Z +
+                            voxelIndexX * Chunk::SIZE_X + voxelIndexZ]
                     .id = id;
             }
         }
