@@ -23,10 +23,9 @@ public:
     void createFrameBuffer(
         FrameBufferHandle handle, FrameBufferSpecification specification) override;
     void deleteFrameBuffer(FrameBufferHandle handle) override;
-    void createShader(
-        ShaderHandle handle, const char *vertexCode, const char *fragmentCode) override;
-    void deleteShader(ShaderHandle handle) override;
-    void createTexture(TextureHandle handle, const TextureCreate &create) override;
+    void createProgram(ProgramHandle handle, ProgramCreate create) override;
+    void deleteShader(ProgramHandle handle) override;
+    void createTexture(TextureHandle handle, TextureCreate create) override;
     void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) override;
     void deleteTexture(TextureHandle handle) override;
     void createIndexBuffer(IndexBufferHandle handle,

@@ -14,9 +14,9 @@ public:
         , m_shader() {
         using namespace Miren;
 
-        Panda::ShaderAsset shaderAsset = Panda::AssetLoader::loadShader(
+        Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
             "shaders/checker/checker_vertex.glsl", "shaders/checker/checker_fragment.glsl");
-        m_shader = createShader(shaderAsset.vertexCode, shaderAsset.fragmentCode);
+        m_shader = createProgram(programAsset.getMirenProgramCreate());
 
         float rightEdge = 0.5f;
         float topEdge = 0.5f;
@@ -45,7 +45,7 @@ public:
 private:
     Miren::VertexBufferHandle m_vertexBuffer;
     Miren::IndexBufferHandle m_indexBuffer;
-    Miren::ShaderHandle m_shader;
+    Miren::ProgramHandle m_shader;
 };
 
 void TriangleLevel::start(Panda::World *world) {

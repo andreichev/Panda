@@ -9,14 +9,14 @@ namespace Panda {
 class Texture {
 public:
     Texture(const char *path) {
-        TextureAsset asset = AssetLoader::loadTexure(path);
+        TextureAsset asset = AssetLoader::loadTexture(path);
         m_handle = Miren::createTexture(asset.getMirenTextureCreate());
         LOG_INFO("CREATED TEXTURE, path: {}", path);
     }
 
-    Texture(uint8_t *data, uint32_t width, uint32_t height) {
+    Texture(Foundation::Memory mem, uint32_t width, uint32_t height) {
         Miren::TextureCreate create;
-        create.m_data = Foundation::Memory(data);
+        create.m_data = mem;
         create.m_format = Miren::TextureFormat::RGBA8;
         create.m_numMips = 0;
         create.m_width = width;

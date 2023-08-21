@@ -100,17 +100,17 @@ struct Context {
                     m_renderer->deleteFrameBuffer(cmd->handle);
                     break;
                 }
-                case RendererCommandType::CreateShader: {
+                case RendererCommandType::CreateProgram: {
                     CMDBUF_LOG("CREATE SHADER COMMAND");
-                    const CreateShaderCommand *cmd =
-                        static_cast<const CreateShaderCommand *>(command);
-                    m_renderer->createShader(cmd->handle, cmd->vertexCode, cmd->fragmentCode);
+                    const CreateProgramCommand *cmd =
+                        static_cast<const CreateProgramCommand *>(command);
+                    m_renderer->createProgram(cmd->handle, cmd->create);
                     break;
                 }
-                case RendererCommandType::DestroyShader: {
+                case RendererCommandType::DestroyProgram: {
                     CMDBUF_LOG("DESTROY SHADER COMMAND");
-                    const DeleteShaderCommand *cmd =
-                        static_cast<const DeleteShaderCommand *>(command);
+                    const DeleteProgramCommand *cmd =
+                        static_cast<const DeleteProgramCommand *>(command);
                     m_renderer->deleteShader(cmd->handle);
                     break;
                 }
@@ -271,16 +271,16 @@ struct Context {
         m_postCommandQueue.write(cmd);
     }
 
-    ShaderHandle createShader(const char *vertexCode, const char *fragmentCode) {
-        ShaderHandle handle = m_shadersHandleAlloc.alloc();
-        CreateShaderCommand cmd(handle, vertexCode, fragmentCode);
+    ProgramHandle createProgram(ProgramCreate create) {
+        ProgramHandle handle = m_shadersHandleAlloc.alloc();
+        CreateProgramCommand cmd(handle, create);
         m_preCommandQueue.write(cmd);
         return handle;
     }
 
-    void deleteShader(ShaderHandle handle) {
+    void deleteProgram(ProgramHandle handle) {
         m_submit->queueFree(handle);
-        DeleteShaderCommand cmd(handle);
+        DeleteProgramCommand cmd(handle);
         m_postCommandQueue.write(cmd);
     }
 
@@ -440,11 +440,11 @@ struct Context {
         m_submit->setIndexBuffer(handle, offset, count);
     }
 
-    void setShader(ShaderHandle handle) {
+    void setShader(ProgramHandle handle) {
         m_submit->setShader(handle);
     }
 
-    void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
+    void setUniform(ProgramHandle handle, const char *name, void *value, UniformDataType type) {
         m_submit->setUniform(handle, name, value, type);
     }
 
@@ -498,7 +498,7 @@ private:
     // DynamicVertexBuffer m_dynamicVertexBuffers[MAX_DYNAMIC_VERTEX_BUFFERS];
 
     HandleAllocator<FrameBufferHandle> m_frameBuffersHandleAlloc;
-    HandleAllocator<ShaderHandle> m_shadersHandleAlloc;
+    HandleAllocator<ProgramHandle> m_shadersHandleAlloc;
     HandleAllocator<TextureHandle> m_texturesHandleAlloc;
     HandleAllocator<VertexLayoutHandle> m_vertexLayoutsHandleAlloc;
     HandleAllocator<VertexBufferHandle> m_vertexBuffersHandleAlloc;

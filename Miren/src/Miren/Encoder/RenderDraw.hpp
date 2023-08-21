@@ -56,7 +56,7 @@ struct RenderDraw {
         m_scissorRect = Rect::zero();
     }
 
-    void addUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
+    void addUniform(ProgramHandle handle, const char *name, void *value, UniformDataType type) {
         m_uniformBuffer[m_uniformsCount++] = Uniform(handle, name, value, type);
     }
 
@@ -68,7 +68,7 @@ struct RenderDraw {
     uint32_t m_numIndices;
     intptr_t m_indicesOffset;
     intptr_t m_verticesOffset;
-    ShaderHandle m_shader;
+    ProgramHandle m_shader;
     IndexBufferHandle m_indexBuffer;
     VertexBufferHandle m_vertexBuffer;
     VertexLayoutHandle m_vertexLayout;

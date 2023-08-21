@@ -46,7 +46,7 @@ void Mesh::reset() {
 void Mesh::create(const Panda::MeshData &primitiveMeshData,
     bool isDynamic,
     Miren::TextureHandle texture,
-    Miren::ShaderHandle shader) {
+    Miren::ProgramHandle shader) {
     reset();
     m_shaderHandle = shader;
     m_textureHandle = texture;
@@ -78,7 +78,7 @@ void Mesh::create(Miren::Vertex *vertices,
     unsigned int indicesCount,
     bool isDynamic,
     Miren::TextureHandle texture,
-    Miren::ShaderHandle shader) {
+    Miren::ProgramHandle shader) {
     reset();
     m_shaderHandle = shader;
     m_textureHandle = texture;

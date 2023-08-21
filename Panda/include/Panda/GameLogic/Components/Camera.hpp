@@ -18,7 +18,7 @@ public:
     Camera();
     ~Camera() override;
     void initialize() override;
-    void setShader(Miren::ShaderHandle shader);
+    void setShader(Miren::ProgramHandle shader);
     void setFieldOfView(float degrees);
     void update(double deltaTime) override;
     inline glm::vec4 getFront() const {
@@ -48,7 +48,7 @@ private:
     glm::vec3 m_target;
     glm::mat4 m_view;
     glm::mat4 m_projection;
-    Miren::ShaderHandle m_shader;
+    Miren::ProgramHandle m_shader;
     float m_fieldOfView;
 };
 

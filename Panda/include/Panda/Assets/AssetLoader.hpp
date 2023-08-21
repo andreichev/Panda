@@ -23,15 +23,19 @@ struct TextureAsset {
     }
 };
 
-struct ShaderAsset {
-    const char *vertexCode;
-    const char *fragmentCode;
+struct ProgramAsset {
+    Foundation::Memory m_vertex;
+    Foundation::Memory m_fragment;
+
+    Miren::ProgramCreate getMirenProgramCreate() {
+        return {m_vertex, m_fragment};
+    }
 };
 
 class AssetLoader {
 public:
-    static TextureAsset loadTexure(const std::string &path);
-    static ShaderAsset loadShader(const std::string &vertexPath, const std::string &fragmentPath);
+    static TextureAsset loadTexture(const std::string &path);
+    static ProgramAsset loadProgram(const std::string &vertexPath, const std::string &fragmentPath);
 
     static void setResourcesPath(std::string path) {
         resourcesPath = path + "/";

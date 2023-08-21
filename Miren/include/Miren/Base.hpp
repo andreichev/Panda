@@ -35,7 +35,7 @@ namespace Miren {
     };
 
 using ViewId = uint16_t;
-MIREN_HANDLE(ShaderHandle)
+MIREN_HANDLE(ProgramHandle)
 MIREN_HANDLE(TextureHandle)
 MIREN_HANDLE(IndexBufferHandle)
 MIREN_HANDLE(FrameBufferHandle)
@@ -50,6 +50,11 @@ enum TextureFormat {
     RED_INTEGER,
     // Depth/stencil
     DEPTH24STENCIL8
+};
+
+struct ProgramCreate {
+    Foundation::Memory m_vertex;
+    Foundation::Memory m_fragment;
 };
 
 struct TextureCreate {

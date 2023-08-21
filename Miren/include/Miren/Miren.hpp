@@ -14,8 +14,8 @@ void terminate();
 // MARK: - Command buffer
 FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification);
 void deleteFrameBuffer(FrameBufferHandle handle);
-ShaderHandle createShader(const char *vertexCode, const char *fragmentCode);
-void deleteShader(ShaderHandle handle);
+ProgramHandle createProgram(ProgramCreate create);
+void deleteProgram(ProgramHandle handle);
 TextureHandle createTexture(TextureCreate create);
 void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height);
 void deleteTexture(TextureHandle handle);
@@ -42,11 +42,11 @@ void setViewport(ViewId id, Rect rect);
 void setViewFrameBuffer(ViewId id, FrameBufferHandle frameBuffer);
 void setState(uint32_t state);
 void setScissorRect(Rect rect);
-void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type);
+void setUniform(ProgramHandle handle, const char *name, void *value, UniformDataType type);
 void setVertexBuffer(VertexBufferHandle handle, intptr_t offset = 0);
 void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, size_t count);
 void setVertexLayout(VertexLayoutHandle handle);
-void setShader(ShaderHandle handle);
+void setShader(ProgramHandle handle);
 void setTexture(TextureHandle textureHandle, uint32_t slot);
 /// Submit draw call
 void submit(ViewId id);

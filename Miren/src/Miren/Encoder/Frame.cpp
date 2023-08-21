@@ -40,12 +40,12 @@ void Frame::setVertexLayout(VertexLayoutHandle handle) {
     draw.m_vertexLayout = handle;
 }
 
-void Frame::setShader(ShaderHandle handle) {
+void Frame::setShader(ProgramHandle handle) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.m_shader = handle;
 }
 
-void Frame::setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
+void Frame::setUniform(ProgramHandle handle, const char *name, void *value, UniformDataType type) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.addUniform(handle, name, value, type);
 }
@@ -78,7 +78,7 @@ void Frame::queueFree(FrameBufferHandle handle) {
     m_frameBuffersFreeHandle.queue(handle);
 }
 
-void Frame::queueFree(ShaderHandle handle) {
+void Frame::queueFree(ProgramHandle handle) {
     m_shadersFreeHandle.queue(handle);
 }
 
@@ -104,7 +104,7 @@ void Frame::free(HandleAllocator<FrameBufferHandle> *allocator) {
     }
 }
 
-void Frame::free(HandleAllocator<ShaderHandle> *allocator) {
+void Frame::free(HandleAllocator<ProgramHandle> *allocator) {
     for (int i = 0; i < m_shadersFreeHandle.getNumQueued(); i++) {
         allocator->free(m_shadersFreeHandle.get(i));
     }

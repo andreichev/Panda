@@ -53,10 +53,10 @@ void BlocksCreation::setVoxel(int x, int y, int z, int8_t id) {
 void BlocksCreation::update(double deltaTime) {
     glm::vec4 position = m_transform->getPosition();
     glm::vec3 target = m_camera->getFront();
-    VoxelRaycastData *v = m_chunksStorage->bresenham3D(
+    auto v = m_chunksStorage->bresenham3D(
         position.x, position.y, position.z, target.x, target.y, target.z, MAXIMUM_DISTANCE);
 
-    if (v != nullptr && v->voxel != nullptr) {
+    if (v && v->voxel != nullptr) {
         if (Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::LEFT)) {
             int x = v->end.x + v->normal.x;
             int y = v->end.y + v->normal.y;

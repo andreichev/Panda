@@ -1,7 +1,5 @@
 #include "Panda/Renderer/Renderer2D.hpp"
 
-#include <glm/gtc/matrix_transform.hpp>
-
 namespace Panda {
 
 struct Vertex {
@@ -26,7 +24,7 @@ struct Vertex {
 struct DrawCallData {
     Renderer2D::Statistics stats;
     glm::mat4 projMat;
-    Miren::ShaderHandle shader;
+    Miren::ProgramHandle shader;
     Foundation::Shared<Texture> whiteTexture;
     Miren::VertexLayoutHandle layout;
     Foundation::Shared<Texture> textures[MAX_TEXTURE_SLOTS];
@@ -51,9 +49,9 @@ void Renderer2D::init() {
         (Vertex *)ALLOC(Foundation::getAllocator(), sizeof(Vertex) * MAX_VERTICES_COUNT);
     s_drawData.indices =
         (uint16_t *)ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
-    Panda::ShaderAsset shaderAsset = Panda::AssetLoader::loadShader(
+    Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
         "shaders/renderer2d/renderer2d_vertex.glsl", "shaders/renderer2d/renderer2d_fragment.glsl");
-    s_drawData.shader = Miren::createShader(shaderAsset.vertexCode, shaderAsset.fragmentCode);
+    s_drawData.shader = Miren::createProgram(programAsset.getMirenProgramCreate());
     Miren::VertexBufferLayoutData layoutData;
     // Position
     layoutData.pushVec3();
@@ -65,9 +63,9 @@ void Renderer2D::init() {
     layoutData.pushVec4();
     s_drawData.layout = Miren::createVertexLayout(layoutData);
     s_drawData.textureSlotIndex = 1;
-    uint32_t *whiteTextureData = (uint32_t *)ALLOC(Foundation::getAllocator(), sizeof(uint32_t));
-    *whiteTextureData = 0xffffffff;
-    s_drawData.whiteTexture = Foundation::makeShared<Texture>((uint8_t *)whiteTextureData, 1, 1);
+    Foundation::Memory whiteTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
+    *(uint32_t *)whiteTextureData.data = 0xffffffff;
+    s_drawData.whiteTexture = Foundation::makeShared<Texture>(whiteTextureData, 1, 1);
     s_drawData.textures[0] = s_drawData.whiteTexture;
     for (uint32_t i = 0; i < MAX_TEXTURE_SLOTS; i++) {
         s_drawData.samplers[i] = i;
@@ -77,7 +75,7 @@ void Renderer2D::init() {
 }
 
 void Renderer2D::terminate() {
-    Miren::deleteShader(s_drawData.shader);
+    Miren::deleteProgram(s_drawData.shader);
     Miren::deleteVertexLayout(s_drawData.layout);
     for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i) {
         s_drawData.textures[i] = nullptr;

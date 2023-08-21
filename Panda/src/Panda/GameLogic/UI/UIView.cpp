@@ -10,7 +10,7 @@ UIView::UIView()
 
 UIView::~UIView() {
     Miren::deleteVertexBuffer(vertexBufferHandle);
-    Miren::deleteShader(shaderHandle);
+    Miren::deleteProgram(programHandle);
     Application::get()->removeWindowSizeListener(this);
 }
 
@@ -18,9 +18,9 @@ UIView::UIView(Rect frame)
     : window(Application::get()->getWindow())
     , frame(frame) {
     float *data = new float[12];
-    ShaderAsset shaderAsset =
-        AssetLoader::loadShader("shaders/ui/uiview_vertex.glsl", "shaders/ui/uiview_fragment.glsl");
-    shaderHandle = Miren::createShader(shaderAsset.vertexCode, shaderAsset.fragmentCode);
+    ProgramAsset programAsset = AssetLoader::loadProgram(
+        "shaders/ui/uiview_vertex.glsl", "shaders/ui/uiview_fragment.glsl");
+    programHandle = Miren::createProgram(programAsset.getMirenProgramCreate());
     Miren::VertexBufferLayoutData layoutData;
     layoutData.pushFloat(2);
     Miren::VertexLayoutHandle vertexLayout = Miren::createVertexLayout(layoutData);
@@ -76,7 +76,7 @@ void UIView::layout() {
 }
 
 void UIView::draw() {
-    Miren::setShader(shaderHandle);
+    Miren::setShader(programHandle);
     Miren::setVertexBuffer(vertexBufferHandle);
     // Miren::submitPrimitives(6);
 }

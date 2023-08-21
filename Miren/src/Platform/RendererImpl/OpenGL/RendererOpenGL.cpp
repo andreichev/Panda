@@ -97,16 +97,15 @@ void RendererOpenGL::deleteFrameBuffer(FrameBufferHandle handle) {
     frameBuffers[handle.id].terminate();
 }
 
-void RendererOpenGL::createShader(
-    ShaderHandle handle, const char *vertexCode, const char *fragmentCode) {
-    shaders[handle.id].create(vertexCode, fragmentCode);
+void RendererOpenGL::createProgram(ProgramHandle handle, ProgramCreate create) {
+    shaders[handle.id].create(create);
 }
 
-void RendererOpenGL::deleteShader(ShaderHandle handle) {
+void RendererOpenGL::deleteShader(ProgramHandle handle) {
     shaders[handle.id].terminate();
 }
 
-void RendererOpenGL::createTexture(TextureHandle handle, const TextureCreate &create) {
+void RendererOpenGL::createTexture(TextureHandle handle, TextureCreate create) {
     textures[handle.id].create(create);
 }
 

@@ -24,14 +24,14 @@ public:
     void create(const MeshData &primitiveMeshData,
         bool isDynamic,
         Miren::TextureHandle texture,
-        Miren::ShaderHandle shader);
+        Miren::ProgramHandle shader);
     void create(Miren::Vertex *vertices,
         unsigned int verticesCount,
         unsigned int *indices,
         unsigned int indicesCount,
         bool isDynamic,
         Miren::TextureHandle texture,
-        Miren::ShaderHandle shader);
+        Miren::ProgramHandle shader);
     void update(double deltaTime) override;
     void updateBuffer(const MeshData &data);
     void updateBuffer(Miren::Vertex *vertices,
@@ -43,7 +43,7 @@ private:
     void updateModelMatrix();
 
     Miren::TextureHandle m_textureHandle;
-    Miren::ShaderHandle m_shaderHandle;
+    Miren::ProgramHandle m_shaderHandle;
     Miren::VertexLayoutHandle m_bufferLayoutHandle;
     Miren::IndexBufferHandle m_indexBufferHandle;
     Miren::VertexBufferHandle m_vertexBufferHandle;

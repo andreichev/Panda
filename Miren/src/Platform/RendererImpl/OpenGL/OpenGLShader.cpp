@@ -17,19 +17,21 @@ OpenGLShader::OpenGLShader()
     : m_id(-1)
     , m_uniformLocationCache() {}
 
-void OpenGLShader::create(const char *vertexCode, const char *fragmentCode) {
+void OpenGLShader::create(ProgramCreate create) {
     PND_ASSERT(m_id == -1, "PROGRAM ALREADY CREATED");
     unsigned int vertex, fragment;
     // vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
     // LOG_INFO("\n\nVERTEX CODE: {}\n\n", vertexCode);
     // LOG_INFO("\n\nFRAGMENT CODE: {}\n\n", fragmentCode);
-    GL_CALL(glShaderSource(vertex, 1, &vertexCode, nullptr));
+    const char *vertexSource = reinterpret_cast<const char *>(create.m_vertex.data);
+    GL_CALL(glShaderSource(vertex, 1, &vertexSource, nullptr));
     GL_CALL(glCompileShader(vertex));
     checkCompileErrors(vertex, "VERTEX");
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    GL_CALL(glShaderSource(fragment, 1, &fragmentCode, nullptr));
+    const char *fragmentSource = reinterpret_cast<const char *>(create.m_fragment.data);
+    GL_CALL(glShaderSource(fragment, 1, &fragmentSource, nullptr));
     GL_CALL(glCompileShader(fragment));
     checkCompileErrors(fragment, "FRAGMENT");
     // shader Program
@@ -41,6 +43,9 @@ void OpenGLShader::create(const char *vertexCode, const char *fragmentCode) {
     // delete the shaders as they're linked into our program now and no longer necessery
     GL_CALL(glDeleteShader(vertex));
     GL_CALL(glDeleteShader(fragment));
+
+    create.m_vertex.release();
+    create.m_fragment.release();
 }
 
 void OpenGLShader::terminate() {

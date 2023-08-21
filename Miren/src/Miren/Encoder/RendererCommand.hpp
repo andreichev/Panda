@@ -17,8 +17,8 @@ enum RendererCommandType {
     RendererShutdown,
     CreateFrameBuffer,
     DestroyFrameBuffer,
-    CreateShader,
-    DestroyShader,
+    CreateProgram,
+    DestroyProgram,
     CreateTexture,
     ResizeTexture,
     DestroyTexture,
@@ -52,23 +52,21 @@ struct DeleteFrameBufferCommand : Foundation::CommandBuffer::Command {
         , handle(handle) {}
 };
 
-struct CreateShaderCommand : Foundation::CommandBuffer::Command {
-    const char *vertexCode;
-    const char *fragmentCode;
-    ShaderHandle handle;
+struct CreateProgramCommand : Foundation::CommandBuffer::Command {
+    ProgramCreate create;
+    ProgramHandle handle;
 
-    CreateShaderCommand(ShaderHandle handle, const char *vertexCode, const char *fragmentCode)
-        : Command(RendererCommandType::CreateShader)
+    CreateProgramCommand(ProgramHandle handle, ProgramCreate create)
+        : Command(RendererCommandType::CreateProgram)
         , handle(handle)
-        , vertexCode(vertexCode)
-        , fragmentCode(fragmentCode) {}
+        , create(create) {}
 };
 
-struct DeleteShaderCommand : Foundation::CommandBuffer::Command {
-    ShaderHandle handle;
+struct DeleteProgramCommand : Foundation::CommandBuffer::Command {
+    ProgramHandle handle;
 
-    DeleteShaderCommand(ShaderHandle handle)
-        : Command(RendererCommandType::DestroyShader)
+    DeleteProgramCommand(ProgramHandle handle)
+        : Command(RendererCommandType::DestroyProgram)
         , handle(handle) {}
 };
 

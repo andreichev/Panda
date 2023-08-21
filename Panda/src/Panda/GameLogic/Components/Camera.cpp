@@ -46,7 +46,7 @@ void Camera::update(double deltaTime) {
     Miren::setUniform(m_shader, "projection", &m_projection[0][0], Miren::UniformDataType::Mat4);
 }
 
-void Camera::setShader(Miren::ShaderHandle _shader) {
+void Camera::setShader(Miren::ProgramHandle _shader) {
     m_shader = _shader;
 }
 

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Miren/VertexBufferLayoutData.hpp"
+#include "Miren/Base.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -14,7 +15,7 @@ namespace Miren {
 class OpenGLShader {
 public:
     OpenGLShader();
-    void create(const char *vertexCode, const char *fragmentCode);
+    void create(ProgramCreate create);
     void terminate();
     void bind();
     void unbind();

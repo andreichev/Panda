@@ -1,28 +1,40 @@
 #pragma once
 
 #include <cstdlib>
+#include <Foundation/Allocator.hpp>
 
 namespace Foundation {
 
-typedef void (*ReleaseFunction)(void *ptr, void *userData);
+using ReleaseFunction = void (*)(void *ptr, void *userData);
 
 struct Memory {
-    Memory()
-        : data(nullptr)
-        , releaseFn(nullptr) {}
-
-    Memory(void *data)
+    Memory(void *data = nullptr, void *userData = nullptr, ReleaseFunction releaseFun = nullptr)
         : data(data)
-        , releaseFn(nullptr) {}
+        , userData(userData)
+        , releaseFn(releaseFun) {}
 
     void *data;
-    ReleaseFunction releaseFn;
     void *userData;
+    ReleaseFunction releaseFn;
 
     const void release() const {
         if (releaseFn != nullptr) {
-            (*releaseFn)(data, userData);
+            releaseFn(data, userData);
         }
+    }
+
+    /// Create memory copying some data
+    static Memory create(void *src, uint32_t size) {
+        void *data = ALLOC(Foundation::getAllocator(), size);
+        memcpy(data, src, size);
+        return Memory(
+            data, nullptr, [](void *ptr, void *) { FREE(Foundation::getAllocator(), ptr); });
+    }
+
+    static Memory alloc(uint32_t size) {
+        void *data = ALLOC(Foundation::getAllocator(), size);
+        return Memory(
+            data, nullptr, [](void *ptr, void *) { FREE(Foundation::getAllocator(), ptr); });
     }
 };
 

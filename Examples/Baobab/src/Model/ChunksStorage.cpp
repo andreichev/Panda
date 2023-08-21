@@ -76,7 +76,7 @@ Chunk *ChunksStorage::getChunk(int x, int y, int z) {
                    chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
 }
 
-VoxelRaycastData *ChunksStorage::bresenham3D(
+std::optional<VoxelRaycastData> ChunksStorage::bresenham3D(
     float x1, float y1, float z1, float x2, float y2, float z2, int maximumDistance) {
     float t = 0.0f;
     int ix = (int)floor(x1);
@@ -122,7 +122,7 @@ VoxelRaycastData *ChunksStorage::bresenham3D(
                 normal.y = (int)-stepy;
             if (steppedIndex == 2)
                 normal.z = (int)-stepz;
-            return new VoxelRaycastData(voxel, end, normal);
+            return VoxelRaycastData(voxel, end, normal);
         }
         if (txMax < tyMax) {
             if (txMax < tzMax) {
@@ -150,5 +150,5 @@ VoxelRaycastData *ChunksStorage::bresenham3D(
             }
         }
     }
-    return nullptr;
+    return {};
 }

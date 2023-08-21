@@ -7,7 +7,7 @@
 namespace Miren {
 
 struct Uniform {
-    ShaderHandle handle;
+    ProgramHandle handle;
     const char *name;
     void *value;
     UniformDataType type;
@@ -26,7 +26,7 @@ struct Uniform {
         return 0;
     }
 
-    Uniform(ShaderHandle handle, const char *name, void *value, UniformDataType type)
+    Uniform(ProgramHandle handle, const char *name, void *value, UniformDataType type)
         : handle(handle)
         , name(name)
         , value(value)

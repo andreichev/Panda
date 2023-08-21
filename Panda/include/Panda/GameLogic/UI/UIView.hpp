@@ -41,7 +41,7 @@ private:
     std::vector<Foundation::Shared<UIView>> subviews;
 
     // TODO: - Один шейдер на все вьюхи
-    Miren::ShaderHandle shaderHandle;
+    Miren::ProgramHandle programHandle;
     Miren::VertexBufferHandle vertexBufferHandle;
     Rect frame;
 };

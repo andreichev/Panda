@@ -36,14 +36,14 @@ void deleteFrameBuffer(FrameBufferHandle handle) {
     s_context->deleteFrameBuffer(handle);
 }
 
-ShaderHandle createShader(const char *vertexCode, const char *fragmentCode) {
+ProgramHandle createProgram(ProgramCreate create) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
-    return s_context->createShader(vertexCode, fragmentCode);
+    return s_context->createProgram(create);
 }
 
-void deleteShader(ShaderHandle handle) {
+void deleteProgram(ProgramHandle handle) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
-    s_context->deleteShader(handle);
+    s_context->deleteProgram(handle);
 }
 
 TextureHandle createTexture(TextureCreate create) {
@@ -169,12 +169,12 @@ void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, size_t count) {
     s_context->setIndexBuffer(handle, offset, count);
 }
 
-void setShader(ShaderHandle handle) {
+void setShader(ProgramHandle handle) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     s_context->setShader(handle);
 }
 
-void setUniform(ShaderHandle handle, const char *name, void *value, UniformDataType type) {
+void setUniform(ProgramHandle handle, const char *name, void *value, UniformDataType type) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     s_context->setUniform(handle, name, value, type);
 }

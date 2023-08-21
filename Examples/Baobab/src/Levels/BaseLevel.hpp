@@ -13,6 +13,6 @@ public:
 
 private:
     Foundation::Shared<ChunksStorage> chunksStorage;
-    Miren::ShaderHandle baseShader;
+    Miren::ProgramHandle baseShader;
     Miren::TextureHandle texture;
 };

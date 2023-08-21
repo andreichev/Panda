@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 
 bool deviceObjectsCreated = false;
-Miren::ShaderHandle shader;
+Miren::ProgramHandle shader;
 Miren::VertexLayoutHandle vertexLayout;
 Miren::TextureHandle fontTexture;
 glm::mat4 projMat(1.f);
@@ -118,7 +118,8 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateFontsTexture() {
 
     using namespace Miren;
     TextureCreate create;
-    create.m_data = Foundation::Memory(texture);
+    create.m_data =
+        Foundation::Memory(texture, nullptr, [](void *ptr, void *userData) { free(ptr); });
     create.m_format = TextureFormat::RGBA8;
     create.m_width = width;
     create.m_height = height;
@@ -134,9 +135,9 @@ IMGUI_IMPL_API void ImGui_ImplMiren_DestroyFontsTexture() {
 
 IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
     using namespace Miren;
-    Panda::ShaderAsset shaderAsset = Panda::AssetLoader::loadShader(
+    Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
         "shaders/imgui/imgui_vertex.glsl", "shaders/imgui/imgui_fragment.glsl");
-    shader = Miren::createShader(shaderAsset.vertexCode, shaderAsset.fragmentCode);
+    shader = Miren::createProgram(programAsset.getMirenProgramCreate());
 
     VertexBufferLayoutData layoutData;
     layoutData.pushVec2();
@@ -149,7 +150,7 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
 
 IMGUI_IMPL_API void ImGui_ImplMiren_DestroyDeviceObjects() {
     using namespace Miren;
-    deleteShader(shader);
+    deleteProgram(shader);
     ImGui_ImplMiren_DestroyFontsTexture();
     deviceObjectsCreated = false;
 }
