@@ -48,11 +48,16 @@ void deleteProgram(ProgramHandle handle) {
 
 TextureHandle createTexture(TextureCreate create) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    PND_ASSERT_F(create.m_width > 0 && create.m_height > 0,
+        "INVALID TEXTURE SIZE w: {}, h: {}",
+        create.m_width,
+        create.m_height);
     return s_context->createTexture(create);
 }
 
 void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    PND_ASSERT_F(width > 0 && height > 0, "INVALID TEXTURE SIZE w: {}, h: {}", width, height);
     s_context->resizeTexture(handle, width, height);
 }
 

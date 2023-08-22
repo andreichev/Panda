@@ -129,6 +129,9 @@ void EditorLayer::onImGuiRender() {
 }
 
 void EditorLayer::updateViewportSize(Size size) {
+    if (size.width == 0 || size.height == 0) {
+        return;
+    }
     m_viewportPanelSize = size;
     m_camera->updateViewportSize(size);
     Size dpi = Application::get()->getWindow()->getDpi();
