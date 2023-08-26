@@ -7,6 +7,8 @@
 #include "Chunk.hpp"
 #include "VoxelRaycastData.hpp"
 
+#include <optional>
+
 class ChunksStorage {
 public:
     static const int SIZE_X = 10;
