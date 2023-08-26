@@ -7,13 +7,14 @@ namespace Panda {
 
 EditorLayer::EditorLayer()
     : m_viewportPanelSize(300, 200)
-    , m_camera(nullptr) {}
+    , m_camera(nullptr)
+    , m_world(nullptr) {}
 
 void EditorLayer::initializeWorld() {
     if (m_camera == nullptr) {
         Entity cameraEntity = m_world->instantiateEntity();
         m_camera = &cameraEntity.addNativeScript<OrthographicCamera>();
-        OrthographicCameraMove &move = cameraEntity.addNativeScript<OrthographicCameraMove>();
+        auto &move = cameraEntity.addNativeScript<OrthographicCameraMove>();
         move.setCamera(m_camera);
     }
 }
