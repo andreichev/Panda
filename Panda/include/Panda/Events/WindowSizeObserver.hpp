@@ -8,7 +8,7 @@
 
 namespace Panda {
 
-class WindowSizeListener {
+class WindowSizeObserver {
 public:
     virtual void windowSizeChanged(Size size) = 0;
 };

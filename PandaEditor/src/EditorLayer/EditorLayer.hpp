@@ -32,7 +32,6 @@ private:
 
     // Panels
     StatisticsPanel statisticsPanel;
-
 };
 
 } // namespace Panda

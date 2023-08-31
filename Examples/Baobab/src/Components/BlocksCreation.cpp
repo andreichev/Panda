@@ -10,6 +10,7 @@ void BlocksCreation::initialize() {
 }
 
 void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ) {
+    // LOG_INFO("UPDATE CHUNK {} {} {}", chunkIndexX, chunkIndexY, chunkIndexZ);
     Panda::MeshData primitiveMeshData = VoxelMeshGenerator::makeOneChunkMesh(
         *m_chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true);
     m_chunksStorage
@@ -51,18 +52,29 @@ void BlocksCreation::setVoxel(int x, int y, int z, int8_t id) {
 }
 
 void BlocksCreation::update(double deltaTime) {
+    bool leftPressed;
+    bool rightPressed;
+    if (Panda::Input::isKeyPressed(Panda::Key::E)) {
+        leftPressed = Panda::Input::isMouseButtonPressed(Panda::MouseButton::LEFT);
+        rightPressed = Panda::Input::isMouseButtonPressed(Panda::MouseButton::RIGHT);
+    } else {
+        leftPressed = Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::LEFT);
+        rightPressed = Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::RIGHT);
+    }
+    if (!leftPressed && !rightPressed) {
+        return;
+    }
     glm::vec4 position = m_transform->getPosition();
     glm::vec3 target = m_camera->getFront();
     auto v = m_chunksStorage->bresenham3D(
         position.x, position.y, position.z, target.x, target.y, target.z, MAXIMUM_DISTANCE);
-
     if (v && v->voxel != nullptr) {
-        if (Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::LEFT)) {
+        if (leftPressed) {
             int x = v->end.x + v->normal.x;
             int y = v->end.y + v->normal.y;
             int z = v->end.z + v->normal.z;
             setVoxel(x, y, z, 11);
-        } else if (Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::RIGHT)) {
+        } else if (rightPressed) {
             int x = v->end.x;
             int y = v->end.y;
             int z = v->end.z;

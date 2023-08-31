@@ -10,7 +10,7 @@
 
 class BlocksCreation : public Panda::NativeScript {
 public:
-    const int MAXIMUM_DISTANCE = 10;
+    const int MAXIMUM_DISTANCE = 100;
 
     void initialize() override;
     void update(double deltaTime) override;
@@ -24,4 +24,5 @@ private:
     Foundation::Shared<ChunksStorage> m_chunksStorage;
     Panda::Transform *m_transform;
     Panda::Camera *m_camera;
+    int m_frame;
 };

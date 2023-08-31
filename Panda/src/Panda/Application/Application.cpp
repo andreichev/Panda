@@ -52,17 +52,17 @@ void Application::pushOverlay(Layer *layer) {
 }
 
 Application::Application(ApplicationStartupSettings &settings)
-    : isApplicationShouldClose(false)
-    , maximumFps(60)
-    , oneSecondTimeCount(0)
-    , deltaTimeMillis(0)
-    , thisSecondFramesCount(0) {
+    : m_isApplicationShouldClose(false)
+    , m_maximumFps(120)
+    , m_oneSecondTimeCount(0)
+    , m_deltaTimeMillis(0)
+    , m_thisSecondFramesCount(0) {
     s_instance = this;
     Foundation::Logger::init();
 
     m_window = createWindow(settings);
     m_window->setEventQueue(&m_eventQueue);
-    timeMillis = getMillis();
+    m_timeMillis = getMillis();
     m_layerStack = NEW(Foundation::getAllocator(), LayerStack);
 
 #ifdef PLATFORM_DESKTOP
@@ -86,24 +86,27 @@ void Application::startBasicGame(Level *level) {
 }
 
 void Application::loop() {
-    while (!isApplicationShouldClose) {
-        uint64_t lastTime = timeMillis;
-        timeMillis = getMillis();
-        deltaTimeMillis += timeMillis - lastTime;
-        if (deltaTimeMillis < (1000 / maximumFps)) {
+    while (!m_isApplicationShouldClose) {
+        uint64_t lastTime = m_timeMillis;
+        m_timeMillis = getMillis();
+        m_deltaTimeMillis += m_timeMillis - lastTime;
+        if (m_deltaTimeMillis < (1000 / m_maximumFps)) {
             continue;
         }
-        oneSecondTimeCount += deltaTimeMillis;
+        m_oneSecondTimeCount += m_deltaTimeMillis;
 
-        thisSecondFramesCount++;
-        if (oneSecondTimeCount >= 1000) {
-            fps = thisSecondFramesCount;
+        m_thisSecondFramesCount++;
+        if (m_oneSecondTimeCount >= 1000) {
+            fps = m_thisSecondFramesCount;
             // LOG_INFO("FPS: {}", fps);
-            thisSecondFramesCount = 0;
-            oneSecondTimeCount = 0;
+            m_thisSecondFramesCount = 0;
+            m_oneSecondTimeCount = 0;
         }
-        double deltaTime = deltaTimeMillis / 1000.0;
-        deltaTimeMillis = 0;
+        double deltaTime = m_deltaTimeMillis / 1000.0;
+        if (deltaTime == 0) {
+            deltaTime = 0.00000001;
+        }
+        m_deltaTimeMillis = 0;
 
         Miren::renderSemaphoreWait();
         // LOG_INFO("APP UPDATE BEGIN");
@@ -146,7 +149,7 @@ void Application::processEvents() {
                 break;
             (*it)->onEvent(event);
         }
-        if (event->isHandled == false) {
+        if (!event->isHandled) {
             Input::onEvent(event);
         }
     }
@@ -157,7 +160,7 @@ EventQueue *Application::getEventQueue() {
     return &m_eventQueue;
 }
 
-void Application::addWindowSizeListener(WindowSizeListener *listener) {
+void Application::addWindowSizeObserver(WindowSizeObserver *listener) {
     m_windowSizeListeners.push_back(listener);
 }
 
@@ -170,7 +173,7 @@ void Application::windowSizeChanged(Size size) {
     }
 }
 
-void Application::removeWindowSizeListener(WindowSizeListener *listener) {
+void Application::removeWindowSizeObserver(WindowSizeObserver *listener) {
     auto it = std::find(m_windowSizeListeners.begin(), m_windowSizeListeners.end(), listener);
     if (it != m_windowSizeListeners.end()) {
         m_windowSizeListeners.erase(it);

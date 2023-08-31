@@ -10,14 +10,14 @@
 #include <Panda/GameLogic/Components/ParticleSystem.hpp>
 #include <Panda/GameLogic/Components/OrthographicCamera.hpp>
 
-class CameraSizeObserver : public Panda::NativeScript, Panda::WindowSizeListener {
+class CameraSizeObserver : public Panda::NativeScript, Panda::WindowSizeObserver {
 public:
     void initialize() override {
-        Panda::Application::get()->addWindowSizeListener(this);
+        Panda::Application::get()->addWindowSizeObserver(this);
     }
 
     ~CameraSizeObserver() {
-        Panda::Application::get()->removeWindowSizeListener(this);
+        Panda::Application::get()->removeWindowSizeObserver(this);
     }
 
     void update(double deltaTime) override {}

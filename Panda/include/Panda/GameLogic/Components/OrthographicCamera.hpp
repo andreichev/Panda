@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Panda/GameLogic/NativeScript.hpp"
-#include "Panda/Events/WindowSizeListener.hpp"
+#include "Panda/Events/WindowSizeObserver.hpp"
 #include "Panda/GameLogic/Components/Transform.hpp"
 
 namespace Panda {
@@ -18,7 +18,7 @@ struct OrthographicCameraBounds {
     }
 };
 
-class OrthographicCamera : public NativeScript, TransformDelegate {
+class OrthographicCamera : public NativeScript, TransformObserver {
 public:
     OrthographicCamera();
     ~OrthographicCamera() override;
@@ -44,7 +44,7 @@ public:
     void updateViewportSize(Size size);
     Point screenCoordToWorld(Point coord);
 
-    // MARK: - Delegate
+    // MARK: - Observer
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
 
 private:

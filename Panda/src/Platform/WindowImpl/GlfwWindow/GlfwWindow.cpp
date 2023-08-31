@@ -137,7 +137,7 @@ bool GlfwWindow::isCursorLocked() {
 }
 
 void GlfwWindow::toggleCursorLock() {
-    m_isCursorLocked = m_isCursorLocked == false;
+    m_isCursorLocked = !m_isCursorLocked;
     resetCursorPos();
     glfwSetInputMode(
         m_windowHandle, GLFW_CURSOR, m_isCursorLocked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);

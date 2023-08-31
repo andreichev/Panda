@@ -5,15 +5,15 @@
 #pragma once
 
 #include "Panda/GameLogic/NativeScript.hpp"
-#include "Panda/Events/WindowSizeListener.hpp"
+#include "Panda/Events/WindowSizeObserver.hpp"
 #include "Transform.hpp"
-#include "TransformDelegate.hpp"
+#include "TransformObserver.hpp"
 
 #include <Miren/Miren.hpp>
 
 namespace Panda {
 
-class Camera : public NativeScript, WindowSizeListener, TransformDelegate {
+class Camera : public NativeScript, WindowSizeObserver, TransformObserver {
 public:
     Camera();
     ~Camera() override;
@@ -30,7 +30,7 @@ public:
     inline glm::vec4 getRight() const {
         return m_right;
     }
-    // MARK: - Delegate
+    // MARK: - Observer
     void transformChanged(glm::vec4 position, glm::vec3 rotation) override;
     void windowSizeChanged(Size size) override;
 

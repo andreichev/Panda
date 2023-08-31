@@ -8,7 +8,7 @@
 #include "Panda/Window/Window.hpp"
 #include "Panda/Application/LayerStack.hpp"
 #include "Panda/Events/EventQueue.hpp"
-#include "Panda/Events/WindowSizeListener.hpp"
+#include "Panda/Events/WindowSizeObserver.hpp"
 #include "Panda/ImGui/ImGuiLayer.hpp"
 
 namespace Panda {
@@ -27,13 +27,13 @@ public:
     }
     void processEvents();
     Window *getWindow();
-    void addWindowSizeListener(WindowSizeListener *listener);
-    void removeWindowSizeListener(WindowSizeListener *listener);
+    void addWindowSizeObserver(WindowSizeObserver *listener);
+    void removeWindowSizeObserver(WindowSizeObserver *listener);
     inline void close() {
-        isApplicationShouldClose = true;
+        m_isApplicationShouldClose = true;
     }
     inline bool isRunning() {
-        return isApplicationShouldClose == false;
+        return !m_isApplicationShouldClose;
     }
     int fps;
     EventQueue *getEventQueue();
@@ -43,19 +43,19 @@ public:
 private:
     void windowSizeChanged(Size size);
 
-    bool isApplicationShouldClose;
-    uint64_t timeMillis;
-    // Таймер до 1 секудны для подсчета FPS (в миллисекундах)
-    uint64_t oneSecondTimeCount;
+    bool m_isApplicationShouldClose;
+    uint64_t m_timeMillis;
+    // Таймер до 1 секундны для подсчета FPS (в миллисекундах)
+    uint64_t m_oneSecondTimeCount;
     // Время после отрисовки предыдущего кадра
-    uint64_t deltaTimeMillis;
-    int thisSecondFramesCount;
+    uint64_t m_deltaTimeMillis;
+    int m_thisSecondFramesCount;
     // Ограничение по FPS
-    int maximumFps;
+    int m_maximumFps;
     LayerStack *m_layerStack;
     EventQueue m_eventQueue;
     Window *m_window;
-    std::vector<WindowSizeListener *> m_windowSizeListeners;
+    std::vector<WindowSizeObserver *> m_windowSizeListeners;
     ImGuiLayer *m_ImGuiLayer;
 
     static Application *s_instance;

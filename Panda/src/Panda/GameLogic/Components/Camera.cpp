@@ -8,8 +8,6 @@
 #include "Panda/Application/Application.hpp"
 #include "Panda/GameLogic/Entity.hpp"
 
-#include <glm/gtc/matrix_transform.hpp>
-
 namespace Panda {
 
 Camera::Camera()
@@ -28,14 +26,14 @@ Camera::Camera()
 }
 
 Camera::~Camera() {
-    m_transform->removeDelegate(this);
-    Application::get()->removeWindowSizeListener(this);
+    m_transform->removeObserver(this);
+    Application::get()->removeWindowSizeObserver(this);
 }
 
 void Camera::initialize() {
     m_transform = &getEntity().getTransform();
-    m_transform->addDelegate(this);
-    Application::get()->addWindowSizeListener(this);
+    m_transform->addObserver(this);
+    Application::get()->addWindowSizeObserver(this);
     updateVectors();
     updateProjectionMatrix();
     updateViewMatrix();

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Panda/Events/WindowSizeListener.hpp"
+#include "Panda/Events/WindowSizeObserver.hpp"
 #include "Panda/Window/Window.hpp"
 #include "Panda/Base/Base.hpp"
 
@@ -13,7 +13,7 @@
 
 namespace Panda {
 
-class UIView : public WindowSizeListener {
+class UIView : public WindowSizeObserver {
 public:
     UIView();
     UIView(Rect frame);

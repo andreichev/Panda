@@ -9,7 +9,7 @@
 
 namespace Panda {
 
-class TransformDelegate {
+class TransformObserver {
 public:
     virtual void transformChanged(glm::vec4 position, glm::vec3 rotation) = 0;
 };

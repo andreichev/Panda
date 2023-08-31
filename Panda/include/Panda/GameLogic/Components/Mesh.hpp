@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Panda/GameLogic/NativeScript.hpp"
-#include "Panda/GameLogic/Components/TransformDelegate.hpp"
+#include "Panda/GameLogic/Components/TransformObserver.hpp"
 #include "Panda/GameLogic/Primitives/MeshData.hpp"
 
 #include <Miren/Miren.hpp>
@@ -14,7 +14,7 @@ namespace Panda {
 
 class Transform;
 
-class Mesh : public NativeScript, TransformDelegate {
+class Mesh : public NativeScript, TransformObserver {
 public:
     ~Mesh() override;
     Mesh();

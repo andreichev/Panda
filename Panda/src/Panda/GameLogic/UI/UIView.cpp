@@ -11,7 +11,7 @@ UIView::UIView()
 UIView::~UIView() {
     Miren::deleteVertexBuffer(vertexBufferHandle);
     Miren::deleteProgram(programHandle);
-    Application::get()->removeWindowSizeListener(this);
+    Application::get()->removeWindowSizeObserver(this);
 }
 
 UIView::UIView(Rect frame)
@@ -27,7 +27,7 @@ UIView::UIView(Rect frame)
     vertexBufferHandle = Miren::createDynamicVertexBuffer(data, sizeof(float) * 12, vertexLayout);
     windowSize = window->getSize();
     // TODO: - Subscribe to window size events
-    Application::get()->addWindowSizeListener(this);
+    Application::get()->addWindowSizeObserver(this);
     layout();
 }
 

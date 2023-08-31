@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "TransformDelegate.hpp"
+#include "TransformObserver.hpp"
 
 namespace Panda {
 
@@ -23,15 +23,15 @@ public:
     void setPosition(float x, float y, float z);
     void setPosition(glm::vec4 pos);
     // ------------------------
-    void addDelegate(TransformDelegate *delegate);
-    void removeDelegate(TransformDelegate *delegate);
+    void addObserver(TransformObserver *delegate);
+    void removeObserver(TransformObserver *delegate);
 
 private:
     void transformUpdated();
 
     glm::vec3 rotation;
     glm::vec4 position;
-    std::vector<TransformDelegate *> delegates;
+    std::vector<TransformObserver *> delegates;
 };
 
 } // namespace Panda

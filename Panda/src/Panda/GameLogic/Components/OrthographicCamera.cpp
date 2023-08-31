@@ -1,7 +1,6 @@
 #include "Panda/GameLogic/Components/OrthographicCamera.hpp"
 
 #include "Panda/Application/Application.hpp"
-#include <glm/gtc/matrix_transform.hpp>
 
 namespace Panda {
 
@@ -18,12 +17,12 @@ OrthographicCamera::OrthographicCamera()
 }
 
 OrthographicCamera::~OrthographicCamera() {
-    m_transform->removeDelegate(this);
+    m_transform->removeObserver(this);
 }
 
 void OrthographicCamera::initialize() {
     m_transform = &getEntity().getTransform();
-    m_transform->addDelegate(this);
+    m_transform->addObserver(this);
     updateViewportSize(m_screenSize);
 }
 
