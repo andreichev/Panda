@@ -21,6 +21,24 @@ void BaseLevel::start(Panda::World *world) {
     LOG_INFO("WORLD GENERATION STARTED");
     chunksStorage = Foundation::makeShared<ChunksStorage>();
     LOG_INFO("WORLD GENERATED");
+    Panda::Entity chunkEntity = world->instantiateEntity();
+    Panda::TextureAsset textureAsset = Panda::AssetLoader::loadTexture("textures/Texture.png");
+    texture = Miren::createTexture(textureAsset.getMirenTextureCreate());
+    for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
+        for (int indexY = 0; indexY < ChunksStorage::SIZE_Y; indexY++) {
+            for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {
+                Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(
+                    *chunksStorage.get(), indexX, indexY, indexZ, true);
+                Panda::Mesh &mesh = chunkEntity.addNativeScript<Panda::Mesh>();
+                mesh.create(meshData, true, texture, baseShader);
+                chunksStorage
+                    ->chunks[indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+                             indexX * ChunksStorage::SIZE_X + indexZ]
+                    .setMesh(&mesh);
+            }
+        }
+    }
+
     Panda::Entity cameraEntity = world->instantiateEntity();
     Panda::Camera &camera = cameraEntity.addNativeScript<Panda::Camera>();
     camera.setFieldOfView(60.f);
@@ -39,24 +57,6 @@ void BaseLevel::start(Panda::World *world) {
     cameraEntity.addNativeScript<FullScreenToggle>();
 
     world->getUIView()->addSubview(Foundation::makeShared<UICrosshair>());
-
-    Panda::Entity chunkEntity = world->instantiateEntity();
-    Panda::TextureAsset textureAsset = Panda::AssetLoader::loadTexture("textures/Texture.png");
-    texture = Miren::createTexture(textureAsset.getMirenTextureCreate());
-    for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
-        for (int indexY = 0; indexY < ChunksStorage::SIZE_Y; indexY++) {
-            for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {
-                Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(
-                    *chunksStorage.get(), indexX, indexY, indexZ, true);
-                Panda::Mesh &mesh = chunkEntity.addNativeScript<Panda::Mesh>();
-                mesh.create(meshData, true, texture, baseShader);
-                chunksStorage
-                    ->chunks[indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
-                             indexX * ChunksStorage::SIZE_X + indexZ]
-                    .setMesh(&mesh);
-            }
-        }
-    }
 
     LOG_INFO("BASE LEVEL STARTED!");
 }

@@ -45,11 +45,13 @@ class NativeScript;
 struct NativeScriptContainer {
     Foundation::Shared<NativeScript> instance = nullptr;
     bool initialized = false;
+    const char *scriptName;
 
     template<typename T>
     T &bind() {
         Foundation::Shared<T> script = Foundation::makeShared<T>();
         instance = script;
+        scriptName = typeid(T).name();
         return *script;
     }
 };

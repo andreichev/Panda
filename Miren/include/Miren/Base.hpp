@@ -6,7 +6,7 @@
 #include <Foundation/Foundation.hpp>
 #include <cstdlib>
 
-#if MIREN_LOG_ENABLED == 0
+#if MIREN_LOG_ENABLED == 1
 #    define MIREN_LOG(...) LOG_INFO(__VA_ARGS__)
 #else
 #    define MIREN_LOG(...)

@@ -14,7 +14,7 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(ChunksStorage &chunks,
     Chunk &chunk = chunks.chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                                  chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
     Vertex *vertices = new Vertex[20000];
-    unsigned int *indices = new unsigned int[20000];
+    uint32_t *indices = new uint32_t[20000];
     uint32_t verticesCount = 0;
     uint32_t indicesCount = 0;
     for (int voxelIndexX = 0; voxelIndexX < Chunk::SIZE_X; voxelIndexX++) {

@@ -56,6 +56,7 @@ void CameraMove::update(double deltaTime) {
         m_window->toggleCursorLock();
         cursorStarted = false;
     }
+    ImGui::SetNextFrameWantCaptureMouse(!m_window->isCursorLocked());
 }
 
 void CameraMove::onImGuiRender() {

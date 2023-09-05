@@ -225,7 +225,7 @@ struct Context {
 
     bool renderFrame() {
         m_rendererSemaphore.wait();
-        // MIREN_LOG("RENDER FRAME BEGIN");
+        MIREN_LOG("RENDER FRAME BEGIN");
         m_preCommandQueue.finishWriting();
         m_postCommandQueue.finishWriting();
         if (m_renderer == nullptr) {
@@ -244,7 +244,7 @@ struct Context {
         rendererExecuteCommands(m_postCommandQueue);
         m_preCommandQueue.reset();
         m_postCommandQueue.reset();
-        // MIREN_LOG("RENDER FRAME END");
+        MIREN_LOG("RENDER FRAME END");
         m_rendererSemaphore.post();
         return m_renderer != nullptr;
     }

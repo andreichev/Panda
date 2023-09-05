@@ -19,7 +19,7 @@ void World::update(double deltaTime) {
     auto view = m_registry.view<NativeScriptListComponent>();
     for (auto entityHandle : view) {
         auto &component = view.get<NativeScriptListComponent>(entityHandle);
-        for (NativeScriptContainer &container : component.scripts) {
+        for (auto &container : component.scripts) {
             if (!container.initialized) {
                 id_t entityId = static_cast<id_t>(entityHandle);
                 container.instance->setEntity({&m_registry, entityId});
@@ -35,8 +35,10 @@ void World::onImGuiRender() {
     auto view = m_registry.view<NativeScriptListComponent>();
     for (auto entityHandle : view) {
         auto &component = view.get<NativeScriptListComponent>(entityHandle);
-        for (NativeScriptContainer &container : component.scripts) {
-            container.instance->onImGuiRender();
+        for (auto &container : component.scripts) {
+            if (container.initialized) {
+                container.instance->onImGuiRender();
+            }
         }
     }
 }

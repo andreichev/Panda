@@ -62,7 +62,6 @@ public:
 private:
     void viewChanged(View &view);
     void submit(RenderDraw *draw);
-    void checkForErrors();
 
     uint32_t m_vao;
     GraphicsContext *context;
