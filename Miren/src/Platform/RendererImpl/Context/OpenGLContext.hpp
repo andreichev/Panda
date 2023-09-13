@@ -13,6 +13,7 @@ class OpenGLContext : public GraphicsContext {
 public:
     void create() override;
     void flip() override;
+    uint32_t getDefaultFrameBufferId() override;
 
 private:
     void *glfwWindowHandle;

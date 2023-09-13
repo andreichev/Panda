@@ -20,6 +20,7 @@ public:
     void pollEvents() override;
     void toggleCursorLock() override;
     bool isCursorLocked() override;
+    void setCursor(Cursor cursor) override;
     void setEventQueue(EventQueue *eventQueue) override;
     Size getSize() override;
     Size getDpi() override;
@@ -32,6 +33,7 @@ private:
     Size m_windowSizeBackup;
     GLFWwindow *m_windowHandle;
     EventQueue *m_eventQueue;
+    GLFWcursor *cursors[Cursor::COUNT];
 };
 
 } // namespace Panda

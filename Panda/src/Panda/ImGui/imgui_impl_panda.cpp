@@ -5,6 +5,16 @@
 #include "Panda/Events/KeyEvents.hpp"
 #include "Panda/Events/MouseEvents.hpp"
 
+struct ImGui_PandaPlatformData {
+    Panda::Cursor MouseCursors[ImGuiMouseCursor_COUNT];
+};
+
+static ImGui_PandaPlatformData *ImGui_ImplGlfw_GetBackendData() {
+    return ImGui::GetCurrentContext()
+               ? (ImGui_PandaPlatformData *)ImGui::GetIO().BackendPlatformUserData
+               : nullptr;
+}
+
 static ImGuiKey ImGui_ImplPanda_KeyCodeToImGuiKey(Panda::Key key) {
     using namespace Panda;
 
@@ -337,8 +347,21 @@ IMGUI_IMPL_API bool ImGui_ImplPanda_Init() {
     ImGuiIO &io = ImGui::GetIO();
     io.BackendPlatformName = "imgui_impl_panda";
 
+    ImGui_PandaPlatformData *bd = IM_NEW(ImGui_PandaPlatformData)();
+    io.BackendPlatformUserData = (void *)bd;
+
+    bd->MouseCursors[ImGuiMouseCursor_Arrow] = Panda::Cursor::ARROW;
+    bd->MouseCursors[ImGuiMouseCursor_TextInput] = Panda::Cursor::IBEAM;
+    bd->MouseCursors[ImGuiMouseCursor_ResizeNS] = Panda::Cursor::RESIZE_NS;
+    bd->MouseCursors[ImGuiMouseCursor_ResizeEW] = Panda::Cursor::RESIZE_EW;
+    bd->MouseCursors[ImGuiMouseCursor_Hand] = Panda::Cursor::POINTING_HAND;
+    bd->MouseCursors[ImGuiMouseCursor_ResizeAll] = Panda::Cursor::RESIZE_ALL;
+    bd->MouseCursors[ImGuiMouseCursor_ResizeNESW] = Panda::Cursor::RESIZE_NESW;
+    bd->MouseCursors[ImGuiMouseCursor_ResizeNWSE] = Panda::Cursor::RESIZE_NWSE;
+    bd->MouseCursors[ImGuiMouseCursor_NotAllowed] = Panda::Cursor::NOT_ALLOWED;
+
     // Setup backend capabilities flags
-    // io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values
     // (optional) io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor
     // io.WantSetMousePos requests (optional, rarely used) io.BackendFlags |=
     // ImGuiBackendFlags_PlatformHasViewports;    // We can create multi-viewports on the Platform
@@ -356,6 +379,7 @@ IMGUI_IMPL_API void ImGui_ImplPanda_Shutdown() {}
 
 IMGUI_IMPL_API void ImGui_ImplPanda_NewFrame(double deltaTime) {
     ImGuiIO &io = ImGui::GetIO();
+    ImGui_PandaPlatformData *bd = ImGui_ImplGlfw_GetBackendData();
     using namespace Panda;
     Application *app = Application::get();
     Size dpi = app->getWindow()->getDpi();
@@ -363,4 +387,6 @@ IMGUI_IMPL_API void ImGui_ImplPanda_NewFrame(double deltaTime) {
     io.DisplaySize = ImVec2(
         (float)(app->getWindow()->getSize().width), (float)(app->getWindow()->getSize().height));
     io.DeltaTime = (float)deltaTime;
+    ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
+    app->getWindow()->setCursor(bd->MouseCursors[imgui_cursor]);
 }

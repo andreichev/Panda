@@ -226,7 +226,7 @@ void RendererOpenGL::viewChanged(View &view) {
     if (view.m_frameBuffer.isValid()) {
         frameBuffers[view.m_frameBuffer.id].bind();
     } else {
-        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, context->getDefaultFrameBufferId()));
     }
     if (!view.m_viewport.isZero()) {
         GL_CALL(glViewport(view.m_viewport.origin.x,

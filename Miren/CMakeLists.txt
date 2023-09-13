@@ -29,6 +29,7 @@ endif ()
 
 add_library(Miren STATIC "${SOURCES}" "${INCLUDE}")
 
+target_compile_definitions(Miren PUBLIC GLES_SILENCE_DEPRECATION)
 target_include_directories(Miren PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(Miren PUBLIC ${PROJECT_SOURCE_DIR}/include)
 

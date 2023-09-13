@@ -22,29 +22,23 @@ GlfwWindow::GlfwWindow(const char *title, Size size, bool isFullscreen) {
     m_isFullScreen = isFullscreen;
     m_windowSizeBackup = size;
     m_isCursorLocked = false;
-
     LOG_INFO("Hello GLFW! {}", glfwGetVersionString());
     glfwSetErrorCallback(glfwErrorCallback);
-
     // Initialize GLFW. Most GLFW functions will not work before doing this.
     if (glfwInit() == false) {
         LOG_CRITICAL("GLFW INITIALIZATION ERROR");
         exit(1);
     }
-
     // Configure GLFW
     glfwDefaultWindowHints(); // optional, the current window hints are already the default
-
 #ifdef PLATFORM_MACOS
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 #endif
-
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
     glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
-
     // Create the window
     m_windowHandle = glfwCreateWindow((int)size.width, (int)size.height, title, nullptr, nullptr);
     if (m_windowHandle == nullptr) {
@@ -52,13 +46,28 @@ GlfwWindow::GlfwWindow(const char *title, Size size, bool isFullscreen) {
         exit(1);
     }
     Miren::PlatformData::get()->nativeWindowHandle = m_windowHandle;
-
     glfwShowWindow(m_windowHandle);
     glfwFocusWindow(m_windowHandle);
-
     if (isFullscreen) {
         setFullScreen(true);
     }
+    cursors[Cursor::ARROW] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    cursors[Cursor::IBEAM] = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+    cursors[Cursor::CROSSHAIR] = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+    cursors[Cursor::POINTING_HAND] = glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR);
+    cursors[Cursor::RESIZE_EW] = glfwCreateStandardCursor(GLFW_RESIZE_EW_CURSOR);
+    cursors[Cursor::RESIZE_NS] = glfwCreateStandardCursor(GLFW_RESIZE_NS_CURSOR);
+#if GLFW_HAS_NEW_CURSORS
+    cursors[Cursor::RESIZE_NESW] = glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR);
+    cursors[Cursor::RESIZE_NWSE] = glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR);
+    cursors[Cursor::RESIZE_ALL] = glfwCreateStandardCursor(GLFW_RESIZE_ALL_CURSOR);
+    cursors[Cursor::NOT_ALLOWED] = glfwCreateStandardCursor(GLFW_NOT_ALLOWED_CURSOR);
+#else
+    cursors[Cursor::RESIZE_NESW] = cursors[Cursor::ARROW];
+    cursors[Cursor::RESIZE_NWSE] = cursors[Cursor::ARROW];
+    cursors[Cursor::RESIZE_ALL] = cursors[Cursor::ARROW];
+    cursors[Cursor::NOT_ALLOWED] = cursors[Cursor::ARROW];
+#endif
 }
 
 bool GlfwWindow::isFullScreen() {
@@ -163,6 +172,11 @@ Size GlfwWindow::getDpi() {
     float xscale, yscale;
     glfwGetMonitorContentScale(glfwGetPrimaryMonitor(), &xscale, &yscale);
     return Size(xscale, yscale);
+}
+
+void GlfwWindow::setCursor(Cursor cursor) {
+    GLFWcursor *glfwCursor = cursors[cursor];
+    glfwSetCursor(m_windowHandle, glfwCursor);
 }
 
 } // namespace Panda

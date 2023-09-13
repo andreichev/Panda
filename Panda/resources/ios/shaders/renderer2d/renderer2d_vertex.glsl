@@ -2,14 +2,20 @@
 
 precision highp float;
 
-layout (location = 0) in vec3 Position;
-layout (location = 1) in vec4 Color;
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec2 texCoord;
+layout (location = 2) in float textureIndex;
+layout (location = 3) in vec4 color;
 
-uniform mat4 ProjViewMtx;
+uniform mat4 projViewMtx;
 
-out vec4 Frag_Color;
+out float fragTextureIndex;
+out vec4 fragColor;
+out vec2 fragTexCoord;
 
 void main(){
-    Frag_Color = Color;
-    gl_Position = ProjViewMtx * vec4(Position, 1);
+    fragTextureIndex = textureIndex;
+    fragColor = color;
+    fragTexCoord = texCoord;
+    gl_Position = projViewMtx * vec4(position, 1);
 }

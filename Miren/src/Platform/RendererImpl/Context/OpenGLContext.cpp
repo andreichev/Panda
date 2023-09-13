@@ -25,4 +25,8 @@ void OpenGLContext::flip() {
     glfwSwapBuffers((GLFWwindow *)glfwWindowHandle);
 }
 
+uint32_t OpenGLContext::getDefaultFrameBufferId() {
+    return 0;
+}
+
 } // namespace Miren

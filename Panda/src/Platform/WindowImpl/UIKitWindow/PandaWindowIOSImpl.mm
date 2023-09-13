@@ -12,39 +12,19 @@ namespace Panda {
 
 PandaWindowIOSImpl::PandaWindowIOSImpl() {
     m_size = Size(
-        UIScreen.mainScreen.bounds.size.width,
-        UIScreen.mainScreen.bounds.size.height
-    );
+                  UIScreen.mainScreen.bounds.size.width,
+                  UIScreen.mainScreen.bounds.size.height
+                  );
     m_dpi = Size(
-        UIScreen.mainScreen.nativeScale,
-        UIScreen.mainScreen.nativeScale
-    );
+                 UIScreen.mainScreen.nativeScale,
+                 UIScreen.mainScreen.nativeScale
+                 );
 }
-
-bool PandaWindowIOSImpl::isFullScreen() {
-    return true;
-}
-
-void PandaWindowIOSImpl::setFullScreen(bool isFullScreen) {}
-
-void PandaWindowIOSImpl::pollEvents() {}
-
-void PandaWindowIOSImpl::toggleCursorLock() {}
-
-bool PandaWindowIOSImpl::isCursorLocked() { return true; }
 
 void PandaWindowIOSImpl::setEventQueue(EventQueue *eventQueue) {
     WonderView *uiView = (__bridge WonderView*)
-        Miren::PlatformData::get()->nativeWindowHandle;
+    Miren::PlatformData::get()->nativeWindowHandle;
     uiView.eventQueue = eventQueue;
-}
-
-Size PandaWindowIOSImpl::getSize() {
-    return m_size;
-}
-
-Size PandaWindowIOSImpl::getDpi() {
-    return m_dpi;
 }
 
 }

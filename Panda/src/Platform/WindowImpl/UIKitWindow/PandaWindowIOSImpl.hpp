@@ -12,14 +12,23 @@ class PandaWindowIOSImpl : public Window {
 public:
     PandaWindowIOSImpl();
     ~PandaWindowIOSImpl() override = default;
-    bool isFullScreen() override;
-    void setFullScreen(bool isFullScreen) override;
-    void pollEvents() override;
-    void toggleCursorLock() override;
-    bool isCursorLocked() override;
+    bool isFullScreen() override {
+        return true;
+    }
+    void setFullScreen(bool isFullScreen) override {}
+    void pollEvents() override {}
+    void toggleCursorLock() override {}
+    bool isCursorLocked() override {
+        return true;
+    }
+    void setCursor(Cursor cursor) override {}
     void setEventQueue(EventQueue *eventQueue) override;
-    Size getSize() override;
-    Size getDpi() override;
+    Size getSize() override {
+        return m_size;
+    }
+    Size getDpi() override {
+        return m_dpi;
+    }
 
 private:
     Size m_size;

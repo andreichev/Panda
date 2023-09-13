@@ -24,7 +24,10 @@ namespace Miren {
         
         CAEAGLLayer *eaglLayer = (__bridge CAEAGLLayer*) PlatformData::get()->layer;
         [_context renderbufferStorage:GL_RENDERBUFFER fromDrawable: eaglLayer];
-        
+        eaglLayer.drawableProperties = @{kEAGLDrawablePropertyRetainedBacking : @NO,
+                                         kEAGLDrawablePropertyColorFormat     : kEAGLColorFormatRGBA8 };
+        eaglLayer.opaque = NO;
+
         glGenRenderbuffers(1, &depthRenderBuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
 
@@ -39,11 +42,7 @@ namespace Miren {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderBuffer);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, colorRenderBuffer);
-        
-        eaglLayer.drawableProperties = @{kEAGLDrawablePropertyRetainedBacking : @NO,
-                                         kEAGLDrawablePropertyColorFormat     : kEAGLColorFormatRGBA8 };
-        eaglLayer.opaque = NO;
-        
+
         glViewport(0, 0, width, height);
         glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -52,5 +51,9 @@ namespace Miren {
     void GlesContext::flip() {
         EAGLContext* _context = (__bridge EAGLContext*) context;
         [_context presentRenderbuffer: GL_RENDERBUFFER];
+    }
+
+    uint32_t GlesContext::getDefaultFrameBufferId() {
+        return frameBuffer;
     }
 }
