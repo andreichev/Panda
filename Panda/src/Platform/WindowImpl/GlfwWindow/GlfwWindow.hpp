@@ -17,6 +17,8 @@ public:
     ~GlfwWindow() override;
     bool isFullScreen() override;
     void setFullScreen(bool isFullScreen) override;
+    bool isMaximized() override;
+    void setMaximized(bool isMaximized) override;
     void pollEvents() override;
     void toggleCursorLock() override;
     bool isCursorLocked() override;

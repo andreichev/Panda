@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panels/StatisticsPanel.hpp"
+#include "Panels/Viewport.hpp"
 
 #include <Panda.hpp>
 
@@ -19,19 +19,8 @@ public:
     void onEvent(Event *event) override;
 
 private:
-    void initializeWorld();
-    void updateViewportSize(Size size);
-
+    Viewport m_viewport;
     World *m_world;
-    Miren::FrameBufferHandle m_sceneFB;
-    Miren::FrameBufferSpecification m_sceneFbSpecification;
-    Miren::ViewId m_sceneViewId = 1;
-    Miren::TextureHandle m_colorAttachment;
-    OrthographicCamera *m_camera;
-    Size m_viewportPanelSize;
-
-    // Panels
-    StatisticsPanel statisticsPanel;
 };
 
 } // namespace Panda

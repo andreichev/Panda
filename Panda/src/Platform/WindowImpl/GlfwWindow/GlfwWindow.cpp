@@ -9,6 +9,19 @@
 
 namespace Panda {
 
+// We gather version tests as define in order to easily see which features are version-dependent.
+#define GLFW_VERSION_COMBINED                                                                      \
+    (GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 + GLFW_VERSION_REVISION)
+#ifdef GLFW_RESIZE_NESW_CURSOR // Let's be nice to people who pulled GLFW between 2019-04-16 (3.4
+                               // define) and 2019-11-29 (cursors defines) // FIXME: Remove when
+                               // GLFW 3.4 is released?
+#    define GLFW_HAS_NEW_CURSORS                                                                   \
+        (GLFW_VERSION_COMBINED >= 3400) // 3.4+ GLFW_RESIZE_ALL_CURSOR, GLFW_RESIZE_NESW_CURSOR,
+                                        // GLFW_RESIZE_NWSE_CURSOR, GLFW_NOT_ALLOWED_CURSOR
+#else
+#    define GLFW_HAS_NEW_CURSORS (0)
+#endif
+
 void glfwErrorCallback(int error_code, const char *description) {
     LOG_ERROR("GLFW ERROR, code: {}, description: {}", error_code, description);
 }
@@ -39,6 +52,7 @@ GlfwWindow::GlfwWindow(const char *title, Size size, bool isFullscreen) {
 #endif
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
     glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
+    glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
     // Create the window
     m_windowHandle = glfwCreateWindow((int)size.width, (int)size.height, title, nullptr, nullptr);
     if (m_windowHandle == nullptr) {
@@ -81,13 +95,8 @@ void GlfwWindow::setFullScreen(bool isFullScreen) {
     // Get the resolution of the primary monitor
     const GLFWvidmode *vidmode = glfwGetVideoMode(monitorHandle);
     if (isFullScreen) {
-        glfwSetWindowMonitor(m_windowHandle,
-            monitorHandle,
-            0,
-            0,
-            vidmode->width,
-            vidmode->height,
-            vidmode->refreshRate);
+        glfwSetWindowMonitor(
+            m_windowHandle, monitorHandle, 0, 0, vidmode->width, vidmode->height, GLFW_DONT_CARE);
     } else {
         glfwSetWindowMonitor(m_windowHandle,
             nullptr,
@@ -95,11 +104,26 @@ void GlfwWindow::setFullScreen(bool isFullScreen) {
             0,
             m_windowSizeBackup.width,
             m_windowSizeBackup.height,
-            vidmode->refreshRate);
+            GLFW_DONT_CARE);
         // Center the window
         glfwSetWindowPos(m_windowHandle,
             (vidmode->width - m_windowSizeBackup.width) / 2,
             (vidmode->height - m_windowSizeBackup.height) / 2);
+    }
+}
+
+bool GlfwWindow::isMaximized() {
+    return glfwGetWindowAttrib(m_windowHandle, GLFW_MAXIMIZED) == GLFW_TRUE;
+}
+
+void GlfwWindow::setMaximized(bool _isMaximized) {
+    if (isMaximized() == _isMaximized) {
+        return;
+    }
+    if (_isMaximized) {
+        glfwMaximizeWindow(m_windowHandle);
+    } else {
+        glfwRestoreWindow(m_windowHandle);
     }
 }
 

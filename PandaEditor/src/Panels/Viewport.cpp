@@ -1,0 +1,79 @@
+#include "Viewport.hpp"
+#include "Components/OrthographicCameraMove.hpp"
+
+#include <Panda.hpp>
+
+namespace Panda {
+
+void Viewport::init(World *world) {
+    m_world = world;
+    if (m_camera == nullptr) {
+        Entity cameraEntity = m_world->instantiateEntity();
+        m_camera = &cameraEntity.addNativeScript<OrthographicCamera>();
+        auto &move = cameraEntity.addNativeScript<OrthographicCameraMove>();
+        move.setCamera(m_camera);
+    }
+    Size dpi = Application::get()->getWindow()->getDpi();
+    Size windowSize = Application::get()->getWindow()->getSize();
+    Miren::TextureCreate create;
+    create.m_data = Foundation::Memory(nullptr);
+    create.m_format = Miren::TextureFormat::RGBA8;
+    create.m_width = m_viewportPanelSize.width * dpi.width;
+    create.m_height = m_viewportPanelSize.height * dpi.height;
+    m_colorAttachment = Miren::createTexture(create);
+    create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
+    Miren::TextureHandle depthAttachment = Miren::createTexture(create);
+    Miren::FrameBufferAttachment attachments[] = {m_colorAttachment, depthAttachment};
+    m_sceneFbSpecification = Miren::FrameBufferSpecification(attachments, 2);
+    m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
+    Miren::setViewport(m_sceneViewId,
+        Miren::Rect(
+            0, 0, m_viewportPanelSize.width * dpi.width, m_viewportPanelSize.height * dpi.height));
+    Miren::setViewport(
+        0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height));
+    Miren::setViewClear(m_sceneViewId, 0x12212bff);
+    m_camera->updateViewportSize(m_viewportPanelSize);
+    Renderer2D::setCamera(m_camera);
+    Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
+    Renderer2D::setViewId(m_sceneViewId);
+}
+
+void Viewport::updateViewportSize(Size size) {
+    if (size.width < 1 || size.height < 1) {
+        return;
+    }
+    m_viewportPanelSize = size;
+    m_camera->updateViewportSize(size);
+    Size dpi = Application::get()->getWindow()->getDpi();
+    Miren::setViewport(
+        m_sceneViewId, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height));
+    // COLOR ATTACHMENT
+    Miren::resizeTexture(m_sceneFbSpecification.attachments[0].handle,
+        size.width * dpi.width,
+        size.height * dpi.height);
+    // DEPTH ATTACHMENT
+    Miren::resizeTexture(m_sceneFbSpecification.attachments[1].handle,
+        size.width * dpi.width,
+        size.height * dpi.height);
+    Miren::deleteFrameBuffer(m_sceneFB);
+    m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
+    Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
+}
+
+void Viewport::onImGuiRender() {
+    ImGui::Begin("Viewport");
+    ImVec2 viewportSpace = ImGui::GetContentRegionAvail();
+    if (viewportSpace.x != m_viewportPanelSize.width ||
+        viewportSpace.y != m_viewportPanelSize.height) {
+        updateViewportSize({viewportSpace.x, viewportSpace.y});
+    }
+    bool viewportHovered = ImGui::IsWindowHovered();
+    Application::get()->getImGuiLayer()->setBlockEvents(!viewportHovered);
+    ImGui::Image((void *)(uintptr_t)m_colorAttachment.id,
+        ImVec2(m_viewportPanelSize.width, m_viewportPanelSize.height),
+        ImVec2(0, 1),
+        ImVec2(1, 0));
+    ImGui::End();
+}
+
+} // namespace Panda

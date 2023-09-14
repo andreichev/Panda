@@ -15,6 +15,8 @@ public:
     virtual ~Window() = default;
     virtual bool isFullScreen() = 0;
     virtual void setFullScreen(bool isFullScreen) = 0;
+    virtual bool isMaximized() = 0;
+    virtual void setMaximized(bool isMaximized) = 0;
     virtual void pollEvents() = 0;
     virtual void toggleCursorLock() = 0;
     virtual bool isCursorLocked() = 0;

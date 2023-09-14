@@ -8,7 +8,7 @@ namespace Panda {
 
 class StatisticsPanel final {
 public:
-    void onImGuiRender() {
+    static void onImGuiRender() {
         ImGui::Begin("Renderer2D statistics");
         ImGui::Text("FPS: %d", Application::get()->fps);
         auto stats = Renderer2D::getStats();

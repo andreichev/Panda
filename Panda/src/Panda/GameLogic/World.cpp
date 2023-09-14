@@ -9,12 +9,15 @@ namespace Panda {
 
 World::World()
     : m_uiRoot()
-    , m_isRunning(false)
+    , m_isRunning(true)
     , m_registry() {}
 
 World::~World() {}
 
 void World::update(double deltaTime) {
+    if (!m_isRunning) {
+        return;
+    }
     m_uiRoot.render();
     auto view = m_registry.view<NativeScriptListComponent>();
     for (auto entityHandle : view) {

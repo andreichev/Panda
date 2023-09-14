@@ -1,6 +1,7 @@
 //========================================================================
-// UTF-8 window title test
-// Copyright (c) Camilla Löwy <elmindreda@glfw.org>
+// GLFW 3.4 POSIX - www.glfw.org
+//------------------------------------------------------------------------
+// Copyright (c) 2022 Camilla Löwy <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
@@ -22,52 +23,10 @@
 //    distribution.
 //
 //========================================================================
-//
-// This test sets a UTF-8 window title
-//
+// It is fine to use C99 in this file because it will not be built with VS
 //========================================================================
 
-#define GLAD_GL_IMPLEMENTATION
-#include <glad/gl.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+#include <poll.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-
-static void error_callback(int error, const char* description)
-{
-    fprintf(stderr, "Error: %s\n", description);
-}
-
-int main(void)
-{
-    GLFWwindow* window;
-
-    glfwSetErrorCallback(error_callback);
-
-    if (!glfwInit())
-        exit(EXIT_FAILURE);
-
-    window = glfwCreateWindow(400, 400, "English 日本語 русский язык 官話", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-
-    glfwMakeContextCurrent(window);
-    gladLoadGL(glfwGetProcAddress);
-    glfwSwapInterval(1);
-
-    while (!glfwWindowShouldClose(window))
-    {
-        glClear(GL_COLOR_BUFFER_BIT);
-        glfwSwapBuffers(window);
-        glfwWaitEvents();
-    }
-
-    glfwTerminate();
-    exit(EXIT_SUCCESS);
-}
+GLFWbool _glfwPollPOSIX(struct pollfd* fds, nfds_t count, double* timeout);
 
