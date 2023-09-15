@@ -29,12 +29,16 @@ void BaseLevel::start(Panda::World *world) {
             for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {
                 Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(
                     *chunksStorage.get(), indexX, indexY, indexZ, true);
-                Panda::Mesh &mesh = chunkEntity.addNativeScript<Panda::Mesh>();
-                mesh.create(meshData, true, texture, baseShader);
+                Panda::DynamicMeshComponent &meshComponent =
+                    chunkEntity.getComponent<Panda::DynamicMeshComponent>();
+                Foundation::Shared<Panda::DynamicMesh> dynamicMesh =
+                    Foundation::makeShared<Panda::DynamicMesh>();
+                meshComponent.meshes.push_back(dynamicMesh);
+                dynamicMesh->create(meshData, texture, baseShader);
                 chunksStorage
                     ->chunks[indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                              indexX * ChunksStorage::SIZE_X + indexZ]
-                    .setMesh(&mesh);
+                    .setMesh(dynamicMesh.get());
             }
         }
     }

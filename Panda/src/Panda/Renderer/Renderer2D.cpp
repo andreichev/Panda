@@ -2,14 +2,14 @@
 
 namespace Panda {
 
-struct Vertex {
-    Vertex(glm::vec3 pos, glm::vec2 textureCoords, float textureIndex, Color color)
+struct Vertex2D {
+    Vertex2D(glm::vec3 pos, glm::vec2 textureCoords, float textureIndex, Color color)
         : pos(pos)
         , textureCoords(textureCoords)
         , textureIndex(textureIndex)
         , color(color) {}
 
-    Vertex()
+    Vertex2D()
         : pos()
         , textureCoords()
         , textureIndex(0)
@@ -30,7 +30,7 @@ struct DrawCallData {
     Foundation::Shared<Texture> textures[MAX_TEXTURE_SLOTS];
     int samplers[MAX_TEXTURE_SLOTS];
     uint32_t textureSlotIndex;
-    Vertex *vertices;
+    Vertex2D *vertices;
     uint32_t verticesCount;
     uint16_t *indices;
     uint32_t indicesCount;
@@ -46,7 +46,7 @@ void Renderer2D::init() {
     s_drawData.vbSize = 0;
     s_drawData.indicesCount = 0;
     s_drawData.vertices =
-        (Vertex *)ALLOC(Foundation::getAllocator(), sizeof(Vertex) * MAX_VERTICES_COUNT);
+        (Vertex2D *)ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
     s_drawData.indices =
         (uint16_t *)ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
     Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
@@ -151,7 +151,7 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     s_drawData.indices[indicesCount++] = indicesOffset + 3;
     s_drawData.indices[indicesCount++] = indicesOffset + 0;
 
-    s_drawData.vbSize += sizeof(Vertex) * 4;
+    s_drawData.vbSize += sizeof(Vertex2D) * 4;
     s_drawData.ibSize += sizeof(uint16_t) * 6;
     PND_ASSERT(verticesCount < MAX_VERTICES_COUNT, "VERTICES LIMIT REACHED");
     PND_ASSERT(indicesCount < MAX_INDICES_COUNT, "INDICES LIMIT REACHED");

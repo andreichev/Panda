@@ -1,7 +1,7 @@
 //
 // Created by Admin on 12.02.2022.
 //
-#include "pch.hpp"
+
 #include "VoxelMeshGenerator.hpp"
 #include "Panda.hpp"
 
@@ -11,6 +11,7 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(ChunksStorage &chunks,
     int chunkIndexZ,
     bool ambientOcclusion) {
     using namespace Miren;
+    using namespace Panda;
     Chunk &chunk = chunks.chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                                  chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
     Vertex *vertices = new Vertex[20000];
@@ -275,7 +276,7 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(ChunksStorage &chunks,
     // LOG_INFO("MESH GENERATED.");
     // LOG_INFO("VERTICES COUNT: {}", verticesCount);
     // LOG_INFO("INDICES COUNT: {}", indicesCount);
-    return Panda::MeshData(vertices, verticesCount, indices, indicesCount);
+    return MeshData(vertices, verticesCount, indices, indicesCount);
 }
 
 void VoxelMeshGenerator::addFaceIndices(

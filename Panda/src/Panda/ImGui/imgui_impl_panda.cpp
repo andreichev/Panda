@@ -375,7 +375,10 @@ IMGUI_IMPL_API bool ImGui_ImplPanda_Init() {
     return true;
 }
 
-IMGUI_IMPL_API void ImGui_ImplPanda_Shutdown() {}
+IMGUI_IMPL_API void ImGui_ImplPanda_Shutdown() {
+    ImGui_PandaPlatformData *bd = ImGui_ImplGlfw_GetBackendData();
+    IM_DELETE(bd);
+}
 
 IMGUI_IMPL_API void ImGui_ImplPanda_NewFrame(double deltaTime) {
     ImGuiIO &io = ImGui::GetIO();

@@ -1,12 +1,8 @@
-//
-// Created by Admin on 11.02.2022.
-//
-
 #pragma once
 
 #include <glm/glm.hpp>
 
-namespace Miren {
+namespace Panda {
 
 struct Vertex {
     glm::vec3 pos;
@@ -29,4 +25,20 @@ struct Vertex {
         , light(light) {}
 };
 
-} // namespace Miren
+struct MeshData {
+    Vertex *vertices;
+    unsigned int verticesCount;
+    unsigned int *indices;
+    unsigned int indicesCount;
+
+    MeshData(Vertex *vertices,
+        unsigned int verticesCount,
+        unsigned int *indices,
+        unsigned int indicesCount)
+        : vertices(vertices)
+        , verticesCount(verticesCount)
+        , indices(indices)
+        , indicesCount(indicesCount) {}
+};
+
+} // namespace Panda

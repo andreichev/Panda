@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "Miren/Vertex.hpp"
 #include "Miren/VertexBufferLayoutData.hpp"
 #include "Miren/RendererI.hpp"
 

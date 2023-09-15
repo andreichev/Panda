@@ -15,12 +15,12 @@ public:
 
     Chunk();
     ~Chunk();
-    Panda::Mesh *getMesh();
-    void setMesh(Panda::Mesh *mesh);
+    Panda::DynamicMesh *getMesh();
+    void setMesh(Panda::DynamicMesh *mesh);
     void set(int x, int y, int z, char id);
     Voxel *get(int x, int y, int z);
     Voxel *m_data;
 
 private:
-    Panda::Mesh *m_mesh;
+    Panda::DynamicMesh *m_mesh;
 };

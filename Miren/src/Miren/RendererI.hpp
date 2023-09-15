@@ -9,7 +9,6 @@
 #include "Miren/Encoder/Frame.hpp"
 #include "Miren/Encoder/Uniform.hpp"
 #include "Miren/VertexBufferLayoutData.hpp"
-#include "Miren/Vertex.hpp"
 
 namespace Miren {
 

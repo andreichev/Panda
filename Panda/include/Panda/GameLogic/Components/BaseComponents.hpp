@@ -6,6 +6,8 @@
 
 #include "Panda/Base/Base.hpp"
 
+#include "Panda/GameLogic/Components/StaticMesh.hpp"
+#include "Panda/GameLogic/Components/DynamicMesh.hpp"
 #include <Foundation/Foundation.hpp>
 
 namespace Panda {
@@ -38,6 +40,14 @@ struct RelationshipComponent {
     RelationshipComponent(const RelationshipComponent &other) = default;
     RelationshipComponent(id_t parent)
         : parentHandle(parent) {}
+};
+
+struct StaticMeshComponent {
+    std::vector<Foundation::Shared<StaticMesh>> meshes;
+};
+
+struct DynamicMeshComponent {
+    std::vector<Foundation::Shared<DynamicMesh>> meshes;
 };
 
 class NativeScript;

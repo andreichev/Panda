@@ -11,13 +11,13 @@ void BlocksCreation::initialize() {
 
 void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ) {
     // LOG_INFO("UPDATE CHUNK {} {} {}", chunkIndexX, chunkIndexY, chunkIndexZ);
-    Panda::MeshData primitiveMeshData = VoxelMeshGenerator::makeOneChunkMesh(
+    Panda::MeshData data = VoxelMeshGenerator::makeOneChunkMesh(
         *m_chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true);
     m_chunksStorage
         ->chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                  chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
         .getMesh()
-        ->updateBuffer(primitiveMeshData);
+        ->update(data);
 }
 
 void BlocksCreation::setVoxel(int x, int y, int z, int8_t id) {

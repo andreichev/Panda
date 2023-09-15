@@ -16,14 +16,13 @@
 // Game logic
 #include "Panda/GameLogic/Entity.hpp"
 #include "Panda/GameLogic/Level.hpp"
-#include "Panda/GameLogic/Components/Mesh.hpp"
+#include "Panda/GameLogic/Components/StaticMesh.hpp"
+#include "Panda/GameLogic/Components/DynamicMesh.hpp"
 #include "Panda/GameLogic/Input.hpp"
-#include "Panda/GameLogic/Primitives/MeshData.hpp"
 #include "Panda/GameLogic/Components/Camera.hpp"
 
 // Renderer stuff
 #include <Panda/Renderer/Renderer2D.hpp>
-#include <Miren/Vertex.hpp>
 
 // Third party
 #include <glm/ext.hpp>

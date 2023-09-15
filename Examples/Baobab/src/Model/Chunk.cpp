@@ -24,10 +24,10 @@ Voxel *Chunk::get(int x, int y, int z) {
     return &m_data[y * Chunk::SIZE_X * Chunk::SIZE_Z + x * Chunk::SIZE_X + z];
 }
 
-Panda::Mesh *Chunk::getMesh() {
+Panda::DynamicMesh *Chunk::getMesh() {
     return m_mesh;
 }
 
-void Chunk::setMesh(Panda::Mesh *mesh) {
+void Chunk::setMesh(Panda::DynamicMesh *mesh) {
     m_mesh = mesh;
 }
