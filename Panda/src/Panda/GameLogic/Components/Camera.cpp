@@ -26,7 +26,9 @@ Camera::Camera()
 }
 
 Camera::~Camera() {
-    m_transform->removeObserver(this);
+    if (m_transform) {
+        m_transform->removeObserver(this);
+    }
     Application::get()->removeWindowSizeObserver(this);
 }
 

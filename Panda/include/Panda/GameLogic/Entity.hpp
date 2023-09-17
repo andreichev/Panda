@@ -62,8 +62,21 @@ public:
         return m_id != -1;
     }
 
+    void setName(std::string &name) {
+        getComponent<TagComponent>().tag = name;
+    }
+
+    void setName(std::string name) {
+        getComponent<TagComponent>().tag = name;
+    }
+
+    friend bool operator==(const Entity &lhs, const Entity &rhs) {
+        return lhs.m_id == rhs.m_id;
+    }
+
 private:
     Entity(entt::registry *m_registry, id_t id);
+    Entity();
 
     template<typename T, typename... Args>
     T &addComponent(Args &&...args) {
@@ -78,6 +91,7 @@ private:
 
     friend class World;
     friend class NativeScript;
+    friend class WorldHierarchyPanel;
 };
 
 } // namespace Panda

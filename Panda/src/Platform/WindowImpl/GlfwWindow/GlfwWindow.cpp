@@ -31,30 +31,36 @@ GlfwWindow::~GlfwWindow() {
     glfwTerminate();
 }
 
-GlfwWindow::GlfwWindow(const char *title, Size size, bool isFullscreen) {
+GlfwWindow::GlfwWindow(const char *title, Size size, bool isFullscreen, bool isMaximized) {
     m_isFullScreen = isFullscreen;
     m_windowSizeBackup = size;
     m_isCursorLocked = false;
     LOG_INFO("Hello GLFW! {}", glfwGetVersionString());
     glfwSetErrorCallback(glfwErrorCallback);
-    // Initialize GLFW. Most GLFW functions will not work before doing this.
     if (glfwInit() == false) {
         LOG_CRITICAL("GLFW INITIALIZATION ERROR");
         exit(1);
     }
-    // Configure GLFW
-    glfwDefaultWindowHints(); // optional, the current window hints are already the default
+    glfwDefaultWindowHints();
 #ifdef PLATFORM_MACOS
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 #endif
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
-    glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
-    // Create the window
-    m_windowHandle = glfwCreateWindow((int)size.width, (int)size.height, title, nullptr, nullptr);
+    glfwWindowHint(GLFW_MAXIMIZED, isMaximized ? GLFW_TRUE : GLFW_FALSE);
+    if (isFullscreen) {
+        GLFWmonitor *monitorHandle = glfwGetPrimaryMonitor();
+        const GLFWvidmode *vidmode = glfwGetVideoMode(monitorHandle);
+        m_windowSizeBackup = {(float)vidmode->width, (float)vidmode->height};
+        m_windowHandle =
+            glfwCreateWindow(vidmode->width, vidmode->height, title, monitorHandle, nullptr);
+    } else {
+        m_windowHandle =
+            glfwCreateWindow((int)size.width, (int)size.height, title, nullptr, nullptr);
+    }
     if (m_windowHandle == nullptr) {
         LOG_CRITICAL("Failed to create the GLFW window");
         exit(1);
@@ -62,9 +68,6 @@ GlfwWindow::GlfwWindow(const char *title, Size size, bool isFullscreen) {
     Miren::PlatformData::get()->nativeWindowHandle = m_windowHandle;
     glfwShowWindow(m_windowHandle);
     glfwFocusWindow(m_windowHandle);
-    if (isFullscreen) {
-        setFullScreen(true);
-    }
     cursors[Cursor::ARROW] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
     cursors[Cursor::IBEAM] = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
     cursors[Cursor::CROSSHAIR] = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
@@ -90,9 +93,7 @@ bool GlfwWindow::isFullScreen() {
 
 void GlfwWindow::setFullScreen(bool isFullScreen) {
     m_isFullScreen = isFullScreen;
-    // Get primary monitor handle
     GLFWmonitor *monitorHandle = glfwGetPrimaryMonitor();
-    // Get the resolution of the primary monitor
     const GLFWvidmode *vidmode = glfwGetVideoMode(monitorHandle);
     if (isFullScreen) {
         glfwSetWindowMonitor(
@@ -159,6 +160,10 @@ void GlfwWindow::addEventHandlers() {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->m_eventQueue->postWindowCloseEvent();
     });
+    int width, height;
+    glfwGetWindowSize(m_windowHandle, &width, &height);
+    m_windowSizeBackup = Size(width, height);
+    m_eventQueue->postSizeEvent(width, height);
 }
 
 void GlfwWindow::pollEvents() {

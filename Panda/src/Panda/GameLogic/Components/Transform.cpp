@@ -67,12 +67,19 @@ void Transform::setPosition(glm::vec4 pos) {
     transformUpdated();
 }
 
+void Transform::setPosition(glm::vec3 pos) {
+    setPosition({pos.x, pos.y, pos.z, 1.0f});
+}
+
 void Transform::addObserver(TransformObserver *delegate) {
     delegates.push_back(delegate);
 }
 
 void Transform::removeObserver(TransformObserver *delegate) {
-    delegates.erase(std::find(delegates.begin(), delegates.end(), delegate));
+    auto it = std::find(delegates.begin(), delegates.end(), delegate);
+    if (it != delegates.end()) {
+        delegates.erase(it);
+    }
 }
 
 glm::vec4 Transform::getPosition() {

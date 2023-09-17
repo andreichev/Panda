@@ -30,6 +30,8 @@ private:
     bool m_isRunning;
     entt::registry m_registry;
     UIView m_uiRoot;
+
+    friend class WorldHierarchyPanel;
 };
 
 } // namespace Panda

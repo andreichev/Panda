@@ -9,6 +9,7 @@ BasicGameLayer::BasicGameLayer(Level *startupLevel) {
 void BasicGameLayer::onAttach() {
     m_world = NEW(Foundation::getAllocator(), World);
     m_currentLevel->start(m_world);
+    m_world->initialize();
 }
 
 void BasicGameLayer::onDetach() {

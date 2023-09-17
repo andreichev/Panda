@@ -17,6 +17,9 @@ OrthographicCamera::OrthographicCamera()
 }
 
 OrthographicCamera::~OrthographicCamera() {
+    if (!m_transform) {
+        return;
+    }
     m_transform->removeObserver(this);
 }
 

@@ -6,8 +6,6 @@
 
 #include <Panda.hpp>
 
-#include <imgui.h>
-
 namespace Panda {
 
 class Viewport final {
@@ -17,6 +15,7 @@ public:
         , m_camera(nullptr) {}
 
     void init(World *world);
+    void setCamera(OrthographicCamera *camera);
     void onImGuiRender();
 
 private:

@@ -13,7 +13,7 @@ namespace Panda {
 
 class GlfwWindow : public Window {
 public:
-    GlfwWindow(const char *title, Size size, bool isFullscreen);
+    GlfwWindow(const char *title, Size size, bool isFullscreen, bool isMaximized);
     ~GlfwWindow() override;
     bool isFullScreen() override;
     void setFullScreen(bool isFullScreen) override;

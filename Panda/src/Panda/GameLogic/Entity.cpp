@@ -10,6 +10,10 @@ Entity::Entity(entt::registry *registry, id_t id)
     : m_registry(registry)
     , m_id(id) {}
 
+Entity::Entity()
+    : m_registry(nullptr)
+    , m_id(-1) {}
+
 Transform &Entity::getTransform() {
     return getComponent<Transform>();
 }

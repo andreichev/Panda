@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Panels/Viewport.hpp"
+#include "Panels/WorldHierarchyPanel.hpp"
 
 #include <Panda.hpp>
 
@@ -19,7 +20,10 @@ public:
     void onEvent(Event *event) override;
 
 private:
+    void initializeExampleWorld();
+
     Viewport m_viewport;
+    WorldHierarchyPanel m_hierarchyPanel;
     World *m_world;
 };
 

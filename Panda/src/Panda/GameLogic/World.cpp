@@ -10,7 +10,7 @@ namespace Panda {
 
 World::World()
     : m_uiRoot()
-    , m_isRunning(true)
+    , m_isRunning(false)
     , m_registry() {}
 
 World::~World() {}
@@ -80,7 +80,7 @@ Entity World::instantiateEntity() {
     id_t entityId = static_cast<id_t>(m_registry.create());
     Entity entity = {&m_registry, entityId};
     entity.addComponent<IdComponent>();
-    entity.addComponent<TagComponent>();
+    entity.addComponent<TagComponent>("Entity");
     entity.addComponent<RelationshipComponent>();
     entity.addComponent<Transform>();
     entity.addComponent<StaticMeshComponent>();

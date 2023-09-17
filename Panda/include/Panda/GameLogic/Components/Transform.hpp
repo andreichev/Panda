@@ -22,6 +22,7 @@ public:
     void translate(glm::vec3 offset);
     void setPosition(float x, float y, float z);
     void setPosition(glm::vec4 pos);
+    void setPosition(glm::vec3 pos);
     // ------------------------
     void addObserver(TransformObserver *delegate);
     void removeObserver(TransformObserver *delegate);

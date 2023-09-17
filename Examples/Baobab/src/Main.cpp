@@ -14,6 +14,7 @@ int startApp(int argc, char **argv) {
     settings.windowTitle = "BAOBAB Craft";
     settings.windowSize = {900, 600};
     settings.isFullScreen = false;
+    settings.isMaximized = false;
     settings.startupLevel = new BaseLevel();
     runPandaApplication(settings);
     return 0;

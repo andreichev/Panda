@@ -1,18 +1,12 @@
 #include "Viewport.hpp"
-#include "Components/OrthographicCameraMove.hpp"
 
 #include <Panda.hpp>
+#include <imgui.h>
 
 namespace Panda {
 
 void Viewport::init(World *world) {
     m_world = world;
-    if (m_camera == nullptr) {
-        Entity cameraEntity = m_world->instantiateEntity();
-        m_camera = &cameraEntity.addNativeScript<OrthographicCamera>();
-        auto &move = cameraEntity.addNativeScript<OrthographicCameraMove>();
-        move.setCamera(m_camera);
-    }
     Size dpi = Application::get()->getWindow()->getDpi();
     Size windowSize = Application::get()->getWindow()->getSize();
     Miren::TextureCreate create;
@@ -32,8 +26,6 @@ void Viewport::init(World *world) {
     Miren::setViewport(
         0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height));
     Miren::setViewClear(m_sceneViewId, 0x12212bff);
-    m_camera->updateViewportSize(m_viewportPanelSize);
-    Renderer2D::setCamera(m_camera);
     Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
     Renderer2D::setViewId(m_sceneViewId);
 }
@@ -43,7 +35,9 @@ void Viewport::updateViewportSize(Size size) {
         return;
     }
     m_viewportPanelSize = size;
-    m_camera->updateViewportSize(size);
+    if (m_camera) {
+        m_camera->updateViewportSize(size);
+    }
     Size dpi = Application::get()->getWindow()->getDpi();
     Miren::setViewport(
         m_sceneViewId, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height));
@@ -74,6 +68,12 @@ void Viewport::onImGuiRender() {
         ImVec2(0, 1),
         ImVec2(1, 0));
     ImGui::End();
+}
+
+void Viewport::setCamera(OrthographicCamera *camera) {
+    m_camera = camera;
+    m_camera->updateViewportSize(m_viewportPanelSize);
+    Renderer2D::setCamera(m_camera);
 }
 
 } // namespace Panda

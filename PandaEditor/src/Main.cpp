@@ -13,6 +13,7 @@ int startApp(int argc, char **argv) {
     settings.windowTitle = "Panda Editor";
     settings.windowSize = {900, 600};
     settings.isFullScreen = false;
+    settings.isMaximized = true;
     settings.startupLayer = new Panda::EditorLayer();
     runPandaApplication(settings);
     return 0;
