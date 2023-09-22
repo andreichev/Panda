@@ -10,9 +10,10 @@
 class BaseLevel : public Panda::Level {
 public:
     void start(Panda::World *world) override;
+    ~BaseLevel();
 
 private:
-    Foundation::Shared<ChunksStorage> chunksStorage;
-    Miren::ProgramHandle baseShader;
-    Miren::TextureHandle texture;
+    Foundation::Shared<ChunksStorage> m_chunksStorage;
+    Miren::ProgramHandle m_groundShader;
+    Miren::TextureHandle m_blocksTileTexture;
 };

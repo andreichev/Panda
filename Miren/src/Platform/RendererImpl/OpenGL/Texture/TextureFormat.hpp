@@ -10,6 +10,8 @@
 #    include <glad/glad.h>
 #endif
 
+namespace Miren {
+
 struct TextureFormatInfo {
     GLenum m_fmt;
     GLenum m_internalFmt;
@@ -24,3 +26,22 @@ static TextureFormatInfo s_textureFormat[] = {
     // Depth/stencil
     {GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8} // DEPTH24STENCIL8
 };
+
+GLint openGLFiltering(TextureFiltering filtering) {
+    switch (filtering) {
+        case NEAREST:
+            return GL_NEAREST;
+        case LINEAR:
+            return GL_LINEAR;
+        case NEAREST_MIPMAP_NEAREST:
+            return GL_NEAREST_MIPMAP_NEAREST;
+        case NEAREST_MIPMAP_LINEAR:
+            return GL_NEAREST_MIPMAP_LINEAR;
+        case LINEAR_MIPMAP_NEAREST:
+            return GL_LINEAR_MIPMAP_NEAREST;
+        case LINEAR_MIPMAP_LINEAR:
+            return GL_LINEAR_MIPMAP_LINEAR;
+    }
+}
+
+} // namespace Miren

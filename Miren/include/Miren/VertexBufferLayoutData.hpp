@@ -85,15 +85,6 @@ public:
         m_stride += VertexBufferElement::getSizeOfType(BufferElementType::Float) * 2;
     }
 
-    void pushVector() {
-        // positions
-        pushVec3();
-        // texture coordinates
-        pushVec2();
-        // light
-        pushFloat(1);
-    }
-
     VertexBufferElement m_elements[MAX_VERTEX_LAYOUT_ELEMENTS];
     uint32_t m_elementsCount;
     uint32_t m_stride;

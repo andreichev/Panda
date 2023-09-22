@@ -1,15 +1,30 @@
 //
 // Created by Admin on 12.02.2022.
 //
+
 #include "pch.hpp"
 #include "PerlinNoise.hpp"
 #include <random>
+
+#include <glm/gtc/noise.hpp>
 
 float interpolate(float v1, float v2, float blend) {
     return (v2 - v1) * blend + v1;
 }
 
-void PerlinNoise::generate2D(
+void PerlinNoise::generate2DGlm(
+    int seedValue, int octaves, float bias, float *values, int width, int height) {
+    glm::vec2 point;
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            point = {x / 64.f, y / 64.f};
+            float value = (glm::perlin(point) + 1) / 6;
+            values[x * width + y] = value;
+        }
+    }
+}
+
+void PerlinNoise::generate2DCustom(
     int seedValue, int octaves, float bias, float *values, int width, int height) {
     std::srand(seedValue);
     float *seed = new float[width * height];

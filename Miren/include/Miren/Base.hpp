@@ -52,6 +52,15 @@ enum TextureFormat {
     DEPTH24STENCIL8
 };
 
+enum TextureFiltering {
+    NEAREST,
+    LINEAR,
+    NEAREST_MIPMAP_NEAREST,
+    NEAREST_MIPMAP_LINEAR,
+    LINEAR_MIPMAP_NEAREST,
+    LINEAR_MIPMAP_LINEAR
+};
+
 struct ProgramCreate {
     Foundation::Memory m_vertex;
     Foundation::Memory m_fragment;
@@ -59,6 +68,8 @@ struct ProgramCreate {
 
 struct TextureCreate {
     TextureFormat m_format;
+    TextureFiltering m_minFiltering;
+    TextureFiltering m_magFiltering;
     uint16_t m_width;
     uint16_t m_height;
     uint8_t m_numMips;
@@ -66,9 +77,11 @@ struct TextureCreate {
 
     TextureCreate()
         : m_format(TextureFormat::None)
+        , m_minFiltering(TextureFiltering::NEAREST)
+        , m_magFiltering(TextureFiltering::NEAREST)
         , m_width(1)
         , m_height(1)
-        , m_numMips(1)
+        , m_numMips(0)
         , m_data(nullptr) {}
 };
 

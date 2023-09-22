@@ -20,11 +20,13 @@ struct Memory {
     const void release() const {
         if (releaseFn != nullptr) {
             releaseFn(data, userData);
+        } else if (data != nullptr) {
+            FREE(Foundation::getAllocator(), data);
         }
     }
 
     /// Create memory copying some data
-    static Memory create(void *src, uint32_t size) {
+    static Memory copying(void *src, uint32_t size) {
         void *data = ALLOC(Foundation::getAllocator(), size);
         memcpy(data, src, size);
         return Memory(

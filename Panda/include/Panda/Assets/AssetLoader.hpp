@@ -16,7 +16,6 @@ struct TextureAsset {
         Miren::TextureCreate create;
         create.m_data = m_data;
         create.m_format = m_format;
-        create.m_numMips = 0;
         create.m_width = m_width;
         create.m_height = m_height;
         return create;

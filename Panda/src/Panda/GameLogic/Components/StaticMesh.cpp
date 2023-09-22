@@ -7,9 +7,6 @@
 namespace Panda {
 
 StaticMesh::~StaticMesh() {
-    if (m_bufferLayoutHandle.isValid()) {
-        Miren::deleteVertexLayout(m_bufferLayoutHandle);
-    }
     if (m_vertexBufferHandle.isValid()) {
         Miren::deleteVertexBuffer(m_vertexBufferHandle);
     }
@@ -23,11 +20,9 @@ void StaticMesh::create(
     m_shaderHandle = shader;
     m_textureHandle = texture;
     m_indicesCount = data.indicesCount;
-    Miren::VertexBufferLayoutData layoutData;
-    layoutData.pushVector();
-    m_bufferLayoutHandle = Miren::createVertexLayout(layoutData);
-    m_vertexBufferHandle = Miren::createVertexBuffer(
-        data.vertices, sizeof(Vertex) * data.verticesCount, m_bufferLayoutHandle);
+    m_bufferLayoutHandle = data.layoutHandle;
+    m_vertexBufferHandle =
+        Miren::createVertexBuffer(data.vertexBuffer, data.vertexBufferSize, m_bufferLayoutHandle);
     m_indexBufferHandle = Miren::createIndexBuffer(
         data.indices, Miren::BufferElementType::UnsignedInt, data.indicesCount);
 }

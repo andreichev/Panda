@@ -5,14 +5,17 @@
 #include "BlocksCreation.hpp"
 #include "Model/VoxelMeshGenerator.hpp"
 
+#include <imgui.h>
+
 void BlocksCreation::initialize() {
     m_transform = &getEntity().getTransform();
+    m_selectedBlock = VoxelType::GROUND;
 }
 
 void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ) {
     // LOG_INFO("UPDATE CHUNK {} {} {}", chunkIndexX, chunkIndexY, chunkIndexZ);
     Panda::MeshData data = VoxelMeshGenerator::makeOneChunkMesh(
-        *m_chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true);
+        m_layoutHandle, *m_chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true);
     m_chunksStorage
         ->chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                  chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
@@ -20,12 +23,12 @@ void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkInde
         ->update(data);
 }
 
-void BlocksCreation::setVoxel(int x, int y, int z, int8_t id) {
+void BlocksCreation::setVoxel(int x, int y, int z, VoxelType type) {
     if (x < 0 || y < 0 || z < 0 || x >= ChunksStorage::WORLD_SIZE_X ||
         y >= ChunksStorage::WORLD_SIZE_Y || z >= ChunksStorage::WORLD_SIZE_Z)
         return;
 
-    m_chunksStorage->setVoxel(x, y, z, id);
+    m_chunksStorage->setVoxel(x, y, z, type);
     int chunkIndexX = x / Chunk::SIZE_X;
     int chunkIndexY = y / Chunk::SIZE_Y;
     int chunkIndexZ = z / Chunk::SIZE_Z;
@@ -73,14 +76,28 @@ void BlocksCreation::update(double deltaTime) {
             int x = v->end.x + v->normal.x;
             int y = v->end.y + v->normal.y;
             int z = v->end.z + v->normal.z;
-            setVoxel(x, y, z, 11);
+            setVoxel(x, y, z, m_selectedBlock);
         } else if (rightPressed) {
             int x = v->end.x;
             int y = v->end.y;
             int z = v->end.z;
-            setVoxel(x, y, z, 0);
+            setVoxel(x, y, z, VoxelType::NOTHING);
         }
     }
+}
+
+void BlocksCreation::onImGuiRender() {
+    ImGui::Begin("Block");
+    if (ImGui::Button("TREE")) {
+        m_selectedBlock = VoxelType::TREE;
+    }
+    if (ImGui::Button("STONE BRICKS")) {
+        m_selectedBlock = VoxelType::STONE_BRICKS;
+    }
+    if (ImGui::Button("BOARDS")) {
+        m_selectedBlock = VoxelType::BOARDS;
+    }
+    ImGui::End();
 }
 
 void BlocksCreation::setChunksStorage(Foundation::Shared<ChunksStorage> storage) {
@@ -89,4 +106,8 @@ void BlocksCreation::setChunksStorage(Foundation::Shared<ChunksStorage> storage)
 
 void BlocksCreation::setCamera(Panda::Camera *camera) {
     m_camera = camera;
+}
+
+void BlocksCreation::setLayoutHandle(Miren::VertexLayoutHandle layoutHandle) {
+    m_layoutHandle = layoutHandle;
 }

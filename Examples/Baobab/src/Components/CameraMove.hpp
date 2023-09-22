@@ -10,7 +10,6 @@ class CameraMove : public Panda::NativeScript {
 public:
     void initialize() override;
     void update(double deltaTime) override;
-    void onImGuiRender() override;
     inline void setCamera(Panda::Camera *camera) {
         m_camera = camera;
     }

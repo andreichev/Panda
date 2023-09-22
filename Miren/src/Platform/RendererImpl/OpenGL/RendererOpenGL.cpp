@@ -117,54 +117,54 @@ void RendererOpenGL::deleteTexture(TextureHandle handle) {
     textures[handle.id].terminate();
 }
 
-void RendererOpenGL::createIndexBuffer(
-    IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
-    indexBuffers[handle.id].create(indices, elementType, count, false);
-    FREE(Foundation::getAllocator(), indices);
+void RendererOpenGL::createIndexBuffer(IndexBufferHandle handle,
+    Foundation::Memory indices,
+    BufferElementType elementType,
+    size_t count) {
+    indexBuffers[handle.id].create(indices.data, elementType, count, false);
+    indices.release();
 }
 
-void RendererOpenGL::createDynamicIndexBuffer(
-    IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) {
-    indexBuffers[handle.id].create(indices, elementType, count, true);
-    if (indices != nullptr) {
-        FREE(Foundation::getAllocator(), indices);
-    }
+void RendererOpenGL::createDynamicIndexBuffer(IndexBufferHandle handle,
+    Foundation::Memory indices,
+    BufferElementType elementType,
+    size_t count) {
+    indexBuffers[handle.id].create(indices.data, elementType, count, true);
+    indices.release();
 }
 
 void RendererOpenGL::updateDynamicIndexBuffer(
-    IndexBufferHandle handle, void *indices, size_t count) {
-    indexBuffers[handle.id].update(indices, count);
-    if (indices != nullptr) {
-        FREE(Foundation::getAllocator(), indices);
-    }
+    IndexBufferHandle handle, Foundation::Memory indices, size_t count) {
+    indexBuffers[handle.id].update(indices.data, count);
+    indices.release();
 }
 
 void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
     indexBuffers[handle.id].terminate();
 }
 
-void RendererOpenGL::createVertexBuffer(
-    VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
-    vertexBuffers[handle.id].create(data, size, false);
+void RendererOpenGL::createVertexBuffer(VertexBufferHandle handle,
+    Foundation::Memory data,
+    uint32_t size,
+    VertexLayoutHandle layoutHandle) {
+    vertexBuffers[handle.id].create(data.data, size, false);
     vertexBuffers[handle.id].setLayoutHandle(layoutHandle);
-    FREE(Foundation::getAllocator(), data);
+    data.release();
 }
 
-void RendererOpenGL::createDynamicVertexBuffer(
-    VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
-    vertexBuffers[handle.id].create(data, size, true);
+void RendererOpenGL::createDynamicVertexBuffer(VertexBufferHandle handle,
+    Foundation::Memory data,
+    uint32_t size,
+    VertexLayoutHandle layoutHandle) {
+    vertexBuffers[handle.id].create(data.data, size, true);
     vertexBuffers[handle.id].setLayoutHandle(layoutHandle);
-    if (data != nullptr) {
-        FREE(Foundation::getAllocator(), data);
-    }
+    data.release();
 }
 
 void RendererOpenGL::updateDynamicVertexBuffer(
-    VertexBufferHandle handle, void *data, uint32_t size) {
-    vertexBuffers[handle.id].update(data, size);
-    if (data != nullptr) {
-        FREE(Foundation::getAllocator(), data);
-    }
+    VertexBufferHandle handle, Foundation::Memory data, uint32_t size) {
+    vertexBuffers[handle.id].update(data.data, size);
+    data.release();
 }
 
 void RendererOpenGL::deleteVertexBuffer(VertexBufferHandle handle) {

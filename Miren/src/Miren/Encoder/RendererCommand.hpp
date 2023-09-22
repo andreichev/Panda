@@ -101,12 +101,14 @@ struct DeleteTextureCommand : Foundation::CommandBuffer::Command {
 
 struct CreateIndexBufferCommand : Foundation::CommandBuffer::Command {
     IndexBufferHandle handle;
-    void *indices;
+    Foundation::Memory indices;
     BufferElementType elementType;
     size_t count;
 
-    CreateIndexBufferCommand(
-        IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count)
+    CreateIndexBufferCommand(IndexBufferHandle handle,
+        Foundation::Memory indices,
+        BufferElementType elementType,
+        size_t count)
         : Command(RendererCommandType::CreateIndexBuffer)
         , handle(handle)
         , indices(indices)
@@ -116,12 +118,14 @@ struct CreateIndexBufferCommand : Foundation::CommandBuffer::Command {
 
 struct CreateDynamicIndexBufferCommand : Foundation::CommandBuffer::Command {
     IndexBufferHandle handle;
-    void *indices;
+    Foundation::Memory indices;
     BufferElementType elementType;
     size_t count;
 
-    CreateDynamicIndexBufferCommand(
-        IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count)
+    CreateDynamicIndexBufferCommand(IndexBufferHandle handle,
+        Foundation::Memory indices,
+        BufferElementType elementType,
+        size_t count)
         : Command(RendererCommandType::CreateDynamicIndexBuffer)
         , handle(handle)
         , indices(indices)
@@ -131,10 +135,11 @@ struct CreateDynamicIndexBufferCommand : Foundation::CommandBuffer::Command {
 
 struct UpdateDynamicIndexBufferCommand : Foundation::CommandBuffer::Command {
     IndexBufferHandle handle;
-    void *indices;
+    Foundation::Memory indices;
     size_t count;
 
-    UpdateDynamicIndexBufferCommand(IndexBufferHandle handle, void *indices, size_t count)
+    UpdateDynamicIndexBufferCommand(
+        IndexBufferHandle handle, Foundation::Memory indices, size_t count)
         : Command(RendererCommandType::UpdateDynamicIndexBuffer)
         , handle(handle)
         , indices(indices)
@@ -152,11 +157,13 @@ struct DeleteIndexBufferCommand : Foundation::CommandBuffer::Command {
 struct CreateVertexBufferCommand : Foundation::CommandBuffer::Command {
     VertexBufferHandle handle;
     VertexLayoutHandle layoutHandle;
-    void *data;
+    Foundation::Memory data;
     uint32_t size;
 
-    CreateVertexBufferCommand(
-        VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle)
+    CreateVertexBufferCommand(VertexBufferHandle handle,
+        Foundation::Memory data,
+        uint32_t size,
+        VertexLayoutHandle layoutHandle)
         : Command(RendererCommandType::CreateVertexBuffer)
         , handle(handle)
         , layoutHandle(layoutHandle)
@@ -167,11 +174,13 @@ struct CreateVertexBufferCommand : Foundation::CommandBuffer::Command {
 struct CreateDynamicVertexBufferCommand : Foundation::CommandBuffer::Command {
     VertexBufferHandle handle;
     VertexLayoutHandle layoutHandle;
-    void *data;
+    Foundation::Memory data;
     uint32_t size;
 
-    CreateDynamicVertexBufferCommand(
-        VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle)
+    CreateDynamicVertexBufferCommand(VertexBufferHandle handle,
+        Foundation::Memory data,
+        uint32_t size,
+        VertexLayoutHandle layoutHandle)
         : Command(RendererCommandType::CreateDynamicVertexBuffer)
         , handle(handle)
         , layoutHandle(layoutHandle)
@@ -181,10 +190,11 @@ struct CreateDynamicVertexBufferCommand : Foundation::CommandBuffer::Command {
 
 struct UpdateDynamicVertexBufferCommand : Foundation::CommandBuffer::Command {
     VertexBufferHandle handle;
-    void *data;
+    Foundation::Memory data;
     uint32_t size;
 
-    UpdateDynamicVertexBufferCommand(VertexBufferHandle handle, void *data, uint32_t size)
+    UpdateDynamicVertexBufferCommand(
+        VertexBufferHandle handle, Foundation::Memory data, uint32_t size)
         : Command(RendererCommandType::UpdateDynamicVertexBuffer)
         , handle(handle)
         , data(data)

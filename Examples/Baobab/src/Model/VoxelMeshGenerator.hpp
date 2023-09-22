@@ -9,7 +9,8 @@
 
 class VoxelMeshGenerator {
 public:
-    static Panda::MeshData makeOneChunkMesh(ChunksStorage &chunks,
+    static Panda::MeshData makeOneChunkMesh(Miren::VertexLayoutHandle layoutHandle,
+        ChunksStorage &chunks,
         int chunkIndexX,
         int chunkIndexY,
         int chunkIndexZ,

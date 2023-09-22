@@ -23,7 +23,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_Shutdown() {
 }
 
 IMGUI_IMPL_API void ImGui_ImplMiren_NewFrame() {
-    if (deviceObjectsCreated == false) {
+    if (!deviceObjectsCreated) {
         ImGui_ImplMiren_CreateDeviceObjects();
         deviceObjectsCreated = true;
     }
@@ -136,7 +136,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_DestroyFontsTexture() {
 IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
     using namespace Miren;
     Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
-        "shaders/imgui/imgui_vertex.glsl", "shaders/imgui/imgui_fragment.glsl");
+        "default-shaders/imgui/imgui_vertex.glsl", "default-shaders/imgui/imgui_fragment.glsl");
     shader = Miren::createProgram(programAsset.getMirenProgramCreate());
 
     VertexBufferLayoutData layoutData;

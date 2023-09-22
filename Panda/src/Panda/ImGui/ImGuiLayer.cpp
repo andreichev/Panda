@@ -30,9 +30,8 @@ void ImGuiLayer::onAttach() {
     // ImGuiConfigFlags_ViewportsNoMerge;
 
     float fontSize = 18.0f;
-    std::string fontPath = AssetLoader::getResourcesPath() + "fonts/Cousine-Regular.ttf";
-    // std::string fontPath = Miren::PlatformData::get()->getResourcesPath() +
-    // "fonts/ProggyClean.ttf";
+    std::string fontPath = AssetLoader::getResourcesPath() + "default-fonts/Cousine-Regular.ttf";
+    // std::string fontPath = AssetLoader::getResourcesPath() + "default-fonts/ProggyClean.ttf";
     io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize);
     // Setup Dear ImGui style
     // ImGui::StyleColorsDark();

@@ -29,24 +29,26 @@ public:
     void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) override;
     void deleteTexture(TextureHandle handle) override;
     void createIndexBuffer(IndexBufferHandle handle,
-        void *indices,
+        Foundation::Memory indices,
         BufferElementType elementType,
         size_t count) override;
     void createDynamicIndexBuffer(IndexBufferHandle handle,
-        void *indices,
+        Foundation::Memory indices,
         BufferElementType elementType,
         size_t count) override;
-    void updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) override;
+    void updateDynamicIndexBuffer(
+        IndexBufferHandle handle, Foundation::Memory indices, size_t count) override;
     void deleteIndexBuffer(IndexBufferHandle handle) override;
     void createVertexBuffer(VertexBufferHandle handle,
-        void *data,
+        Foundation::Memory data,
         uint32_t size,
         VertexLayoutHandle layoutHandle) override;
     void createDynamicVertexBuffer(VertexBufferHandle handle,
-        void *data,
+        Foundation::Memory data,
         uint32_t size,
         VertexLayoutHandle layoutHandle) override;
-    void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) override;
+    void updateDynamicVertexBuffer(
+        VertexBufferHandle handle, Foundation::Memory data, uint32_t size) override;
     void deleteVertexBuffer(VertexBufferHandle handle) override;
     void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) override;
     void deleteVertexLayout(VertexLayoutHandle handle) override;

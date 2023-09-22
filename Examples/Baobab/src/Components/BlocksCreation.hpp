@@ -14,15 +14,18 @@ public:
 
     void initialize() override;
     void update(double deltaTime) override;
+    void onImGuiRender() override;
     void setChunksStorage(Foundation::Shared<ChunksStorage> storage);
     void setCamera(Panda::Camera *camera);
+    void setLayoutHandle(Miren::VertexLayoutHandle layoutHandle);
 
 private:
-    void setVoxel(int x, int y, int z, int8_t id);
+    void setVoxel(int x, int y, int z, VoxelType type);
     void updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ);
 
     Foundation::Shared<ChunksStorage> m_chunksStorage;
     Panda::Transform *m_transform;
     Panda::Camera *m_camera;
-    int m_frame;
+    Miren::VertexLayoutHandle m_layoutHandle;
+    VoxelType m_selectedBlock;
 };

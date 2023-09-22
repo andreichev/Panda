@@ -62,9 +62,9 @@ ProgramAsset AssetLoader::loadProgram(
             false, "SHADER::FILE {} or {} NOT SUCCESSFULLY READ", vertexPath, fragmentPath);
     }
     Foundation::Memory vertexData =
-        Foundation::Memory::create((void *)vertexCode.c_str(), vertexCode.size() + 1);
+        Foundation::Memory::copying((void *)vertexCode.c_str(), vertexCode.size() + 1);
     Foundation::Memory fragmentData =
-        Foundation::Memory::create((void *)fragmentCode.c_str(), fragmentCode.size() + 1);
+        Foundation::Memory::copying((void *)fragmentCode.c_str(), fragmentCode.size() + 1);
     return {vertexData, fragmentData};
 }
 

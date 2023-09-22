@@ -24,7 +24,7 @@ public:
     ChunksStorage();
     ~ChunksStorage();
 
-    void setVoxel(int x, int y, int z, uint8_t id);
+    void setVoxel(int x, int y, int z, VoxelType type);
     Voxel *getVoxel(int x, int y, int z);
     Chunk *getChunk(int x, int y, int z);
     std::optional<VoxelRaycastData> bresenham3D(

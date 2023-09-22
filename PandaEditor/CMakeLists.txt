@@ -12,13 +12,15 @@ file(GLOB_RECURSE INCLUDE
         )
 
 file(GLOB RESOURCE_FOLDERS
-        resources/*
+        resources/common/*
         ${PANDA_DIRECTORY}/resources/common/*
         )
 
 if (DESKTOP)
-    file(GLOB RESOURCE_ADDITIONAL_FOLDERS ${PANDA_DIRECTORY}/resources/desktop/*)
-    list(APPEND RESOURCE_FOLDERS "${RESOURCE_ADDITIONAL_FOLDERS}")
+    file(GLOB PANDA_DESKTOP_RESOURCES ${PANDA_DIRECTORY}/resources/desktop/*)
+    list(APPEND RESOURCE_FOLDERS "${PANDA_DESKTOP_RESOURCES}")
+    file(GLOB DESKTOP_RESOURCES resources/desktop/*)
+    list(APPEND RESOURCE_FOLDERS "${DESKTOP_RESOURCES}")
 else()
     message(FATAL_ERROR "Only desktop platform supported for editor")
 endif()

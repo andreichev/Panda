@@ -66,18 +66,19 @@ void deleteTexture(TextureHandle handle) {
     s_context->deleteTexture(handle);
 }
 
-IndexBufferHandle createIndexBuffer(void *indices, BufferElementType elementType, size_t count) {
+IndexBufferHandle createIndexBuffer(
+    Foundation::Memory indices, BufferElementType elementType, size_t count) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     return s_context->createIndexBuffer(indices, elementType, count);
 }
 
 IndexBufferHandle createDynamicIndexBuffer(
-    void *indices, BufferElementType elementType, size_t count) {
+    Foundation::Memory indices, BufferElementType elementType, size_t count) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     return s_context->createDynamicIndexBuffer(indices, elementType, count);
 }
 
-void updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) {
+void updateDynamicIndexBuffer(IndexBufferHandle handle, Foundation::Memory indices, size_t count) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     s_context->updateDynamicIndexBuffer(handle, indices, count);
 }
@@ -87,18 +88,19 @@ void deleteIndexBuffer(IndexBufferHandle handle) {
     s_context->deleteIndexBuffer(handle);
 }
 
-VertexBufferHandle createVertexBuffer(void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+VertexBufferHandle createVertexBuffer(
+    Foundation::Memory data, uint32_t size, VertexLayoutHandle layoutHandle) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     return s_context->createVertexBuffer(data, size, layoutHandle);
 }
 
 VertexBufferHandle createDynamicVertexBuffer(
-    void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+    Foundation::Memory data, uint32_t size, VertexLayoutHandle layoutHandle) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     return s_context->createDynamicVertexBuffer(data, size, layoutHandle);
 }
 
-void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
+void updateDynamicVertexBuffer(VertexBufferHandle handle, Foundation::Memory data, uint32_t size) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     s_context->updateDynamicVertexBuffer(handle, data, size);
 }

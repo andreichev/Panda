@@ -303,7 +303,7 @@ struct Context {
     }
 
     IndexBufferHandle createIndexBuffer(
-        void *indices, BufferElementType elementType, size_t count) {
+        Foundation::Memory indices, BufferElementType elementType, size_t count) {
         IndexBufferHandle handle = m_indexBuffersHandleAlloc.alloc();
         CreateIndexBufferCommand cmd(handle, indices, elementType, count);
         m_preCommandQueue.write(cmd);
@@ -311,14 +311,15 @@ struct Context {
     }
 
     IndexBufferHandle createDynamicIndexBuffer(
-        void *indices, BufferElementType elementType, size_t count) {
+        Foundation::Memory indices, BufferElementType elementType, size_t count) {
         IndexBufferHandle handle = m_indexBuffersHandleAlloc.alloc();
         CreateDynamicIndexBufferCommand cmd(handle, indices, elementType, count);
         m_preCommandQueue.write(cmd);
         return handle;
     }
 
-    void updateDynamicIndexBuffer(IndexBufferHandle handle, void *indices, size_t count) {
+    void updateDynamicIndexBuffer(
+        IndexBufferHandle handle, Foundation::Memory indices, size_t count) {
         UpdateDynamicIndexBufferCommand cmd(handle, indices, count);
         m_preCommandQueue.write(cmd);
     }
@@ -330,22 +331,24 @@ struct Context {
     }
 
     VertexBufferHandle createVertexBuffer(
-        void *data, uint32_t size, VertexLayoutHandle layoutHandle) {
+        Foundation::Memory data, uint32_t size, VertexLayoutHandle layoutHandle) {
         VertexBufferHandle handle = m_vertexBuffersHandleAlloc.alloc();
         CreateVertexBufferCommand cmd(handle, data, size, layoutHandle);
         m_preCommandQueue.write(cmd);
         return handle;
     }
 
-    VertexBufferHandle createDynamicVertexBuffer(
-        void *data, uint32_t size, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE) {
+    VertexBufferHandle createDynamicVertexBuffer(Foundation::Memory data,
+        uint32_t size,
+        VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE) {
         VertexBufferHandle handle = m_vertexBuffersHandleAlloc.alloc();
         CreateDynamicVertexBufferCommand cmd(handle, data, size, layoutHandle);
         m_preCommandQueue.write(cmd);
         return handle;
     }
 
-    void updateDynamicVertexBuffer(VertexBufferHandle handle, void *data, uint32_t size) {
+    void updateDynamicVertexBuffer(
+        VertexBufferHandle handle, Foundation::Memory data, uint32_t size) {
         UpdateDynamicVertexBufferCommand cmd(handle, data, size);
         m_preCommandQueue.write(cmd);
     }

@@ -19,7 +19,7 @@ UIView::UIView(Rect frame)
     , frame(frame) {
     float *data = new float[12];
     ProgramAsset programAsset = AssetLoader::loadProgram(
-        "shaders/ui/uiview_vertex.glsl", "shaders/ui/uiview_fragment.glsl");
+        "default-shaders/ui/uiview_vertex.glsl", "default-shaders/ui/uiview_fragment.glsl");
     programHandle = Miren::createProgram(programAsset.getMirenProgramCreate());
     Miren::VertexBufferLayoutData layoutData;
     layoutData.pushFloat(2);

@@ -6,6 +6,17 @@
 
 #include <imgui.h>
 
+struct Vertex {
+    glm::vec3 pos;
+    glm::vec2 uv;
+    float light;
+
+    Vertex(float x, float y, float z, float u, float v, float light)
+        : pos(x, y, z)
+        , uv(u, v)
+        , light(light) {}
+};
+
 class CubeComponent final : public Panda::NativeScript {
 public:
     void initialize() override {
@@ -55,7 +66,9 @@ public:
         // clang-format on
 
         Miren::VertexBufferLayoutData layoutData;
-        layoutData.pushVector();
+        layoutData.pushVec3();
+        layoutData.pushVec2();
+        layoutData.pushFloat(1);
         Miren::VertexLayoutHandle layoutHandle = Miren::createVertexLayout(layoutData);
         vertexBuffer = Miren::createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
         indexBuffer = Miren::createIndexBuffer(indices, Miren::BufferElementType::UnsignedInt, 36);
@@ -63,7 +76,7 @@ public:
         Panda::TextureAsset textureAsset = Panda::AssetLoader::loadTexture("textures/arbuz1.png");
         texture = Miren::createTexture(textureAsset.getMirenTextureCreate());
         Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
-            "shaders/base/base_vertex.glsl", "shaders/base/base_fragment.glsl");
+            "default-shaders/base/base_vertex.glsl", "default-shaders/base/base_fragment.glsl");
         shader = Miren::createProgram(programAsset.getMirenProgramCreate());
         Miren::setShader(shader);
 

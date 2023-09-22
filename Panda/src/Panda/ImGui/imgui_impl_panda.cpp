@@ -296,8 +296,9 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             const KeyPressedEvent *ev = static_cast<const KeyPressedEvent *>(event);
             ImGuiKey key = ImGui_ImplPanda_KeyCodeToImGuiKey(ev->key);
             io.AddKeyEvent(key, true);
-            io.SetKeyEventNativeData(
-                key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user code)
+            // io.SetKeyEventNativeData(
+            //     key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user
+            //     code)
             event->isHandled = io.WantCaptureKeyboard;
             break;
         }
@@ -305,8 +306,9 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             const KeyReleasedEvent *ev = static_cast<const KeyReleasedEvent *>(event);
             ImGuiKey key = ImGui_ImplPanda_KeyCodeToImGuiKey(ev->key);
             io.AddKeyEvent(key, false);
-            io.SetKeyEventNativeData(
-                key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user code)
+            // io.SetKeyEventNativeData(
+            //     key, static_cast<int>(ev->key), -1); // To support legacy indexing (<1.87 user
+            //     code)
             event->isHandled = io.WantCaptureKeyboard;
             break;
         }

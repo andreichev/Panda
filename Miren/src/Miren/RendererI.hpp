@@ -34,21 +34,27 @@ public:
     virtual void createTexture(TextureHandle handle, TextureCreate) = 0;
     virtual void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) = 0;
     virtual void deleteTexture(TextureHandle handle) = 0;
-    virtual void createIndexBuffer(
-        IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) = 0;
-    virtual void createDynamicIndexBuffer(
-        IndexBufferHandle handle, void *indices, BufferElementType elementType, size_t count) = 0;
+    virtual void createIndexBuffer(IndexBufferHandle handle,
+        Foundation::Memory indices,
+        BufferElementType elementType,
+        size_t count) = 0;
+    virtual void createDynamicIndexBuffer(IndexBufferHandle handle,
+        Foundation::Memory indices,
+        BufferElementType elementType,
+        size_t count) = 0;
     virtual void updateDynamicIndexBuffer(
-        IndexBufferHandle handle, void *indices, size_t count) = 0;
+        IndexBufferHandle handle, Foundation::Memory indices, size_t count) = 0;
     virtual void deleteIndexBuffer(IndexBufferHandle handle) = 0;
-    virtual void createVertexBuffer(
-        VertexBufferHandle handle, void *data, uint32_t size, VertexLayoutHandle layoutHandle) = 0;
+    virtual void createVertexBuffer(VertexBufferHandle handle,
+        Foundation::Memory data,
+        uint32_t size,
+        VertexLayoutHandle layoutHandle) = 0;
     virtual void createDynamicVertexBuffer(VertexBufferHandle handle,
-        void *data,
+        Foundation::Memory data,
         uint32_t size,
         VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE) = 0;
     virtual void updateDynamicVertexBuffer(
-        VertexBufferHandle handle, void *data, uint32_t size) = 0;
+        VertexBufferHandle handle, Foundation::Memory data, uint32_t size) = 0;
     virtual void deleteVertexBuffer(VertexBufferHandle handle) = 0;
     virtual void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) = 0;
     virtual void deleteVertexLayout(VertexLayoutHandle handle) = 0;

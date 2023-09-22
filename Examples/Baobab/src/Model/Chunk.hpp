@@ -17,7 +17,7 @@ public:
     ~Chunk();
     Panda::DynamicMesh *getMesh();
     void setMesh(Panda::DynamicMesh *mesh);
-    void set(int x, int y, int z, char id);
+    void set(int x, int y, int z, VoxelType type);
     Voxel *get(int x, int y, int z);
     Voxel *m_data;
 

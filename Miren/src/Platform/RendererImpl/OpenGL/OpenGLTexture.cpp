@@ -35,14 +35,17 @@ void OpenGLTexture::create(const TextureCreate &create) {
         create.m_data.data));
     create.m_data.release();
 
-    // GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4));
-    // GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
+    if (create.m_numMips > 0) {
+        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, create.m_numMips));
+        GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
+    }
 
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-    // GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(
+        GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, openGLFiltering(create.m_minFiltering)));
+    GL_CALL(glTexParameteri(
+        GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, openGLFiltering(create.m_magFiltering)));
 }
 
 void OpenGLTexture::resize(uint32_t width, uint32_t height) {
