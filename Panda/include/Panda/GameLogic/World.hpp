@@ -6,7 +6,6 @@
 
 #include "Panda/GameLogic/Entity.hpp"
 #include "Panda/Window/Window.hpp"
-#include "Panda/GameLogic/UI/UIView.hpp"
 
 #include <entt/entt.hpp>
 
@@ -21,7 +20,6 @@ public:
     void onImGuiRender();
     Entity instantiateEntity();
     void destroy(Entity entity);
-    UIView *getUIView();
     inline bool isRunning() {
         return m_isRunning;
     }
@@ -29,7 +27,6 @@ public:
 private:
     bool m_isRunning;
     entt::registry m_registry;
-    UIView m_uiRoot;
 
     friend class WorldHierarchyPanel;
 };

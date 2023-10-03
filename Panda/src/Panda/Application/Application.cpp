@@ -10,6 +10,7 @@
 #include "Panda/Events/WindowEvents.hpp"
 #include "Panda/Base/Random.hpp"
 #include "Panda/Renderer/Renderer2D.hpp"
+#include "Panda/Renderer/Renderer3D.hpp"
 #include "Panda/GameLogic/Input.hpp"
 
 #include <Miren/Miren.hpp>
@@ -71,6 +72,7 @@ Application::Application(ApplicationStartupSettings &settings)
     Miren::renderSemaphoreWait();
     Random::init();
     Renderer2D::init();
+    Renderer3D::init();
     if (settings.startupLevel != nullptr) {
         startBasicGame(settings.startupLevel);
     } else if (settings.startupLayer != nullptr) {
@@ -111,11 +113,13 @@ void Application::loop() {
         Miren::renderSemaphoreWait();
         // LOG_INFO("APP UPDATE BEGIN");
         Renderer2D::begin();
+        Renderer3D::begin();
         LayerStack &layerStack = *m_layerStack;
         for (Layer *layer : layerStack) {
             layer->onUpdate(deltaTime);
         }
         Renderer2D::end();
+        Renderer3D::end();
         m_ImGuiLayer->begin(deltaTime);
         for (Layer *layer : layerStack) {
             layer->onImGuiRender();

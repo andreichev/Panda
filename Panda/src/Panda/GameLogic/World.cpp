@@ -9,8 +9,7 @@
 namespace Panda {
 
 World::World()
-    : m_uiRoot()
-    , m_isRunning(false)
+    : m_isRunning(false)
     , m_registry() {}
 
 World::~World() {}
@@ -19,7 +18,6 @@ void World::update(double deltaTime) {
     if (!m_isRunning) {
         return;
     }
-    m_uiRoot.render();
     // Update native scripts
     {
         auto view = m_registry.view<NativeScriptListComponent>();
@@ -96,10 +94,6 @@ void World::destroy(Entity entity) {
         Entity child = Entity(&m_registry, childHandle);
         destroy(child);
     }
-}
-
-UIView *World::getUIView() {
-    return &m_uiRoot;
 }
 
 } // namespace Panda

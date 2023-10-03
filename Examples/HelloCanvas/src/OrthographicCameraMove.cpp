@@ -18,30 +18,27 @@ void OrthographicCameraMove::update(double deltaTime) {
     glm::vec4 cameraPosition = m_transform->getPosition();
     bool moved = false;
     if (Input::isKeyPressed(Key::A)) {
-        cameraPosition.x -=
-            cos(glm::radians(cameraRotation.z)) * m_cameraTranslationSpeed * deltaTime;
-        cameraPosition.y -=
-            sin(glm::radians(cameraRotation.z)) * m_cameraTranslationSpeed * deltaTime;
+        cameraPosition -= m_camera->getRight() * (float)(m_cameraTranslationSpeed * deltaTime);
         moved = true;
     } else if (Input::isKeyPressed(Key::D)) {
-        cameraPosition.x +=
-            cos(glm::radians(cameraRotation.z)) * m_cameraTranslationSpeed * deltaTime;
-        cameraPosition.y +=
-            sin(glm::radians(cameraRotation.z)) * m_cameraTranslationSpeed * deltaTime;
+        cameraPosition += m_camera->getRight() * (float)(m_cameraTranslationSpeed * deltaTime);
         moved = true;
     }
 
     if (Input::isKeyPressed(Key::W)) {
-        cameraPosition.x +=
-            -sin(glm::radians(cameraRotation.z)) * m_cameraTranslationSpeed * deltaTime;
-        cameraPosition.y +=
-            cos(glm::radians(cameraRotation.z)) * m_cameraTranslationSpeed * deltaTime;
+        cameraPosition += m_camera->getUp() * (float)(m_cameraTranslationSpeed * deltaTime);
         moved = true;
     } else if (Input::isKeyPressed(Key::S)) {
-        cameraPosition.x -=
-            -sin(glm::radians(cameraRotation.z)) * m_cameraTranslationSpeed * deltaTime;
-        cameraPosition.y -=
-            cos(glm::radians(cameraRotation.z)) * m_cameraTranslationSpeed * deltaTime;
+        cameraPosition -= m_camera->getUp() * (float)(m_cameraTranslationSpeed * deltaTime);
+        moved = true;
+    }
+    double scroll = Input::getMouseScrollY();
+    if (scroll != 0) {
+        m_zoom -= scroll * 0.15f;
+        m_zoom = Foundation::min(m_zoom, 10.0);
+        m_zoom = Foundation::max(m_zoom, 1.0);
+        m_cameraTranslationSpeed = m_zoom;
+        cameraPosition.z = m_zoom;
         moved = true;
     }
     if (moved) {
@@ -50,29 +47,20 @@ void OrthographicCameraMove::update(double deltaTime) {
 
     if (m_rotation) {
         if (Input::isKeyPressed(Key::Q)) {
-            cameraRotation += m_cameraRotationSpeed * deltaTime;
+            cameraRotation.z += m_cameraRotationSpeed * deltaTime;
             if (cameraRotation.z > 180.0f) {
                 cameraRotation -= 360.0f;
             }
             m_transform->setRotation(cameraRotation);
         }
         if (Input::isKeyPressed(Key::E)) {
-            cameraRotation -= m_cameraRotationSpeed * deltaTime;
+            cameraRotation.z -= m_cameraRotationSpeed * deltaTime;
             if (cameraRotation.z <= -180.0f) {
                 cameraRotation += 360.0f;
             }
             m_transform->setRotation(cameraRotation);
         }
     }
-
-    double scroll = Input::getMouseScrollY();
-    if (scroll != 0) {
-        m_zoom -= scroll * 0.15f;
-        m_zoom = Foundation::min(m_zoom, 10.0);
-        m_zoom = Foundation::max(m_zoom, 1.0);
-        m_camera->setZoomLevel(m_zoom);
-    }
-    m_cameraTranslationSpeed = m_zoom;
 }
 
 void OrthographicCameraMove::onImGuiRender() {}

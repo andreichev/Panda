@@ -7,8 +7,8 @@ namespace Panda {
 
 void Viewport::init(World *world) {
     m_world = world;
-    Size dpi = Application::get()->getWindow()->getDpi();
-    Size windowSize = Application::get()->getWindow()->getSize();
+    Vec2 dpi = Application::get()->getWindow()->getDpi();
+    Vec2 windowSize = Application::get()->getWindow()->getSize();
     Miren::TextureCreate create;
     create.m_data = Foundation::Memory(nullptr);
     create.m_format = Miren::TextureFormat::RGBA8;
@@ -30,13 +30,13 @@ void Viewport::init(World *world) {
     Renderer2D::setViewId(m_sceneViewId);
 }
 
-void Viewport::updateViewportSize(Size size) {
+void Viewport::updateViewportSize(Vec2 size) {
     if (size.width < 1 || size.height < 1) {
         return;
     }
     m_viewportPanelSize = size;
     if (m_camera) {
-        m_camera->updateViewportSize(size);
+        m_camera->viewportSizeChanged(size);
     }
     Size dpi = Application::get()->getWindow()->getDpi();
     Miren::setViewport(
@@ -70,9 +70,9 @@ void Viewport::onImGuiRender() {
     ImGui::End();
 }
 
-void Viewport::setCamera(OrthographicCamera *camera) {
+void Viewport::setCamera(Camera *camera) {
     m_camera = camera;
-    m_camera->updateViewportSize(m_viewportPanelSize);
+    m_camera->viewportSizeChanged(m_viewportPanelSize);
     Renderer2D::setCamera(m_camera);
 }
 

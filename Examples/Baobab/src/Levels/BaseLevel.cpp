@@ -9,13 +9,12 @@
 #include "Components/CameraMove.hpp"
 #include "Components/BlocksCreation.hpp"
 #include "Components/FullScreenToggle.hpp"
-#include "Components/UI/UICrosshair.hpp"
 
 #include <Panda.hpp>
 #include <Miren/Miren.hpp>
 
 void BaseLevel::start(Panda::World *world) {
-    Miren::setViewClear(0, 0x12212bff);
+    Miren::setViewClear(0, 0x3D75C9FF);
     Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
         "shaders/ground/ground_vertex.glsl", "shaders/ground/ground_fragment.glsl");
     m_groundShader = Miren::createProgram(programAsset.getMirenProgramCreate());
@@ -53,7 +52,7 @@ void BaseLevel::start(Panda::World *world) {
     Panda::Entity cameraEntity = world->instantiateEntity();
     Panda::Camera &camera = cameraEntity.addNativeScript<Panda::Camera>();
     camera.setFieldOfView(60.f);
-    camera.setShader(m_groundShader);
+    Panda::Renderer3D::setCamera(&camera);
     CameraMove &cameraMove = cameraEntity.addNativeScript<CameraMove>();
     cameraMove.setCamera(&camera);
     cameraEntity.getTransform().translate(ChunksStorage::WORLD_SIZE_X / 2,
@@ -67,7 +66,6 @@ void BaseLevel::start(Panda::World *world) {
     blocksCreation.setLayoutHandle(layoutHandle);
 
     cameraEntity.addNativeScript<FullScreenToggle>();
-    world->getUIView()->addSubview(Foundation::makeShared<UICrosshair>());
 
     LOG_INFO("BASE LEVEL STARTED!");
 }

@@ -1,14 +1,14 @@
 #pragma once
 
-#include <Panda/GameLogic/UI/UIView.hpp>
+#include <PandaUI/UIView.hpp>
 
-class UICrosshair : public Panda::UIView {
+class UICrosshair : public PandaUI::UIView {
 public:
     UICrosshair();
     void layout() override;
 
 private:
-    Foundation::Shared<Panda::UIView> horizontal;
-    Foundation::Shared<Panda::UIView> vertical;
+    Foundation::Shared<PandaUI::UIView> horizontal;
+    Foundation::Shared<PandaUI::UIView> vertical;
     void addSubviews();
 };

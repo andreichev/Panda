@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-#include "Panda/GameLogic/Components/OrthographicCamera.hpp"
+#include "Panda/GameLogic/Components/Camera.hpp"
 #include "Panda/Renderer/Texture.hpp"
 
 #include <Miren/Miren.hpp>
@@ -22,7 +22,7 @@ public:
             , texture(nullptr)
             , rotation(0) {}
 
-        Point origin;
+        Vec3 origin;
         Size size;
         Color color;
         float rotation;
@@ -48,11 +48,11 @@ public:
     static Statistics getStats();
     static void terminate();
     static void setViewId(Miren::ViewId id);
-    static void setCamera(OrthographicCamera *camera);
+    static void setCamera(Camera *camera);
 
 private:
     static Miren::ViewId s_viewId;
-    static OrthographicCamera *s_camera;
+    static Camera *s_camera;
     static void drawRect(glm::mat4 &transform, RectData rect);
 };
 

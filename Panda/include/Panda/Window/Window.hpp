@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "Panda/Events/EventQueue.hpp"
 #include "Panda/Base/Base.hpp"
+#include "Panda/Events/EventQueue.hpp"
 #include "Panda/Window/Cursor.hpp"
 
 namespace Panda {

@@ -23,6 +23,7 @@
 
 // Renderer stuff
 #include <Panda/Renderer/Renderer2D.hpp>
+#include <Panda/Renderer/Renderer3D.hpp>
 
 // Third party
 #include <glm/ext.hpp>

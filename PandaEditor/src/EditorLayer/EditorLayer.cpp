@@ -2,7 +2,7 @@
 #include "Panels/Dockspace.hpp"
 #include "Panels/MenuBar.hpp"
 #include "Panels/StatisticsPanel.hpp"
-#include "Components/OrthographicCameraMove.hpp"
+#include "Components/CameraMove.hpp"
 #include "Components/Sprite.hpp"
 
 namespace Panda {
@@ -23,8 +23,9 @@ void EditorLayer::onAttach() {
 void EditorLayer::initializeExampleWorld() {
     Entity cameraEntity = m_world->instantiateEntity();
     cameraEntity.setName("Camera");
-    auto &camera = cameraEntity.addNativeScript<OrthographicCamera>();
-    auto &move = cameraEntity.addNativeScript<OrthographicCameraMove>();
+    cameraEntity.getTransform().setPosition(0.f, 0.f, 4.f);
+    auto &camera = cameraEntity.addNativeScript<Camera>();
+    auto &move = cameraEntity.addNativeScript<CameraMove>();
     move.setCamera(&camera);
     m_viewport.setCamera(&camera);
 

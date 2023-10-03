@@ -40,7 +40,7 @@ struct DrawCallData {
 
 static DrawCallData s_drawData;
 Miren::ViewId Renderer2D::s_viewId = 0;
-OrthographicCamera *Renderer2D::s_camera = nullptr;
+Camera *Renderer2D::s_camera = nullptr;
 
 void Renderer2D::init() {
     s_drawData.vbSize = 0;
@@ -196,7 +196,7 @@ void Renderer2D::setViewId(Miren::ViewId id) {
     s_viewId = id;
 }
 
-void Renderer2D::setCamera(OrthographicCamera *camera) {
+void Renderer2D::setCamera(Camera *camera) {
     s_camera = camera;
 }
 

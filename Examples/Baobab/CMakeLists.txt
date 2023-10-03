@@ -58,3 +58,6 @@ set_target_properties(Baobab
 
 # Dependencies - Panda
 target_link_libraries(Baobab Panda)
+
+# Dependencies - PandaUI
+target_link_libraries(Baobab PandaUI)

@@ -4,90 +4,89 @@
 
 namespace Panda {
 
-using id_t = uint64_t;
+struct Vec2 {
+    union {
+        float x, width;
+    };
+    union {
+        float y, height;
+    };
 
-struct Size {
-    float width;
-    float height;
-
-    Size()
-        : width(0)
-        , height(0) {}
-
-    Size(float width, float height)
-        : width(width)
-        , height(height) {}
-
-    inline bool isZero() {
-        return width == 0 && height == 0;
-    }
-};
-
-struct Point {
-    float x;
-    float y;
-
-    Point()
+    Vec2()
         : x(0)
         , y(0) {}
 
-    Point(glm::vec2 p)
-        : x(p.x)
-        , y(p.y) {}
+    Vec2(glm::vec2 c)
+        : x(c.x)
+        , y(c.y) {}
 
-    Point(float x, float y)
+    Vec2(float x, float y)
         : x(x)
         , y(y) {}
-
-    inline bool isZero() {
-        return x == 0 && y == 0;
-    }
 };
 
-struct Rect {
-    Point origin;
-    Size size;
+struct Vec3 {
+    union {
+        float x, r, width;
+    };
+    union {
+        float y, g, height;
+    };
+    union {
+        float z, b;
+    };
 
-    Rect()
-        : origin()
-        , size() {}
+    Vec3()
+        : x(0)
+        , y(0)
+        , z(0) {}
 
-    Rect(float x, float y, float width, float height)
-        : origin(x, y)
-        , size(width, height) {}
+    Vec3(glm::vec3 c)
+        : x(c.x)
+        , y(c.y)
+        , z(c.z) {}
 
-    inline static Rect zero() {
-        return Rect();
-    }
-
-    inline bool isZero() {
-        return origin.isZero() && size.isZero();
-    }
+    Vec3(float x, float y, float z)
+        : x(x)
+        , y(y)
+        , z(z) {}
 };
 
-struct Color {
-    float r;
-    float g;
-    float b;
-    float a;
+struct Vec4 {
+    union {
+        float x, r, width;
+    };
+    union {
+        float y, g, height;
+    };
+    union {
+        float z, b;
+    };
+    union {
+        float w, a;
+    };
 
-    Color()
-        : r(1)
-        , g(0)
-        , b(0)
-        , a(1) {}
+    Vec4()
+        : x(0)
+        , y(0)
+        , z(0)
+        , w(0) {}
 
-    Color(glm::vec4 c)
-        : r(c.x)
-        , g(c.y)
-        , b(c.z)
-        , a(c.w) {}
+    Vec4(glm::vec4 c)
+        : x(c.x)
+        , y(c.y)
+        , z(c.z)
+        , w(c.w) {}
 
-    Color(float r, float g, float b, float a)
-        : r(r)
-        , g(g)
-        , b(b)
-        , a(a) {}
+    Vec4(float x, float y, float z, float w)
+        : x(x)
+        , y(y)
+        , z(z)
+        , w(w) {}
 };
+
+using id_t = uint64_t;
+using Size = Vec2;
+using Color = Vec4;
 
 } // namespace Panda

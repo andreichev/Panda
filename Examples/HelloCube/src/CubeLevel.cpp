@@ -75,8 +75,9 @@ public:
 
         Panda::TextureAsset textureAsset = Panda::AssetLoader::loadTexture("textures/arbuz1.png");
         texture = Miren::createTexture(textureAsset.getMirenTextureCreate());
-        Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
-            "default-shaders/base/base_vertex.glsl", "default-shaders/base/base_fragment.glsl");
+        Panda::ProgramAsset programAsset =
+            Panda::AssetLoader::loadProgram("default-shaders/renderer3d/base_vertex.glsl",
+                "default-shaders/renderer3d/base_fragment.glsl");
         shader = Miren::createProgram(programAsset.getMirenProgramCreate());
         Miren::setShader(shader);
 
@@ -84,14 +85,15 @@ public:
         view = glm::lookAt(
             glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         // view = glm::rotate(glm::mat4(1.0f), glm::radians(180.f), glm::vec3(0.0f, 1.0f, 0.0f));
-        projectionMatrix = glm::perspective<float>(
+        projection = glm::perspective<float>(
             40.f, (float)windowSize.width / (float)windowSize.height, 0.1f, 1000.0f);
         // projectionMatrix = glm::perspective(90.f, 1.0f, 0.1f, 1000.0f);
         model = glm::mat4(1.f);
         translate = glm::vec3(0.f, 0.f, 0.f);
+        viewProjection = projection * view;
 
         Miren::setUniform(
-            shader, "projection", &projectionMatrix[0][0], Miren::UniformDataType::Mat4);
+            shader, "projViewMtx", &viewProjection[0][0], Miren::UniformDataType::Mat4);
         time = 0;
     }
 
@@ -102,13 +104,13 @@ public:
             glm::scale(glm::mat4(1.f), glm::vec3(abs(sin(time)) + 1.f, abs(sin(time)) + 1.f, 1.f));
         model = glm::translate(model, translate);
         model = glm::rotate(model, (float)time, glm::vec3(1.f, 1.f, 0.f));
+        viewProjection = projection * view;
 
         Miren::setShader(shader);
         Miren::setTexture(texture, 0);
         Miren::setUniform(shader, "model", &model[0][0], Miren::UniformDataType::Mat4);
-        Miren::setUniform(shader, "view", &view[0][0], Miren::UniformDataType::Mat4);
         Miren::setUniform(
-            shader, "projection", &projectionMatrix[0][0], Miren::UniformDataType::Mat4);
+            shader, "projViewMtx", &viewProjection[0][0], Miren::UniformDataType::Mat4);
 
         Miren::setVertexBuffer(vertexBuffer);
         Miren::setIndexBuffer(indexBuffer, 0, 36);
@@ -123,7 +125,8 @@ private:
     glm::vec3 translate;
     glm::mat4 view;
     glm::mat4 model;
-    glm::mat4 projectionMatrix;
+    glm::mat4 projection;
+    glm::mat4 viewProjection;
 
     double time;
     Miren::TextureHandle texture;

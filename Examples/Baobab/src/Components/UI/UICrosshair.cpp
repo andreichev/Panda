@@ -1,8 +1,8 @@
 #include "UICrosshair.hpp"
 
 UICrosshair::UICrosshair()
-    : horizontal(Foundation::makeShared<Panda::UIView>())
-    , vertical(Foundation::makeShared<Panda::UIView>()) {
+    : horizontal(Foundation::makeShared<PandaUI::UIView>())
+    , vertical(Foundation::makeShared<PandaUI::UIView>()) {
     addSubviews();
 }
 
@@ -12,6 +12,8 @@ void UICrosshair::addSubviews() {
 }
 
 void UICrosshair::layout() {
-    horizontal->setFrame(Panda::Rect(windowSize.width / 2 - 25, windowSize.height / 2 - 2, 50, 4));
-    vertical->setFrame(Panda::Rect(windowSize.width / 2 - 2, windowSize.height / 2 - 25, 4, 50));
+    horizontal->setFrame(
+        PandaUI::Rect(m_frame.size.width / 2 - 25, m_frame.size.height / 2 - 2, 50, 4));
+    vertical->setFrame(
+        PandaUI::Rect(m_frame.size.width / 2 - 2, m_frame.size.height / 2 - 25, 4, 50));
 }
