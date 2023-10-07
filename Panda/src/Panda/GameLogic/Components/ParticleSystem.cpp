@@ -26,7 +26,7 @@ void ParticleSystem::update(double deltaTime) {
         particle.rotation += 0.01f * (float)deltaTime;
 
         Renderer2D::RectData rect;
-        rect.origin = Vec3(particle.position.x, particle.position.y, 0.f);
+        rect.origin = Vec3(particle.position.x, particle.position.y, particle.position.z);
         float life = particle.lifeRemaining / particle.lifeTime;
         glm::vec4 color = glm::lerp(particle.colorEnd, particle.colorBegin, life);
         rect.color = color;
@@ -47,6 +47,7 @@ void ParticleSystem::emit(const ParticleProps &particleProps) {
     particle.velocity = particleProps.velocity;
     particle.velocity.x += particleProps.velocityVariation.x * (Random::getFloat() - 0.5f);
     particle.velocity.y += particleProps.velocityVariation.y * (Random::getFloat() - 0.5f);
+    particle.velocity.z += particleProps.velocityVariation.z * (Random::getFloat() - 0.5f);
 
     // Color
     particle.colorBegin = particleProps.colorBegin;

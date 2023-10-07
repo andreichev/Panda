@@ -4,11 +4,11 @@
 
 namespace Panda {
 
-#define MAX_PARTICLES 1000
+#define MAX_PARTICLES 10000
 
 struct ParticleProps {
-    glm::vec2 position;
-    glm::vec2 velocity, velocityVariation;
+    glm::vec3 position;
+    glm::vec3 velocity, velocityVariation;
     glm::vec4 colorBegin, colorEnd;
     float sizeBegin, sizeEnd, sizeVariation;
     float lifeTime = 1.0f;
@@ -25,8 +25,8 @@ public:
 
 private:
     struct Particle {
-        glm::vec2 position;
-        glm::vec2 velocity;
+        glm::vec3 position;
+        glm::vec3 velocity;
         glm::vec4 colorBegin, colorEnd;
         float rotation = 0.0f;
         float sizeBegin, sizeEnd;

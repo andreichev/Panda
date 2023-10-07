@@ -24,6 +24,7 @@ public:
         m_viewProjection = m_projection * m_view;
         return m_viewProjection;
     }
+    Vec3 screenCoordToWorld(Vec2 screen, float distance);
     inline glm::vec4 getFront() const {
         return m_front;
     }
