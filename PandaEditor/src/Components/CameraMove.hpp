@@ -21,8 +21,6 @@ public:
 private:
     Camera *m_camera;
     Transform *m_transform;
-    float m_cameraTranslationSpeed = 1.0f;
-    float m_cameraRotationSpeed = 180.0f;
     float m_mouseSpeed = 0.2f;
     float m_moveSpeed = 20.0f;
 };

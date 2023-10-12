@@ -19,8 +19,6 @@ public:
 private:
     Panda::Camera *m_camera;
     Panda::Transform *m_transform;
-    float m_cameraTranslationSpeed = 1.0f;
-    float m_cameraRotationSpeed = 180.0f;
-    double m_zoom;
-    bool m_rotation;
+    float m_moveSpeed = 1.4f;
+    float m_rotationSpeed = 180.0f;
 };

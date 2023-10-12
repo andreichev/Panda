@@ -24,7 +24,11 @@ public:
         m_viewProjection = m_projection * m_view;
         return m_viewProjection;
     }
+    /// Первый вариант: дистанция от камеры задается в мировых координатах
     Vec3 screenCoordToWorld(Vec2 screen, float distance);
+    /// Второй вариант: дистанция от камеры задается буфером глубины.
+    /// Значение z от -1 до 1 для OpenGL или от 0 до 1 для Vulkan.
+    Vec3 screenCoordToWorld(Vec3 screen);
     inline glm::vec4 getFront() const {
         return m_front;
     }

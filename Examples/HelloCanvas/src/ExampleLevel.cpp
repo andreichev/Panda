@@ -80,9 +80,8 @@ public:
             particleProps.velocityVariation = glm::vec3(1.5f, 1.5f, 1.5f);
             float x = Panda::Input::getMousePositionX();
             float y = Panda::Input::getMousePositionY();
-            // float cameraZ = m_camera->getEntity().getTransform().getPosition().z;
-            // LOG_INFO("CAMERA HEIGHT: {}", cameraZ);
-            Panda::Vec3 coord = m_camera->screenCoordToWorld({x, y}, 20.f);
+            float cameraZ = m_camera->getEntity().getTransform().getPosition().z;
+            Panda::Vec3 coord = m_camera->screenCoordToWorld({x, y}, cameraZ);
             particleProps.position = glm::vec3(coord.x, coord.y, coord.z);
             for (int i = 0; i < 5; i++) {
                 m_particleSystem->emit(particleProps);
@@ -117,7 +116,7 @@ void ExampleLevel::start(Panda::World *world) {
     Panda::Entity entity = world->instantiateEntity();
     Panda::Camera &camera = entity.addNativeScript<Panda::Camera>();
     Panda::Renderer2D::setCamera(&camera);
-    entity.getTransform().translate(0.f, 0.f, 1.f);
+    entity.getTransform().translate(0.f, 0.f, 3.f);
     Panda::ParticleSystem &particle = entity.addNativeScript<Panda::ParticleSystem>();
     ExampleRenderer &dummy = entity.addNativeScript<ExampleRenderer>();
     OrthographicCameraMove &cameraMove = entity.addNativeScript<OrthographicCameraMove>();
