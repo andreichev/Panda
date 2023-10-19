@@ -68,24 +68,15 @@ public:
         Panda::Renderer2D::drawRect(rect3);
 
         if (Panda::Input::isMouseButtonPressed(Panda::MouseButton::LEFT)) {
-            Panda::ParticleProps particleProps;
-            particleProps.colorBegin =
-                glm::vec4(1.0f, abs(sin(colorFactor)), abs(cos(colorFactor)), 1.f);
-            particleProps.colorEnd = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-            particleProps.sizeBegin = 0.1f;
-            particleProps.sizeVariation = 0.1f;
-            particleProps.sizeEnd = 0.0f;
-            particleProps.lifeTime = 20.0f;
-            particleProps.velocity = glm::vec3(0.0f, 0.0f, 0.f);
-            particleProps.velocityVariation = glm::vec3(1.5f, 1.5f, 1.5f);
             float x = Panda::Input::getMousePositionX();
             float y = Panda::Input::getMousePositionY();
-            float cameraZ = m_camera->getEntity().getTransform().getPosition().z;
-            Panda::Vec3 coord = m_camera->screenCoordToWorld({x, y}, cameraZ);
-            particleProps.position = glm::vec3(coord.x, coord.y, coord.z);
-            for (int i = 0; i < 5; i++) {
-                m_particleSystem->emit(particleProps);
-            }
+            emit(x, y);
+        }
+
+        int touchCount = Panda::Input::touchCount();
+        for (int i = 0; i < touchCount; i++) {
+            Panda::Input::Touch touch = Panda::Input::getTouch(i);
+            emit(touch.x, touch.y);
         }
 
         if (Panda::Input::isKeyJustPressed(Panda::Key::ESCAPE)) {
@@ -104,6 +95,25 @@ public:
     }
 
 private:
+    void emit(float screenX, float screenY) {
+        Panda::ParticleProps particleProps;
+        particleProps.colorBegin =
+            glm::vec4(1.0f, abs(sin(colorFactor)), abs(cos(colorFactor)), 1.f);
+        particleProps.colorEnd = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+        particleProps.sizeBegin = 0.1f;
+        particleProps.sizeVariation = 0.1f;
+        particleProps.sizeEnd = 0.0f;
+        particleProps.lifeTime = 120.0f;
+        particleProps.velocity = glm::vec3(0.0f, 0.0f, 0.f);
+        particleProps.velocityVariation = glm::vec3(1.5f, 1.5f, 1.5f);
+        float cameraZ = m_camera->getEntity().getTransform().getPosition().z;
+        Panda::Vec3 coord = m_camera->screenCoordToWorld({screenX, screenY}, cameraZ);
+        particleProps.position = glm::vec3(coord.x, coord.y, coord.z);
+        for (int i = 0; i < 5; i++) {
+            m_particleSystem->emit(particleProps);
+        }
+    }
+
     Panda::ParticleSystem *m_particleSystem;
     Panda::Camera *m_camera;
     Foundation::Shared<Panda::Texture> m_texture;
@@ -116,7 +126,7 @@ void ExampleLevel::start(Panda::World *world) {
     Panda::Entity entity = world->instantiateEntity();
     Panda::Camera &camera = entity.addNativeScript<Panda::Camera>();
     Panda::Renderer2D::setCamera(&camera);
-    entity.getTransform().translate(0.f, 0.f, 3.f);
+    entity.getTransform().translate(0.f, 0.f, 10.f);
     Panda::ParticleSystem &particle = entity.addNativeScript<Panda::ParticleSystem>();
     ExampleRenderer &dummy = entity.addNativeScript<ExampleRenderer>();
     OrthographicCameraMove &cameraMove = entity.addNativeScript<OrthographicCameraMove>();

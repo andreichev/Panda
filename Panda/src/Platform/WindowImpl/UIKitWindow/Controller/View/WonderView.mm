@@ -35,6 +35,7 @@
 
 - (void) setupPlatform {
     // self.backgroundColor = UIColor.redColor;
+    [self setMultipleTouchEnabled:true];
     CGFloat scale = UIScreen.mainScreen.nativeScale;
     [self setContentScaleFactor:scale];
     CGFloat width = self.frame.size.width * scale;
@@ -63,47 +64,42 @@
     Miren::renderFrame();
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     if (_eventQueue == NULL) { return; }
-    UITouch *touch = [[event allTouches] anyObject];
-    CGPoint touchLocation = [touch locationInView:self];
-    // touchLocation.x *= self.contentScaleFactor;
-    // touchLocation.y *= self.contentScaleFactor;
-    _eventQueue->postMouseEvent(touchLocation.x, touchLocation.y);
-    _eventQueue->postMouseButtonEvent(Panda::MouseButton::LEFT, true);
+    for (UITouch *touch in touches) {
+        CGPoint touchLocation = [touch locationInView:self];
+        // touchLocation.x *= self.contentScaleFactor;
+        // touchLocation.y *= self.contentScaleFactor;
+        // printf("TOUCH BEGAN: %d\n", touch.hash);
+        _eventQueue->postTouchBeganEvent(int(touch.hash), touchLocation.x, touchLocation.y);
+    }
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     if (_eventQueue == NULL) { return; }
-    UITouch *touch = [[event allTouches] anyObject];
-    CGPoint touchLocation = [touch locationInView:self];
-    // touchLocation.x *= self.contentScaleFactor;
-    // touchLocation.y *= self.contentScaleFactor;
-    _eventQueue->postMouseEvent(touchLocation.x, touchLocation.y);
-    _eventQueue->postMouseButtonEvent(Panda::MouseButton::LEFT, false);
+    for (UITouch *touch in touches) {
+        // printf("TOUCH ENDED: %d\n", touch.hash);
+        _eventQueue->postTouchEndedEvent(int(touch.hash));
+    }
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-{
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     if (_eventQueue == NULL) { return; }
-    UITouch *touch = [[event allTouches] anyObject];
-    CGPoint touchLocation = [touch locationInView:self];
-    // touchLocation.x *= self.contentScaleFactor;
-    // touchLocation.y *= self.contentScaleFactor;
-
-    _eventQueue->postMouseEvent(touchLocation.x, touchLocation.y);
+    for (UITouch *touch in touches) {
+        CGPoint touchLocation = [touch locationInView:self];
+        // touchLocation.x *= self.contentScaleFactor;
+        // touchLocation.y *= self.contentScaleFactor;
+        // printf("TOUCH MOVED: %d\n", touch.hash);
+        _eventQueue->postTouchMovedEvent(int(touch.hash), touchLocation.x, touchLocation.y);
+    }
 }
 
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
-{
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     if (_eventQueue == NULL) { return; }
-    UITouch *touch = [[event allTouches] anyObject];
-    CGPoint touchLocation = [touch locationInView:self];
-    // touchLocation.x *= self.contentScaleFactor;
-    // touchLocation.y *= self.contentScaleFactor;
-    // TODO: Post mouse released event
+    for (UITouch *touch in touches) {
+        // printf("TOUCH CANCELLED: %d\n", touch.hash);
+        _eventQueue->postTouchEndedEvent(int(touch.hash));
+    }
 }
 
 @end

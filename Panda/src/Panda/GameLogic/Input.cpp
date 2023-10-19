@@ -4,6 +4,7 @@
 
 #include "Panda/GameLogic/Input.hpp"
 #include "Panda/Events/WindowEvents.hpp"
+#include "Panda/Events/TouchEvents.hpp"
 #include "Panda/Events/KeyEvents.hpp"
 #include "Panda/Events/MouseEvents.hpp"
 
@@ -19,6 +20,7 @@ double Input::mousePositionX = 0;
 double Input::mousePositionY = 0;
 double Input::mouseScrollX = 0;
 double Input::mouseScrollY = 0;
+std::vector<Input::Touch> Input::activeTouches;
 
 void Input::onEvent(Event *event) {
     switch (event->type) {
@@ -59,6 +61,21 @@ void Input::onEvent(Event *event) {
         case EventType::MouseScrolled: {
             const MouseScrolledEvent *ev = static_cast<const MouseScrolledEvent *>(event);
             Input::postScrollEvent(ev->xoffset, ev->yoffset);
+            break;
+        }
+        case EventType::TouchBegan: {
+            const TouchBeganEvent *ev = static_cast<const TouchBeganEvent *>(event);
+            Input::postTouchBeganEvent(ev->id, ev->x, ev->y);
+            break;
+        }
+        case EventType::TouchMoved: {
+            const TouchMovedEvent *ev = static_cast<const TouchMovedEvent *>(event);
+            Input::postTouchMovedEvent(ev->id, ev->x, ev->y);
+            break;
+        }
+        case EventType::TouchEnded: {
+            const TouchEndedEvent *ev = static_cast<const TouchEndedEvent *>(event);
+            Input::postTouchEndedEvent(ev->id);
             break;
         }
     }
@@ -128,6 +145,41 @@ void Input::nextFrame() {
     frame++;
     mouseScrollX = 0;
     mouseScrollY = 0;
+}
+
+Input::Touch Input::getTouch(int index) {
+    if (index >= 0 && index < activeTouches.size()) {
+        return activeTouches[index];
+    }
+    PND_ASSERT_F(false, "WRONG TOUCH INDEX {}", index);
+    return Input::Touch(0, 0, 0);
+}
+
+int Input::touchCount() {
+    return activeTouches.size();
+}
+
+void Input::postTouchBeganEvent(int id, float x, float y) {
+    activeTouches.emplace_back(id, x, y);
+}
+
+void Input::postTouchMovedEvent(int id, float x, float y) {
+    auto touch = std::find_if(
+        activeTouches.begin(), activeTouches.end(), [id](auto touch) { return touch.id == id; });
+    PND_ASSERT(touch != activeTouches.end(), "TOUCH NOT FOUND");
+    if (touch != activeTouches.end()) {
+        touch->x = x;
+        touch->y = y;
+    }
+}
+
+void Input::postTouchEndedEvent(int id) {
+    auto touch = std::find_if(
+        activeTouches.begin(), activeTouches.end(), [id](auto touch) { return touch.id == id; });
+    PND_ASSERT(touch != activeTouches.end(), "TOUCH NOT FOUND");
+    if (touch != activeTouches.end()) {
+        activeTouches.erase(touch);
+    }
 }
 
 } // namespace Panda

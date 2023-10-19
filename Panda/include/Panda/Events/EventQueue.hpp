@@ -20,6 +20,9 @@ public:
     void postSizeEvent(uint32_t width, uint32_t height);
     void postKeyEvent(Key key, bool down);
     void postMouseEvent(double x, double y);
+    void postTouchBeganEvent(int id, float x, float y);
+    void postTouchMovedEvent(int id, float x, float y);
+    void postTouchEndedEvent(int id);
     void postScrollEvent(double xoffset, double yoffset);
     void postWindowCloseEvent();
     Event *poll();

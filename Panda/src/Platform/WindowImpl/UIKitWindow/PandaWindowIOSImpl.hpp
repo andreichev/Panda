@@ -29,6 +29,8 @@ public:
     Size getDpi() override {
         return m_dpi;
     }
+    bool isMaximized() override {}
+    void setMaximized(bool isMaximized) override {}
 
 private:
     Size m_size;

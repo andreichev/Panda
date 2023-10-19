@@ -19,7 +19,10 @@ enum EventType {
     MouseButtonPressed,
     MouseButtonReleased,
     MouseMoved,
-    MouseScrolled
+    MouseScrolled,
+    TouchBegan,
+    TouchMoved,
+    TouchEnded
 };
 
 struct Event : public Foundation::CommandBuffer::Command {

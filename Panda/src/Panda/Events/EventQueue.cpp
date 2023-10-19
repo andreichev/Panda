@@ -5,6 +5,7 @@
 #include "Panda/Events/EventQueue.hpp"
 #include "Panda/Events/KeyEvents.hpp"
 #include "Panda/Events/MouseEvents.hpp"
+#include "Panda/Events/TouchEvents.hpp"
 #include "Panda/Events/WindowEvents.hpp"
 
 namespace Panda {
@@ -56,6 +57,21 @@ void EventQueue::postScrollEvent(double xoffset, double yoffset) {
 
 void EventQueue::postWindowCloseEvent() {
     WindowCloseEvent event;
+    m_events.write(event);
+}
+
+void EventQueue::postTouchBeganEvent(int id, float x, float y) {
+    TouchBeganEvent event(id, x, y);
+    m_events.write(event);
+}
+
+void EventQueue::postTouchMovedEvent(int id, float x, float y) {
+    TouchMovedEvent event(id, x, y);
+    m_events.write(event);
+}
+
+void EventQueue::postTouchEndedEvent(int id) {
+    TouchEndedEvent event(id);
     m_events.write(event);
 }
 
