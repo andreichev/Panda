@@ -4,7 +4,7 @@
 
 namespace Panda {
 
-#define MAX_PARTICLES 10000
+#define MAX_PARTICLES 1000
 
 struct ParticleProps {
     glm::vec3 position;

@@ -2,9 +2,9 @@
 // Created by Admin on 25.01.2022.
 //
 
+#include "Panda/Application/Application.hpp"
 #include "Panda/GameLogic/World.hpp"
 #include "Panda/GameLogic/NativeScript.hpp"
-#include "Panda/Renderer/Renderer3D.hpp"
 
 namespace Panda {
 
@@ -41,7 +41,7 @@ void World::update(double deltaTime) {
             auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
             auto &transform = view.get<Transform>(entityHandle);
             for (auto &mesh : staticMeshComponent.meshes) {
-                Renderer3D::submit(&transform, mesh.get());
+                Application::get()->getRenderer3D().submit(&transform, mesh.get());
             }
         }
     }
@@ -52,7 +52,7 @@ void World::update(double deltaTime) {
             auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
             auto &transform = view.get<Transform>(entityHandle);
             for (auto &mesh : dynamicMeshComponent.meshes) {
-                Renderer3D::submit(&transform, mesh.get());
+                Application::get()->getRenderer3D().submit(&transform, mesh.get());
             }
         }
     }

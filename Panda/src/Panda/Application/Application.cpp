@@ -34,7 +34,8 @@ Application::~Application() {
     LOG_INFO("APP SHUTDOWN BEGIN");
     Miren::renderSemaphoreWait();
     DELETE(Foundation::getAllocator(), m_layerStack);
-    Renderer2D::terminate();
+    DELETE(Foundation::getAllocator(), m_renderer2d);
+    DELETE(Foundation::getAllocator(), m_renderer3d);
 #ifdef PLATFORM_DESKTOP
     Miren::terminate();
 #endif
@@ -71,8 +72,8 @@ Application::Application(ApplicationStartupSettings &settings)
 #endif
     Miren::renderSemaphoreWait();
     Random::init();
-    Renderer2D::init();
-    Renderer3D::init();
+    m_renderer2d = NEW(Foundation::getAllocator(), Renderer2D);
+    m_renderer3d = NEW(Foundation::getAllocator(), Renderer3D);
     if (settings.startupLevel != nullptr) {
         startBasicGame(settings.startupLevel);
     } else if (settings.startupLayer != nullptr) {
@@ -112,14 +113,14 @@ void Application::loop() {
 
         Miren::renderSemaphoreWait();
         // LOG_INFO("APP UPDATE BEGIN");
-        Renderer2D::begin();
-        Renderer3D::begin();
+        m_renderer2d->begin();
+        m_renderer3d->begin();
         LayerStack &layerStack = *m_layerStack;
         for (Layer *layer : layerStack) {
             layer->onUpdate(deltaTime);
         }
-        Renderer2D::end();
-        Renderer3D::end();
+        m_renderer2d->end();
+        m_renderer3d->end();
         m_ImGuiLayer->begin(deltaTime);
         for (Layer *layer : layerStack) {
             layer->onImGuiRender();

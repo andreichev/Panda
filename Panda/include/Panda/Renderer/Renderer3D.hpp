@@ -20,19 +20,24 @@ public:
         uint32_t drawCalls = 0;
     };
 
-    static void init();
-    static void begin();
-    static void submit(Transform *transform, StaticMesh *mesh);
-    static void submit(Transform *transform, DynamicMesh *mesh);
-    static void end();
-    static Statistics getStats();
-    static void terminate();
-    static void setCamera(Camera *camera);
-    static void setViewId(Miren::ViewId id);
+    struct DrawData {
+        Renderer3D::Statistics stats;
+    };
+
+    Renderer3D();
+    ~Renderer3D();
+    void begin();
+    void submit(Transform *transform, StaticMesh *mesh);
+    void submit(Transform *transform, DynamicMesh *mesh);
+    void end();
+    Statistics getStats();
+    void setCamera(Camera *camera);
+    void setViewId(Miren::ViewId id);
 
 private:
-    static Miren::ViewId s_viewId;
-    static Camera *s_camera;
+    DrawData m_drawData;
+    Miren::ViewId m_viewId;
+    Camera *m_camera;
 };
 
 } // namespace Panda

@@ -4,7 +4,7 @@
 
 #include "Sprite.hpp"
 
-#include <Panda/Renderer/Renderer2D.hpp>
+#include <Panda/Application/Application.hpp>
 
 namespace Panda {
 
@@ -24,7 +24,7 @@ void Sprite::update(double deltaTime) {
         rect.origin = {position.x, position.y, position.z};
         rect.rotation = m_transform->getRotation().z;
     }
-    Panda::Renderer2D::drawRect(rect);
+    Panda::Application::get()->getRenderer2D().drawRect(rect);
 }
 
 } // namespace Panda

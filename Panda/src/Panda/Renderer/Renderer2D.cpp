@@ -2,57 +2,17 @@
 
 namespace Panda {
 
-struct Vertex2D {
-    Vertex2D(glm::vec3 pos, glm::vec2 textureCoords, float textureIndex, Color color)
-        : pos(pos)
-        , textureCoords(textureCoords)
-        , textureIndex(textureIndex)
-        , color(color) {}
-
-    Vertex2D()
-        : pos()
-        , textureCoords()
-        , textureIndex(0)
-        , color() {}
-
-    glm::vec3 pos;
-    glm::vec2 textureCoords;
-    float textureIndex;
-    Color color;
-};
-
-struct DrawCallData {
-    Renderer2D::Statistics stats;
-    glm::mat4 projMat;
-    Miren::ProgramHandle shader;
-    Foundation::Shared<Texture> whiteTexture;
-    Miren::VertexLayoutHandle layout;
-    Foundation::Shared<Texture> textures[MAX_TEXTURE_SLOTS];
-    int samplers[MAX_TEXTURE_SLOTS];
-    uint32_t textureSlotIndex;
-    Vertex2D *vertices;
-    uint32_t verticesCount;
-    uint16_t *indices;
-    uint32_t indicesCount;
-    uint32_t vbSize;
-    uint32_t ibSize;
-};
-
-static DrawCallData s_drawData;
-Miren::ViewId Renderer2D::s_viewId = 0;
-Camera *Renderer2D::s_camera = nullptr;
-
-void Renderer2D::init() {
-    s_drawData.vbSize = 0;
-    s_drawData.indicesCount = 0;
-    s_drawData.vertices =
+Renderer2D::Renderer2D() {
+    m_drawData.vbSize = 0;
+    m_drawData.indicesCount = 0;
+    m_drawData.vertices =
         (Vertex2D *)ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
-    s_drawData.indices =
+    m_drawData.indices =
         (uint16_t *)ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
     Panda::ProgramAsset programAsset =
         Panda::AssetLoader::loadProgram("default-shaders/renderer2d/renderer2d_vertex.glsl",
             "default-shaders/renderer2d/renderer2d_fragment.glsl");
-    s_drawData.shader = Miren::createProgram(programAsset.getMirenProgramCreate());
+    m_drawData.shader = Miren::createProgram(programAsset.getMirenProgramCreate());
     Miren::VertexBufferLayoutData layoutData;
     // Position
     layoutData.pushVec3();
@@ -62,38 +22,38 @@ void Renderer2D::init() {
     layoutData.pushFloat(1);
     // Color
     layoutData.pushVec4();
-    s_drawData.layout = Miren::createVertexLayout(layoutData);
-    s_drawData.textureSlotIndex = 1;
+    m_drawData.layout = Miren::createVertexLayout(layoutData);
+    m_drawData.textureSlotIndex = 1;
     Foundation::Memory whiteTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
     *(uint32_t *)whiteTextureData.data = 0xffffffff;
-    s_drawData.whiteTexture = Foundation::makeShared<Texture>(whiteTextureData, 1, 1);
-    s_drawData.textures[0] = s_drawData.whiteTexture;
+    m_drawData.whiteTexture = Foundation::makeShared<Texture>(whiteTextureData, 1, 1);
+    m_drawData.textures[0] = m_drawData.whiteTexture;
     for (uint32_t i = 0; i < MAX_TEXTURE_SLOTS; i++) {
-        s_drawData.samplers[i] = i;
+        m_drawData.samplers[i] = i;
     }
     Miren::setUniform(
-        s_drawData.shader, "u_textures", s_drawData.samplers, Miren::UniformDataType::IntArray);
+        m_drawData.shader, "u_textures", m_drawData.samplers, Miren::UniformDataType::IntArray);
 }
 
-void Renderer2D::terminate() {
-    Miren::deleteProgram(s_drawData.shader);
-    Miren::deleteVertexLayout(s_drawData.layout);
+Renderer2D::~Renderer2D() {
+    Miren::deleteProgram(m_drawData.shader);
+    Miren::deleteVertexLayout(m_drawData.layout);
     for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i) {
-        s_drawData.textures[i] = nullptr;
+        m_drawData.textures[i] = nullptr;
     }
-    s_drawData.whiteTexture = nullptr;
-    FREE(Foundation::getAllocator(), s_drawData.vertices);
-    FREE(Foundation::getAllocator(), s_drawData.indices);
+    m_drawData.whiteTexture = nullptr;
+    FREE(Foundation::getAllocator(), m_drawData.vertices);
+    FREE(Foundation::getAllocator(), m_drawData.indices);
 }
 
 void Renderer2D::begin() {
-    s_drawData.stats.quadCount = 0;
-    s_drawData.stats.drawCalls = 0;
-    s_drawData.verticesCount = 0;
-    s_drawData.vbSize = 0;
-    s_drawData.indicesCount = 0;
-    s_drawData.ibSize = 0;
-    s_drawData.textureSlotIndex = 1;
+    m_drawData.stats.quadCount = 0;
+    m_drawData.stats.drawCalls = 0;
+    m_drawData.verticesCount = 0;
+    m_drawData.vbSize = 0;
+    m_drawData.indicesCount = 0;
+    m_drawData.ibSize = 0;
+    m_drawData.textureSlotIndex = 1;
 }
 
 void Renderer2D::drawRect(RectData rect) {
@@ -108,8 +68,8 @@ void Renderer2D::drawRect(RectData rect) {
 }
 
 void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
-    uint16_t indicesOffset = s_drawData.verticesCount;
-    uint32_t &verticesCount = s_drawData.verticesCount;
+    uint16_t indicesOffset = m_drawData.verticesCount;
+    uint32_t &verticesCount = m_drawData.verticesCount;
     glm::vec4 positions[4];
     positions[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
     positions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
@@ -123,81 +83,81 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
 
     float textureIndex = 0.0f;
     if (rect.texture != nullptr) {
-        for (uint32_t i = 1; i < s_drawData.textureSlotIndex; i++) {
-            if (*s_drawData.textures[i] == *rect.texture) {
+        for (uint32_t i = 1; i < m_drawData.textureSlotIndex; i++) {
+            if (*m_drawData.textures[i] == *rect.texture) {
                 textureIndex = (float)i;
                 break;
             }
         }
         if (textureIndex == 0.0f) {
             // TODO: Check if next batch is needed
-            textureIndex = (float)s_drawData.textureSlotIndex;
-            s_drawData.textures[s_drawData.textureSlotIndex] = rect.texture;
-            s_drawData.textureSlotIndex++;
+            textureIndex = (float)m_drawData.textureSlotIndex;
+            m_drawData.textures[m_drawData.textureSlotIndex] = rect.texture;
+            m_drawData.textureSlotIndex++;
         }
     }
 
     for (int i = 0; i < 4; i++) {
-        s_drawData.vertices[verticesCount].pos = transform * positions[i];
-        s_drawData.vertices[verticesCount].textureIndex = textureIndex;
-        s_drawData.vertices[verticesCount].color = rect.color;
-        s_drawData.vertices[verticesCount].textureCoords = textureCoords[i];
+        m_drawData.vertices[verticesCount].pos = transform * positions[i];
+        m_drawData.vertices[verticesCount].textureIndex = textureIndex;
+        m_drawData.vertices[verticesCount].color = rect.color;
+        m_drawData.vertices[verticesCount].textureCoords = textureCoords[i];
         verticesCount++;
     }
-    uint32_t &indicesCount = s_drawData.indicesCount;
-    s_drawData.indices[indicesCount++] = indicesOffset + 0;
-    s_drawData.indices[indicesCount++] = indicesOffset + 1;
-    s_drawData.indices[indicesCount++] = indicesOffset + 2;
-    s_drawData.indices[indicesCount++] = indicesOffset + 2;
-    s_drawData.indices[indicesCount++] = indicesOffset + 3;
-    s_drawData.indices[indicesCount++] = indicesOffset + 0;
+    uint32_t &indicesCount = m_drawData.indicesCount;
+    m_drawData.indices[indicesCount++] = indicesOffset + 0;
+    m_drawData.indices[indicesCount++] = indicesOffset + 1;
+    m_drawData.indices[indicesCount++] = indicesOffset + 2;
+    m_drawData.indices[indicesCount++] = indicesOffset + 2;
+    m_drawData.indices[indicesCount++] = indicesOffset + 3;
+    m_drawData.indices[indicesCount++] = indicesOffset + 0;
 
-    s_drawData.vbSize += sizeof(Vertex2D) * 4;
-    s_drawData.ibSize += sizeof(uint16_t) * 6;
+    m_drawData.vbSize += sizeof(Vertex2D) * 4;
+    m_drawData.ibSize += sizeof(uint16_t) * 6;
     PND_ASSERT(verticesCount < MAX_VERTICES_COUNT, "VERTICES LIMIT REACHED");
     PND_ASSERT(indicesCount < MAX_INDICES_COUNT, "INDICES LIMIT REACHED");
-    s_drawData.stats.quadCount += 1;
+    m_drawData.stats.quadCount += 1;
 }
 
 Renderer2D::Statistics Renderer2D::getStats() {
-    return s_drawData.stats;
+    return m_drawData.stats;
 }
 
 void Renderer2D::end() {
-    if (s_drawData.verticesCount == 0 || s_camera == nullptr) {
+    if (m_drawData.verticesCount == 0 || m_camera == nullptr) {
         return;
     }
-    Miren::setShader(s_drawData.shader);
-    Miren::setUniform(s_drawData.shader,
+    Miren::setShader(m_drawData.shader);
+    Miren::setUniform(m_drawData.shader,
         "projViewMtx",
-        (void *)&s_camera->getViewProjectionMatrix(),
+        (void *)&m_camera->getViewProjectionMatrix(),
         Miren::UniformDataType::Mat4);
 
     Miren::TransientVertexBuffer tvb;
-    Miren::allocTransientVertexBuffer(&tvb, s_drawData.vbSize);
-    memcpy(tvb.data, s_drawData.vertices, s_drawData.vbSize);
+    Miren::allocTransientVertexBuffer(&tvb, m_drawData.vbSize);
+    memcpy(tvb.data, m_drawData.vertices, m_drawData.vbSize);
 
     Miren::TransientIndexBuffer tib;
     Miren::allocTransientIndexBuffer(
-        &tib, s_drawData.indicesCount, Miren::BufferElementType::UnsignedShort);
-    memcpy(tib.data, s_drawData.indices, s_drawData.ibSize);
+        &tib, m_drawData.indicesCount, Miren::BufferElementType::UnsignedShort);
+    memcpy(tib.data, m_drawData.indices, m_drawData.ibSize);
 
     Miren::setState(0);
-    for (int i = 0; i < s_drawData.textureSlotIndex; i++) {
-        Miren::setTexture(s_drawData.textures[i]->getHandle(), i);
+    for (int i = 0; i < m_drawData.textureSlotIndex; i++) {
+        Miren::setTexture(m_drawData.textures[i]->getHandle(), i);
     }
-    Miren::setVertexLayout(s_drawData.layout);
+    Miren::setVertexLayout(m_drawData.layout);
     Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
-    Miren::setIndexBuffer(tib.handle, tib.startIndex, s_drawData.indicesCount);
-    Miren::submit(s_viewId);
+    Miren::setIndexBuffer(tib.handle, tib.startIndex, m_drawData.indicesCount);
+    Miren::submit(m_viewId);
 }
 
 void Renderer2D::setViewId(Miren::ViewId id) {
-    s_viewId = id;
+    m_viewId = id;
 }
 
 void Renderer2D::setCamera(Camera *camera) {
-    s_camera = camera;
+    m_camera = camera;
 }
 
 } // namespace Panda

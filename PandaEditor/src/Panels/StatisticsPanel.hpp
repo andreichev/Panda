@@ -11,7 +11,7 @@ public:
     static void onImGuiRender() {
         ImGui::Begin("Renderer2D statistics");
         ImGui::Text("FPS: %d", Application::get()->fps);
-        auto stats = Renderer2D::getStats();
+        auto stats = Application::get()->getRenderer2D().getStats();
         ImGui::Text("Quads count: %d", stats.quadCount);
         ImGui::Text("Vertices count: %d", stats.getTotalVertexCount());
         ImGui::Text("Indices count: %d", stats.getTotalIndexCount());

@@ -15,10 +15,15 @@ public:
     UIView();
     UIView(Rect frame);
     virtual ~UIView();
-    void render();
     void addSubview(Foundation::Shared<UIView> node);
     void removeSubview(Foundation::Shared<UIView> node);
     void setFrame(Rect frame);
+    void setBackgroundColor(Color color) {
+        m_backgroundColor = color;
+    }
+    Color getBackgroundColor() {
+        return m_backgroundColor;
+    }
 
     // Вызывается для позиционирования (обновление буфера)
     virtual void layout();
@@ -29,6 +34,10 @@ public:
 protected:
     std::vector<Foundation::Shared<UIView>> m_subviews;
     Rect m_frame;
+    Color m_backgroundColor;
+
+private:
+    void render();
 };
 
 } // namespace PandaUI

@@ -41,19 +41,56 @@ public:
         }
     };
 
-    static void init();
-    static void begin();
-    static void drawRect(RectData rect);
-    static void end();
-    static Statistics getStats();
-    static void terminate();
-    static void setViewId(Miren::ViewId id);
-    static void setCamera(Camera *camera);
+    struct Vertex2D {
+        Vertex2D(glm::vec3 pos, glm::vec2 textureCoords, float textureIndex, Color color)
+            : pos(pos)
+            , textureCoords(textureCoords)
+            , textureIndex(textureIndex)
+            , color(color) {}
+
+        Vertex2D()
+            : pos()
+            , textureCoords()
+            , textureIndex(0)
+            , color() {}
+
+        glm::vec3 pos;
+        glm::vec2 textureCoords;
+        float textureIndex;
+        Color color;
+    };
+
+    struct DrawCallData {
+        Renderer2D::Statistics stats;
+        glm::mat4 projMat;
+        Miren::ProgramHandle shader;
+        Foundation::Shared<Texture> whiteTexture;
+        Miren::VertexLayoutHandle layout;
+        Foundation::Shared<Texture> textures[MAX_TEXTURE_SLOTS];
+        int samplers[MAX_TEXTURE_SLOTS];
+        uint32_t textureSlotIndex;
+        Vertex2D *vertices;
+        uint32_t verticesCount;
+        uint16_t *indices;
+        uint32_t indicesCount;
+        uint32_t vbSize;
+        uint32_t ibSize;
+    };
+
+    Renderer2D();
+    ~Renderer2D();
+    void begin();
+    void drawRect(RectData rect);
+    void end();
+    Statistics getStats();
+    void setViewId(Miren::ViewId id);
+    void setCamera(Camera *camera);
 
 private:
-    static Miren::ViewId s_viewId;
-    static Camera *s_camera;
-    static void drawRect(glm::mat4 &transform, RectData rect);
+    Miren::ViewId m_viewId;
+    Camera *m_camera;
+    DrawCallData m_drawData;
+    void drawRect(glm::mat4 &transform, RectData rect);
 };
 
 } // namespace Panda

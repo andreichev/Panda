@@ -1,6 +1,6 @@
 #include "Panda/GameLogic/Components/ParticleSystem.hpp"
 
-#include "Panda/Renderer/Renderer2D.hpp"
+#include "Panda/Application/Application.hpp"
 #include "Panda/Base/Random.hpp"
 
 #include <glm/gtx/compatibility.hpp>
@@ -33,7 +33,7 @@ void ParticleSystem::update(double deltaTime) {
         float size = glm::lerp(particle.sizeEnd, particle.sizeBegin, life);
         rect.size = Size(size, size);
         rect.rotation = particle.rotation;
-        Renderer2D::drawRect(rect);
+        Application::get()->getRenderer2D().drawRect(rect);
     }
 }
 
@@ -59,7 +59,7 @@ void ParticleSystem::emit(const ParticleProps &particleProps) {
         particleProps.sizeBegin + particleProps.sizeVariation * (Random::getFloat() - 0.5f);
     particle.sizeEnd = particleProps.sizeEnd;
 
-    if (m_poolIndex == 0) {
+    if (m_poolIndex <= 0) {
         m_poolIndex = MAX_PARTICLES - 1;
     } else {
         m_poolIndex--;

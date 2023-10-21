@@ -10,6 +10,8 @@
 #include "Panda/Events/EventQueue.hpp"
 #include "Panda/Events/WindowSizeObserver.hpp"
 #include "Panda/ImGui/ImGuiLayer.hpp"
+#include "Panda/Renderer/Renderer2D.hpp"
+#include "Panda/Renderer/Renderer3D.hpp"
 
 namespace Panda {
 
@@ -37,6 +39,12 @@ public:
     }
     int fps;
     EventQueue *getEventQueue();
+    Renderer2D &getRenderer2D() {
+        return *m_renderer2d;
+    }
+    Renderer3D &getRenderer3D() {
+        return *m_renderer3d;
+    }
 
     static Application *get();
 
@@ -57,6 +65,8 @@ private:
     Window *m_window;
     std::vector<WindowSizeObserver *> m_windowSizeListeners;
     ImGuiLayer *m_ImGuiLayer;
+    Renderer2D *m_renderer2d;
+    Renderer3D *m_renderer3d;
 
     static Application *s_instance;
 };
