@@ -18,10 +18,13 @@ public:
     void addSubview(Foundation::Shared<UIView> node);
     void removeSubview(Foundation::Shared<UIView> node);
     void setFrame(Rect frame);
+    const Rect &getFrame() const {
+        return m_frame;
+    }
     void setBackgroundColor(Color color) {
         m_backgroundColor = color;
     }
-    Color getBackgroundColor() {
+    const Color &getBackgroundColor() {
         return m_backgroundColor;
     }
 

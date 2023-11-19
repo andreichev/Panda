@@ -14,3 +14,6 @@ target_include_directories(PandaUI PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Dependencies - Miren
 target_link_libraries(PandaUI Miren)
+
+# Dependencies - Panda
+target_link_libraries(PandaUI Panda)
