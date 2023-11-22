@@ -12,6 +12,8 @@
 
 namespace Panda {
 
+class World;
+
 class Entity final {
 public:
     template<typename T>
@@ -70,12 +72,16 @@ public:
         getComponent<TagComponent>().tag = name;
     }
 
+    World *getWorld() {
+        return m_world;
+    }
+
     friend bool operator==(const Entity &lhs, const Entity &rhs) {
         return lhs.m_id == rhs.m_id;
     }
 
 private:
-    Entity(entt::registry *m_registry, id_t id);
+    Entity(entt::registry *m_registry, id_t id, World *world);
     Entity();
 
     template<typename T, typename... Args>
@@ -87,6 +93,7 @@ private:
     }
 
     entt::registry *m_registry;
+    World *m_world;
     id_t m_id;
 
     friend class World;

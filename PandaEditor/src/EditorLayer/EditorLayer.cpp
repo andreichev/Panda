@@ -1,7 +1,6 @@
 #include "EditorLayer.hpp"
 #include "Panels/Dockspace.hpp"
 #include "Panels/MenuBar.hpp"
-#include "Panels/StatisticsPanel.hpp"
 #include "Components/CameraMove.hpp"
 #include "Components/Sprite.hpp"
 
@@ -10,13 +9,15 @@ namespace Panda {
 EditorLayer::EditorLayer()
     : m_world(nullptr)
     , m_viewport()
-    , m_hierarchyPanel(nullptr) {}
+    , m_hierarchyPanel(nullptr)
+    , m_statisticsPanel(nullptr) {}
 
 void EditorLayer::onAttach() {
     m_world = NEW(Foundation::getAllocator(), World);
     m_world->initialize();
     m_viewport.init(m_world);
     m_hierarchyPanel.setWorld(m_world);
+    m_statisticsPanel.setWorld(m_world);
     initializeExampleWorld();
 }
 
@@ -52,7 +53,7 @@ void EditorLayer::onUpdate(double deltaTime) {
 void EditorLayer::onImGuiRender() {
     Dockspace::beginImGuiDockspace();
     MenuBar::onImGuiRender();
-    StatisticsPanel::onImGuiRender();
+    m_statisticsPanel.onImGuiRender();
     m_viewport.onImGuiRender();
     m_hierarchyPanel.onImGuiRender();
     Dockspace::endImGuiDockspace();

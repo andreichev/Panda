@@ -6,13 +6,15 @@
 
 namespace Panda {
 
-Entity::Entity(entt::registry *registry, id_t id)
+Entity::Entity(entt::registry *registry, id_t id, World *world)
     : m_registry(registry)
-    , m_id(id) {}
+    , m_id(id)
+    , m_world(world) {}
 
 Entity::Entity()
     : m_registry(nullptr)
-    , m_id(-1) {}
+    , m_id(-1)
+    , m_world(nullptr) {}
 
 Transform &Entity::getTransform() {
     return getComponent<Transform>();
@@ -36,13 +38,13 @@ void Entity::removeChildEntity(Entity entity) {
 
 void Entity::removeFromParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    Entity parent = Entity(m_registry, thisRelationship.parentHandle);
+    Entity parent = Entity(m_registry, thisRelationship.parentHandle, m_world);
     parent.removeChildEntity(*this);
 }
 
 Entity Entity::getParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    return Entity(m_registry, thisRelationship.parentHandle);
+    return Entity(m_registry, thisRelationship.parentHandle, m_world);
 }
 
 } // namespace Panda

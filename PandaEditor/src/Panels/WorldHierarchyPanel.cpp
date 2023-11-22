@@ -17,7 +17,7 @@ void WorldHierarchyPanel::onImGuiRender() {
     ImGui::Begin("World Hierarchy");
     if (m_world) {
         m_world->m_registry.each([&](auto entityId) {
-            Entity entity(&m_world->m_registry, (id_t)entityId);
+            Entity entity(&m_world->m_registry, (id_t)entityId, m_world);
             drawEntityNode(entity);
         });
     }

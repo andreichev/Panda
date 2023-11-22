@@ -52,7 +52,7 @@ void BaseLevel::start(Panda::World *world) {
     Panda::Entity cameraEntity = world->instantiateEntity();
     Panda::Camera &camera = cameraEntity.addNativeScript<Panda::Camera>();
     camera.setFieldOfView(60.f);
-    Panda::Application::get()->getRenderer3D().setCamera(&camera);
+    world->getRenderer3D().setCamera(&camera);
     CameraMove &cameraMove = cameraEntity.addNativeScript<CameraMove>();
     cameraMove.setCamera(&camera);
     cameraEntity.getTransform().translate(ChunksStorage::WORLD_SIZE_X / 2,

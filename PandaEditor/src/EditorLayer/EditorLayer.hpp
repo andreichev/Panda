@@ -2,6 +2,7 @@
 
 #include "Panels/Viewport.hpp"
 #include "Panels/WorldHierarchyPanel.hpp"
+#include "Panels/StatisticsPanel.hpp"
 
 #include <Panda.hpp>
 
@@ -23,6 +24,7 @@ private:
     void initializeExampleWorld();
 
     Viewport m_viewport;
+    StatisticsPanel m_statisticsPanel;
     WorldHierarchyPanel m_hierarchyPanel;
     World *m_world;
 };

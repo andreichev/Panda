@@ -33,7 +33,7 @@ void ParticleSystem::update(double deltaTime) {
         float size = glm::lerp(particle.sizeEnd, particle.sizeBegin, life);
         rect.size = Size(size, size);
         rect.rotation = particle.rotation;
-        Application::get()->getRenderer2D().drawRect(rect);
+        getEntity().getWorld()->getRenderer2D().drawRect(rect);
     }
 }
 

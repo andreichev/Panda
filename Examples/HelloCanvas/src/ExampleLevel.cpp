@@ -10,7 +10,7 @@
 #include <Panda/GameLogic/Components/ParticleSystem.hpp>
 #include <Panda/GameLogic/Components/Camera.hpp>
 
-class CameraSizeObserver : public Panda::NativeScript, Panda::WindowSizeObserver {
+class CameraSizeObserver final : public Panda::NativeScript, Panda::WindowSizeObserver {
 public:
     void initialize() override {
         Panda::Application::get()->addWindowSizeObserver(this);
@@ -34,7 +34,7 @@ private:
     Panda::Camera *m_camera;
 };
 
-class ExampleRenderer : public Panda::NativeScript {
+class ExampleRenderer final : public Panda::NativeScript {
 public:
     void initialize() override {
         m_texture = Foundation::makeShared<Panda::Texture>("textures/arbuz1.png");
@@ -46,6 +46,7 @@ public:
     void update(double deltaTime) override {
         degree += 60 * deltaTime;
         colorFactor += deltaTime;
+        Panda::Renderer2D &renderer2D = getEntity().getWorld()->getRenderer2D();
 
         Panda::Renderer2D::RectData rect1;
         rect1.color = Panda::Color(1.0f, 1.f, 1.f, 1.f);
@@ -53,19 +54,19 @@ public:
         rect1.size = Panda::Size(0.4f, 0.4f);
         rect1.rotation = degree;
         rect1.texture = m_texture;
-        Panda::Application::get()->getRenderer2D().drawRect(rect1);
+        renderer2D.drawRect(rect1);
 
         Panda::Renderer2D::RectData rect2;
         rect2.color = Panda::Color(1.0f, abs(sin(colorFactor)), 0.f, 1.f);
         rect2.origin = Panda::Vec3(0.6f, 0.6f, 0.f);
         rect2.size = Panda::Size(0.3f, 0.3f);
-        Panda::Application::get()->getRenderer2D().drawRect(rect2);
+        renderer2D.drawRect(rect2);
 
         Panda::Renderer2D::RectData rect3;
         rect3.color = Panda::Color(0.f, 0.f, 1.f, 1.f);
         rect3.origin = Panda::Vec3(0.1f, 0.8f, 0.f);
         rect3.size = Panda::Size(0.2f, 0.2f);
-        Panda::Application::get()->getRenderer2D().drawRect(rect3);
+        renderer2D.drawRect(rect3);
 
         if (Panda::Input::isMouseButtonPressed(Panda::MouseButton::LEFT)) {
             float x = Panda::Input::getMousePositionX();
@@ -125,10 +126,10 @@ void ExampleLevel::start(Panda::World *world) {
     using namespace Miren;
     Panda::Entity entity = world->instantiateEntity();
     Panda::Camera &camera = entity.addNativeScript<Panda::Camera>();
-    Panda::Application::get()->getRenderer2D().setCamera(&camera);
     entity.getTransform().translate(0.f, 0.f, 10.f);
     Panda::ParticleSystem &particle = entity.addNativeScript<Panda::ParticleSystem>();
     ExampleRenderer &dummy = entity.addNativeScript<ExampleRenderer>();
+    world->getRenderer2D().setCamera(&camera);
     OrthographicCameraMove &cameraMove = entity.addNativeScript<OrthographicCameraMove>();
     CameraSizeObserver &cameraSizeObserver = entity.addNativeScript<CameraSizeObserver>();
     cameraMove.setCamera(&camera);

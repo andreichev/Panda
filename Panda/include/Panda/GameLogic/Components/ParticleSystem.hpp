@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Panda/GameLogic/NativeScript.hpp"
+#include "Panda/Renderer/Renderer2D.hpp"
 
 namespace Panda {
 

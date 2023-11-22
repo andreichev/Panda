@@ -13,7 +13,7 @@ namespace Panda {
 class NativeScript {
 public:
     NativeScript()
-        : m_entity(nullptr, -1)
+        : m_entity(nullptr, -1, nullptr)
         , m_isActive(true) {}
 
     virtual ~NativeScript() = default;

@@ -24,7 +24,7 @@ void Sprite::update(double deltaTime) {
         rect.origin = {position.x, position.y, position.z};
         rect.rotation = m_transform->getRotation().z;
     }
-    Panda::Application::get()->getRenderer2D().drawRect(rect);
+    getEntity().getWorld()->getRenderer2D().drawRect(rect);
 }
 
 } // namespace Panda

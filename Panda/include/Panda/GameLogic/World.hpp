@@ -6,6 +6,8 @@
 
 #include "Panda/GameLogic/Entity.hpp"
 #include "Panda/Window/Window.hpp"
+#include "Panda/Renderer/Renderer2D.hpp"
+#include "Panda/Renderer/Renderer3D.hpp"
 
 #include <entt/entt.hpp>
 
@@ -23,10 +25,18 @@ public:
     inline bool isRunning() {
         return m_isRunning;
     }
+    Renderer2D &getRenderer2D() {
+        return m_renderer2d;
+    }
+    Renderer3D &getRenderer3D() {
+        return m_renderer3d;
+    }
 
 private:
     bool m_isRunning;
     entt::registry m_registry;
+    Renderer2D m_renderer2d;
+    Renderer3D m_renderer3d;
 
     friend class WorldHierarchyPanel;
 };

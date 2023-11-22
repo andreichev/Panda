@@ -27,7 +27,7 @@ void Viewport::init(World *world) {
         0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height));
     Miren::setViewClear(m_sceneViewId, 0x12212bff);
     Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
-    Application::get()->getRenderer2D().setViewId(m_sceneViewId);
+    m_world->getRenderer2D().setViewId(m_sceneViewId);
 }
 
 void Viewport::updateViewportSize(Vec2 size) {
@@ -73,7 +73,7 @@ void Viewport::onImGuiRender() {
 void Viewport::setCamera(Camera *camera) {
     m_camera = camera;
     m_camera->viewportSizeChanged(m_viewportPanelSize);
-    Application::get()->getRenderer2D().setCamera(m_camera);
+    m_world->getRenderer2D().setCamera(m_camera);
 }
 
 } // namespace Panda
