@@ -1,11 +1,13 @@
 #include "Viewport.hpp"
 
 #include <Panda.hpp>
+#include <PandaUI/PandaUI.hpp>
 #include <imgui.h>
 
 namespace Panda {
 
 void Viewport::init(World *world) {
+    PandaUI::initialize();
     m_world = world;
     Vec2 dpi = Application::get()->getWindow()->getDpi();
     Vec2 windowSize = Application::get()->getWindow()->getSize();
@@ -28,6 +30,7 @@ void Viewport::init(World *world) {
     Miren::setViewClear(m_sceneViewId, 0x12212bff);
     Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
     m_world->getRenderer2D().setViewId(m_sceneViewId);
+    PandaUI::Context::shared().updateViewId(m_sceneViewId);
 }
 
 void Viewport::updateViewportSize(Vec2 size) {
@@ -35,6 +38,7 @@ void Viewport::updateViewportSize(Vec2 size) {
         return;
     }
     m_viewportPanelSize = size;
+    PandaUI::Context::shared().updateViewportSize({size.width, size.height});
     if (m_camera) {
         m_camera->viewportSizeChanged(size);
     }
@@ -70,7 +74,7 @@ void Viewport::onImGuiRender() {
     ImGui::End();
 }
 
-void Viewport::setCamera(Camera *camera) {
+void Viewport::setCamera(CameraComponent *camera) {
     m_camera = camera;
     m_camera->viewportSizeChanged(m_viewportPanelSize);
     m_world->getRenderer2D().setCamera(m_camera);

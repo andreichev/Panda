@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Panda//GameLogic/Camera.hpp"
 #include "Panda/GameLogic/NativeScript.hpp"
 #include "Panda/Events/WindowSizeObserver.hpp"
 #include "Transform.hpp"
@@ -13,14 +14,14 @@
 
 namespace Panda {
 
-class Camera final : public NativeScript, TransformObserver {
+class CameraComponent final : public Camera, public NativeScript, TransformObserver {
 public:
-    Camera();
-    ~Camera() override;
+    CameraComponent();
+    ~CameraComponent() override;
     void initialize() override;
     void setFieldOfView(float degrees);
     void update(double deltaTime) override {}
-    inline glm::mat4 &getViewProjectionMatrix() {
+    glm::mat4 &getViewProjectionMatrix() override {
         m_viewProjection = m_projection * m_view;
         return m_viewProjection;
     }

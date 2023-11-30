@@ -86,6 +86,12 @@ struct Color {
         , g(g)
         , b(b)
         , a(a) {}
+
+    Color(uint32_t rgba)
+        : r((rgba >> 24) / 255.f)
+        , g((rgba >> 16) / 255.f)
+        , b((rgba >> 8) / 255.f)
+        , a((rgba >> 0) / 255.f) {}
 };
 
 } // namespace PandaUI

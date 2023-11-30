@@ -3,6 +3,7 @@
 //
 
 #include "PandaUI/PandaUI.hpp"
+#include "PandaUI/ApplicationLayer/Layer.hpp"
 
 #include <Panda/Application/Application.hpp>
 
@@ -11,7 +12,9 @@ namespace PandaUI {
 void initialize() {
     Panda::Application *app = Panda::Application::get();
     PND_ASSERT(app != nullptr, "APP IS NOT INITIALIZED BEFORE PandaUI");
-    app->pushOverlay(NEW(Foundation::getAllocator(), PandaAppUILayer));
+    PND_ASSERT(!Context::isInitialized(),
+        "UICONTEXT ALREADY INITIALIZED. IT CAN BE INITIALIZED ONLY ONCE");
+    app->pushOverlay(NEW(Foundation::getAllocator(), Layer));
 }
 
 } // namespace PandaUI

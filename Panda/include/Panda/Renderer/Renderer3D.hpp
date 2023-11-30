@@ -7,7 +7,7 @@
 #include "Panda/GameLogic/Components/Transform.hpp"
 #include "Panda/GameLogic/Components/StaticMesh.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
-#include "Panda/GameLogic/Components/Camera.hpp"
+#include "Panda/GameLogic/Components/CameraComponent.hpp"
 
 namespace Panda {
 
@@ -31,13 +31,13 @@ public:
     void submit(Transform *transform, DynamicMesh *mesh);
     void end();
     Statistics getStats();
-    void setCamera(Camera *camera);
+    void setCamera(CameraComponent *camera);
     void setViewId(Miren::ViewId id);
 
 private:
     DrawData m_drawData;
     Miren::ViewId m_viewId;
-    Camera *m_camera;
+    CameraComponent *m_camera;
 };
 
 } // namespace Panda

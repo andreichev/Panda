@@ -3,7 +3,7 @@
 //
 
 #include "pndpch.hpp"
-#include "Panda/GameLogic/Components/Camera.hpp"
+#include "Panda/GameLogic/Components/CameraComponent.hpp"
 
 #include "Panda/Application/Application.hpp"
 #include "Panda/GameLogic/Entity.hpp"
@@ -13,7 +13,7 @@ namespace Panda {
 const float zNear = 0.1f;
 const float zFar = 1000.f;
 
-Camera::Camera()
+CameraComponent::CameraComponent()
     : m_transform(nullptr)
     , m_fieldOfView(70.f)
     , m_viewportSize(Application::get()->getWindow()->getSize())
@@ -27,13 +27,13 @@ Camera::Camera()
     LOG_INFO("Camera created, viewport size: {}, {}", m_viewportSize.width, m_viewportSize.height);
 }
 
-Camera::~Camera() {
+CameraComponent::~CameraComponent() {
     if (m_transform) {
         m_transform->removeObserver(this);
     }
 }
 
-void Camera::initialize() {
+void CameraComponent::initialize() {
     m_transform = &getEntity().getTransform();
     m_transform->addObserver(this);
     updateVectors();
@@ -41,16 +41,16 @@ void Camera::initialize() {
     updateViewMatrix();
 }
 
-void Camera::setFieldOfView(float degrees) {
+void CameraComponent::setFieldOfView(float degrees) {
     m_fieldOfView = degrees;
 }
 
-void Camera::updateProjectionMatrix() {
+void CameraComponent::updateProjectionMatrix() {
     float aspectRatio = m_viewportSize.width / m_viewportSize.height;
     m_projection = glm::perspective<float>(glm::radians(m_fieldOfView), aspectRatio, zNear, zFar);
 }
 
-void Camera::updateVectors() {
+void CameraComponent::updateVectors() {
     glm::vec3 rotation = m_transform->getRotation();
     m_rotationMatrix = glm::mat4(1.f);
     m_rotationMatrix =
@@ -65,18 +65,18 @@ void Camera::updateVectors() {
     m_up = m_rotationMatrix * glm::vec4(0.f, 1.f, 0.f, 1.f);
 }
 
-void Camera::updateViewMatrix() {
+void CameraComponent::updateViewMatrix() {
     glm::vec4 position = m_transform->getPosition();
     m_target = position + m_front;
     m_view = glm::lookAt(glm::vec3(position), m_target, glm::vec3(m_up));
 }
 
-void Camera::viewportSizeChanged(Size size) {
+void CameraComponent::viewportSizeChanged(Size size) {
     m_viewportSize = size;
     updateProjectionMatrix();
 }
 
-Vec3 Camera::screenCoordToWorld(Vec2 screen, float distance) {
+Vec3 CameraComponent::screenCoordToWorld(Vec2 screen, float distance) {
     glm::vec4 in;
     in.x = 2.f * screen.x / m_viewportSize.width - 1.f;
     in.y = 1.f - 2.f * screen.y / m_viewportSize.height;
@@ -94,7 +94,7 @@ Vec3 Camera::screenCoordToWorld(Vec2 screen, float distance) {
     return Vec3(result.x, result.y, result.z);
 }
 
-Vec3 Camera::screenCoordToWorld(Vec3 screen) {
+Vec3 CameraComponent::screenCoordToWorld(Vec3 screen) {
     glm::vec4 in;
     in.x = 2.f * screen.x / m_viewportSize.width - 1.f;
     in.y = 1.f - 2.f * screen.y / m_viewportSize.height;
@@ -108,7 +108,7 @@ Vec3 Camera::screenCoordToWorld(Vec3 screen) {
 
 // MARK: - Transform Delegate
 
-void Camera::transformChanged(glm::vec4 position, glm::vec3 rotation) {
+void CameraComponent::transformChanged(glm::vec4 position, glm::vec3 rotation) {
     updateVectors();
     updateViewMatrix();
 }

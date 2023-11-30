@@ -25,12 +25,14 @@ command+="\)"
 
 files=$(eval ${command})
 
+count=0
 echo "Formatting files:"
 for file in $files; do
-    echo $file
+    # echo $file
+    count=$(( count + 1 ))
     clang-format -i "$file"
 done
-echo "Formatting done. Thanks to clang-format ❤️"
+echo "${count} files formatted. Thanks to clang-format ❤️"
 
 else
 echo "warning: ClangFormat not installed"

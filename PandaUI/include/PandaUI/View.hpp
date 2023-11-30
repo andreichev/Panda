@@ -10,13 +10,13 @@
 
 namespace PandaUI {
 
-class UIView {
+class View {
 public:
-    UIView();
-    UIView(Rect frame);
-    virtual ~UIView();
-    void addSubview(Foundation::Shared<UIView> node);
-    void removeSubview(Foundation::Shared<UIView> node);
+    View();
+    View(Rect frame);
+    virtual ~View();
+    void addSubview(View *node);
+    void removeSubview(View *node);
     void setFrame(Rect frame);
     const Rect &getFrame() const {
         return m_frame;
@@ -30,17 +30,12 @@ public:
 
     // Вызывается для позиционирования (обновление буфера)
     virtual void layout();
-    // Вызывается для отрисовки.
-    virtual void draw();
 
     // TODO: - Добавить superview
 protected:
-    std::vector<Foundation::Shared<UIView>> m_subviews;
+    std::vector<View *> m_subviews;
     Rect m_frame;
     Color m_backgroundColor;
-
-private:
-    void render();
 };
 
 } // namespace PandaUI

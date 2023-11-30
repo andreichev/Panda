@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "PandaUI/ApplicationLayer/PandaAppUILayer.hpp"
+#include "PandaUI/Context.hpp"
 
 namespace PandaUI {
 

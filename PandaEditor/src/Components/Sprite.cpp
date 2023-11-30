@@ -21,7 +21,7 @@ void Sprite::update(double deltaTime) {
     rect.size = {1.f, 1.f};
     if (m_transform) {
         auto position = m_transform->getPosition();
-        rect.origin = {position.x, position.y, position.z};
+        rect.center = {position.x, position.y, position.z};
         rect.rotation = m_transform->getRotation().z;
     }
     getEntity().getWorld()->getRenderer2D().drawRect(rect);

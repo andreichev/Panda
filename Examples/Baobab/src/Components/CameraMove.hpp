@@ -10,7 +10,7 @@ class CameraMove : public Panda::NativeScript {
 public:
     void initialize() override;
     void update(double deltaTime) override;
-    inline void setCamera(Panda::Camera *camera) {
+    inline void setCamera(Panda::CameraComponent *camera) {
         m_camera = camera;
     }
 
@@ -18,6 +18,6 @@ private:
     float m_mouseSpeed = 0.2f;
     float m_moveSpeed = 20.0f;
     Panda::Transform *m_transform;
-    Panda::Camera *m_camera;
+    Panda::CameraComponent *m_camera;
     Panda::Window *m_window;
 };

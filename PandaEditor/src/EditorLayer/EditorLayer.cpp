@@ -25,7 +25,7 @@ void EditorLayer::initializeExampleWorld() {
     Entity cameraEntity = m_world->instantiateEntity();
     cameraEntity.setName("Camera");
     cameraEntity.getTransform().setPosition(0.f, 0.f, 4.f);
-    auto &camera = cameraEntity.addNativeScript<Camera>();
+    auto &camera = cameraEntity.addNativeScript<CameraComponent>();
     auto &move = cameraEntity.addNativeScript<CameraMove>();
     move.setCamera(&camera);
     m_viewport.setCamera(&camera);

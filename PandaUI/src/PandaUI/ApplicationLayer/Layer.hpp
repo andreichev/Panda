@@ -4,17 +4,16 @@
 
 #pragma once
 
-#include "PandaUI/UIView.hpp"
+#include "PandaUI/Context.hpp"
 
 #include <Panda/Application/Layer.hpp>
-#include <Panda/Renderer/Renderer2D.hpp>
 
 namespace PandaUI {
 
-class PandaAppUILayer final : public Panda::Layer {
+class Layer final : public Panda::Layer {
 public:
-    PandaAppUILayer();
-    ~PandaAppUILayer() override = default;
+    Layer();
+    ~Layer() override;
     void onAttach() override;
     void onDetach() override;
     void onUpdate(double deltaTime) override;
@@ -22,8 +21,7 @@ public:
     void onEvent(Panda::Event *event) override;
 
 private:
-    std::vector<UIView> m_views;
-    Panda::Renderer2D m_renderer2d;
+    Context m_context;
 };
 
 } // namespace PandaUI

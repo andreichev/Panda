@@ -57,3 +57,6 @@ set_target_properties(HelloCanvas
 
 # Dependencies - Panda
 target_link_libraries(HelloCanvas Panda)
+
+# Dependencies - Panda
+target_link_libraries(HelloCanvas PandaUI)

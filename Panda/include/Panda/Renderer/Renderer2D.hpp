@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-#include "Panda/GameLogic/Components/Camera.hpp"
+#include "Panda/GameLogic/Camera.hpp"
 #include "Panda/Renderer/Texture.hpp"
 
 #include <Miren/Miren.hpp>
@@ -12,17 +12,22 @@ namespace Panda {
 #define MAX_INDICES_COUNT 160000
 #define MAX_TEXTURE_SLOTS 8
 
+/// Renderer2D отвечает за то, чтобы рисовать примитивные двумерные 2D фигуры.
+/// Для этого Renderer2D создает шейдер и буферы с вершинами, текстурами, индексами.
+/// Renderer2D вызывает отрисовку после вызова end();
+/// Если требуется не стандартный framebuffer, его требуется создать вне Renderer2D
+/// и передать viewId.
 class Renderer2D {
 public:
     struct RectData {
         RectData()
-            : origin()
+            : center()
             , size()
             , color()
             , texture(nullptr)
             , rotation(0) {}
 
-        Vec3 origin;
+        Vec3 center;
         Size size;
         Color color;
         float rotation;

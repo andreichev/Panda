@@ -50,7 +50,7 @@ void BaseLevel::start(Panda::World *world) {
     }
 
     Panda::Entity cameraEntity = world->instantiateEntity();
-    Panda::Camera &camera = cameraEntity.addNativeScript<Panda::Camera>();
+    Panda::CameraComponent &camera = cameraEntity.addNativeScript<Panda::CameraComponent>();
     camera.setFieldOfView(60.f);
     world->getRenderer3D().setCamera(&camera);
     CameraMove &cameraMove = cameraEntity.addNativeScript<CameraMove>();

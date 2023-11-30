@@ -8,7 +8,8 @@
 #include <Panda/Application/Application.hpp>
 #include <Panda/Renderer/Renderer2D.hpp>
 #include <Panda/GameLogic/Components/ParticleSystem.hpp>
-#include <Panda/GameLogic/Components/Camera.hpp>
+#include <Panda/GameLogic/Components/CameraComponent.hpp>
+#include <PandaUI/PandaUI.hpp>
 
 class CameraSizeObserver final : public Panda::NativeScript, Panda::WindowSizeObserver {
 public:
@@ -24,14 +25,15 @@ public:
 
     void windowSizeChanged(Panda::Size size) override {
         m_camera->viewportSizeChanged(size);
+        PandaUI::Context::shared().updateViewportSize({size.width, size.height});
     }
 
-    void setCamera(Panda::Camera *camera) {
+    void setCamera(Panda::CameraComponent *camera) {
         m_camera = camera;
     }
 
 private:
-    Panda::Camera *m_camera;
+    Panda::CameraComponent *m_camera;
 };
 
 class ExampleRenderer final : public Panda::NativeScript {
@@ -50,7 +52,7 @@ public:
 
         Panda::Renderer2D::RectData rect1;
         rect1.color = Panda::Color(1.0f, 1.f, 1.f, 1.f);
-        rect1.origin = Panda::Vec3(0.3f, -0.5f, 0.f);
+        rect1.center = Panda::Vec3(0.3f, -0.5f, 0.f);
         rect1.size = Panda::Size(0.4f, 0.4f);
         rect1.rotation = degree;
         rect1.texture = m_texture;
@@ -58,13 +60,13 @@ public:
 
         Panda::Renderer2D::RectData rect2;
         rect2.color = Panda::Color(1.0f, abs(sin(colorFactor)), 0.f, 1.f);
-        rect2.origin = Panda::Vec3(0.6f, 0.6f, 0.f);
+        rect2.center = Panda::Vec3(0.6f, 0.6f, 0.f);
         rect2.size = Panda::Size(0.3f, 0.3f);
         renderer2D.drawRect(rect2);
 
         Panda::Renderer2D::RectData rect3;
         rect3.color = Panda::Color(0.f, 0.f, 1.f, 1.f);
-        rect3.origin = Panda::Vec3(0.1f, 0.8f, 0.f);
+        rect3.center = Panda::Vec3(0.1f, 0.8f, 0.f);
         rect3.size = Panda::Size(0.2f, 0.2f);
         renderer2D.drawRect(rect3);
 
@@ -91,7 +93,7 @@ public:
         m_particleSystem = particleSystem;
     }
 
-    void setCamera(Panda::Camera *camera) {
+    void setCamera(Panda::CameraComponent *camera) {
         m_camera = camera;
     }
 
@@ -116,7 +118,7 @@ private:
     }
 
     Panda::ParticleSystem *m_particleSystem;
-    Panda::Camera *m_camera;
+    Panda::CameraComponent *m_camera;
     Foundation::Shared<Panda::Texture> m_texture;
     float degree = 0.f;
     float colorFactor = 0.f;
@@ -124,8 +126,9 @@ private:
 
 void ExampleLevel::start(Panda::World *world) {
     using namespace Miren;
+    PandaUI::initialize();
     Panda::Entity entity = world->instantiateEntity();
-    Panda::Camera &camera = entity.addNativeScript<Panda::Camera>();
+    Panda::CameraComponent &camera = entity.addNativeScript<Panda::CameraComponent>();
     entity.getTransform().translate(0.f, 0.f, 10.f);
     Panda::ParticleSystem &particle = entity.addNativeScript<Panda::ParticleSystem>();
     ExampleRenderer &dummy = entity.addNativeScript<ExampleRenderer>();

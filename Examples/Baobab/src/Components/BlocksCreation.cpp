@@ -104,7 +104,7 @@ void BlocksCreation::setChunksStorage(Foundation::Shared<ChunksStorage> storage)
     m_chunksStorage = storage;
 }
 
-void BlocksCreation::setCamera(Panda::Camera *camera) {
+void BlocksCreation::setCamera(Panda::CameraComponent *camera) {
     m_camera = camera;
 }
 

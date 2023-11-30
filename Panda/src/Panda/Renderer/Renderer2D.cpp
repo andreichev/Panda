@@ -58,7 +58,7 @@ void Renderer2D::begin() {
 
 void Renderer2D::drawRect(RectData rect) {
     glm::mat4 identity = glm::mat4(1.0f);
-    glm::vec3 position = glm::vec3(rect.origin.x, rect.origin.y, rect.origin.z);
+    glm::vec3 position = glm::vec3(rect.center.x, rect.center.y, rect.center.z);
     glm::vec3 scale = glm::vec3(rect.size.width, rect.size.height, 1.f);
     glm::mat4 transform =
         glm::translate(identity, position) *

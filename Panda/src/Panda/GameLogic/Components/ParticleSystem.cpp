@@ -26,7 +26,7 @@ void ParticleSystem::update(double deltaTime) {
         particle.rotation += 0.01f * (float)deltaTime;
 
         Renderer2D::RectData rect;
-        rect.origin = Vec3(particle.position.x, particle.position.y, particle.position.z);
+        rect.center = Vec3(particle.position.x, particle.position.y, particle.position.z);
         float life = particle.lifeRemaining / particle.lifeTime;
         glm::vec4 color = glm::lerp(particle.colorEnd, particle.colorBegin, life);
         rect.color = color;

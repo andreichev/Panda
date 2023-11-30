@@ -54,3 +54,6 @@ set_target_properties(PandaEditor
 
 # Dependencies - Panda
 target_link_libraries(PandaEditor Panda)
+
+# Dependencies - PandaUI
+target_link_libraries(PandaEditor PandaUI)

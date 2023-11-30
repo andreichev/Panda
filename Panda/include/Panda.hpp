@@ -19,7 +19,7 @@
 #include "Panda/GameLogic/Components/StaticMesh.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
 #include "Panda/GameLogic/Input.hpp"
-#include "Panda/GameLogic/Components/Camera.hpp"
+#include "Panda/GameLogic/Components/CameraComponent.hpp"
 
 // Renderer stuff
 #include <Panda/Renderer/Renderer2D.hpp>

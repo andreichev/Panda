@@ -70,7 +70,7 @@ void Renderer3D::setViewId(Miren::ViewId id) {
     m_viewId = id;
 }
 
-void Renderer3D::setCamera(Camera *camera) {
+void Renderer3D::setCamera(CameraComponent *camera) {
     m_camera = camera;
 }
 

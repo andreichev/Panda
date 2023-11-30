@@ -16,7 +16,7 @@ public:
     void update(double deltaTime) override;
     void onImGuiRender() override;
     void setChunksStorage(Foundation::Shared<ChunksStorage> storage);
-    void setCamera(Panda::Camera *camera);
+    void setCamera(Panda::CameraComponent *camera);
     void setLayoutHandle(Miren::VertexLayoutHandle layoutHandle);
 
 private:
@@ -25,7 +25,7 @@ private:
 
     Foundation::Shared<ChunksStorage> m_chunksStorage;
     Panda::Transform *m_transform;
-    Panda::Camera *m_camera;
+    Panda::CameraComponent *m_camera;
     Miren::VertexLayoutHandle m_layoutHandle;
     VoxelType m_selectedBlock;
 };

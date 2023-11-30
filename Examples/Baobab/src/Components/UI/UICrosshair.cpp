@@ -1,8 +1,8 @@
 #include "UICrosshair.hpp"
 
 UICrosshair::UICrosshair()
-    : horizontal(Foundation::makeShared<PandaUI::UIView>())
-    , vertical(Foundation::makeShared<PandaUI::UIView>()) {
+    : horizontal(Foundation::makeShared<PandaUI::View>())
+    , vertical(Foundation::makeShared<PandaUI::View>()) {
     addSubviews();
 }
 
