@@ -31,6 +31,8 @@ public:
     // Вызывается для позиционирования (обновление буфера)
     virtual void layout();
 
+    virtual void render();
+
     // TODO: - Добавить superview
 protected:
     std::vector<View *> m_subviews;

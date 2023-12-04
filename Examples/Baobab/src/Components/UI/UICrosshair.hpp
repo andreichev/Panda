@@ -1,14 +1,15 @@
 #pragma once
 
-#include <PandaUI/View.hpp>
+#include <PandaUI/PandaUI.hpp>
 
 class UICrosshair : public PandaUI::View {
 public:
     UICrosshair();
+    ~UICrosshair() override;
     void layout() override;
 
 private:
-    Foundation::Shared<PandaUI::View> horizontal;
-    Foundation::Shared<PandaUI::View> vertical;
+    PandaUI::View *horizontal;
+    PandaUI::View *vertical;
     void addSubviews();
 };

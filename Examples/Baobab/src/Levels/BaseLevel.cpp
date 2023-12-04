@@ -9,9 +9,36 @@
 #include "Components/CameraMove.hpp"
 #include "Components/BlocksCreation.hpp"
 #include "Components/FullScreenToggle.hpp"
+#include "Components/UI/UICrosshair.hpp"
 
 #include <Panda.hpp>
+#include <PandaUI/PandaUI.hpp>
 #include <Miren/Miren.hpp>
+
+class CameraSizeObserver final : public Panda::NativeScript, Panda::WindowSizeObserver {
+public:
+    void initialize() override {
+        Panda::Application::get()->addWindowSizeObserver(this);
+    }
+
+    ~CameraSizeObserver() {
+        Panda::Application::get()->removeWindowSizeObserver(this);
+    }
+
+    void update(double deltaTime) override {}
+
+    void windowSizeChanged(Panda::Size size) override {
+        m_camera->viewportSizeChanged(size);
+        PandaUI::Context::shared().updateViewportSize({size.width, size.height});
+    }
+
+    void setCamera(Panda::CameraComponent *camera) {
+        m_camera = camera;
+    }
+
+private:
+    Panda::CameraComponent *m_camera;
+};
 
 void BaseLevel::start(Panda::World *world) {
     Miren::setViewClear(0, 0x3D75C9FF);
@@ -55,6 +82,8 @@ void BaseLevel::start(Panda::World *world) {
     world->getRenderer3D().setCamera(&camera);
     CameraMove &cameraMove = cameraEntity.addNativeScript<CameraMove>();
     cameraMove.setCamera(&camera);
+    CameraSizeObserver &cameraSizeObserver = cameraEntity.addNativeScript<CameraSizeObserver>();
+    cameraSizeObserver.setCamera(&camera);
     cameraEntity.getTransform().translate(ChunksStorage::WORLD_SIZE_X / 2,
         ChunksStorage::WORLD_SIZE_Y / 4,
         ChunksStorage::WORLD_SIZE_Z / 2);
@@ -66,6 +95,10 @@ void BaseLevel::start(Panda::World *world) {
     blocksCreation.setLayoutHandle(layoutHandle);
 
     cameraEntity.addNativeScript<FullScreenToggle>();
+
+    PandaUI::initialize();
+    UICrosshair *crosshair = PandaUI::makeView<UICrosshair>();
+    PandaUI::Context::shared().getView().addSubview(crosshair);
 
     LOG_INFO("BASE LEVEL STARTED!");
 }

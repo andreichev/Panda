@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Foundation/Foundation.hpp>
 #include <glm/glm.hpp>
 
 namespace PandaUI {
@@ -87,11 +88,16 @@ struct Color {
         , b(b)
         , a(a) {}
 
-    Color(uint32_t rgba)
-        : r((rgba >> 24) / 255.f)
-        , g((rgba >> 16) / 255.f)
-        , b((rgba >> 8) / 255.f)
-        , a((rgba >> 0) / 255.f) {}
+    Color(uint32_t rgba) {
+        uint8_t _r = rgba >> 24;
+        uint8_t _g = rgba >> 16;
+        uint8_t _b = rgba >> 8;
+        uint8_t _a = rgba >> 0;
+        r = (_r) / 255.f;
+        g = (_g) / 255.f;
+        b = (_b) / 255.f;
+        a = (_a) / 255.f;
+    }
 };
 
 } // namespace PandaUI

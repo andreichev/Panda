@@ -16,42 +16,44 @@ Context &Context::shared() {
 }
 
 Context::Context()
-    : m_viewId(0)
+    : m_mirenViewId(0)
     , m_viewportSize(100, 100) {
     m_camera.updateViewportSize(m_viewportSize);
     m_renderer2d.setCamera(&m_camera);
     m_renderer2d.setViewId(0);
+    // Make background view transparent
+    m_view.setBackgroundColor(Color(0x00000000));
 
-    Rect rect(30, 30, 50, 200);
-    View view(rect);
-    view.setBackgroundColor({0x66FF66FF});
-    m_views.push_back(view);
+    Rect rect1(20, 20, 130, 30);
+    View *view1 = makeView<View>(rect1);
+    view1->setBackgroundColor({0xFFFFFFFF});
+    getView().addSubview(view1);
+
+    Rect rect2(20, 55, 130, 30);
+    View *view2 = makeView<View>(rect2);
+    view2->setBackgroundColor({0x1C3578FF});
+    getView().addSubview(view2);
+
+    Rect rect3(20, 90, 130, 30);
+    View *view3 = makeView<View>(rect3);
+    view3->setBackgroundColor({0xE4181CFF});
+    getView().addSubview(view3);
 }
 
 void Context::update(double deltaTime) {
     m_renderer2d.begin();
-    for (View &view : m_views) {
-        Panda::Renderer2D::RectData rect;
-        Point origin = view.getFrame().origin;
-        Size size = view.getFrame().size;
-        rect.center = Panda::Vec3(origin.x + size.width / 2, origin.y + size.height / 2, 0.f);
-        rect.size = Panda::Size(size.width, size.height);
-        Color color = view.getBackgroundColor();
-        rect.color = {color.r, color.g, color.b, color.a};
-        m_renderer2d.drawRect(rect);
-    }
+    m_view.render();
     m_renderer2d.end();
 }
 
 void Context::updateViewportSize(Size size) {
     m_viewportSize = size;
     m_camera.updateViewportSize(size);
-    for (View &view : m_views) {
-        view.layout();
-    }
+    m_view.setFrame(PandaUI::Rect(0, 0, size.width, size.height));
 }
+
 void Context::updateViewId(Miren::ViewId viewId) {
-    m_viewId = viewId;
+    m_mirenViewId = viewId;
     m_renderer2d.setViewId(viewId);
 }
 

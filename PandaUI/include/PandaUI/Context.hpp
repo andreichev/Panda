@@ -14,10 +14,27 @@ namespace PandaUI {
 
 class Context final {
 public:
-    Context();
     void update(double deltaTime);
     void updateViewportSize(Size size);
     void updateViewId(Miren::ViewId viewId);
+
+    template<typename T, typename... Args>
+    T *makeView(Args &&...args) {
+        // TODO: Собственный аллокатор для PandaUI
+        return NEW(Foundation::getAllocator(), T)(std::forward<Args>(args)...);
+    }
+
+    void removeView(View *view) {
+        DELETE(Foundation::getAllocator(), view);
+    }
+
+    View &getView() {
+        return m_view;
+    }
+
+    Panda::Renderer2D &getRenderer() {
+        return m_renderer2d;
+    }
 
     static Context &shared();
     static bool isInitialized() {
@@ -25,11 +42,13 @@ public:
     }
 
 private:
+    Context();
+
     static Context *s_shared;
-    std::vector<View> m_views;
+    View m_view;
     Panda::Renderer2D m_renderer2d;
     UICamera m_camera;
-    Miren::ViewId m_viewId;
+    Miren::ViewId m_mirenViewId;
     Size m_viewportSize;
 
     friend class Layer;
