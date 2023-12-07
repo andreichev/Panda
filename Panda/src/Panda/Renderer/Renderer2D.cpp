@@ -2,7 +2,7 @@
 
 namespace Panda {
 
-Renderer2D::Renderer2D() {
+Renderer2D::Renderer2D() : m_viewId(0), m_camera(nullptr) {
     m_drawData.vbSize = 0;
     m_drawData.indicesCount = 0;
     m_drawData.vertices =

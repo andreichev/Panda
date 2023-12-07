@@ -170,7 +170,7 @@ struct Point {
         : x(x)
         , y(y) {}
 
-    inline bool isZero() {
+    inline bool isZero() const {
         return x == 0 && y == 0;
     }
 };
@@ -188,7 +188,7 @@ struct Rect {
         , size(width, height) {}
 
     inline static Rect zero() {
-        return Rect();
+        return {};
     }
 
     inline bool isZero() {
