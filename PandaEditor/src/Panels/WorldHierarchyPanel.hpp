@@ -17,7 +17,6 @@ public:
     }
 
 private:
-    void drawProperties(Entity entity);
     void drawEntityNode(Entity entity);
 
     World *m_world;

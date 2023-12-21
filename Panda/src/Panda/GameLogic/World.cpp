@@ -92,12 +92,12 @@ Entity World::instantiateEntity() {
 }
 
 void World::destroy(Entity entity) {
-    m_registry.destroy(static_cast<entt::entity>(entity.getId()));
     entity.removeFromParent();
     for (id_t childHandle : entity.getChildEntities()) {
         Entity child = Entity(&m_registry, childHandle, this);
         destroy(child);
     }
+    m_registry.destroy(static_cast<entt::entity>(entity.getId()));
 }
 
 } // namespace Panda
