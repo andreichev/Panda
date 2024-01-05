@@ -66,12 +66,12 @@ RendererOpenGL::RendererOpenGL() {
     LOG_INFO("OPENGL VERSION {}", glGetString(GL_VERSION));
     // glEnable(GL_DEBUG_OUTPUT);
     // glDebugMessageCallback(gpuErrorCallback, nullptr);
-    GL_CALL(glGenVertexArrays(1, &m_vao));
-    GL_CALL(glBindVertexArray(m_vao));
+    GL_CALL(glGenVertexArrays(1, &m_uselessVao));
+    GL_CALL(glBindVertexArray(m_uselessVao));
 }
 
 RendererOpenGL::~RendererOpenGL() {
-    GL_CALL(glDeleteVertexArrays(1, &m_vao));
+    GL_CALL(glDeleteVertexArrays(1, &m_uselessVao));
     DELETE(Foundation::getAllocator(), context);
     s_instance = nullptr;
 }
@@ -280,7 +280,7 @@ void RendererOpenGL::submit(RenderDraw *draw) {
             : vertexBuffers[draw->m_vertexBuffer.id].getLayoutHandle();
     PND_ASSERT(layoutHandle.id != MIREN_INVALID_HANDLE, "Invalid handle");
     VertexBufferLayoutData &layout = vertexLayouts[layoutHandle.id];
-    GL_CALL(glBindVertexArray(m_vao));
+    GL_CALL(glBindVertexArray(m_uselessVao));
     shaders[draw->m_shader.id].bindAttributes(layout, draw->m_verticesOffset);
     indexBuffers[draw->m_indexBuffer.id].bind();
     GL_CALL(glDrawElements(GL_TRIANGLES,

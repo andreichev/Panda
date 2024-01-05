@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Panda//GameLogic/Camera.hpp"
+#include "Panda/GameLogic/Camera.hpp"
 #include "Panda/GameLogic/NativeScript.hpp"
 #include "Panda/Events/WindowSizeObserver.hpp"
 #include "Transform.hpp"

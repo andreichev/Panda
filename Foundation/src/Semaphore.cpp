@@ -21,9 +21,7 @@ struct SemaphoreInternal {
 #if defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
     dispatch_semaphore_t m_handle;
 #elif defined(PLATFORM_POSIX)
-    pthread_mutex_t m_mutex;
-    pthread_cond_t m_cond;
-    int32_t m_count;
+    sem_t *m_sem;
 #elif defined(PLATFORM_WINDOWS)
     HANDLE m_handle;
 #endif
@@ -62,97 +60,40 @@ bool Semaphore::wait(int32_t _msecs) {
 
 #elif defined(PLATFORM_POSIX)
 
-uint64_t toNs(const timespec &_ts) {
-    return _ts.tv_sec * UINT64_C(1000000000) + _ts.tv_nsec;
-}
-
-void toTimespecNs(timespec &_ts, uint64_t _nsecs) {
-    _ts.tv_sec = _nsecs / UINT64_C(1000000000);
-    _ts.tv_nsec = _nsecs % UINT64_C(1000000000);
-}
-
-void toTimespecMs(timespec &_ts, int32_t _msecs) {
-    toTimespecNs(_ts, uint64_t(_msecs) * 1000000);
-}
-
-void add(timespec &_ts, int32_t _msecs) {
-    uint64_t ns = toNs(_ts);
-    toTimespecNs(_ts, ns + uint64_t(_msecs) * 1000000);
-}
-
 Semaphore::Semaphore() {
-    STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
+    PND_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
 
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
-    si->m_count = 0;
 
-    int result;
-
-    result = pthread_mutex_init(&si->m_mutex, NULL);
-    ASSERT(0 == result, "pthread_mutex_init %d", result);
-
-    result = pthread_cond_init(&si->m_cond, NULL);
-    ASSERT(0 == result, "pthread_cond_init %d", result);
+    si->m_sem = sem_open("/full_sem", O_CREAT, 0644, 0);
+    PND_ASSERT(si->m_sem != SEM_FAILED, "sem_open");
 }
 
 Semaphore::~Semaphore() {
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
 
-    int result;
-    result = pthread_cond_destroy(&si->m_cond);
-    ASSERT(0 == result, "pthread_cond_destroy %d", result);
-
-    result = pthread_mutex_destroy(&si->m_mutex);
-    ASSERT(0 == result, "pthread_mutex_destroy %d", result);
+    int result = sem_close(si->m_sem);
+    PND_ASSERT_F(0 == result, "sem_close %d", result);
 }
 
 void Semaphore::post(uint32_t _count) {
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
 
-    int result = pthread_mutex_lock(&si->m_mutex);
-    ASSERT(0 == result, "pthread_mutex_lock %d", result);
+    int result;
 
     for (uint32_t ii = 0; ii < _count; ++ii) {
-        result = pthread_cond_signal(&si->m_cond);
-        ASSERT(0 == result, "pthread_cond_signal %d", result);
+        result = sem_post(si->m_sem);
+        PND_ASSERT_F(0 == result, "sem_post %d", result);
     }
-
-    si->m_count += _count;
-
-    result = pthread_mutex_unlock(&si->m_mutex);
-    ASSERT(0 == result, "pthread_mutex_unlock %d", result);
 }
 
 bool Semaphore::wait(int32_t _msecs) {
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
 
-    int result = pthread_mutex_lock(&si->m_mutex);
-    ASSERT(0 == result, "pthread_mutex_lock %d", result);
+    int result = sem_wait(si->m_sem);
+    PND_ASSERT_F(0 == result, "sem_wait %d", result);
 
-    if (-1 == _msecs) {
-        while (0 == result && 0 >= si->m_count) {
-            result = pthread_cond_wait(&si->m_cond, &si->m_mutex);
-        }
-    } else {
-        timespec ts;
-        clock_gettime(CLOCK_REALTIME, &ts);
-        add(ts, _msecs);
-
-        while (0 == result && 0 >= si->m_count) {
-            result = pthread_cond_timedwait(&si->m_cond, &si->m_mutex, &ts);
-        }
-    }
-
-    bool ok = 0 == result;
-
-    if (ok) {
-        --si->m_count;
-    }
-
-    result = pthread_mutex_unlock(&si->m_mutex);
-    ASSERT(0 == result, "pthread_mutex_unlock %d", result);
-
-    return ok;
+    return 0 == result;
 }
 
 #elif defined(PLATFORM_WINDOWS)

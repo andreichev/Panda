@@ -15,7 +15,7 @@ TextureAsset AssetLoader::loadTexture(const std::string &path) {
     // stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
     std::string texturePath = AssetLoader::getResourcesPath() + path;
-    unsigned char *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
+    void *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
 
     if (image == nullptr) {
         LOG_ERROR("Failed to load a texture file! {}", stbi_failure_reason());

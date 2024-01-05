@@ -102,11 +102,11 @@ private:
         Panda::ParticleProps particleProps;
         particleProps.colorBegin =
             glm::vec4(1.0f, abs(sin(colorFactor)), abs(cos(colorFactor)), 1.f);
-        particleProps.colorEnd = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+        particleProps.colorEnd = glm::vec4(1.0f, 1.0f, 0.0f, 0.0f);
         particleProps.sizeBegin = 0.1f;
         particleProps.sizeVariation = 0.1f;
-        particleProps.sizeEnd = 0.0f;
-        particleProps.lifeTime = 120.0f;
+        particleProps.sizeEnd = 1.0f;
+        particleProps.lifeTime = 10.0f;
         particleProps.velocity = glm::vec3(0.0f, 0.0f, 0.f);
         particleProps.velocityVariation = glm::vec3(1.5f, 1.5f, 1.5f);
         float cameraZ = m_camera->getEntity().getTransform().getPosition().z;

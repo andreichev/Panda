@@ -65,7 +65,7 @@ private:
     void viewChanged(View &view);
     void submit(RenderDraw *draw);
 
-    uint32_t m_vao;
+    uint32_t m_uselessVao;
     GraphicsContext *context;
     OpenGLFrameBuffer frameBuffers[1000];
     OpenGLShader shaders[1000];

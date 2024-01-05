@@ -20,5 +20,5 @@ public:
     static bool isAir(int x, int y, int z, ChunksStorage &chunks);
 
 private:
-    static constexpr float ambientOcclusionFactor = 0.1f;
+    static constexpr float ambientOcclusionFactor = 0.2f;
 };
