@@ -33,6 +33,8 @@ public:
     }
 
 private:
+    Entity getMainCameraEntity();
+
     bool m_isRunning;
     entt::registry m_registry;
     Renderer2D m_renderer2d;

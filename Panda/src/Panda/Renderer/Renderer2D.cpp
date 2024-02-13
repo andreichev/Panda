@@ -4,7 +4,7 @@ namespace Panda {
 
 Renderer2D::Renderer2D()
     : m_viewId(0)
-    , m_camera(nullptr) {
+    , m_viewProj(1.f) {
     m_drawData.vbSize = 0;
     m_drawData.indicesCount = 0;
     m_drawData.vertices =
@@ -126,14 +126,12 @@ Renderer2D::Statistics Renderer2D::getStats() {
 }
 
 void Renderer2D::end() {
-    if (m_drawData.verticesCount == 0 || m_camera == nullptr) {
+    if (m_drawData.verticesCount == 0) {
         return;
     }
     Miren::setShader(m_drawData.shader);
-    Miren::setUniform(m_drawData.shader,
-        "projViewMtx",
-        (void *)&m_camera->getViewProjectionMatrix(),
-        Miren::UniformDataType::Mat4);
+    Miren::setUniform(
+        m_drawData.shader, "projViewMtx", (void *)&m_viewProj, Miren::UniformDataType::Mat4);
 
     Miren::TransientVertexBuffer tvb;
     Miren::allocTransientVertexBuffer(&tvb, m_drawData.vbSize);
@@ -158,8 +156,8 @@ void Renderer2D::setViewId(Miren::ViewId id) {
     m_viewId = id;
 }
 
-void Renderer2D::setCamera(Camera *camera) {
-    m_camera = camera;
+void Renderer2D::setViewProj(glm::mat4 viewProj) {
+    m_viewProj = viewProj;
 }
 
 } // namespace Panda

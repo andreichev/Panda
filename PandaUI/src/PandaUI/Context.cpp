@@ -18,8 +18,9 @@ Context &Context::shared() {
 Context::Context()
     : m_mirenViewId(0)
     , m_viewportSize(100, 100) {
-    m_camera.updateViewportSize(m_viewportSize);
-    m_renderer2d.setCamera(&m_camera);
+    m_camera.setViewportSize(m_viewportSize);
+    // View matrix is identity
+    m_renderer2d.setViewProj(m_camera.getProjection());
     m_renderer2d.setViewId(0);
     // Make background view transparent
     m_view.setBackgroundColor(Color(0x00000000));
@@ -48,7 +49,9 @@ void Context::update(double deltaTime) {
 
 void Context::updateViewportSize(Size size) {
     m_viewportSize = size;
-    m_camera.updateViewportSize(size);
+    m_camera.setViewportSize(size);
+    // View matrix is identity
+    m_renderer2d.setViewProj(m_camera.getProjection());
     m_view.setFrame(PandaUI::Rect(0, 0, size.width, size.height));
 }
 

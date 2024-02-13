@@ -8,7 +8,6 @@
 #include "PandaUI/UICamera.hpp"
 
 #include <Panda/Renderer/Renderer2D.hpp>
-#include <Panda/GameLogic/Components/CameraComponent.hpp>
 
 namespace PandaUI {
 

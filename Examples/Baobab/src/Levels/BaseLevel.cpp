@@ -28,16 +28,16 @@ public:
     void update(double deltaTime) override {}
 
     void windowSizeChanged(Panda::Size size) override {
-        m_camera->viewportSizeChanged(size);
+        m_camera->setViewportSize(size);
         PandaUI::Context::shared().updateViewportSize({size.width, size.height});
     }
 
-    void setCamera(Panda::CameraComponent *camera) {
+    void setCamera(Panda::Camera *camera) {
         m_camera = camera;
     }
 
 private:
-    Panda::CameraComponent *m_camera;
+    Panda::Camera *m_camera;
 };
 
 void BaseLevel::start(Panda::World *world) {
@@ -77,21 +77,19 @@ void BaseLevel::start(Panda::World *world) {
     }
 
     Panda::Entity cameraEntity = world->instantiateEntity();
-    Panda::CameraComponent &camera = cameraEntity.addNativeScript<Panda::CameraComponent>();
+    Panda::WorldCamera &camera = cameraEntity.addComponent<Panda::CameraComponent>().camera;
     camera.setFieldOfView(60.f);
-    world->getRenderer3D().setCamera(&camera);
     CameraMove &cameraMove = cameraEntity.addNativeScript<CameraMove>();
-    cameraMove.setCamera(&camera);
     CameraSizeObserver &cameraSizeObserver = cameraEntity.addNativeScript<CameraSizeObserver>();
     cameraSizeObserver.setCamera(&camera);
-    cameraEntity.getTransform().translate(ChunksStorage::WORLD_SIZE_X / 2,
+    cameraEntity.getTransform().translate({ChunksStorage::WORLD_SIZE_X / 2,
         ChunksStorage::WORLD_SIZE_Y / 4,
-        ChunksStorage::WORLD_SIZE_Z / 2);
-    cameraEntity.getTransform().rotate(25.f, 0.f, 0.f);
+        ChunksStorage::WORLD_SIZE_Z / 2});
+    cameraEntity.getTransform().rotateEuler({glm::degrees(25.f), 0.f, 0.f});
 
     BlocksCreation &blocksCreation = cameraEntity.addNativeScript<BlocksCreation>();
     blocksCreation.setChunksStorage(m_chunksStorage);
-    blocksCreation.setCamera(&camera);
+    blocksCreation.setCameraMove(&cameraMove);
     blocksCreation.setLayoutHandle(layoutHandle);
 
     cameraEntity.addNativeScript<FullScreenToggle>();

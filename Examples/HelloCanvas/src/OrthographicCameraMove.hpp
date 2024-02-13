@@ -5,20 +5,22 @@
 #pragma once
 
 #include <Panda.hpp>
-#include <Panda/GameLogic/Components/CameraComponent.hpp>
 
 class OrthographicCameraMove : public Panda::NativeScript {
 public:
     void initialize() override;
     void update(double deltaTime) override;
     void onImGuiRender() override;
-    inline void setCamera(Panda::CameraComponent *camera) {
-        m_camera = camera;
-    }
 
 private:
-    Panda::CameraComponent *m_camera;
-    Panda::Transform *m_transform;
+    void updateVectors();
+
+    Panda::TransformComponent *m_transform;
+    glm::mat4 m_rotationMatrix;
+    glm::vec4 m_front;
+    glm::vec4 m_up;
+    glm::vec4 m_right;
+    glm::vec3 m_target;
     float m_moveSpeed = 1.4f;
     float m_rotationSpeed = 180.0f;
 };

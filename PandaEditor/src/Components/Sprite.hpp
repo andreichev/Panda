@@ -21,7 +21,7 @@ public:
 private:
     void initialize() override;
     void update(double deltaTime) override;
-    Transform *m_transform;
+    TransformComponent *m_transform;
     Color m_color;
 };
 

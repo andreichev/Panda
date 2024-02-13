@@ -8,7 +8,6 @@
 #include <Panda/Application/Application.hpp>
 #include <Panda/Renderer/Renderer2D.hpp>
 #include <Panda/GameLogic/Components/ParticleSystem.hpp>
-#include <Panda/GameLogic/Components/CameraComponent.hpp>
 #include <PandaUI/PandaUI.hpp>
 
 class CameraSizeObserver final : public Panda::NativeScript, Panda::WindowSizeObserver {
@@ -24,23 +23,23 @@ public:
     void update(double deltaTime) override {}
 
     void windowSizeChanged(Panda::Size size) override {
-        m_camera->viewportSizeChanged(size);
+        m_camera->setViewportSize(size);
         PandaUI::Context::shared().updateViewportSize({size.width, size.height});
     }
 
-    void setCamera(Panda::CameraComponent *camera) {
+    void setCamera(Panda::WorldCamera *camera) {
         m_camera = camera;
     }
 
 private:
-    Panda::CameraComponent *m_camera;
+    Panda::WorldCamera *m_camera;
 };
 
 class ExampleRenderer final : public Panda::NativeScript {
 public:
     void initialize() override {
         m_texture = Foundation::makeShared<Panda::Texture>("textures/arbuz1.png");
-        m_camera->viewportSizeChanged(Panda::Application::get()->getWindow()->getSize());
+        m_camera->setViewportSize(Panda::Application::get()->getWindow()->getSize());
     }
 
     ~ExampleRenderer() {}
@@ -93,7 +92,8 @@ public:
         m_particleSystem = particleSystem;
     }
 
-    void setCamera(Panda::CameraComponent *camera) {
+    void setCameraEntity(Panda::Entity entity, Panda::WorldCamera *camera) {
+        m_cameraEntity = entity;
         m_camera = camera;
     }
 
@@ -109,8 +109,9 @@ private:
         particleProps.lifeTime = 10.0f;
         particleProps.velocity = glm::vec3(0.0f, 0.0f, 0.f);
         particleProps.velocityVariation = glm::vec3(1.5f, 1.5f, 1.5f);
-        float cameraZ = m_camera->getEntity().getTransform().getPosition().z;
-        Panda::Vec3 coord = m_camera->screenCoordToWorld({screenX, screenY}, cameraZ);
+        float cameraZ = m_cameraEntity.getTransform().getPosition().z;
+        glm::mat4 view = glm::inverse(m_cameraEntity.getTransform().getTransform());
+        Panda::Vec3 coord = m_camera->screenCoordToWorld(view, {screenX, screenY}, cameraZ);
         particleProps.position = glm::vec3(coord.x, coord.y, coord.z);
         for (int i = 0; i < 5; i++) {
             m_particleSystem->emit(particleProps);
@@ -118,7 +119,8 @@ private:
     }
 
     Panda::ParticleSystem *m_particleSystem;
-    Panda::CameraComponent *m_camera;
+    Panda::WorldCamera *m_camera;
+    Panda::Entity m_cameraEntity;
     Foundation::Shared<Panda::Texture> m_texture;
     float degree = 0.f;
     float colorFactor = 0.f;
@@ -128,15 +130,13 @@ void ExampleLevel::start(Panda::World *world) {
     using namespace Miren;
     PandaUI::initialize();
     Panda::Entity entity = world->instantiateEntity();
-    Panda::CameraComponent &camera = entity.addNativeScript<Panda::CameraComponent>();
-    entity.getTransform().translate(0.f, 0.f, 10.f);
+    Panda::CameraComponent &cameraComponent = entity.addComponent<Panda::CameraComponent>();
+    entity.getTransform().translate({0.f, 0.f, 10.f});
     Panda::ParticleSystem &particle = entity.addNativeScript<Panda::ParticleSystem>();
     ExampleRenderer &dummy = entity.addNativeScript<ExampleRenderer>();
-    world->getRenderer2D().setCamera(&camera);
-    OrthographicCameraMove &cameraMove = entity.addNativeScript<OrthographicCameraMove>();
+    entity.addNativeScript<OrthographicCameraMove>();
     CameraSizeObserver &cameraSizeObserver = entity.addNativeScript<CameraSizeObserver>();
-    cameraMove.setCamera(&camera);
-    cameraSizeObserver.setCamera(&camera);
+    cameraSizeObserver.setCamera(&cameraComponent.camera);
     dummy.setParticleSystem(&particle);
-    dummy.setCamera(&camera);
+    dummy.setCameraEntity(entity, &cameraComponent.camera);
 }

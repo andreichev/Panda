@@ -9,21 +9,27 @@
 
 namespace PandaUI {
 
-class UICamera : public Panda::Camera {
+class UICamera final : public Panda::Camera {
 public:
     UICamera()
-        : m_viewProj(1.f) {}
+        : m_proj(1.f) {}
 
-    glm::mat4 &getViewProjectionMatrix() override {
-        return m_viewProj;
+    glm::mat4 &getProjection() override {
+        return m_proj;
     }
 
-    void updateViewportSize(Size size) {
-        m_viewProj = glm::ortho(0.f, size.width, size.height, 0.f);
+    void setViewportSize(Panda::Size size) override {
+        m_viewportSize = size;
+        m_proj = glm::ortho(0.f, size.width, size.height, 0.f);
+    }
+
+    Panda::Size getViewportSize() override {
+        return m_viewportSize;
     }
 
 private:
-    glm::mat4 m_viewProj;
+    Panda::Size m_viewportSize;
+    glm::mat4 m_proj;
 };
 
 } // namespace PandaUI

@@ -67,8 +67,8 @@ void BlocksCreation::update(double deltaTime) {
     if (!leftPressed && !rightPressed) {
         return;
     }
-    glm::vec4 position = m_transform->getPosition();
-    glm::vec3 target = m_camera->getFront();
+    glm::vec3 position = m_transform->getPosition();
+    glm::vec3 target = m_cameraMove->getFront();
     auto v = m_chunksStorage->bresenham3D(
         position.x, position.y, position.z, target.x, target.y, target.z, MAXIMUM_DISTANCE);
     if (v && v->voxel != nullptr) {
@@ -104,8 +104,8 @@ void BlocksCreation::setChunksStorage(Foundation::Shared<ChunksStorage> storage)
     m_chunksStorage = storage;
 }
 
-void BlocksCreation::setCamera(Panda::CameraComponent *camera) {
-    m_camera = camera;
+void BlocksCreation::setCameraMove(CameraMove *cameraMove) {
+    m_cameraMove = cameraMove;
 }
 
 void BlocksCreation::setLayoutHandle(Miren::VertexLayoutHandle layoutHandle) {

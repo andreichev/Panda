@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Panda/Base/Base.hpp>
 #include <Foundation/Foundation.hpp>
 #include <glm/glm.hpp>
 
@@ -19,6 +20,10 @@ struct Size {
 
     inline bool isZero() {
         return width == 0 && height == 0;
+    }
+
+    operator Panda::Vec2() const {
+        return {width, height};
     }
 };
 

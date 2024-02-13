@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-#include "Panda/GameLogic/Camera.hpp"
 #include "Panda/Renderer/Texture.hpp"
 
 #include <Miren/Miren.hpp>
@@ -89,11 +88,11 @@ public:
     void end();
     Statistics getStats();
     void setViewId(Miren::ViewId id);
-    void setCamera(Camera *camera);
+    void setViewProj(glm::mat4 viewProj);
 
 private:
+    glm::mat4 m_viewProj;
     Miren::ViewId m_viewId;
-    Camera *m_camera;
     DrawCallData m_drawData;
     void drawRect(glm::mat4 &transform, RectData rect);
 };

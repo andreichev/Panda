@@ -18,8 +18,8 @@
 #include "Panda/GameLogic/Level.hpp"
 #include "Panda/GameLogic/Components/StaticMesh.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
+#include "Panda/GameLogic/NativeScript.hpp"
 #include "Panda/GameLogic/Input.hpp"
-#include "Panda/GameLogic/Components/CameraComponent.hpp"
 
 // Renderer stuff
 #include <Panda/Renderer/Renderer2D.hpp>

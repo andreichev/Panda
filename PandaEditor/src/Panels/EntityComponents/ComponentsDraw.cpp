@@ -7,16 +7,17 @@
 
 namespace Panda {
 
-void drawTranslation(Transform &transform) {
+void drawTranslation(TransformComponent &transform) {
     glm::vec3 position = transform.getPosition();
     drawVec3Control("Translation", position);
     transform.setPosition(position);
 }
 
-void drawRotation(Transform &transform) {
-    glm::vec3 rotation = transform.getRotation();
-    drawVec3Control("Rotation", rotation);
-    transform.setRotation(rotation);
+void drawRotation(TransformComponent &transform) {
+    glm::vec3 rotation = transform.getRotationEuler();
+    glm::vec3 degrees = glm::degrees(rotation);
+    drawVec3Control("Rotation", degrees);
+    transform.setRotationEuler(glm::radians(degrees));
 }
 
 void drawComponents(Entity entity) {

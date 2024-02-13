@@ -7,16 +7,17 @@
 #include "Panda/Base/Base.hpp"
 
 #include "Panda/GameLogic/Components/StaticMesh.hpp"
+#include "Panda/GameLogic/Components/WorldCamera.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
 #include <Foundation/Foundation.hpp>
 
 namespace Panda {
 
-struct IdComponent {
+struct IdComponent final {
     id_t id = 0;
 };
 
-struct TagComponent {
+struct TagComponent final {
     std::string tag;
 
     TagComponent() = default;
@@ -32,7 +33,7 @@ struct TagComponent {
     }
 };
 
-struct RelationshipComponent {
+struct RelationshipComponent final {
     id_t parentHandle = -1;
     std::vector<id_t> children;
 
@@ -42,17 +43,22 @@ struct RelationshipComponent {
         : parentHandle(parent) {}
 };
 
-struct StaticMeshComponent {
+struct StaticMeshComponent final {
     std::vector<Foundation::Shared<StaticMesh>> meshes;
 };
 
-struct DynamicMeshComponent {
+struct DynamicMeshComponent final {
     std::vector<Foundation::Shared<DynamicMesh>> meshes;
+};
+
+struct CameraComponent final {
+    bool isPrimary = true;
+    WorldCamera camera;
 };
 
 class NativeScript;
 
-struct NativeScriptContainer {
+struct NativeScriptContainer final {
     Foundation::Shared<NativeScript> instance = nullptr;
     bool initialized = false;
     const char *scriptName;
@@ -66,7 +72,7 @@ struct NativeScriptContainer {
     }
 };
 
-struct NativeScriptListComponent {
+struct NativeScriptListComponent final {
     std::vector<NativeScriptContainer> scripts;
 
     template<typename T>

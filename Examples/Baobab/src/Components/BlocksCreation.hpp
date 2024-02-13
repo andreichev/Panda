@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "CameraMove.hpp"
 #include "Model/ChunksStorage.hpp"
 
 #include <Panda.hpp>
@@ -16,7 +17,7 @@ public:
     void update(double deltaTime) override;
     void onImGuiRender() override;
     void setChunksStorage(Foundation::Shared<ChunksStorage> storage);
-    void setCamera(Panda::CameraComponent *camera);
+    void setCameraMove(CameraMove *cameraMove);
     void setLayoutHandle(Miren::VertexLayoutHandle layoutHandle);
 
 private:
@@ -24,8 +25,8 @@ private:
     void updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ);
 
     Foundation::Shared<ChunksStorage> m_chunksStorage;
-    Panda::Transform *m_transform;
-    Panda::CameraComponent *m_camera;
+    Panda::TransformComponent *m_transform;
+    CameraMove *m_cameraMove;
     Miren::VertexLayoutHandle m_layoutHandle;
     VoxelType m_selectedBlock;
 };

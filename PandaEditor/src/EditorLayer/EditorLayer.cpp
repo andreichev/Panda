@@ -24,11 +24,10 @@ void EditorLayer::onAttach() {
 void EditorLayer::initializeExampleWorld() {
     Entity cameraEntity = m_world->instantiateEntity();
     cameraEntity.setName("Camera");
-    cameraEntity.getTransform().setPosition(0.f, 0.f, 4.f);
-    auto &camera = cameraEntity.addNativeScript<CameraComponent>();
-    auto &move = cameraEntity.addNativeScript<CameraMove>();
-    move.setCamera(&camera);
-    m_viewport.setCamera(&camera);
+    cameraEntity.getTransform().setPosition({0.f, 0.f, 4.f});
+    auto &camera = cameraEntity.addComponent<CameraComponent>();
+    cameraEntity.addNativeScript<CameraMove>();
+    m_viewport.setCamera(&camera.camera);
 
     Entity sprite1Entity = m_world->instantiateEntity();
     sprite1Entity.setName("Orange Sprite");
@@ -39,7 +38,7 @@ void EditorLayer::initializeExampleWorld() {
     sprite2Entity.setName("Cyan Sprite");
     auto &sprite2 = sprite2Entity.addNativeScript<Sprite>();
     sprite2.setColor({0.5f, 1.0f, 1.0f, 1.0f});
-    sprite2Entity.getTransform().setPosition(1.f, 1.f, 0.f);
+    sprite2Entity.getTransform().setPosition({1.f, 1.f, 0.f});
 }
 
 void EditorLayer::onDetach() {

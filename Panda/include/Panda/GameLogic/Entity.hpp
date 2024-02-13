@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Panda/Window/Window.hpp"
-#include "Components/Transform.hpp"
+#include "Components/TransformComponent.hpp"
 #include "Components/BaseComponents.hpp"
 
 #include <entt/entt.hpp>
@@ -16,10 +16,20 @@ class World;
 
 class Entity final {
 public:
+    Entity();
+
     template<typename T>
     T &addNativeScript() {
         NativeScriptListComponent &component = getComponent<NativeScriptListComponent>();
         return component.add<T>();
+    }
+
+    template<typename T, typename... Args>
+    T &addComponent(Args &&...args) {
+        PND_ASSERT(!hasComponent<T>(), "Entity already has component!");
+        entt::entity entity = static_cast<entt::entity>(m_id);
+        T &component = m_registry->emplace<T>(entity, std::forward<Args>(args)...);
+        return component;
     }
 
     template<typename T>
@@ -48,15 +58,15 @@ public:
 
     void removeFromParent();
 
-    Transform &getTransform();
+    TransformComponent &getTransform();
 
     Entity getParent();
 
-    inline const std::vector<id_t> &getChildEntities() {
+    const std::vector<id_t> &getChildEntities() {
         return getComponent<RelationshipComponent>().children;
     }
 
-    inline id_t getId() {
+    id_t getId() {
         return m_id;
     }
 
@@ -82,15 +92,6 @@ public:
 
 private:
     Entity(entt::registry *m_registry, id_t id, World *world);
-    Entity();
-
-    template<typename T, typename... Args>
-    T &addComponent(Args &&...args) {
-        PND_ASSERT(!hasComponent<T>(), "Entity already has component!");
-        entt::entity entity = static_cast<entt::entity>(m_id);
-        T &component = m_registry->emplace<T>(entity, std::forward<Args>(args)...);
-        return component;
-    }
 
     entt::registry *m_registry;
     World *m_world;

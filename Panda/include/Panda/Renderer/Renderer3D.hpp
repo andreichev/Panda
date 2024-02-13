@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "Panda/GameLogic/Components/Transform.hpp"
+#include "Panda/GameLogic/Components/TransformComponent.hpp"
 #include "Panda/GameLogic/Components/StaticMesh.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
-#include "Panda/GameLogic/Components/CameraComponent.hpp"
+#include "Panda/GameLogic/Camera.hpp"
 
 namespace Panda {
 
@@ -27,17 +27,17 @@ public:
     Renderer3D();
     ~Renderer3D();
     void begin();
-    void submit(Transform *transform, StaticMesh *mesh);
-    void submit(Transform *transform, DynamicMesh *mesh);
+    void submit(TransformComponent *transform, StaticMesh *mesh);
+    void submit(TransformComponent *transform, DynamicMesh *mesh);
     void end();
     Statistics getStats();
-    void setCamera(CameraComponent *camera);
+    void setViewProj(glm::mat4 viewProj);
     void setViewId(Miren::ViewId id);
 
 private:
     DrawData m_drawData;
     Miren::ViewId m_viewId;
-    CameraComponent *m_camera;
+    glm::mat4 m_viewProj;
 };
 
 } // namespace Panda

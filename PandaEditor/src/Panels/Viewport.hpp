@@ -15,7 +15,7 @@ public:
         , m_camera(nullptr) {}
 
     void init(World *world);
-    void setCamera(CameraComponent *camera);
+    void setCamera(Camera *camera);
     void onImGuiRender();
 
 private:
@@ -26,7 +26,7 @@ private:
     Miren::FrameBufferSpecification m_sceneFbSpecification;
     Miren::ViewId m_sceneViewId = 1;
     Miren::TextureHandle m_colorAttachment;
-    CameraComponent *m_camera;
+    Camera *m_camera;
     Size m_viewportPanelSize;
 };
 

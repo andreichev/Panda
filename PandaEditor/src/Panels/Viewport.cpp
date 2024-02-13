@@ -40,7 +40,7 @@ void Viewport::updateViewportSize(Vec2 size) {
     m_viewportPanelSize = size;
     PandaUI::Context::shared().updateViewportSize({size.width, size.height});
     if (m_camera) {
-        m_camera->viewportSizeChanged(size);
+        m_camera->setViewportSize(size);
     }
     Size dpi = Application::get()->getWindow()->getDpi();
     Miren::setViewport(
@@ -74,10 +74,9 @@ void Viewport::onImGuiRender() {
     ImGui::End();
 }
 
-void Viewport::setCamera(CameraComponent *camera) {
+void Viewport::setCamera(Camera *camera) {
     m_camera = camera;
-    m_camera->viewportSizeChanged(m_viewportPanelSize);
-    m_world->getRenderer2D().setCamera(m_camera);
+    m_camera->setViewportSize(m_viewportPanelSize);
 }
 
 } // namespace Panda

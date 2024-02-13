@@ -10,14 +10,20 @@ class CameraMove : public Panda::NativeScript {
 public:
     void initialize() override;
     void update(double deltaTime) override;
-    inline void setCamera(Panda::CameraComponent *camera) {
-        m_camera = camera;
+    glm::vec4 getFront() {
+        return m_front;
     }
 
 private:
+    void updateVectors();
+
     float m_mouseSpeed = 0.2f;
     float m_moveSpeed = 20.0f;
-    Panda::Transform *m_transform;
-    Panda::CameraComponent *m_camera;
+    Panda::TransformComponent *m_transform;
+    glm::mat4 m_rotationMatrix;
+    glm::vec4 m_front;
+    glm::vec4 m_up;
+    glm::vec4 m_right;
+    glm::vec3 m_target;
     Panda::Window *m_window;
 };

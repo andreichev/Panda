@@ -2,7 +2,6 @@
 // Created by Admin on 25.01.2022.
 //
 
-#include "Panda/Application/Application.hpp"
 #include "Panda/GameLogic/World.hpp"
 #include "Panda/GameLogic/NativeScript.hpp"
 
@@ -38,10 +37,10 @@ void World::update(double deltaTime) {
     }
     // Render static meshes
     {
-        auto view = m_registry.view<StaticMeshComponent, Transform>();
+        auto view = m_registry.view<StaticMeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
             auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
-            auto &transform = view.get<Transform>(entityHandle);
+            auto &transform = view.get<TransformComponent>(entityHandle);
             for (auto &mesh : staticMeshComponent.meshes) {
                 m_renderer3d.submit(&transform, mesh.get());
             }
@@ -49,15 +48,26 @@ void World::update(double deltaTime) {
     }
     // Render dynamic meshes
     {
-        auto view = m_registry.view<DynamicMeshComponent, Transform>();
+        auto view = m_registry.view<DynamicMeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
             auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
-            auto &transform = view.get<Transform>(entityHandle);
+            auto &transform = view.get<TransformComponent>(entityHandle);
             for (auto &mesh : dynamicMeshComponent.meshes) {
                 m_renderer3d.submit(&transform, mesh.get());
             }
         }
     }
+
+    Entity cameraEntity = getMainCameraEntity();
+    if (cameraEntity.isValid()) {
+        WorldCamera &camera = cameraEntity.getComponent<CameraComponent>().camera;
+
+        glm::mat4 view = glm::inverse(cameraEntity.getTransform().getTransform());
+        glm::mat4 viewProj = camera.getProjection() * view;
+        m_renderer2d.setViewProj(viewProj);
+        m_renderer3d.setViewProj(viewProj);
+    }
+
     m_renderer2d.end();
     m_renderer3d.end();
 }
@@ -84,7 +94,7 @@ Entity World::instantiateEntity() {
     entity.addComponent<IdComponent>();
     entity.addComponent<TagComponent>("Entity");
     entity.addComponent<RelationshipComponent>();
-    entity.addComponent<Transform>();
+    entity.addComponent<TransformComponent>();
     entity.addComponent<StaticMeshComponent>();
     entity.addComponent<DynamicMeshComponent>();
     entity.addComponent<NativeScriptListComponent>();
@@ -98,6 +108,18 @@ void World::destroy(Entity entity) {
         destroy(child);
     }
     m_registry.destroy(static_cast<entt::entity>(entity.getId()));
+}
+
+Entity World::getMainCameraEntity() {
+    auto view = m_registry.view<CameraComponent>();
+    for (auto entity : view) {
+        auto &comp = view.get<CameraComponent>(entity);
+        if (comp.isPrimary) {
+            id_t id = static_cast<id_t>(entity);
+            return {&m_registry, id, this};
+        }
+    }
+    return {};
 }
 
 } // namespace Panda

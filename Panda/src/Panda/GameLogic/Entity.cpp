@@ -16,8 +16,8 @@ Entity::Entity()
     , m_id(-1)
     , m_world(nullptr) {}
 
-Transform &Entity::getTransform() {
-    return getComponent<Transform>();
+TransformComponent &Entity::getTransform() {
+    return getComponent<TransformComponent>();
 }
 
 void Entity::addChildEntity(Entity entity) {
