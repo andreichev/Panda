@@ -18,6 +18,7 @@ public:
 
 private:
     void drawEntityNode(Entity entity);
+    void drawEntityCreateMenu();
 
     World *m_world;
     Entity m_selected;

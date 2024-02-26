@@ -21,6 +21,11 @@ void WorldHierarchyPanel::onImGuiRender() {
             drawEntityNode(entity);
         });
     }
+    if (ImGui::BeginPopupContextWindow(
+            nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
+        drawEntityCreateMenu();
+        ImGui::EndPopup();
+    }
     ImGui::End();
 
     ImGui::Begin("Properties");
@@ -42,6 +47,16 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     if (opened) {
         ImGui::TreePop();
     }
+}
+
+void WorldHierarchyPanel::drawEntityCreateMenu() {
+    if (!ImGui::BeginMenu("Create"))
+        return;
+    if (ImGui::MenuItem("Empty Entity")) {
+        Entity newEntity = m_world->instantiateEntity();
+        newEntity.getComponent<TagComponent>().tag = "Empty Entity";
+    }
+    ImGui::EndMenu();
 }
 
 } // namespace Panda
