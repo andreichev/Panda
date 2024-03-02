@@ -74,6 +74,10 @@ public:
         return m_id != -1;
     }
 
+    std::string &getName() {
+        return getComponent<TagComponent>().tag;
+    }
+
     void setName(std::string &name) {
         getComponent<TagComponent>().tag = name;
     }

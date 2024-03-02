@@ -45,6 +45,11 @@ void EventQueue::postKeyEvent(Key key, bool down) {
     }
 }
 
+void EventQueue::postCharEvent(uint32_t c) {
+    CharacterInputEvent event(c);
+    m_events.write(event);
+}
+
 void EventQueue::postMouseEvent(double x, double y) {
     MouseMovedEvent event(x, y);
     m_events.write(event);

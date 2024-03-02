@@ -7,6 +7,14 @@
 
 namespace Panda {
 
+struct CharacterInputEvent : public Event {
+    CharacterInputEvent(uint32_t c)
+        : Event(EventType::InputCharacter)
+        , c(c) {}
+
+    uint32_t c;
+};
+
 struct KeyPressedEvent : public Event {
     KeyPressedEvent(Key key)
         : Event(EventType::KeyPressed)

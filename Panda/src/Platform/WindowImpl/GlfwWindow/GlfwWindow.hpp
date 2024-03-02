@@ -26,6 +26,8 @@ public:
     void setEventQueue(EventQueue *eventQueue) override;
     Size getSize() override;
     Size getDpi() override;
+    const char *getClipboardText() override;
+    void setClipboardText(const char *text) override;
 
 private:
     void resetCursorPos();

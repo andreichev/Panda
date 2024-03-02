@@ -141,6 +141,10 @@ void GlfwWindow::addEventHandlers() {
             self->m_eventQueue->postKeyEvent(
                 static_cast<Key>(key), action == GLFW_PRESS || action == GLFW_REPEAT);
         });
+    glfwSetCharCallback(m_windowHandle, [](GLFWwindow *windowHandle, unsigned int c) {
+        GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
+        self->m_eventQueue->postCharEvent(c);
+    });
     glfwSetCursorPosCallback(m_windowHandle, [](GLFWwindow *windowHandle, double x, double y) {
         GlfwWindow *self = static_cast<GlfwWindow *>(glfwGetWindowUserPointer(windowHandle));
         self->m_eventQueue->postMouseEvent(x, y);
@@ -206,6 +210,14 @@ Size GlfwWindow::getDpi() {
 void GlfwWindow::setCursor(Cursor cursor) {
     GLFWcursor *glfwCursor = cursors[cursor];
     glfwSetCursor(m_windowHandle, glfwCursor);
+}
+
+const char *GlfwWindow::getClipboardText() {
+    return glfwGetClipboardString((GLFWwindow *)m_windowHandle);
+}
+
+void GlfwWindow::setClipboardText(const char *text) {
+    glfwSetClipboardString(m_windowHandle, text);
 }
 
 } // namespace Panda

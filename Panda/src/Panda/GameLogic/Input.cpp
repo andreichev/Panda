@@ -43,6 +43,10 @@ void Input::onEvent(Event *event) {
             Input::setKeyPressed(ev->key, false);
             break;
         }
+        case EventType::InputCharacter: {
+            // TODO: Add entered character sequence in Input. Can be used in cheats
+            break;
+        }
         case EventType::MouseMoved: {
             const MouseMovedEvent *ev = static_cast<const MouseMovedEvent *>(event);
             Input::postMouseChangedPosition(ev->x, ev->y);

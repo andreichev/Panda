@@ -20,8 +20,23 @@ void drawRotation(TransformComponent &transform) {
     transform.setRotationEuler(glm::radians(degrees));
 }
 
+void drawTag(Entity entity) {
+    char buffer[256];
+    memset(buffer, 0, 256);
+    buffer[0] = 0; // Setting the first byte to 0 makes checking if string is empty easier later.
+    const std::string &tag = entity.getName();
+    memcpy(buffer, tag.c_str(), tag.length());
+    if (ImGui::InputText("##Tag", buffer, 256)) {
+        if (buffer[0] == 0) {
+            memcpy(buffer, "Unnamed Entity", 16);
+        }
+        entity.getComponent<TagComponent>().tag = buffer;
+    }
+}
+
 void drawComponents(Entity entity) {
     auto &transform = entity.getTransform();
+    drawTag(entity);
     drawTranslation(transform);
     drawRotation(transform);
 }
