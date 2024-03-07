@@ -43,6 +43,13 @@ struct RelationshipComponent final {
         : parentHandle(parent) {}
 };
 
+struct SpriteRendererComponent final {
+    Color color;
+
+    SpriteRendererComponent() = default;
+    SpriteRendererComponent(const SpriteRendererComponent &other) = default;
+};
+
 struct StaticMeshComponent final {
     std::vector<Foundation::Shared<StaticMesh>> meshes;
 };

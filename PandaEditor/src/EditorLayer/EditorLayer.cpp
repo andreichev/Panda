@@ -2,7 +2,6 @@
 #include "Panels/Dockspace.hpp"
 #include "Panels/MenuBar.hpp"
 #include "Components/CameraMove.hpp"
-#include "Components/Sprite.hpp"
 
 namespace Panda {
 
@@ -31,13 +30,13 @@ void EditorLayer::initializeExampleWorld() {
 
     Entity sprite1Entity = m_world->instantiateEntity();
     sprite1Entity.setName("Orange Sprite");
-    auto &sprite1 = sprite1Entity.addNativeScript<Sprite>();
-    sprite1.setColor({1.0f, 0.5f, 0.2f, 1.0f});
+    auto &sprite1 = sprite1Entity.addComponent<SpriteRendererComponent>();
+    sprite1.color = {1.0f, 0.5f, 0.2f, 1.0f};
 
     Entity sprite2Entity = m_world->instantiateEntity();
     sprite2Entity.setName("Cyan Sprite");
-    auto &sprite2 = sprite2Entity.addNativeScript<Sprite>();
-    sprite2.setColor({0.5f, 1.0f, 1.0f, 1.0f});
+    auto &sprite2 = sprite2Entity.addComponent<SpriteRendererComponent>();
+    sprite2.color = {0.5f, 1.0f, 1.0f, 1.0f};
     sprite2Entity.getTransform().setPosition({1.f, 1.f, 0.f});
 }
 

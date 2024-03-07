@@ -35,6 +35,20 @@ void World::update(double deltaTime) {
             }
         }
     }
+    // Render Sprites
+    {
+        auto view = m_registry.view<SpriteRendererComponent, TransformComponent>();
+        for (auto entityHandle : view) {
+            auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
+            auto &transform = view.get<TransformComponent>(entityHandle);
+            Panda::Renderer2D::RectData rect;
+            rect.color = spriteComponent.color;
+            rect.size = {1.f, 1.f};
+            rect.center = transform.getPosition();
+            rect.rotation = transform.getRotationEuler().z;
+            m_renderer2d.drawRect(rect);
+        }
+    }
     // Render static meshes
     {
         auto view = m_registry.view<StaticMeshComponent, TransformComponent>();
