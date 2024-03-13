@@ -14,9 +14,10 @@ public:
         , m_shader() {
         using namespace Miren;
 
-        Panda::ProgramAsset programAsset =
-            Panda::AssetLoader::loadProgram("default-shaders/checker/checker_vertex.glsl",
-                "default-shaders/checker/checker_fragment.glsl");
+        Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
+            "default-shaders/checker/checker_vertex.glsl",
+            "default-shaders/checker/checker_fragment.glsl"
+        );
         m_shader = createProgram(programAsset.getMirenProgramCreate());
 
         float rightEdge = 0.5f;

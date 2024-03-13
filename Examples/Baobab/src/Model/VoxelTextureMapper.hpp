@@ -27,13 +27,15 @@ struct VoxelTextureData {
         , bottomTileIndex(tileIndex)
         , bottomColor(0xFFFFFFFF) {}
 
-    VoxelTextureData(VoxelType type,
+    VoxelTextureData(
+        VoxelType type,
         uint8_t sideTileIndex,
         uint32_t sideColor,
         uint8_t topTileIndex,
         uint32_t topColor,
         uint8_t bottomTileIndex,
-        uint32_t bottomColor)
+        uint32_t bottomColor
+    )
         : type(type)
         , sideTileIndex(sideTileIndex)
         , sideColor(sideColor)

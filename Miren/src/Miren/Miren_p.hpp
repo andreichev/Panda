@@ -140,7 +140,8 @@ struct Context {
                     const CreateIndexBufferCommand *cmd =
                         static_cast<const CreateIndexBufferCommand *>(command);
                     m_renderer->createIndexBuffer(
-                        cmd->handle, cmd->indices, cmd->elementType, cmd->count);
+                        cmd->handle, cmd->indices, cmd->elementType, cmd->count
+                    );
                     break;
                 }
                 case RendererCommandType::CreateDynamicIndexBuffer: {
@@ -148,7 +149,8 @@ struct Context {
                     const CreateDynamicIndexBufferCommand *cmd =
                         static_cast<const CreateDynamicIndexBufferCommand *>(command);
                     m_renderer->createDynamicIndexBuffer(
-                        cmd->handle, cmd->indices, cmd->elementType, cmd->count);
+                        cmd->handle, cmd->indices, cmd->elementType, cmd->count
+                    );
                     break;
                 }
                 case RendererCommandType::UpdateDynamicIndexBuffer: {
@@ -170,7 +172,8 @@ struct Context {
                     const CreateVertexBufferCommand *cmd =
                         static_cast<const CreateVertexBufferCommand *>(command);
                     m_renderer->createVertexBuffer(
-                        cmd->handle, cmd->data, cmd->size, cmd->layoutHandle);
+                        cmd->handle, cmd->data, cmd->size, cmd->layoutHandle
+                    );
                     break;
                 }
                 case RendererCommandType::CreateDynamicVertexBuffer: {
@@ -178,7 +181,8 @@ struct Context {
                     const CreateDynamicVertexBufferCommand *cmd =
                         static_cast<const CreateDynamicVertexBufferCommand *>(command);
                     m_renderer->createDynamicVertexBuffer(
-                        cmd->handle, cmd->data, cmd->size, cmd->layoutHandle);
+                        cmd->handle, cmd->data, cmd->size, cmd->layoutHandle
+                    );
                     break;
                 }
                 case RendererCommandType::UpdateDynamicVertexBuffer: {
@@ -217,8 +221,10 @@ struct Context {
         Foundation::CommandBuffer::Command *command = m_preCommandQueue.read();
         if (command != nullptr) {
             CMDBUF_LOG("RENDERER INIT COMMAND");
-            PND_ASSERT(command->type == RendererCommandType::RendererInit,
-                "First command should be RendererInit");
+            PND_ASSERT(
+                command->type == RendererCommandType::RendererInit,
+                "First command should be RendererInit"
+            );
             m_renderer = NEW(Foundation::getAllocator(), RendererOpenGL);
         }
     }
@@ -302,8 +308,8 @@ struct Context {
         m_postCommandQueue.write(cmd);
     }
 
-    IndexBufferHandle createIndexBuffer(
-        Foundation::Memory indices, BufferElementType elementType, size_t count) {
+    IndexBufferHandle
+    createIndexBuffer(Foundation::Memory indices, BufferElementType elementType, size_t count) {
         IndexBufferHandle handle = m_indexBuffersHandleAlloc.alloc();
         CreateIndexBufferCommand cmd(handle, indices, elementType, count);
         m_preCommandQueue.write(cmd);
@@ -311,15 +317,16 @@ struct Context {
     }
 
     IndexBufferHandle createDynamicIndexBuffer(
-        Foundation::Memory indices, BufferElementType elementType, size_t count) {
+        Foundation::Memory indices, BufferElementType elementType, size_t count
+    ) {
         IndexBufferHandle handle = m_indexBuffersHandleAlloc.alloc();
         CreateDynamicIndexBufferCommand cmd(handle, indices, elementType, count);
         m_preCommandQueue.write(cmd);
         return handle;
     }
 
-    void updateDynamicIndexBuffer(
-        IndexBufferHandle handle, Foundation::Memory indices, size_t count) {
+    void
+    updateDynamicIndexBuffer(IndexBufferHandle handle, Foundation::Memory indices, size_t count) {
         UpdateDynamicIndexBufferCommand cmd(handle, indices, count);
         m_preCommandQueue.write(cmd);
     }
@@ -330,25 +337,27 @@ struct Context {
         m_postCommandQueue.write(cmd);
     }
 
-    VertexBufferHandle createVertexBuffer(
-        Foundation::Memory data, uint32_t size, VertexLayoutHandle layoutHandle) {
+    VertexBufferHandle
+    createVertexBuffer(Foundation::Memory data, uint32_t size, VertexLayoutHandle layoutHandle) {
         VertexBufferHandle handle = m_vertexBuffersHandleAlloc.alloc();
         CreateVertexBufferCommand cmd(handle, data, size, layoutHandle);
         m_preCommandQueue.write(cmd);
         return handle;
     }
 
-    VertexBufferHandle createDynamicVertexBuffer(Foundation::Memory data,
+    VertexBufferHandle createDynamicVertexBuffer(
+        Foundation::Memory data,
         uint32_t size,
-        VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE) {
+        VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE
+    ) {
         VertexBufferHandle handle = m_vertexBuffersHandleAlloc.alloc();
         CreateDynamicVertexBufferCommand cmd(handle, data, size, layoutHandle);
         m_preCommandQueue.write(cmd);
         return handle;
     }
 
-    void updateDynamicVertexBuffer(
-        VertexBufferHandle handle, Foundation::Memory data, uint32_t size) {
+    void
+    updateDynamicVertexBuffer(VertexBufferHandle handle, Foundation::Memory data, uint32_t size) {
         UpdateDynamicVertexBufferCommand cmd(handle, data, size);
         m_preCommandQueue.write(cmd);
     }
@@ -406,21 +415,24 @@ struct Context {
         buffer->data = &m_submit->m_transientVb.data[transientVBOffset];
         m_submit->m_transientVbSize += size;
         PND_ASSERT(
-            m_submit->m_transientVbSize < TRANSIENT_VERTEX_BUFFER_SIZE, "INCREASE DEFAULT VB SIZE");
+            m_submit->m_transientVbSize < TRANSIENT_VERTEX_BUFFER_SIZE, "INCREASE DEFAULT VB SIZE"
+        );
         buffer->size = size;
         buffer->startVertex = transientVBOffset;
         buffer->handle = m_submit->m_transientVb.handle;
     }
 
     void allocTransientIndexBuffer(
-        TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType) {
+        TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType
+    ) {
         uint32_t transientIBOffset = m_submit->m_transientIbSize;
         uint32_t elementSize = VertexBufferElement::getSizeOfType(elementType);
         uint32_t size = count * elementSize;
         buffer->data = &m_submit->m_transientIb.data[transientIBOffset];
         m_submit->m_transientIbSize += size;
         PND_ASSERT(
-            m_submit->m_transientIbSize < TRANSIENT_INDEX_BUFFER_SIZE, "INCREASE DEFAULT IB SIZE");
+            m_submit->m_transientIbSize < TRANSIENT_INDEX_BUFFER_SIZE, "INCREASE DEFAULT IB SIZE"
+        );
         buffer->size = size;
         buffer->startIndex = transientIBOffset;
         buffer->elementType = elementType;

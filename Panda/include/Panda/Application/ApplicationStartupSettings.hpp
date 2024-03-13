@@ -31,13 +31,15 @@ public:
         , startupLevel(nullptr)
         , startupLayer(nullptr) {}
 
-    ApplicationStartupSettings(const char *name,
+    ApplicationStartupSettings(
+        const char *name,
         const char *windowTitle,
         const Size &windowSize,
         bool isFullScreen,
         bool isMaximized,
         Level *startupLevel,
-        Layer *startupLayer)
+        Layer *startupLayer
+    )
         : name(name)
         , windowTitle(windowTitle)
         , windowSize(windowSize)

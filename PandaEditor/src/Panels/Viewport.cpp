@@ -22,11 +22,15 @@ void Viewport::init(World *world) {
     Miren::FrameBufferAttachment attachments[] = {m_colorAttachment, depthAttachment};
     m_sceneFbSpecification = Miren::FrameBufferSpecification(attachments, 2);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
-    Miren::setViewport(m_sceneViewId,
-        Miren::Rect(
-            0, 0, m_viewportPanelSize.width * dpi.width, m_viewportPanelSize.height * dpi.height));
     Miren::setViewport(
-        0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height));
+        m_sceneViewId,
+        Miren::Rect(
+            0, 0, m_viewportPanelSize.width * dpi.width, m_viewportPanelSize.height * dpi.height
+        )
+    );
+    Miren::setViewport(
+        0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
+    );
     Miren::setViewClear(m_sceneViewId, 0x12212bff);
     Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
     m_world->getRenderer2D().setViewId(m_sceneViewId);
@@ -44,15 +48,20 @@ void Viewport::updateViewportSize(Vec2 size) {
     }
     Size dpi = Application::get()->getWindow()->getDpi();
     Miren::setViewport(
-        m_sceneViewId, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height));
+        m_sceneViewId, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
+    );
     // COLOR ATTACHMENT
-    Miren::resizeTexture(m_sceneFbSpecification.attachments[0].handle,
+    Miren::resizeTexture(
+        m_sceneFbSpecification.attachments[0].handle,
         size.width * dpi.width,
-        size.height * dpi.height);
+        size.height * dpi.height
+    );
     // DEPTH ATTACHMENT
-    Miren::resizeTexture(m_sceneFbSpecification.attachments[1].handle,
+    Miren::resizeTexture(
+        m_sceneFbSpecification.attachments[1].handle,
         size.width * dpi.width,
-        size.height * dpi.height);
+        size.height * dpi.height
+    );
     Miren::deleteFrameBuffer(m_sceneFB);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
@@ -67,10 +76,12 @@ void Viewport::onImGuiRender() {
     }
     bool viewportHovered = ImGui::IsWindowHovered();
     Application::get()->getImGuiLayer()->setBlockEvents(!viewportHovered);
-    ImGui::Image((void *)(uintptr_t)m_colorAttachment.id,
+    ImGui::Image(
+        (void *)(uintptr_t)m_colorAttachment.id,
         ImVec2(m_viewportPanelSize.width, m_viewportPanelSize.height),
         ImVec2(0, 1),
-        ImVec2(1, 0));
+        ImVec2(1, 0)
+    );
     ImGui::End();
 }
 

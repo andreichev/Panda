@@ -43,8 +43,8 @@ namespace Foundation {
 struct AllocatorI {
     virtual ~AllocatorI() = default;
 
-    virtual void *realloc(
-        void *ptr, size_t size, size_t _align, const char *file, uint32_t line) = 0;
+    virtual void *
+    realloc(void *ptr, size_t size, size_t _align, const char *file, uint32_t line) = 0;
 };
 
 class DefaultAllocator : public AllocatorI {
@@ -59,24 +59,30 @@ public:
 template<typename Ty>
 Ty alignUp(Ty _a, int32_t _align);
 
-void *alloc(AllocatorI *allocator,
+void *alloc(
+    AllocatorI *allocator,
     size_t size,
     size_t _align = 0,
     const char *file = nullptr,
-    uint32_t line = 0);
+    uint32_t line = 0
+);
 
-void free(AllocatorI *allocator,
+void free(
+    AllocatorI *allocator,
     void *ptr,
     size_t _align = 0,
     const char *file = nullptr,
-    uint32_t line = 0);
+    uint32_t line = 0
+);
 
 template<typename ObjectT>
-inline void deleteObject(AllocatorI *_allocator,
+inline void deleteObject(
+    AllocatorI *_allocator,
     ObjectT *_object,
     size_t _align = 0,
     const char *_file = nullptr,
-    uint32_t _line = 0) {
+    uint32_t _line = 0
+) {
     if (_object == nullptr) {
         return;
     }

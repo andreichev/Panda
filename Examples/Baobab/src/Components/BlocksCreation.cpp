@@ -15,10 +15,12 @@ void BlocksCreation::initialize() {
 void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ) {
     // LOG_INFO("UPDATE CHUNK {} {} {}", chunkIndexX, chunkIndexY, chunkIndexZ);
     Panda::MeshData data = VoxelMeshGenerator::makeOneChunkMesh(
-        m_layoutHandle, *m_chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true);
+        m_layoutHandle, *m_chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true
+    );
     m_chunksStorage
-        ->chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
-                 chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
+        ->chunks
+            [chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+             chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
         .getMesh()
         ->update(data);
 }
@@ -70,7 +72,8 @@ void BlocksCreation::update(double deltaTime) {
     glm::vec3 position = m_transform->getPosition();
     glm::vec3 target = m_cameraMove->getFront();
     auto v = m_chunksStorage->bresenham3D(
-        position.x, position.y, position.z, target.x, target.y, target.z, MAXIMUM_DISTANCE);
+        position.x, position.y, position.z, target.x, target.y, target.z, MAXIMUM_DISTANCE
+    );
     if (v && v->voxel != nullptr) {
         if (leftPressed) {
             int x = v->end.x + v->normal.x;

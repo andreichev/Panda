@@ -24,7 +24,8 @@ void OpenGLTexture::create(const TextureCreate &create) {
     GLenum format = s_textureFormat[create.m_format].m_fmt;
     GLenum internalFormat = s_textureFormat[create.m_format].m_internalFmt;
     GLenum type = s_textureFormat[create.m_format].m_type;
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D,
+    GL_CALL(glTexImage2D(
+        GL_TEXTURE_2D,
         0,
         format,
         create.m_width,
@@ -32,7 +33,8 @@ void OpenGLTexture::create(const TextureCreate &create) {
         0,
         internalFormat,
         type,
-        create.m_data.data));
+        create.m_data.data
+    ));
     create.m_data.release();
 
     if (create.m_numMips > 0) {
@@ -43,9 +45,11 @@ void OpenGLTexture::create(const TextureCreate &create) {
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
     GL_CALL(glTexParameteri(
-        GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, openGLFiltering(create.m_minFiltering)));
+        GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, openGLFiltering(create.m_minFiltering)
+    ));
     GL_CALL(glTexParameteri(
-        GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, openGLFiltering(create.m_magFiltering)));
+        GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, openGLFiltering(create.m_magFiltering)
+    ));
 }
 
 void OpenGLTexture::resize(uint32_t width, uint32_t height) {

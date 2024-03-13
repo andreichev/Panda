@@ -11,9 +11,10 @@ Renderer2D::Renderer2D()
         (Vertex2D *)ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
     m_drawData.indices =
         (uint16_t *)ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
-    Panda::ProgramAsset programAsset =
-        Panda::AssetLoader::loadProgram("default-shaders/renderer2d/renderer2d_vertex.glsl",
-            "default-shaders/renderer2d/renderer2d_fragment.glsl");
+    Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
+        "default-shaders/renderer2d/renderer2d_vertex.glsl",
+        "default-shaders/renderer2d/renderer2d_fragment.glsl"
+    );
     m_drawData.shader = Miren::createProgram(programAsset.getMirenProgramCreate());
     Miren::VertexBufferLayoutData layoutData;
     // Position
@@ -34,7 +35,8 @@ Renderer2D::Renderer2D()
         m_drawData.samplers[i] = i;
     }
     Miren::setUniform(
-        m_drawData.shader, "u_textures", m_drawData.samplers, Miren::UniformDataType::IntArray);
+        m_drawData.shader, "u_textures", m_drawData.samplers, Miren::UniformDataType::IntArray
+    );
 }
 
 Renderer2D::~Renderer2D() {
@@ -131,7 +133,8 @@ void Renderer2D::end() {
     }
     Miren::setShader(m_drawData.shader);
     Miren::setUniform(
-        m_drawData.shader, "projViewMtx", (void *)&m_viewProj, Miren::UniformDataType::Mat4);
+        m_drawData.shader, "projViewMtx", (void *)&m_viewProj, Miren::UniformDataType::Mat4
+    );
 
     Miren::TransientVertexBuffer tvb;
     Miren::allocTransientVertexBuffer(&tvb, m_drawData.vbSize);
@@ -139,7 +142,8 @@ void Renderer2D::end() {
 
     Miren::TransientIndexBuffer tib;
     Miren::allocTransientIndexBuffer(
-        &tib, m_drawData.indicesCount, Miren::BufferElementType::UnsignedShort);
+        &tib, m_drawData.indicesCount, Miren::BufferElementType::UnsignedShort
+    );
     memcpy(tib.data, m_drawData.indices, m_drawData.ibSize);
 
     Miren::setState(0);

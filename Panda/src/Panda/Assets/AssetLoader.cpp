@@ -36,8 +36,8 @@ TextureAsset AssetLoader::loadTexture(const std::string &path) {
     return texture;
 }
 
-ProgramAsset AssetLoader::loadProgram(
-    const std::string &vertexPath, const std::string &fragmentPath) {
+ProgramAsset
+AssetLoader::loadProgram(const std::string &vertexPath, const std::string &fragmentPath) {
     std::string vertexCode, fragmentCode;
     std::ifstream vShaderFile, fShaderFile;
     // ensure ifstream objects can throw exceptions:
@@ -59,7 +59,8 @@ ProgramAsset AssetLoader::loadProgram(
         fragmentCode = fShaderStream.str();
     } catch (std::ifstream::failure &e) {
         PND_ASSERT_F(
-            false, "SHADER::FILE {} or {} NOT SUCCESSFULLY READ", vertexPath, fragmentPath);
+            false, "SHADER::FILE {} or {} NOT SUCCESSFULLY READ", vertexPath, fragmentPath
+        );
     }
     Foundation::Memory vertexData =
         Foundation::Memory::copying((void *)vertexCode.c_str(), vertexCode.size() + 1);

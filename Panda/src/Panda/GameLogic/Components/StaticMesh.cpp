@@ -16,7 +16,8 @@ StaticMesh::~StaticMesh() {
 }
 
 void StaticMesh::create(
-    const Panda::MeshData &data, Miren::TextureHandle texture, Miren::ProgramHandle shader) {
+    const Panda::MeshData &data, Miren::TextureHandle texture, Miren::ProgramHandle shader
+) {
     m_shaderHandle = shader;
     m_textureHandle = texture;
     m_indicesCount = data.indicesCount;
@@ -24,7 +25,8 @@ void StaticMesh::create(
     m_vertexBufferHandle =
         Miren::createVertexBuffer(data.vertexBuffer, data.vertexBufferSize, m_bufferLayoutHandle);
     m_indexBufferHandle = Miren::createIndexBuffer(
-        data.indices, Miren::BufferElementType::UnsignedInt, data.indicesCount);
+        data.indices, Miren::BufferElementType::UnsignedInt, data.indicesCount
+    );
 }
 
 } // namespace Panda

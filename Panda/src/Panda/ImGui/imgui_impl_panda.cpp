@@ -316,8 +316,7 @@ IMGUI_IMPL_API void ImGui_ImplPanda_NewFrame(double deltaTime) {
     Application *app = Application::get();
     Size dpi = app->getWindow()->getDpi();
     io.DisplayFramebufferScale = ImVec2(dpi.width, dpi.height);
-    io.DisplaySize = ImVec2(
-        (float)(app->getWindow()->getSize().width), (float)(app->getWindow()->getSize().height));
+    io.DisplaySize = ImVec2(app->getWindow()->getSize().width, app->getWindow()->getSize().height);
     io.DeltaTime = (float)deltaTime;
     ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
     app->getWindow()->setCursor(bd->MouseCursors[imgui_cursor]);

@@ -19,13 +19,15 @@ namespace Miren {
 
 RendererOpenGL *RendererOpenGL::s_instance;
 
-void gpuErrorCallback(GLenum source,
+void gpuErrorCallback(
+    GLenum source,
     GLenum type,
     GLuint id,
     GLenum severity,
     GLsizei length,
     const GLchar *message,
-    const void *userParam) {
+    const void *userParam
+) {
     LOG_INFO(message);
     LOG_CRITICAL("OPENGL ERROR");
 }
@@ -89,7 +91,8 @@ void RendererOpenGL::flip() {
 }
 
 void RendererOpenGL::createFrameBuffer(
-    FrameBufferHandle handle, FrameBufferSpecification specification) {
+    FrameBufferHandle handle, FrameBufferSpecification specification
+) {
     frameBuffers[handle.id].create(specification);
 }
 
@@ -117,24 +120,29 @@ void RendererOpenGL::deleteTexture(TextureHandle handle) {
     textures[handle.id].terminate();
 }
 
-void RendererOpenGL::createIndexBuffer(IndexBufferHandle handle,
+void RendererOpenGL::createIndexBuffer(
+    IndexBufferHandle handle,
     Foundation::Memory indices,
     BufferElementType elementType,
-    size_t count) {
+    size_t count
+) {
     indexBuffers[handle.id].create(indices.data, elementType, count, false);
     indices.release();
 }
 
-void RendererOpenGL::createDynamicIndexBuffer(IndexBufferHandle handle,
+void RendererOpenGL::createDynamicIndexBuffer(
+    IndexBufferHandle handle,
     Foundation::Memory indices,
     BufferElementType elementType,
-    size_t count) {
+    size_t count
+) {
     indexBuffers[handle.id].create(indices.data, elementType, count, true);
     indices.release();
 }
 
 void RendererOpenGL::updateDynamicIndexBuffer(
-    IndexBufferHandle handle, Foundation::Memory indices, size_t count) {
+    IndexBufferHandle handle, Foundation::Memory indices, size_t count
+) {
     indexBuffers[handle.id].update(indices.data, count);
     indices.release();
 }
@@ -143,26 +151,31 @@ void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
     indexBuffers[handle.id].terminate();
 }
 
-void RendererOpenGL::createVertexBuffer(VertexBufferHandle handle,
+void RendererOpenGL::createVertexBuffer(
+    VertexBufferHandle handle,
     Foundation::Memory data,
     uint32_t size,
-    VertexLayoutHandle layoutHandle) {
+    VertexLayoutHandle layoutHandle
+) {
     vertexBuffers[handle.id].create(data.data, size, false);
     vertexBuffers[handle.id].setLayoutHandle(layoutHandle);
     data.release();
 }
 
-void RendererOpenGL::createDynamicVertexBuffer(VertexBufferHandle handle,
+void RendererOpenGL::createDynamicVertexBuffer(
+    VertexBufferHandle handle,
     Foundation::Memory data,
     uint32_t size,
-    VertexLayoutHandle layoutHandle) {
+    VertexLayoutHandle layoutHandle
+) {
     vertexBuffers[handle.id].create(data.data, size, true);
     vertexBuffers[handle.id].setLayoutHandle(layoutHandle);
     data.release();
 }
 
 void RendererOpenGL::updateDynamicVertexBuffer(
-    VertexBufferHandle handle, Foundation::Memory data, uint32_t size) {
+    VertexBufferHandle handle, Foundation::Memory data, uint32_t size
+) {
     vertexBuffers[handle.id].update(data.data, size);
     data.release();
 }
@@ -182,7 +195,8 @@ void RendererOpenGL::setUniform(const Uniform &uniform) {
     switch (uniform.type) {
         case UniformDataType::Mat4:
             shaders[uniform.handle.id].setUniformMat4(
-                uniform.name, static_cast<float *>(uniform.value));
+                uniform.name, static_cast<float *>(uniform.value)
+            );
             return;
         case UniformDataType::Int:
             shaders[uniform.handle.id].setUniformInt(uniform.name, (int)(intptr_t)uniform.value);
@@ -202,11 +216,13 @@ void RendererOpenGL::submit(Frame *frame, View *views) {
     MIREN_LOG("FRAME SUBMITTED. DRAW CALLS: {}", frame->getDrawCallsCount());
     if (frame->m_transientVbSize > 0) {
         vertexBuffers[frame->m_transientVb.handle.id].update(
-            frame->m_transientVb.data, frame->m_transientVbSize);
+            frame->m_transientVb.data, frame->m_transientVbSize
+        );
     }
     if (frame->m_transientIbSize > 0) {
         indexBuffers[frame->m_transientIb.handle.id].update(
-            frame->m_transientIb.data, frame->m_transientIbSize / 2);
+            frame->m_transientIb.data, frame->m_transientIbSize / 2
+        );
     }
     ViewId viewId = -1;
     for (int i = 0; i < frame->getDrawCallsCount(); i++) {
@@ -229,10 +245,12 @@ void RendererOpenGL::viewChanged(View &view) {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, context->getDefaultFrameBufferId()));
     }
     if (!view.m_viewport.isZero()) {
-        GL_CALL(glViewport(view.m_viewport.origin.x,
+        GL_CALL(glViewport(
+            view.m_viewport.origin.x,
             view.m_viewport.origin.y,
             view.m_viewport.size.width,
-            view.m_viewport.size.height));
+            view.m_viewport.size.height
+        ));
     }
     uint32_t rgba = view.m_clearColor;
     uint8_t r = rgba >> 24;
@@ -266,10 +284,12 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     }
     if (!draw->m_scissorRect.isZero()) {
         GL_CALL(glEnable(GL_SCISSOR_TEST));
-        GL_CALL(glScissor((int)draw->m_scissorRect.origin.x,
+        GL_CALL(glScissor(
+            (int)draw->m_scissorRect.origin.x,
             (int)draw->m_scissorRect.origin.y,
             (int)draw->m_scissorRect.size.width,
-            (int)draw->m_scissorRect.size.height));
+            (int)draw->m_scissorRect.size.height
+        ));
     } else {
         GL_CALL(glDisable(GL_SCISSOR_TEST));
     }
@@ -283,10 +303,12 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     GL_CALL(glBindVertexArray(m_uselessVao));
     shaders[draw->m_shader.id].bindAttributes(layout, draw->m_verticesOffset);
     indexBuffers[draw->m_indexBuffer.id].bind();
-    GL_CALL(glDrawElements(GL_TRIANGLES,
+    GL_CALL(glDrawElements(
+        GL_TRIANGLES,
         draw->m_numIndices,
         indexBuffers[draw->m_indexBuffer.id].getElementType(),
-        (void *)draw->m_indicesOffset));
+        (void *)draw->m_indicesOffset
+    ));
     indexBuffers[draw->m_indexBuffer.id].unbind();
     shaders[draw->m_shader.id].unbind();
     vertexBuffers[draw->m_vertexBuffer.id].unbind();

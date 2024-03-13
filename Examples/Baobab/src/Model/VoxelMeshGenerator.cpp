@@ -24,16 +24,19 @@ glm::vec2 getUV(uint8_t tileIndex) {
     return {u, v};
 }
 
-Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(Miren::VertexLayoutHandle layoutHandle,
+Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
+    Miren::VertexLayoutHandle layoutHandle,
     ChunksStorage &chunks,
     int chunkIndexX,
     int chunkIndexY,
     int chunkIndexZ,
-    bool ambientOcclusion) {
+    bool ambientOcclusion
+) {
     using namespace Miren;
     using namespace Panda;
-    Chunk &chunk = chunks.chunks[chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
-                                 chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
+    Chunk &chunk = chunks.chunks
+                       [chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+                        chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
     Vertex *vertices = new Vertex[20000];
     uint32_t *indices = new uint32_t[20000];
     uint32_t verticesCount = 0;
@@ -84,34 +87,42 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(Miren::VertexLayoutHandle l
                             ambientOcclusionFactor;
                     }
                     glm::vec2 uv = getUV(textureData.sideTileIndex);
-                    vertices[verticesCount++] = Vertex(x,
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y,
                         z + 1.0f,
                         uv.x,
                         uv.y + uvSize,
                         textureData.sideColor,
-                        light * (1.f - b - d - h));
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - b - d - h)
+                    );
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y,
                         z + 1.0f,
                         uv.x + uvSize,
                         uv.y + uvSize,
                         textureData.sideColor,
-                        light * (1.f - b - c - g)); // 1
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - b - c - g)
+                    ); // 1
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y + 1.0f,
                         z + 1.0f,
                         uv.x + uvSize,
                         uv.y,
                         textureData.sideColor,
-                        light * (1.f - a - c - e)); // 2
-                    vertices[verticesCount++] = Vertex(x,
+                        light * (1.f - a - c - e)
+                    ); // 2
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y + 1.0f,
                         z + 1.0f,
                         uv.x,
                         uv.y,
                         textureData.sideColor,
-                        light * (1.f - a - d - f)); // 3
+                        light * (1.f - a - d - f)
+                    ); // 3
                 }
                 // Back
                 if (isAir(x, y, z - 1, chunks)) {
@@ -140,34 +151,42 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(Miren::VertexLayoutHandle l
                             ambientOcclusionFactor;
                     }
                     glm::vec2 uv = getUV(textureData.sideTileIndex);
-                    vertices[verticesCount++] = Vertex(x,
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y,
                         z,
                         uv.x + uvSize,
                         uv.y + uvSize,
                         textureData.sideColor,
-                        light * (1.f - b - c - f)); // 4
-                    vertices[verticesCount++] = Vertex(x,
+                        light * (1.f - b - c - f)
+                    ); // 4
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y + 1.0f,
                         z,
                         uv.x + uvSize,
                         uv.y,
                         textureData.sideColor,
-                        light * (1.f - a - c - e)); // 5
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - a - c - e)
+                    ); // 5
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y + 1.0f,
                         z,
                         uv.x,
                         uv.y,
                         textureData.sideColor,
-                        light * (1.f - a - d - g)); // 6
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - a - d - g)
+                    ); // 6
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y,
                         z,
                         uv.x,
                         uv.y + uvSize,
                         textureData.sideColor,
-                        light * (1.f - b - d - h)); // 7
+                        light * (1.f - b - d - h)
+                    ); // 7
                 }
                 // Top
                 if (isAir(x, y + 1, z, chunks)) {
@@ -196,34 +215,42 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(Miren::VertexLayoutHandle l
                             ambientOcclusionFactor;
                     }
                     glm::vec2 uv = getUV(textureData.topTileIndex);
-                    vertices[verticesCount++] = Vertex(x,
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y + 1.0f,
                         z,
                         uv.x,
                         uv.y + uvSize,
                         textureData.topColor,
-                        light * (1.f - b - d - h)); // 8
-                    vertices[verticesCount++] = Vertex(x,
+                        light * (1.f - b - d - h)
+                    ); // 8
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y + 1.0f,
                         z + 1.0f,
                         uv.x + uvSize,
                         uv.y + uvSize,
                         textureData.topColor,
-                        light * (1.f - b - c - g)); // 11
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - b - c - g)
+                    ); // 11
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y + 1.0f,
                         z + 1.0f,
                         uv.x + uvSize,
                         uv.y,
                         textureData.topColor,
-                        light * (1.f - a - c - e)); // 10
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - a - c - e)
+                    ); // 10
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y + 1.0f,
                         z,
                         uv.x,
                         uv.y,
                         textureData.topColor,
-                        light * (1.f - a - d - f)); // 9
+                        light * (1.f - a - d - f)
+                    ); // 9
                 }
                 // Bottom
                 if (isAir(x, y - 1, z, chunks)) {
@@ -252,34 +279,42 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(Miren::VertexLayoutHandle l
                             ambientOcclusionFactor;
                     }
                     glm::vec2 uv = getUV(textureData.bottomTileIndex);
-                    vertices[verticesCount++] = Vertex(x,
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y,
                         z,
                         uv.x,
                         uv.y + uvSize,
                         textureData.bottomColor,
-                        light * (1.f - b - d - h)); // 12
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - b - d - h)
+                    ); // 12
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y,
                         z,
                         uv.x + uvSize,
                         uv.y + uvSize,
                         textureData.bottomColor,
-                        light * (1.f - a - d - f)); // 13
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - a - d - f)
+                    ); // 13
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y,
                         z + 1.0f,
                         uv.x + uvSize,
                         uv.y,
                         textureData.bottomColor,
-                        light * (1.f - a - c - e)); // 14
-                    vertices[verticesCount++] = Vertex(x,
+                        light * (1.f - a - c - e)
+                    ); // 14
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y,
                         z + 1.0f,
                         uv.x,
                         uv.y,
                         textureData.bottomColor,
-                        light * (1.f - b - c - g)); // 15
+                        light * (1.f - b - c - g)
+                    ); // 15
                 }
                 // Right
                 if (isAir(x - 1, y, z, chunks)) {
@@ -308,34 +343,42 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(Miren::VertexLayoutHandle l
                             ambientOcclusionFactor;
                     }
                     glm::vec2 uv = getUV(textureData.sideTileIndex);
-                    vertices[verticesCount++] = Vertex(x,
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y,
                         z,
                         uv.x,
                         uv.y + uvSize,
                         textureData.sideColor,
-                        light * (1.f - b - d - h)); // 16
-                    vertices[verticesCount++] = Vertex(x,
+                        light * (1.f - b - d - h)
+                    ); // 16
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y,
                         z + 1.0f,
                         uv.x + uvSize,
                         uv.y + uvSize,
                         textureData.sideColor,
-                        light * (1.f - b - c - f)); // 17
-                    vertices[verticesCount++] = Vertex(x,
+                        light * (1.f - b - c - f)
+                    ); // 17
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y + 1.0f,
                         z + 1.0f,
                         uv.x + uvSize,
                         uv.y,
                         textureData.sideColor,
-                        light * (1.f - a - c - e)); // 18
-                    vertices[verticesCount++] = Vertex(x,
+                        light * (1.f - a - c - e)
+                    ); // 18
+                    vertices[verticesCount++] = Vertex(
+                        x,
                         y + 1.0f,
                         z,
                         uv.x,
                         uv.y,
                         textureData.sideColor,
-                        light * (1.f - a - d - g)); // 19
+                        light * (1.f - a - d - g)
+                    ); // 19
                 }
                 // Left
                 if (isAir(x + 1, y, z, chunks)) {
@@ -364,34 +407,42 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(Miren::VertexLayoutHandle l
                             ambientOcclusionFactor;
                     }
                     glm::vec2 uv = getUV(textureData.sideTileIndex);
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y,
                         z,
                         uv.x + uvSize,
                         uv.y + uvSize,
                         textureData.sideColor,
-                        light * (1.f - b - d - h)); // 20
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - b - d - h)
+                    ); // 20
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y + 1.0f,
                         z,
                         uv.x + uvSize,
                         uv.y,
                         textureData.sideColor,
-                        light * (1.f - a - d - f)); // 23
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - a - d - f)
+                    ); // 23
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y + 1.0f,
                         z + 1.0f,
                         uv.x,
                         uv.y,
                         textureData.sideColor,
-                        light * (1.f - a - c - e)); // 22
-                    vertices[verticesCount++] = Vertex(x + 1.0f,
+                        light * (1.f - a - c - e)
+                    ); // 22
+                    vertices[verticesCount++] = Vertex(
+                        x + 1.0f,
                         y,
                         z + 1.0f,
                         uv.x,
                         uv.y + uvSize,
                         textureData.sideColor,
-                        light * (1.f - b - c - g)); // 21
+                        light * (1.f - b - c - g)
+                    ); // 21
                 }
             }
         }
@@ -402,11 +453,13 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(Miren::VertexLayoutHandle l
     Foundation::Memory verticesData = Foundation::Memory(vertices, nullptr, freeBuffer);
     Foundation::Memory indicesData = Foundation::Memory(indices, nullptr, freeBuffer);
     return MeshData(
-        layoutHandle, verticesData, sizeof(Vertex) * verticesCount, indicesData, indicesCount);
+        layoutHandle, verticesData, sizeof(Vertex) * verticesCount, indicesData, indicesCount
+    );
 }
 
 void VoxelMeshGenerator::addFaceIndices(
-    uint32_t offset, uint32_t &indicesCount, unsigned int *indices) {
+    uint32_t offset, uint32_t &indicesCount, unsigned int *indices
+) {
     indices[indicesCount++] = offset;
     indices[indicesCount++] = offset + 1;
     indices[indicesCount++] = offset + 2;

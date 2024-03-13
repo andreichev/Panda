@@ -22,7 +22,8 @@ void WorldHierarchyPanel::onImGuiRender() {
         });
     }
     if (ImGui::BeginPopupContextWindow(
-            nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
+            nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems
+        )) {
         drawEntityCreateMenu();
         ImGui::EndPopup();
     }

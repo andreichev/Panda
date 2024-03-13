@@ -177,13 +177,17 @@ public:
     }
 
     inline T *erase(const T *it, const T *it_last) {
-        ASSERT(it >= m_data && it < m_data + m_size && it_last >= it && it_last <= m_data + m_size,
-            "element not found");
+        ASSERT(
+            it >= m_data && it < m_data + m_size && it_last >= it && it_last <= m_data + m_size,
+            "element not found"
+        );
         const ptrdiff_t count = it_last - it;
         const ptrdiff_t off = it - m_data;
-        memmove(m_data + off,
+        memmove(
+            m_data + off,
             m_data + off + count,
-            ((size_t)m_size - (size_t)off - (size_t)count) * sizeof(T));
+            ((size_t)m_size - (size_t)off - (size_t)count) * sizeof(T)
+        );
         m_size -= (int)count;
         return m_data + off;
     }

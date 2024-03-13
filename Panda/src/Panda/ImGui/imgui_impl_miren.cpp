@@ -66,7 +66,8 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
 
         Miren::TransientIndexBuffer tib;
         Miren::allocTransientIndexBuffer(
-            &tib, cmd_list->IdxBuffer.size(), Miren::BufferElementType::UnsignedShort);
+            &tib, cmd_list->IdxBuffer.size(), Miren::BufferElementType::UnsignedShort
+        );
         memcpy(tib.data, cmd_list->IdxBuffer.Data, cmd_list->IdxBuffer.size_in_bytes());
 
         // Will project scissor/clipping rectangles into framebuffer space
@@ -80,17 +81,23 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
             if (cmd->UserCallback != NULL) {
                 cmd->UserCallback(cmd_list, cmd);
             } else {
-                ImVec2 clip_min((cmd->ClipRect.x - clip_off.x) * clip_scale.x,
-                    (cmd->ClipRect.y - clip_off.y) * clip_scale.y);
-                ImVec2 clip_max((cmd->ClipRect.z - clip_off.x) * clip_scale.x,
-                    (cmd->ClipRect.w - clip_off.y) * clip_scale.y);
+                ImVec2 clip_min(
+                    (cmd->ClipRect.x - clip_off.x) * clip_scale.x,
+                    (cmd->ClipRect.y - clip_off.y) * clip_scale.y
+                );
+                ImVec2 clip_max(
+                    (cmd->ClipRect.z - clip_off.x) * clip_scale.x,
+                    (cmd->ClipRect.w - clip_off.y) * clip_scale.y
+                );
                 if (clip_max.x <= clip_min.x || clip_max.y <= clip_min.y) {
                     continue;
                 }
-                Rect scissorRect = Rect(clip_min.x,
+                Rect scissorRect = Rect(
+                    clip_min.x,
                     ((float)fb_height - clip_max.y),
                     (clip_max.x - clip_min.x),
-                    (clip_max.y - clip_min.y));
+                    (clip_max.y - clip_min.y)
+                );
                 Miren::setScissorRect(scissorRect);
                 Miren::setState(0);
                 Miren::setShader(shader);
@@ -113,6 +120,7 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateFontsTexture() {
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
     uint32_t textureSize = width * height * 4;
+    LOG_INFO("FONT TEXTURE SIZE: {}, {}", width, height);
     void *texture = malloc(textureSize);
     memcpy(texture, pixels, textureSize);
 
@@ -124,6 +132,8 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateFontsTexture() {
     create.m_width = width;
     create.m_height = height;
     create.m_numMips = 0;
+    create.m_magFiltering = NEAREST;
+    create.m_minFiltering = NEAREST;
     fontTexture = createTexture(create);
     io.Fonts->SetTexID((ImTextureID)(intptr_t)fontTexture.id);
     return true;
@@ -136,7 +146,8 @@ IMGUI_IMPL_API void ImGui_ImplMiren_DestroyFontsTexture() {
 IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
     using namespace Miren;
     Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
-        "default-shaders/imgui/imgui_vertex.glsl", "default-shaders/imgui/imgui_fragment.glsl");
+        "default-shaders/imgui/imgui_vertex.glsl", "default-shaders/imgui/imgui_fragment.glsl"
+    );
     shader = Miren::createProgram(programAsset.getMirenProgramCreate());
 
     VertexBufferLayoutData layoutData;

@@ -43,7 +43,8 @@ private:
 void BaseLevel::start(Panda::World *world) {
     Miren::setViewClear(0, 0x3D75C9FF);
     Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
-        "shaders/ground/ground_vertex.glsl", "shaders/ground/ground_fragment.glsl");
+        "shaders/ground/ground_vertex.glsl", "shaders/ground/ground_fragment.glsl"
+    );
     m_groundShader = Miren::createProgram(programAsset.getMirenProgramCreate());
     LOG_INFO("WORLD GENERATION STARTED");
     m_chunksStorage = Foundation::makeShared<ChunksStorage>();
@@ -61,7 +62,8 @@ void BaseLevel::start(Panda::World *world) {
         for (int indexY = 0; indexY < ChunksStorage::SIZE_Y; indexY++) {
             for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {
                 Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(
-                    layoutHandle, *m_chunksStorage.get(), indexX, indexY, indexZ, true);
+                    layoutHandle, *m_chunksStorage.get(), indexX, indexY, indexZ, true
+                );
                 Panda::DynamicMeshComponent &meshComponent =
                     chunkEntity.getComponent<Panda::DynamicMeshComponent>();
                 Foundation::Shared<Panda::DynamicMesh> dynamicMesh =
@@ -69,8 +71,9 @@ void BaseLevel::start(Panda::World *world) {
                 meshComponent.meshes.push_back(dynamicMesh);
                 dynamicMesh->create(meshData, m_blocksTileTexture, m_groundShader);
                 m_chunksStorage
-                    ->chunks[indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
-                             indexX * ChunksStorage::SIZE_X + indexZ]
+                    ->chunks
+                        [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+                         indexX * ChunksStorage::SIZE_X + indexZ]
                     .setMesh(dynamicMesh.get());
             }
         }
@@ -82,9 +85,11 @@ void BaseLevel::start(Panda::World *world) {
     CameraMove &cameraMove = cameraEntity.addNativeScript<CameraMove>();
     CameraSizeObserver &cameraSizeObserver = cameraEntity.addNativeScript<CameraSizeObserver>();
     cameraSizeObserver.setCamera(&camera);
-    cameraEntity.getTransform().translate({ChunksStorage::WORLD_SIZE_X / 2,
-        ChunksStorage::WORLD_SIZE_Y / 4,
-        ChunksStorage::WORLD_SIZE_Z / 2});
+    cameraEntity.getTransform().translate(
+        {ChunksStorage::WORLD_SIZE_X / 2,
+         ChunksStorage::WORLD_SIZE_Y / 4,
+         ChunksStorage::WORLD_SIZE_Z / 2}
+    );
     cameraEntity.getTransform().rotateEuler({glm::degrees(25.f), 0.f, 0.f});
 
     BlocksCreation &blocksCreation = cameraEntity.addNativeScript<BlocksCreation>();

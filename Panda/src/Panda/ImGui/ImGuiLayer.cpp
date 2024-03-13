@@ -29,10 +29,13 @@ void ImGuiLayer::onAttach() {
     // Windows io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons; io.ConfigFlags |=
     // ImGuiConfigFlags_ViewportsNoMerge;
 
-    float fontSize = 18.0f;
+    ImFontConfig config;
+    config.OversampleH = 4;
+    config.OversampleV = 4;
+    float fontSize = 16.0f;
     std::string fontPath = AssetLoader::getResourcesPath() + "default-fonts/Cousine-Regular.ttf";
     // std::string fontPath = AssetLoader::getResourcesPath() + "default-fonts/ProggyClean.ttf";
-    io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize);
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize, &config);
     // Setup Dear ImGui style
     // ImGui::StyleColorsDark();
     // ImGui::StyleColorsClassic();

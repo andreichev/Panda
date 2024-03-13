@@ -157,8 +157,8 @@ void Thread::setThreadName(const char *_name) {
 #elif defined(PLATFORM_WINDOWS)
     // Try to use the new thread naming API from Win10 Creators update onwards if we have it
     typedef HRESULT(WINAPI * SetThreadDescriptionProc)(HANDLE, PCWSTR);
-    SetThreadDescriptionProc SetThreadDescription = (SetThreadDescriptionProc)::GetProcAddress(
-        (HMODULE)GetModuleHandleA("Kernel32.dll"), "SetThreadDescription");
+    SetThreadDescriptionProc SetThreadDescription = (SetThreadDescriptionProc
+    )::GetProcAddress((HMODULE)GetModuleHandleA("Kernel32.dll"), "SetThreadDescription");
     // SetThreadDescriptionProc SetThreadDescription =
     //     dlsym<SetThreadDescriptionProc>((void *)GetModuleHandleA("Kernel32.dll"),
     //     "SetThreadDescription");

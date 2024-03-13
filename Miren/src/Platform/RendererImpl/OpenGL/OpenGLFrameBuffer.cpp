@@ -15,8 +15,10 @@ static inline bool isDepthFormat(TextureFormat format) {
 }
 
 void OpenGLFrameBuffer::checkStatus() {
-    PND_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE,
-        "Framebuffer is incomplete!");
+    PND_ASSERT(
+        glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE,
+        "Framebuffer is incomplete!"
+    );
 }
 
 OpenGLFrameBuffer::OpenGLFrameBuffer()
@@ -38,8 +40,8 @@ void OpenGLFrameBuffer::create(FrameBufferSpecification specification) {
             attachmentType = GL_COLOR_ATTACHMENT0 + i;
         }
         GLuint textureId = texture.getId();
-        GL_CALL(
-            glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, textureId, 0));
+        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, textureId, 0)
+        );
     }
     checkStatus();
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));

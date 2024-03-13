@@ -12,11 +12,13 @@ struct MeshData {
     Foundation::Memory indices;
     uint32_t indicesCount;
 
-    MeshData(Miren::VertexLayoutHandle layoutHandle,
+    MeshData(
+        Miren::VertexLayoutHandle layoutHandle,
         Foundation::Memory vertexBuffer,
         uint32_t vertexBufferSize,
         Foundation::Memory indices,
-        uint32_t indicesCount)
+        uint32_t indicesCount
+    )
         : layoutHandle(layoutHandle)
         , vertexBuffer(vertexBuffer)
         , vertexBufferSize(vertexBufferSize)

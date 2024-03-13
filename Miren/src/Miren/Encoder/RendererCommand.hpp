@@ -105,10 +105,12 @@ struct CreateIndexBufferCommand : Foundation::CommandBuffer::Command {
     BufferElementType elementType;
     size_t count;
 
-    CreateIndexBufferCommand(IndexBufferHandle handle,
+    CreateIndexBufferCommand(
+        IndexBufferHandle handle,
         Foundation::Memory indices,
         BufferElementType elementType,
-        size_t count)
+        size_t count
+    )
         : Command(RendererCommandType::CreateIndexBuffer)
         , handle(handle)
         , indices(indices)
@@ -122,10 +124,12 @@ struct CreateDynamicIndexBufferCommand : Foundation::CommandBuffer::Command {
     BufferElementType elementType;
     size_t count;
 
-    CreateDynamicIndexBufferCommand(IndexBufferHandle handle,
+    CreateDynamicIndexBufferCommand(
+        IndexBufferHandle handle,
         Foundation::Memory indices,
         BufferElementType elementType,
-        size_t count)
+        size_t count
+    )
         : Command(RendererCommandType::CreateDynamicIndexBuffer)
         , handle(handle)
         , indices(indices)
@@ -139,7 +143,8 @@ struct UpdateDynamicIndexBufferCommand : Foundation::CommandBuffer::Command {
     size_t count;
 
     UpdateDynamicIndexBufferCommand(
-        IndexBufferHandle handle, Foundation::Memory indices, size_t count)
+        IndexBufferHandle handle, Foundation::Memory indices, size_t count
+    )
         : Command(RendererCommandType::UpdateDynamicIndexBuffer)
         , handle(handle)
         , indices(indices)
@@ -160,10 +165,12 @@ struct CreateVertexBufferCommand : Foundation::CommandBuffer::Command {
     Foundation::Memory data;
     uint32_t size;
 
-    CreateVertexBufferCommand(VertexBufferHandle handle,
+    CreateVertexBufferCommand(
+        VertexBufferHandle handle,
         Foundation::Memory data,
         uint32_t size,
-        VertexLayoutHandle layoutHandle)
+        VertexLayoutHandle layoutHandle
+    )
         : Command(RendererCommandType::CreateVertexBuffer)
         , handle(handle)
         , layoutHandle(layoutHandle)
@@ -177,10 +184,12 @@ struct CreateDynamicVertexBufferCommand : Foundation::CommandBuffer::Command {
     Foundation::Memory data;
     uint32_t size;
 
-    CreateDynamicVertexBufferCommand(VertexBufferHandle handle,
+    CreateDynamicVertexBufferCommand(
+        VertexBufferHandle handle,
         Foundation::Memory data,
         uint32_t size,
-        VertexLayoutHandle layoutHandle)
+        VertexLayoutHandle layoutHandle
+    )
         : Command(RendererCommandType::CreateDynamicVertexBuffer)
         , handle(handle)
         , layoutHandle(layoutHandle)
@@ -194,7 +203,8 @@ struct UpdateDynamicVertexBufferCommand : Foundation::CommandBuffer::Command {
     uint32_t size;
 
     UpdateDynamicVertexBufferCommand(
-        VertexBufferHandle handle, Foundation::Memory data, uint32_t size)
+        VertexBufferHandle handle, Foundation::Memory data, uint32_t size
+    )
         : Command(RendererCommandType::UpdateDynamicVertexBuffer)
         , handle(handle)
         , data(data)

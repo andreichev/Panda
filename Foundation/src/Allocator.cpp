@@ -56,12 +56,14 @@ void free(AllocatorI *allocator, void *ptr, size_t align, const char *file, uint
 }
 
 void *realloc(
-    AllocatorI *allocator, void *ptr, size_t size, size_t align, const char *file, uint32_t line) {
+    AllocatorI *allocator, void *ptr, size_t size, size_t align, const char *file, uint32_t line
+) {
     return allocator->realloc(ptr, size, align, file, line);
 }
 
 inline void *alignedAlloc(
-    AllocatorI *_allocator, size_t _size, size_t _align, const char *_file, uint32_t _line) {
+    AllocatorI *_allocator, size_t _size, size_t _align, const char *_file, uint32_t _line
+) {
     const size_t align = max(_align, sizeof(uint32_t));
     const size_t total = _size + align;
     uint8_t *ptr = (uint8_t *)alloc(_allocator, total, 0, _file, _line);
@@ -71,20 +73,22 @@ inline void *alignedAlloc(
     return aligned;
 }
 
-inline void alignedFree(
-    AllocatorI *_allocator, void *_ptr, size_t _align, const char *_file, uint32_t _line) {
+inline void
+alignedFree(AllocatorI *_allocator, void *_ptr, size_t _align, const char *_file, uint32_t _line) {
     uint8_t *aligned = (uint8_t *)_ptr;
     uint32_t *header = (uint32_t *)aligned - 1;
     uint8_t *ptr = aligned - *header;
     free(_allocator, ptr, 0, _file, _line);
 }
 
-inline void *alignedRealloc(AllocatorI *_allocator,
+inline void *alignedRealloc(
+    AllocatorI *_allocator,
     void *_ptr,
     size_t _size,
     size_t _align,
     const char *_file,
-    uint32_t _line) {
+    uint32_t _line
+) {
     if (nullptr == _ptr) {
         return alignedAlloc(_allocator, _size, _align, _file, _line);
     }
@@ -115,7 +119,8 @@ DefaultAllocator::DefaultAllocator() {}
 DefaultAllocator::~DefaultAllocator() {}
 
 void *DefaultAllocator::realloc(
-    void *_ptr, size_t _size, size_t _align, const char *_file, uint32_t _line) {
+    void *_ptr, size_t _size, size_t _align, const char *_file, uint32_t _line
+) {
     if (_size == 0) {
         if (_ptr != nullptr) {
             if (_align <= CONFIG_ALLOCATOR_NATURAL_ALIGNMENT) {

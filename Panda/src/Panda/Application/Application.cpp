@@ -24,7 +24,8 @@ Application *Application::get() {
 
 uint64_t getMillis() {
     auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch());
+        std::chrono::system_clock::now().time_since_epoch()
+    );
     return now.count();
 }
 
@@ -161,7 +162,8 @@ void Application::addWindowSizeObserver(WindowSizeObserver *listener) {
 
 void Application::windowSizeChanged(Size size) {
     Miren::Rect viewport = Miren::Rect(
-        0, 0, size.width * m_window->getDpi().width, size.height * m_window->getDpi().height);
+        0, 0, size.width * m_window->getDpi().width, size.height * m_window->getDpi().height
+    );
     Miren::setViewport(0, viewport);
     for (auto &listener : m_windowSizeListeners) {
         listener->windowSizeChanged(size);

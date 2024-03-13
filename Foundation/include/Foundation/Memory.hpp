@@ -29,14 +29,16 @@ struct Memory {
     static Memory copying(void *src, uint32_t size) {
         void *data = ALLOC(Foundation::getAllocator(), size);
         memcpy(data, src, size);
-        return Memory(
-            data, nullptr, [](void *ptr, void *) { FREE(Foundation::getAllocator(), ptr); });
+        return Memory(data, nullptr, [](void *ptr, void *) {
+            FREE(Foundation::getAllocator(), ptr);
+        });
     }
 
     static Memory alloc(uint32_t size) {
         void *data = ALLOC(Foundation::getAllocator(), size);
-        return Memory(
-            data, nullptr, [](void *ptr, void *) { FREE(Foundation::getAllocator(), ptr); });
+        return Memory(data, nullptr, [](void *ptr, void *) {
+            FREE(Foundation::getAllocator(), ptr);
+        });
     }
 };
 

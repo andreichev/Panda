@@ -16,7 +16,8 @@ OpenGLIndexBuffer::OpenGLIndexBuffer()
     , m_isDynamic(false) {}
 
 void OpenGLIndexBuffer::create(
-    void *indices, BufferElementType elementType, size_t count, bool isDynamic) {
+    void *indices, BufferElementType elementType, size_t count, bool isDynamic
+) {
     PND_ASSERT(m_id == -1, "INDEX BUFFER ALREADY CREATED");
     m_isDynamic = isDynamic;
     m_count = count;
@@ -34,10 +35,12 @@ void OpenGLIndexBuffer::create(
     GL_CALL(glGenBuffers(1, &m_id));
     GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id));
     if (indices != nullptr) {
-        GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+        GL_CALL(glBufferData(
+            GL_ELEMENT_ARRAY_BUFFER,
             count * m_elementSize,
             indices,
-            isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
+            isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW
+        ));
     }
     GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }

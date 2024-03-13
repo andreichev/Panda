@@ -19,22 +19,24 @@ void deleteProgram(ProgramHandle handle);
 TextureHandle createTexture(TextureCreate create);
 void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height);
 void deleteTexture(TextureHandle handle);
-IndexBufferHandle createIndexBuffer(
-    Foundation::Memory indices, BufferElementType elementType, size_t count);
-IndexBufferHandle createDynamicIndexBuffer(
-    Foundation::Memory indices, BufferElementType elementType, size_t count);
+IndexBufferHandle
+createIndexBuffer(Foundation::Memory indices, BufferElementType elementType, size_t count);
+IndexBufferHandle
+createDynamicIndexBuffer(Foundation::Memory indices, BufferElementType elementType, size_t count);
 void updateDynamicIndexBuffer(IndexBufferHandle, Foundation::Memory indices, size_t count);
 void deleteIndexBuffer(IndexBufferHandle handle);
 // Only next frame vertex buffer
 void allocTransientVertexBuffer(TransientVertexBuffer *buffer, uint32_t size);
 // Only next frame index buffer
 void allocTransientIndexBuffer(
-    TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType);
+    TransientIndexBuffer *buffer, uint32_t count, BufferElementType elementType
+);
 VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data);
-VertexBufferHandle createVertexBuffer(
-    Foundation::Memory vertices, uint32_t size, VertexLayoutHandle layoutHandle);
+VertexBufferHandle
+createVertexBuffer(Foundation::Memory vertices, uint32_t size, VertexLayoutHandle layoutHandle);
 VertexBufferHandle createDynamicVertexBuffer(
-    Foundation::Memory, uint32_t size, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE);
+    Foundation::Memory, uint32_t size, VertexLayoutHandle layoutHandle = MIREN_INVALID_HANDLE
+);
 void updateDynamicVertexBuffer(VertexBufferHandle handle, Foundation::Memory data, uint32_t size);
 void deleteVertexBuffer(VertexBufferHandle handle);
 void deleteVertexLayout(VertexLayoutHandle handle);

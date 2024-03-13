@@ -168,8 +168,9 @@ void Input::postTouchBeganEvent(int id, float x, float y) {
 }
 
 void Input::postTouchMovedEvent(int id, float x, float y) {
-    auto touch = std::find_if(
-        activeTouches.begin(), activeTouches.end(), [id](auto touch) { return touch.id == id; });
+    auto touch = std::find_if(activeTouches.begin(), activeTouches.end(), [id](auto touch) {
+        return touch.id == id;
+    });
     PND_ASSERT(touch != activeTouches.end(), "TOUCH NOT FOUND");
     if (touch != activeTouches.end()) {
         touch->x = x;
@@ -178,8 +179,9 @@ void Input::postTouchMovedEvent(int id, float x, float y) {
 }
 
 void Input::postTouchEndedEvent(int id) {
-    auto touch = std::find_if(
-        activeTouches.begin(), activeTouches.end(), [id](auto touch) { return touch.id == id; });
+    auto touch = std::find_if(activeTouches.begin(), activeTouches.end(), [id](auto touch) {
+        return touch.id == id;
+    });
     PND_ASSERT(touch != activeTouches.end(), "TOUCH NOT FOUND");
     if (touch != activeTouches.end()) {
         activeTouches.erase(touch);

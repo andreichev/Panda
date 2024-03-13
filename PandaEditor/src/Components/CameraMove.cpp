@@ -52,7 +52,8 @@ void CameraMove::update(double deltaTime) {
         // Действия в реальном мире не нужно умножать на deltaTime, умножать нужно только действия в
         // игровом мире.
         m_transform->rotateEuler(
-            {-glm::radians(deltaY * m_mouseSpeed), -glm::radians(deltaX * m_mouseSpeed), 0.f});
+            {-glm::radians(deltaY * m_mouseSpeed), -glm::radians(deltaX * m_mouseSpeed), 0.f}
+        );
         updateVectors();
         lastMouseX = mouseX;
         lastMouseY = mouseY;

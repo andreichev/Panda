@@ -12,8 +12,9 @@ namespace PandaUI {
 void initialize() {
     Panda::Application *app = Panda::Application::get();
     PND_ASSERT(app != nullptr, "APP IS NOT INITIALIZED BEFORE PandaUI");
-    PND_ASSERT(!Context::isInitialized(),
-        "UICONTEXT ALREADY INITIALIZED. IT CAN BE INITIALIZED ONLY ONCE");
+    PND_ASSERT(
+        !Context::isInitialized(), "UICONTEXT ALREADY INITIALIZED. IT CAN BE INITIALIZED ONLY ONCE"
+    );
     app->pushOverlay(NEW(Foundation::getAllocator(), Layer));
 }
 
