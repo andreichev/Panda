@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include "Colors.hpp"
-
+#include <Panda/ImGui/Colors.hpp>
 #include <Panda/Base/Base.hpp>
 #include <imgui_internal.h>
 #include <imgui.h>

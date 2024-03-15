@@ -1,13 +1,12 @@
-#include "pndpch.hpp"
 #include "Panda/ImGui/ImGuiLayer.hpp"
 
 #include <imgui.h>
 
 #include "Panda/Application/Application.hpp"
-#include "Panda/Assets/AssetLoader.hpp"
 
-#include <Miren/PlatformData.hpp>
-
+#include "Panda/ImGui/FontAwesome.h"
+#include "Panda/ImGui/Colors.hpp"
+#include "Panda/ImGui/ImGuiFonts.hpp"
 // ImGui platform impl
 #include "imgui_impl_panda.hpp"
 // ImGui renderer impl
@@ -21,32 +20,53 @@ ImGuiLayer::ImGuiLayer()
 void ImGuiLayer::onAttach() {
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
-    // (void)io;
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
-    // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform
-    // Windows io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons; io.ConfigFlags |=
-    // ImGuiConfigFlags_ViewportsNoMerge;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
 
-    ImFontConfig config;
-    config.OversampleH = 4;
-    config.OversampleV = 4;
-    float fontSize = 16.0f;
-    std::string fontPath = AssetLoader::getResourcesPath() + "default-fonts/Cousine-Regular.ttf";
-    // std::string fontPath = AssetLoader::getResourcesPath() + "default-fonts/ProggyClean.ttf";
-    io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize, &config);
-    // Setup Dear ImGui style
+    FontConfiguration robotoBold;
+    robotoBold.fontName = "Bold";
+    robotoBold.fileName = "SF-Compact/SF-Compact-Display-Bold.otf";
+    robotoBold.size = 17.0f;
+    Fonts::add(robotoBold);
+
+    FontConfiguration robotoLarge;
+    robotoLarge.fontName = "Large";
+    robotoLarge.fileName = "SF-Compact/SF-Compact-Display-Regular.otf";
+    robotoLarge.size = 22.0f;
+    Fonts::add(robotoLarge);
+
+    FontConfiguration robotoDefault;
+    robotoDefault.fontName = "Default";
+    robotoDefault.fileName = "SF-Compact/SF-Compact-Display-Medium.otf";
+    robotoDefault.size = 15.0f;
+    Fonts::add(robotoDefault, true);
+
+    static const ImWchar s_fontAwesomeRanges[] = {ICON_MIN, ICON_MAX, 0};
+    FontConfiguration fontAwesome;
+    fontAwesome.fontName = "FontAwesome";
+    fontAwesome.fileName = "FontAwesome/fontawesome-webfont.ttf";
+    fontAwesome.size = 16.0f;
+    fontAwesome.glyphRanges = s_fontAwesomeRanges;
+    fontAwesome.mergeWithLast = true;
+    Fonts::add(fontAwesome);
+
+    FontConfiguration robotoSmall;
+    robotoSmall.fontName = "Small";
+    robotoSmall.fileName = "SF-Compact/SF-Compact-Display-Medium.otf";
+    robotoSmall.size = 12.0f;
+    Fonts::add(robotoSmall);
+
+    FontConfiguration robotoExtraSmall;
+    robotoExtraSmall.fontName = "ExtraSmall";
+    robotoExtraSmall.fileName = "SF-Compact/SF-Compact-Display-Medium.otf";
+    robotoExtraSmall.size = 10.0f;
+    Fonts::add(robotoExtraSmall);
+
     // ImGui::StyleColorsDark();
     // ImGui::StyleColorsClassic();
-
-    // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look
-    // identical to regular ones. ImGuiStyle &style = ImGui::GetStyle(); if (io.ConfigFlags) {
-    //     style.WindowRounding = 20.0f;
-    //     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    // }
-
-    // setDarkThemeColors();
+    setDarkThemeColors();
 
     // Setup Platform/Renderer bindings
     ImGui_ImplPanda_Init();
@@ -61,7 +81,7 @@ void ImGuiLayer::onDetach() {
 
 void ImGuiLayer::onEvent(Event *event) {
     ImGui_ImplPanda_HandleEvent(event);
-    if (m_blockEvents == false) {
+    if (!m_blockEvents) {
         event->isHandled = false;
     }
 }
@@ -79,6 +99,54 @@ void ImGuiLayer::end() {
     ImGui_ImplMiren_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGuiLayer::setDarkThemeColors() {}
+void ImGuiLayer::setDarkThemeColors() {
+    auto &colors = ImGui::GetStyle().Colors;
+    colors[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.105f, 0.11f, 1.0f);
+
+    // Headers
+    colors[ImGuiCol_Header] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.15f, 0.1505f, 0.151f, 1.0f);
+
+    // Buttons
+    colors[ImGuiCol_Button] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.15f, 0.1505f, 0.151f, 1.0f);
+
+    // Frame BG
+    colors[ImGuiCol_FrameBg] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.3f, 0.305f, 0.31f, 1.0f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.15f, 0.1505f, 0.151f, 1.0f);
+
+    // Tabs
+    colors[ImGuiCol_Tab] = ImVec4(0.15f, 0.1505f, 0.151f, 1.0f);
+    colors[ImGuiCol_TabHovered] = ImVec4(0.38f, 0.3805f, 0.381f, 1.0f);
+    colors[ImGuiCol_TabActive] = ImVec4(0.28f, 0.2805f, 0.281f, 1.0f);
+    colors[ImGuiCol_TabUnfocused] = ImVec4(0.15f, 0.1505f, 0.151f, 1.0f);
+    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.2f, 0.205f, 0.21f, 1.0f);
+
+    // Title
+    colors[ImGuiCol_TitleBg] = ImVec4(0.15f, 0.1505f, 0.151f, 1.0f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.15f, 0.1505f, 0.151f, 1.0f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15f, 0.1505f, 0.151f, 1.0f);
+
+    // Resize Grip
+    colors[ImGuiCol_ResizeGrip] = ImVec4(0.91f, 0.91f, 0.91f, 0.25f);
+    colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.81f, 0.81f, 0.81f, 0.67f);
+    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.46f, 0.46f, 0.46f, 0.95f);
+
+    // Scrollbar
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.0f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.0f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.0f);
+
+    // Check Mark
+    colors[ImGuiCol_CheckMark] = ImVec4(0.94f, 0.94f, 0.94f, 1.0f);
+
+    // Slider
+    colors[ImGuiCol_SliderGrab] = ImVec4(0.51f, 0.51f, 0.51f, 0.7f);
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(0.66f, 0.66f, 0.66f, 1.0f);
+}
 
 } // namespace Panda
