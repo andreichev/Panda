@@ -25,44 +25,44 @@ void ImGuiLayer::onAttach() {
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
 
-    FontConfiguration robotoBold;
-    robotoBold.fontName = "Bold";
-    robotoBold.fileName = "SF-Compact/SF-Compact-Display-Bold.otf";
-    robotoBold.size = 17.0f;
-    Fonts::add(robotoBold);
+    FontConfiguration fontBold;
+    fontBold.fontName = "Bold";
+    fontBold.fileName = "SF-Compact/SF-Compact-Display-Bold.otf";
+    fontBold.size = 17.0f;
+    Fonts::add(fontBold);
 
-    FontConfiguration robotoLarge;
-    robotoLarge.fontName = "Large";
-    robotoLarge.fileName = "SF-Compact/SF-Compact-Display-Regular.otf";
-    robotoLarge.size = 22.0f;
-    Fonts::add(robotoLarge);
+    FontConfiguration fontLarge;
+    fontLarge.fontName = "Large";
+    fontLarge.fileName = "SF-Compact/SF-Compact-Display-Regular.otf";
+    fontLarge.size = 22.0f;
+    Fonts::add(fontLarge);
 
-    FontConfiguration robotoDefault;
-    robotoDefault.fontName = "Default";
-    robotoDefault.fileName = "SF-Compact/SF-Compact-Display-Medium.otf";
-    robotoDefault.size = 15.0f;
-    Fonts::add(robotoDefault, true);
+    FontConfiguration fontDefault;
+    fontDefault.fontName = "Default";
+    fontDefault.fileName = "SF-Compact/SF-Compact-Display-Regular.otf";
+    fontDefault.size = 17.0f;
+    Fonts::add(fontDefault, true);
 
     static const ImWchar s_fontAwesomeRanges[] = {ICON_MIN, ICON_MAX, 0};
     FontConfiguration fontAwesome;
     fontAwesome.fontName = "FontAwesome";
     fontAwesome.fileName = "FontAwesome/fontawesome-webfont.ttf";
-    fontAwesome.size = 16.0f;
+    fontAwesome.size = 17.0f;
     fontAwesome.glyphRanges = s_fontAwesomeRanges;
     fontAwesome.mergeWithLast = true;
     Fonts::add(fontAwesome);
 
-    FontConfiguration robotoSmall;
-    robotoSmall.fontName = "Small";
-    robotoSmall.fileName = "SF-Compact/SF-Compact-Display-Medium.otf";
-    robotoSmall.size = 12.0f;
-    Fonts::add(robotoSmall);
+    FontConfiguration fontSmall;
+    fontSmall.fontName = "Small";
+    fontSmall.fileName = "SF-Compact/SF-Compact-Display-Medium.otf";
+    fontSmall.size = 14.0f;
+    Fonts::add(fontSmall);
 
-    FontConfiguration robotoExtraSmall;
-    robotoExtraSmall.fontName = "ExtraSmall";
-    robotoExtraSmall.fileName = "SF-Compact/SF-Compact-Display-Medium.otf";
-    robotoExtraSmall.size = 10.0f;
-    Fonts::add(robotoExtraSmall);
+    FontConfiguration fontExtraSmall;
+    fontExtraSmall.fontName = "ExtraSmall";
+    fontExtraSmall.fileName = "SF-Compact/SF-Compact-Display-Medium.otf";
+    fontExtraSmall.size = 10.0f;
+    Fonts::add(fontExtraSmall);
 
     // ImGui::StyleColorsDark();
     // ImGui::StyleColorsClassic();

@@ -5,9 +5,9 @@
 
 namespace Panda {
 
-Renderer3D::Renderer3D() {}
-
-Renderer3D::~Renderer3D() {}
+Renderer3D::Renderer3D()
+    : m_viewId(0)
+    , m_viewProj(1.f) {}
 
 void updateModel(Panda::TransformComponent *transform, glm::mat4 &model) {
     model = transform->getTransform();
