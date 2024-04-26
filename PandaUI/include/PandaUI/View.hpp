@@ -15,10 +15,24 @@ public:
     View();
     View(Rect frame);
     virtual ~View();
-    void addSubview(View *node);
-    void removeSubview(View *node);
-    void setFrame(Rect frame);
-    const Rect &getFrame() const {
+    /* ------------------------------ Hierarchy ------------------------------ */
+    void addSubview(Foundation::Shared<View> node);
+    void removeSubview(Foundation::Shared<View> node);
+
+    /* ------------------------------ Style ------------------------------ */
+    void styleReset();
+    void styleSetSize(Size size);
+    void styleSetOrigin(Point point);
+    void styleSetMargins(EdgeInsets margins);
+    void styleSetRelative();
+    void styleSetAbsolute();
+    void styleSetInsetsFromParent(EdgeInsets insets);
+
+    /* ------------------------------ Properties ------------------------------ */
+    void setFrame(Rect frame) {
+        m_frame = frame;
+    }
+    Rect getFrame() {
         return m_frame;
     }
     void setBackgroundColor(Color color) {
@@ -27,17 +41,23 @@ public:
     const Color &getBackgroundColor() {
         return m_backgroundColor;
     }
+    std::vector<Foundation::Shared<View>> getSubviews() {
+        return m_subviews;
+    }
 
-    // Вызывается для позиционирования (обновление буфера)
-    virtual void layout();
-
-    virtual void render();
+    virtual void calculateLayout();
 
     // TODO: - Добавить superview
 protected:
-    std::vector<View *> m_subviews;
-    Rect m_frame;
+    std::vector<Foundation::Shared<View>> m_subviews;
     Color m_backgroundColor;
+
+private:
+    void applyCalculatedLayout();
+    Rect m_frame;
+    uint8_t m_internal[20];
+    void render(float offsetX, float offsetY);
+    friend class Context;
 };
 
 } // namespace PandaUI

@@ -18,8 +18,4 @@ void initialize() {
     app->pushOverlay(NEW(Foundation::getAllocator(), Layer));
 }
 
-void freeView(View *view) {
-    Context::shared().removeView(view);
-}
-
 } // namespace PandaUI

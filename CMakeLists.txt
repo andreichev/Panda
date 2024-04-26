@@ -11,6 +11,7 @@ add_subdirectory(Vendor/glm)
 add_subdirectory(Vendor/stb_image)
 add_subdirectory(Vendor/imgui)
 add_subdirectory(Vendor/entt)
+add_subdirectory(Vendor/yoga)
 
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
 

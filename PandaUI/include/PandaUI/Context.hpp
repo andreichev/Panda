@@ -18,17 +18,17 @@ public:
     void updateViewId(Miren::ViewId viewId);
 
     template<typename T, typename... Args>
-    T *makeView(Args &&...args) {
+    Foundation::Shared<T> makeView(Args &&...args) {
         // TODO: Собственный аллокатор для PandaUI
-        return NEW(Foundation::getAllocator(), T)(std::forward<Args>(args)...);
+        return Foundation::makeShared<T>(std::forward<Args>(args)...);
     }
 
-    void removeView(View *view) {
-        DELETE(Foundation::getAllocator(), view);
+    Foundation::Shared<View> getRootView() {
+        return m_rootView;
     }
 
-    View &getView() {
-        return m_view;
+    void setRootView(Foundation::Shared<View> view) {
+        m_rootView = view;
     }
 
     Panda::Renderer2D &getRenderer() {
@@ -44,7 +44,7 @@ private:
     Context();
 
     static Context *s_shared;
-    View m_view;
+    Foundation::Shared<View> m_rootView;
     Panda::Renderer2D m_renderer2d;
     UICamera m_camera;
     Miren::ViewId m_mirenViewId;

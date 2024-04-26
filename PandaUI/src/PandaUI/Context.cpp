@@ -5,6 +5,8 @@
 #include "PandaUI/Context.hpp"
 
 #include <Foundation/Foundation.hpp>
+#include <Panda/Application/Application.hpp>
+#include <yoga/Yoga.h>
 
 namespace PandaUI {
 
@@ -17,42 +19,43 @@ Context &Context::shared() {
 
 Context::Context()
     : m_mirenViewId(0)
-    , m_viewportSize(100, 100) {
+    , m_viewportSize()
+    , m_rootView(nullptr) {
+    Panda::Window *window = Panda::Application::get()->getWindow();
+    m_viewportSize = window->getSize();
     m_camera.setViewportSize(m_viewportSize);
     // View matrix is identity
     m_renderer2d.setViewProj(m_camera.getProjection());
     m_renderer2d.setViewId(0);
     // Make background view transparent
-    m_view.setBackgroundColor(Color(0x00000000));
-
-    Rect rect1(20, 20, 130, 30);
-    View *view1 = makeView<View>(rect1);
-    view1->setBackgroundColor({0xFFFFFFFF});
-    getView().addSubview(view1);
-
-    Rect rect2(20, 55, 130, 30);
-    View *view2 = makeView<View>(rect2);
-    view2->setBackgroundColor({0x1C3578FF});
-    getView().addSubview(view2);
-
-    Rect rect3(20, 90, 130, 30);
-    View *view3 = makeView<View>(rect3);
-    view3->setBackgroundColor({0xE4181CFF});
-    getView().addSubview(view3);
+    if (m_rootView) {
+        m_rootView->setBackgroundColor(Color(0x00000000));
+    }
+    YGConfigRef config = YGConfigNew();
+    YGConfigSetUseWebDefaults(config, false);
 }
 
 void Context::update(double deltaTime) {
-    m_renderer2d.begin();
-    m_view.render();
-    m_renderer2d.end();
+    if (m_rootView) {
+        m_renderer2d.begin();
+        m_rootView->render(0, 0);
+        m_renderer2d.end();
+    }
 }
 
 void Context::updateViewportSize(Size size) {
-    m_viewportSize = size;
-    m_camera.setViewportSize(size);
-    // View matrix is identity
-    m_renderer2d.setViewProj(m_camera.getProjection());
-    m_view.setFrame(PandaUI::Rect(0, 0, size.width, size.height));
+    if (m_rootView) {
+        m_viewportSize = size;
+        m_camera.setViewportSize(size);
+        // View matrix is identity
+        m_renderer2d.setViewProj(m_camera.getProjection());
+
+        // m_rootView->styleSetAbsolute();
+        // m_rootView->styleSetOrigin({0, 0});
+        // LOG_INFO("SIZE: {}, {}", size.width, size.height);
+        m_rootView->styleSetSize(size);
+        m_rootView->calculateLayout();
+    }
 }
 
 void Context::updateViewId(Miren::ViewId viewId) {
