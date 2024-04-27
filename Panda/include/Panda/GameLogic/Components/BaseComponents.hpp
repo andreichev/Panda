@@ -51,11 +51,11 @@ struct SpriteRendererComponent final {
 };
 
 struct StaticMeshComponent final {
-    std::vector<Foundation::Shared<StaticMesh>> meshes;
+    std::vector<StaticMesh> meshes;
 };
 
 struct DynamicMeshComponent final {
-    std::vector<Foundation::Shared<DynamicMesh>> meshes;
+    std::vector<DynamicMesh> meshes;
 };
 
 struct CameraComponent final {

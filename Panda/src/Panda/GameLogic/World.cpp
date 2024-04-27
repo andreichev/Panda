@@ -56,7 +56,7 @@ void World::update(double deltaTime) {
             auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
             auto &transform = view.get<TransformComponent>(entityHandle);
             for (auto &mesh : staticMeshComponent.meshes) {
-                m_renderer3d.submit(&transform, mesh.get());
+                m_renderer3d.submit(&transform, &mesh);
             }
         }
     }
@@ -67,7 +67,7 @@ void World::update(double deltaTime) {
             auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
             auto &transform = view.get<TransformComponent>(entityHandle);
             for (auto &mesh : dynamicMeshComponent.meshes) {
-                m_renderer3d.submit(&transform, mesh.get());
+                m_renderer3d.submit(&transform, &mesh);
             }
         }
     }

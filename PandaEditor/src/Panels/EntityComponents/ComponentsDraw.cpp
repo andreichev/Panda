@@ -78,6 +78,11 @@ void drawComponents(Entity entity) {
         propertyColor("Color", component.color);
         endPropertiesGrid();
     });
+    drawComponent<DynamicMeshComponent>("Dynamic Mesh", entity, [](auto &component) {
+        beginPropertiesGrid();
+
+        endPropertiesGrid();
+    });
 }
 
 } // namespace Panda

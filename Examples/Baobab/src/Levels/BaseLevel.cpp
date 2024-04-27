@@ -9,7 +9,7 @@
 #include "Components/CameraMove.hpp"
 #include "Components/BlocksCreation.hpp"
 #include "Components/FullScreenToggle.hpp"
-#include "Components/UI/UICrosshair.hpp"
+#include "Components/UI/RootView.hpp"
 
 #include <Panda.hpp>
 #include <PandaUI/PandaUI.hpp>
@@ -49,7 +49,6 @@ void BaseLevel::start(Panda::World *world) {
     LOG_INFO("WORLD GENERATION STARTED");
     m_chunksStorage = Foundation::makeShared<ChunksStorage>();
     LOG_INFO("WORLD GENERATED");
-    Panda::Entity chunkEntity = world->instantiateEntity();
     Panda::TextureAsset textureAsset = Panda::AssetLoader::loadTexture("textures/BlocksTile.png");
     Miren::TextureCreate textureCreate = textureAsset.getMirenTextureCreate();
     textureCreate.m_numMips = 4;
@@ -61,20 +60,19 @@ void BaseLevel::start(Panda::World *world) {
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
         for (int indexY = 0; indexY < ChunksStorage::SIZE_Y; indexY++) {
             for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {
+                Panda::Entity chunkEntity = world->instantiateEntity();
                 Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(
                     layoutHandle, *m_chunksStorage.get(), indexX, indexY, indexZ, true
                 );
                 Panda::DynamicMeshComponent &meshComponent =
                     chunkEntity.getComponent<Panda::DynamicMeshComponent>();
-                Foundation::Shared<Panda::DynamicMesh> dynamicMesh =
-                    Foundation::makeShared<Panda::DynamicMesh>();
-                meshComponent.meshes.push_back(dynamicMesh);
-                dynamicMesh->create(meshData, m_blocksTileTexture, m_groundShader);
+                Panda::DynamicMesh &dynamicMesh = meshComponent.meshes.emplace_back();
+                dynamicMesh.create(meshData, m_blocksTileTexture, m_groundShader);
                 m_chunksStorage
                     ->chunks
                         [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                          indexX * ChunksStorage::SIZE_X + indexZ]
-                    .setMesh(dynamicMesh.get());
+                    .setMeshEntity(chunkEntity);
             }
         }
     }
@@ -100,8 +98,8 @@ void BaseLevel::start(Panda::World *world) {
     cameraEntity.addNativeScript<FullScreenToggle>();
 
     PandaUI::initialize();
-    UICrosshair *crosshair = PandaUI::makeView<UICrosshair>();
-    PandaUI::Context::shared().getView().addSubview(crosshair);
+    Foundation::Shared<RootView> view = PandaUI::makeView<RootView>();
+    PandaUI::Context::shared().setRootView(view);
 
     LOG_INFO("BASE LEVEL STARTED!");
 }

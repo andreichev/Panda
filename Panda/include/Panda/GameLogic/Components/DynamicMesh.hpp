@@ -12,15 +12,10 @@ namespace Panda {
 
 class DynamicMesh {
 public:
-    DynamicMesh()
-        : m_model(1.f)
-        , m_bufferLayoutHandle(MIREN_INVALID_HANDLE)
-        , m_indexBufferHandle(MIREN_INVALID_HANDLE)
-        , m_vertexBufferHandle(MIREN_INVALID_HANDLE)
-        , m_indicesCount(0)
-        , m_textureHandle(MIREN_INVALID_HANDLE)
-        , m_shaderHandle(MIREN_INVALID_HANDLE) {}
     ~DynamicMesh();
+    DynamicMesh();
+    DynamicMesh(DynamicMesh &&source);
+    DynamicMesh(DynamicMesh &source);
 
     void create(const MeshData &data, Miren::TextureHandle texture, Miren::ProgramHandle shader);
     void update(const MeshData &data);

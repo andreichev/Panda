@@ -3,12 +3,13 @@
 UICrosshair::UICrosshair()
     : horizontal(PandaUI::makeView<PandaUI::View>())
     , vertical(PandaUI::makeView<PandaUI::View>()) {
+    setupStyle();
     addSubviews();
+    makeConstraints();
 }
 
-UICrosshair::~UICrosshair() {
-    PandaUI::freeView(horizontal);
-    PandaUI::freeView(vertical);
+void UICrosshair::setupStyle() {
+    m_backgroundColor = 0xFFFFFF00;
 }
 
 void UICrosshair::addSubviews() {
@@ -16,13 +17,13 @@ void UICrosshair::addSubviews() {
     addSubview(vertical);
 }
 
-void UICrosshair::layout() {
-    // horizontal->setFrame(
-    //     PandaUI::Rect(m_frame.size.width / 2 - 25, m_frame.size.height / 2 - 2, 50, 4));
-    // vertical->setFrame(
-    //     PandaUI::Rect(m_frame.size.width / 2 - 2, m_frame.size.height / 2 - 25, 4, 50));
-    Panda::Size windowSize = Panda::Application::get()->getWindow()->getSize();
-    horizontal->setFrame(PandaUI::Rect(windowSize.width / 2 - 25, windowSize.height / 2 - 2, 50, 4)
-    );
-    vertical->setFrame(PandaUI::Rect(windowSize.width / 2 - 2, windowSize.height / 2 - 25, 4, 50));
+void UICrosshair::makeConstraints() {
+    horizontal->styleSetAbsolute();
+    horizontal->styleSetOriginPercent({50.f, 50.f});
+    horizontal->setTransform(glm::translate(glm::mat4(1.f), {-25, -2.0, 0.0}));
+    horizontal->styleSetSize({50, 4});
+    vertical->styleSetAbsolute();
+    vertical->styleSetOriginPercent({50.f, 50.f});
+    vertical->setTransform(glm::translate(glm::mat4(1.f), {-2.0, -25, 0.0}));
+    vertical->styleSetSize({4, 50});
 }

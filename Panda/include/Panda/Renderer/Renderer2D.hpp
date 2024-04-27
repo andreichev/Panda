@@ -24,12 +24,14 @@ public:
             , size()
             , color()
             , texture(nullptr)
-            , rotation(0) {}
+            , rotation(0)
+            , transform(1.f) {}
 
         Vec3 center;
         Size size;
         Color color;
         float rotation;
+        glm::mat4 transform;
         Foundation::Shared<Texture> texture;
     };
 

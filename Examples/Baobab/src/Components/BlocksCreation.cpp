@@ -21,8 +21,10 @@ void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkInde
         ->chunks
             [chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
              chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
-        .getMesh()
-        ->update(data);
+        .getMeshEntity()
+        .getComponent<Panda::DynamicMeshComponent>()
+        .meshes.front()
+        .update(data);
 }
 
 void BlocksCreation::setVoxel(int x, int y, int z, VoxelType type) {

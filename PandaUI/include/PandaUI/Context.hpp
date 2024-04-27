@@ -16,7 +16,9 @@ public:
     void update(double deltaTime);
     void updateViewportSize(Size size);
     void updateViewId(Miren::ViewId viewId);
-
+    Size getViewportSize() {
+        return m_viewportSize;
+    }
     template<typename T, typename... Args>
     Foundation::Shared<T> makeView(Args &&...args) {
         // TODO: Собственный аллокатор для PandaUI

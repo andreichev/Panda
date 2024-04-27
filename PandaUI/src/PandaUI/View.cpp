@@ -15,7 +15,8 @@ View::View()
 
 View::View(Rect frame)
     : m_backgroundColor(1.f, 1.f, 1.f, 1.f)
-    , m_frame(frame) {
+    , m_frame(frame)
+    , m_transform(1.f) {
     YGNodeRef thisYogaView = YGNodeNew();
     auto *internal = (ViewInternal *)m_internal;
     internal->ref = thisYogaView;
@@ -29,11 +30,29 @@ View::~View() {
     LOG_INFO("YOGA VIEW FREED");
 }
 
+void View::notifyWillCalculateLayout() {
+    viewWillCalculateLayout();
+    for (auto view : m_subviews) {
+        view->notifyWillCalculateLayout();
+    }
+}
+
 void View::styleSetSize(Size size) {
     auto *internal = (ViewInternal *)m_internal;
     YGNodeRef thisYogaView = internal->ref;
     YGNodeStyleSetWidth(thisYogaView, size.width);
     YGNodeStyleSetHeight(thisYogaView, size.height);
+}
+
+void View::styleSetSizePercent(Size size) {
+    PND_ASSERT(
+        size.width >= 0 && size.width <= 100 && size.height >= 0 && size.height <= 100,
+        "Percent values should be between 0 and 100"
+    );
+    auto *internal = (ViewInternal *)m_internal;
+    YGNodeRef thisYogaView = internal->ref;
+    YGNodeStyleSetWidthPercent(thisYogaView, size.width);
+    YGNodeStyleSetHeightPercent(thisYogaView, size.height);
 }
 
 void View::styleSetMargins(EdgeInsets margins) {
@@ -50,6 +69,17 @@ void View::styleSetOrigin(Point point) {
     YGNodeRef thisYogaView = internal->ref;
     YGNodeStyleSetPosition(thisYogaView, YGEdgeLeft, point.x);
     YGNodeStyleSetPosition(thisYogaView, YGEdgeTop, point.y);
+}
+
+void View::styleSetOriginPercent(Point point) {
+    PND_ASSERT(
+        point.x >= 0 && point.x <= 100 && point.y >= 0 && point.y <= 100,
+        "Percent values should be between 0 and 100"
+    );
+    auto *internal = (ViewInternal *)m_internal;
+    YGNodeRef thisYogaView = internal->ref;
+    YGNodeStyleSetPositionPercent(thisYogaView, YGEdgeLeft, point.x);
+    YGNodeStyleSetPositionPercent(thisYogaView, YGEdgeTop, point.y);
 }
 
 void View::styleReset() {
@@ -79,15 +109,28 @@ void View::styleSetInsetsFromParent(EdgeInsets insets) {
     YGNodeStyleSetPosition(thisYogaView, YGEdgeLeft, insets.left);
 }
 
-void View::addSubview(Foundation::Shared<View> node) {
-    PND_ASSERT(node != nullptr, "INVALID NODE");
+void View::addSubview(Foundation::Shared<View> view) {
+    PND_ASSERT(view != nullptr, "INVALID NODE");
+    m_subviews.push_back(view);
     auto *thisInternal = (ViewInternal *)m_internal;
     YGNodeRef thisYogaView = thisInternal->ref;
-    auto *thatInternal = (ViewInternal *)node->m_internal;
+    auto thatInternal = (ViewInternal *)view->m_internal;
     YGNodeRef thatYogaView = thatInternal->ref;
-    int subviewsCount = YGNodeGetChildCount(thatYogaView);
+    int subviewsCount = YGNodeGetChildCount(thisYogaView);
     YGNodeInsertChild(thisYogaView, thatYogaView, subviewsCount);
-    m_subviews.push_back(node);
+}
+
+void View::resolveHierarchy() {
+    auto *thisInternal = (ViewInternal *)m_internal;
+    YGNodeRef thisYogaView = thisInternal->ref;
+    YGNodeRemoveAllChildren(thisYogaView);
+    for (auto view : m_subviews) {
+        auto *thatInternal = (ViewInternal *)view->m_internal;
+        YGNodeRef thatYogaView = thatInternal->ref;
+        int subviewsCount = YGNodeGetChildCount(thisYogaView);
+        YGNodeInsertChild(thisYogaView, thatYogaView, subviewsCount);
+        view->resolveHierarchy();
+    }
 }
 
 void View::removeSubview(Foundation::Shared<View> node) {
@@ -101,6 +144,7 @@ void View::removeSubview(Foundation::Shared<View> node) {
 }
 
 void View::calculateLayout() {
+    notifyWillCalculateLayout();
     auto *thisInternal = (ViewInternal *)m_internal;
     YGNodeRef thisYogaView = thisInternal->ref;
     YGNodeCalculateLayout(thisYogaView, YGUndefined, YGUndefined, YGDirectionLTR);
@@ -129,6 +173,7 @@ void View::render(float offsetX, float offsetY) {
     rect.size = Panda::Size(size.width, size.height);
     Color color = getBackgroundColor();
     rect.color = {color.r, color.g, color.b, color.a};
+    rect.transform = m_transform;
     Context::shared().getRenderer().drawRect(rect);
     for (auto view : m_subviews) {
         view->render(origin.x + offsetX, origin.y + offsetY);

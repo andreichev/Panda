@@ -102,7 +102,7 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     }
 
     for (int i = 0; i < 4; i++) {
-        m_drawData.vertices[verticesCount].pos = transform * positions[i];
+        m_drawData.vertices[verticesCount].pos = rect.transform * transform * positions[i];
         m_drawData.vertices[verticesCount].textureIndex = textureIndex;
         m_drawData.vertices[verticesCount].color = rect.color;
         m_drawData.vertices[verticesCount].textureCoords = textureCoords[i];
