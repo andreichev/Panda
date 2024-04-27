@@ -79,9 +79,50 @@ void drawComponents(Entity entity) {
         endPropertiesGrid();
     });
     drawComponent<DynamicMeshComponent>("Dynamic Mesh", entity, [](auto &component) {
-        beginPropertiesGrid();
+        ImGui::Text("Meshes count: %d", (int)component.meshes.size());
+    });
+    drawComponent<StaticMeshComponent>("Static Mesh", entity, [](auto &component) {
+        ImGui::Text("Meshes count: %d", (int)component.meshes.size());
+    });
+    drawComponent<CameraComponent>("Camera", entity, [](auto &component) {
+        auto &camera = component.camera;
+        ImGui::Checkbox("Primary", &component.isPrimary);
 
-        endPropertiesGrid();
+        const char *projectionTypeStrings[] = {"Perspective", "Orthographic"};
+        const char *currentProjectionTypeString =
+            projectionTypeStrings[(int)camera.getProjectionType()];
+        if (ImGui::BeginCombo("Projection", currentProjectionTypeString)) {
+            for (int i = 0; i < 2; i++) {
+                bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
+                if (ImGui::Selectable(projectionTypeStrings[i], isSelected)) {
+                    currentProjectionTypeString = projectionTypeStrings[i];
+                    camera.setProjectionType((WorldCamera::ProjectionType)i);
+                }
+                if (isSelected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+        if (camera.getProjectionType() == WorldCamera::ProjectionType::PERSPECTIVE) {
+            float perspectiveVerticalFov = glm::degrees(camera.getFieldOfView());
+            if (ImGui::DragFloat("Vertical FOV", &perspectiveVerticalFov))
+                camera.setFieldOfView(glm::radians(perspectiveVerticalFov));
+        }
+        if (camera.getProjectionType() == WorldCamera::ProjectionType::ORTHOGRAPHIC) {
+            float orthoSize = camera.getOrthoSize();
+            if (ImGui::DragFloat("Size", &orthoSize)) {
+                camera.setOrthoSize(orthoSize);
+            }
+        }
+        float near = camera.getNear();
+        if (ImGui::DragFloat("Near", &near)) {
+            camera.setNear(near);
+        }
+        float far = camera.getFar();
+        if (ImGui::DragFloat("Far", &far)) {
+            camera.setFar(far);
+        }
     });
 }
 

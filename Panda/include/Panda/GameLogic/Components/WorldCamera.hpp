@@ -12,15 +12,18 @@ public:
 
     WorldCamera();
     ~WorldCamera() = default;
-    glm::mat4 &getProjection() override {
-        return m_projection;
-    };
+    glm::mat4 &getProjection() override;
+    ;
     void setProjectionType(ProjectionType type);
     // MARK: Perspective parameters
     void setFieldOfView(float degrees);
-    float getFieldOfView() {
-        return m_fieldOfView;
-    }
+    float getFieldOfView();
+    float getNear();
+    void setNear(float near);
+    float getFar();
+    void setFar(float far);
+    float getOrthoSize();
+    void setOrthoSize(float orthoSize);
     // MARK: Orthographic parameters
 
     // MARK: Camera
@@ -46,6 +49,9 @@ private:
     Size m_viewportSize;
     glm::mat4 m_projection;
     float m_fieldOfView;
+    float m_near;
+    float m_far;
+    float m_orthoSize;
 };
 
 } // namespace Panda
