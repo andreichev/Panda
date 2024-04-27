@@ -48,7 +48,7 @@ static void drawComponent(const std::string &name, Entity entity, UIFunction<T> 
     }
 }
 
-void drawTag(Entity entity) {
+static void drawTag(Entity entity) {
     char buffer[256];
     memset(buffer, 0, 256);
     buffer[0] = 0; // Setting the first byte to 0 makes checking if string is empty easier later.
@@ -62,8 +62,26 @@ void drawTag(Entity entity) {
     }
 }
 
+template<typename T>
+static void displayAddComponentEntry(Entity entity, const std::string &entryName) {
+    if (!entity.hasComponent<T>()) {
+        if (ImGui::MenuItem(entryName.c_str())) {
+            entity.addComponent<T>();
+            ImGui::CloseCurrentPopup();
+        }
+    }
+}
+
 void drawComponents(Entity entity) {
     drawTag(entity);
+    if (ImGui::Button("Add Component")) {
+        ImGui::OpenPopup("AddComponent");
+    }
+    if (ImGui::BeginPopup("AddComponent")) {
+        displayAddComponentEntry<CameraComponent>(entity, "Camera");
+        displayAddComponentEntry<SpriteRendererComponent>(entity, "Sprite Renderer");
+        ImGui::EndPopup();
+    }
     drawComponent<TransformComponent>("Transform", entity, [](auto &component) {
         glm::vec3 position = component.getPosition();
         drawVec3Control("Translation", position);
@@ -105,9 +123,10 @@ void drawComponents(Entity entity) {
             ImGui::EndCombo();
         }
         if (camera.getProjectionType() == WorldCamera::ProjectionType::PERSPECTIVE) {
-            float perspectiveVerticalFov = glm::degrees(camera.getFieldOfView());
-            if (ImGui::DragFloat("Vertical FOV", &perspectiveVerticalFov))
-                camera.setFieldOfView(glm::radians(perspectiveVerticalFov));
+            float perspectiveVerticalFov = camera.getFieldOfView();
+            if (ImGui::DragFloat("Vertical FOV", &perspectiveVerticalFov)) {
+                camera.setFieldOfView(perspectiveVerticalFov);
+            }
         }
         if (camera.getProjectionType() == WorldCamera::ProjectionType::ORTHOGRAPHIC) {
             float orthoSize = camera.getOrthoSize();
