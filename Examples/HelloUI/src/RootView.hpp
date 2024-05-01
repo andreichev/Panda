@@ -11,7 +11,7 @@ public:
         Foundation::Shared<View> subview1 = Foundation::makeShared<View>();
         subview1->setBackgroundColor(0xFF5522FF);
         subview1->styleSetAbsolute();
-        subview1->styleSetInsetsFromParent({20, 30, 30, 50});
+        subview1->styleSetInsetsFromParent({50, 30, 30, 50});
 
         addSubview(subview1);
 

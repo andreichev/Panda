@@ -11,7 +11,6 @@
 void ExampleLevel::start(Panda::World *world) {
     using namespace Miren;
     PandaUI::initialize();
-
     Foundation::Shared<RootView> view = PandaUI::makeView<RootView>();
     PandaUI::Context::shared().setRootView(view);
 }

@@ -1,7 +1,8 @@
 #include "EditorLayer.hpp"
 #include "Panels/Dockspace.hpp"
 #include "Panels/MenuBar.hpp"
-#include "Components/CameraMove.hpp"
+
+#include "Camera/CameraController.hpp"
 
 namespace Panda {
 
@@ -9,35 +10,32 @@ EditorLayer::EditorLayer()
     : m_world(nullptr)
     , m_viewport()
     , m_hierarchyPanel(nullptr)
-    , m_statisticsPanel(nullptr) {}
+    , m_statisticsPanel(nullptr)
+    , m_editorCamera()
+    , m_cameraController()
+    , m_sceneState(SceneState::EDIT) {}
 
 void EditorLayer::onAttach() {
     m_world = NEW(Foundation::getAllocator(), World);
     m_world->initialize();
     m_viewport.init(m_world);
+    m_viewport.setCamera(&m_editorCamera);
     m_hierarchyPanel.setWorld(m_world);
     m_statisticsPanel.setWorld(m_world);
-    initializeExampleWorld();
+    initializeEmptyWorld();
+    m_cameraController.setPosition({0.f, 0.f, 4.f});
 }
 
-void EditorLayer::initializeExampleWorld() {
+void EditorLayer::initializeEmptyWorld() {
     Entity cameraEntity = m_world->instantiateEntity();
     cameraEntity.setName("Camera");
     cameraEntity.getTransform().setPosition({0.f, 0.f, 4.f});
-    auto &camera = cameraEntity.addComponent<CameraComponent>();
-    cameraEntity.addNativeScript<CameraMove>();
-    m_viewport.setCamera(&camera.camera);
+    cameraEntity.addComponent<CameraComponent>();
 
     Entity sprite1Entity = m_world->instantiateEntity();
     sprite1Entity.setName("Orange Sprite");
     auto &sprite1 = sprite1Entity.addComponent<SpriteRendererComponent>();
     sprite1.color = {1.0f, 0.5f, 0.2f, 1.0f};
-
-    Entity sprite2Entity = m_world->instantiateEntity();
-    sprite2Entity.setName("Cyan Sprite");
-    auto &sprite2 = sprite2Entity.addComponent<SpriteRendererComponent>();
-    sprite2.color = {0.5f, 1.0f, 1.0f, 1.0f};
-    sprite2Entity.getTransform().setPosition({1.f, 1.f, 0.f});
 }
 
 void EditorLayer::onDetach() {
@@ -45,7 +43,24 @@ void EditorLayer::onDetach() {
 }
 
 void EditorLayer::onUpdate(double deltaTime) {
-    m_world->update(deltaTime);
+    switch (m_sceneState) {
+        case SceneState::EDIT: {
+            m_cameraController.update(deltaTime);
+            glm::mat4 view = m_cameraController.getViewMatrix();
+            glm::mat4 proj = m_editorCamera.getProjection();
+            m_world->updateEditor(deltaTime, proj * view);
+            break;
+        }
+        case SceneState::PLAY: {
+            m_viewport.setCamera(m_world->getMainCamera());
+            m_world->updateRuntime(deltaTime);
+            break;
+        }
+        case SceneState::SIMULATE: {
+            // TODO: Implement
+            break;
+        }
+    }
 }
 
 void EditorLayer::onImGuiRender() {
@@ -59,6 +74,15 @@ void EditorLayer::onImGuiRender() {
 
 void EditorLayer::onEvent(Event *event) {
     Input::onEvent(event);
+}
+
+void EditorLayer::play() {
+    m_sceneState = SceneState::PLAY;
+}
+
+void EditorLayer::stop() {
+    m_sceneState = SceneState::EDIT;
+    m_viewport.setCamera(&m_editorCamera);
 }
 
 } // namespace Panda

@@ -18,7 +18,8 @@ public:
     World();
     ~World();
     void initialize();
-    void update(double deltaTime);
+    void updateRuntime(double deltaTime);
+    void updateEditor(double deltaTime, glm::mat4 viewProjectionMatrix);
     void onImGuiRender();
     Entity instantiateEntity();
     void destroy(Entity entity);
@@ -31,6 +32,8 @@ public:
     Renderer3D &getRenderer3D() {
         return m_renderer3d;
     }
+
+    Camera *getMainCamera();
 
 private:
     Entity getMainCameraEntity();

@@ -13,7 +13,7 @@ World::World()
 
 World::~World() {}
 
-void World::update(double deltaTime) {
+void World::updateRuntime(double deltaTime) {
     if (!m_isRunning) {
         return;
     }
@@ -86,6 +86,54 @@ void World::update(double deltaTime) {
     m_renderer3d.end();
 }
 
+void World::updateEditor(double deltaTime, glm::mat4 viewProjectionMatrix) {
+    m_renderer2d.begin();
+    m_renderer3d.begin();
+
+    // Render Sprites
+    {
+        auto view = m_registry.view<SpriteRendererComponent, TransformComponent>();
+        for (auto entityHandle : view) {
+            auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
+            auto &transform = view.get<TransformComponent>(entityHandle);
+            Panda::Renderer2D::RectData rect;
+            rect.color = spriteComponent.color;
+            rect.size = {1.f, 1.f};
+            rect.center = transform.getPosition();
+            rect.rotation = transform.getRotationEuler().z;
+            m_renderer2d.drawRect(rect);
+        }
+    }
+    // Render static meshes
+    {
+        auto view = m_registry.view<StaticMeshComponent, TransformComponent>();
+        for (auto entityHandle : view) {
+            auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
+            auto &transform = view.get<TransformComponent>(entityHandle);
+            for (auto &mesh : staticMeshComponent.meshes) {
+                m_renderer3d.submit(&transform, &mesh);
+            }
+        }
+    }
+    // Render dynamic meshes
+    {
+        auto view = m_registry.view<DynamicMeshComponent, TransformComponent>();
+        for (auto entityHandle : view) {
+            auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
+            auto &transform = view.get<TransformComponent>(entityHandle);
+            for (auto &mesh : dynamicMeshComponent.meshes) {
+                m_renderer3d.submit(&transform, &mesh);
+            }
+        }
+    }
+
+    m_renderer2d.setViewProj(viewProjectionMatrix);
+    m_renderer3d.setViewProj(viewProjectionMatrix);
+
+    m_renderer2d.end();
+    m_renderer3d.end();
+}
+
 void World::onImGuiRender() {
     auto view = m_registry.view<NativeScriptListComponent>();
     for (auto entityHandle : view) {
@@ -134,6 +182,14 @@ Entity World::getMainCameraEntity() {
         }
     }
     return {};
+}
+
+Camera *World::getMainCamera() {
+    Entity entity = getMainCameraEntity();
+    if (!entity.isValid()) {
+        return nullptr;
+    }
+    return &entity.getComponent<CameraComponent>().camera;
 }
 
 } // namespace Panda

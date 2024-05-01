@@ -1,0 +1,31 @@
+//
+// Created by Admin on 12.02.2022.
+//
+
+#pragma once
+
+#include <Panda.hpp>
+
+namespace Panda {
+
+class CameraController {
+public:
+    CameraController();
+    void update(float deltaTime);
+    const glm::mat4 getViewMatrix();
+    void setPosition(glm::vec3 position);
+
+private:
+    void updateVectors();
+
+    TransformComponent m_transform;
+    glm::vec4 m_front;
+    glm::vec4 m_up;
+    glm::vec4 m_right;
+    glm::vec3 m_target;
+    float m_mouseSpeed;
+    float m_moveSpeed;
+};
+// '/:'
+// 12wedfrgtvbh
+} // namespace Panda

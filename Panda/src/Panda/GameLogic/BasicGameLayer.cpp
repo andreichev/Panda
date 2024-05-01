@@ -18,7 +18,7 @@ void BasicGameLayer::onDetach() {
 }
 
 void BasicGameLayer::onUpdate(double deltaTime) {
-    m_world->update(deltaTime);
+    m_world->updateRuntime(deltaTime);
 }
 
 void BasicGameLayer::onImGuiRender() {
