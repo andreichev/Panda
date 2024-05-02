@@ -1,13 +1,13 @@
 #include "EditorLayer.hpp"
-#include "Panels/Dockspace.hpp"
-#include "Panels/MenuBar.hpp"
 
-#include "Camera/CameraController.hpp"
+#include "Panels/Common/ImGuiHelper.hpp"
 
 namespace Panda {
 
 EditorLayer::EditorLayer()
     : m_world(nullptr)
+    , m_toolbar()
+    , m_dockspace()
     , m_viewport()
     , m_hierarchyPanel(nullptr)
     , m_statisticsPanel(nullptr)
@@ -64,12 +64,30 @@ void EditorLayer::onUpdate(double deltaTime) {
 }
 
 void EditorLayer::onImGuiRender() {
-    Dockspace::beginImGuiDockspace();
-    MenuBar::onImGuiRender();
+    m_menuBar.onImGuiRender();
+    SceneState pickedSceneState = m_toolbar.onImGuiRender(m_menuBar.height, m_sceneState);
+    m_dockspace.beginImGuiDockspace(m_toolbar.height + m_menuBar.height);
     m_statisticsPanel.onImGuiRender();
     m_viewport.onImGuiRender();
     m_hierarchyPanel.onImGuiRender();
-    Dockspace::endImGuiDockspace();
+    m_dockspace.endImGuiDockspace();
+
+    if (pickedSceneState != m_sceneState) {
+        switch (pickedSceneState) {
+            case SceneState::EDIT: {
+                stop();
+                break;
+            }
+            case SceneState::PLAY: {
+                play();
+                break;
+            }
+            case SceneState::SIMULATE:
+                play();
+                break;
+        }
+        m_sceneState = pickedSceneState;
+    }
 }
 
 void EditorLayer::onEvent(Event *event) {

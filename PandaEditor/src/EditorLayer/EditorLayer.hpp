@@ -1,10 +1,14 @@
 #pragma once
 
 #include "Panels/Viewport.hpp"
+#include "Panels/MenuBar.hpp"
+#include "Panels/Dockspace.hpp"
 #include "Panels/WorldHierarchyPanel.hpp"
 #include "Panels/StatisticsPanel.hpp"
+#include "Panels/Toolbar.hpp"
 #include "Camera/EditorCamera.hpp"
 #include "Camera/CameraController.hpp"
+#include "EditorLayer/SceneState.hpp"
 
 #include <Panda.hpp>
 
@@ -28,6 +32,9 @@ public:
 private:
     void initializeEmptyWorld();
 
+    MenuBar m_menuBar;
+    Toolbar m_toolbar;
+    Dockspace m_dockspace;
     Viewport m_viewport;
     StatisticsPanel m_statisticsPanel;
     WorldHierarchyPanel m_hierarchyPanel;
@@ -35,7 +42,6 @@ private:
     CameraController m_cameraController;
     World *m_world;
 
-    enum class SceneState { EDIT = 0, PLAY = 1, SIMULATE = 2 };
     SceneState m_sceneState = SceneState::EDIT;
 };
 
