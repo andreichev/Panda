@@ -10,13 +10,13 @@ namespace Panda {
 
 class Viewport final {
 public:
-    Viewport()
-        : m_viewportPanelSize(300, 200)
-        , m_camera(nullptr) {}
+    Viewport();
 
     void init(World *world);
     void setCamera(Camera *camera);
     void onImGuiRender();
+    void focus();
+    bool isFocused();
 
 private:
     void updateViewportSize(Size size);
@@ -24,10 +24,12 @@ private:
     World *m_world;
     Miren::FrameBufferHandle m_sceneFB;
     Miren::FrameBufferSpecification m_sceneFbSpecification;
-    Miren::ViewId m_sceneViewId = 1;
+    Miren::ViewId m_sceneViewId;
     Miren::TextureHandle m_colorAttachment;
     Camera *m_camera;
     Size m_viewportPanelSize;
+    bool m_focusNextFrame;
+    bool m_focused;
 };
 
 } // namespace Panda

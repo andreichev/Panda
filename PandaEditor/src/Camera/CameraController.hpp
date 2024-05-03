@@ -14,10 +14,15 @@ public:
     void update(float deltaTime);
     const glm::mat4 getViewMatrix();
     void setPosition(glm::vec3 position);
+    void setActive(bool flag);
 
 private:
     void updateVectors();
 
+    bool m_isActive;
+    bool m_cursorStarted;
+    double m_lastMouseX;
+    double m_lastMouseY;
     TransformComponent m_transform;
     glm::vec4 m_front;
     glm::vec4 m_up;

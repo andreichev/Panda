@@ -27,6 +27,7 @@ public:
     void onEvent(Event *event) override;
 
     void play();
+    void simulate();
     void stop();
 
 private:

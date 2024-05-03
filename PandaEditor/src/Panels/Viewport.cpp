@@ -6,6 +6,17 @@
 
 namespace Panda {
 
+Viewport::Viewport()
+    : m_viewportPanelSize(300, 200)
+    , m_camera(nullptr)
+    , m_focused(false)
+    , m_focusNextFrame(true)
+    , m_world(nullptr)
+    , m_sceneFB()
+    , m_sceneFbSpecification()
+    , m_sceneViewId(1)
+    , m_colorAttachment() {}
+
 void Viewport::init(World *world) {
     PandaUI::initialize();
     m_world = world;
@@ -69,26 +80,41 @@ void Viewport::updateViewportSize(Vec2 size) {
 }
 
 void Viewport::onImGuiRender() {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
     ImGui::Begin("Viewport");
-    ImVec2 viewportSpace = ImGui::GetContentRegionAvail();
-    if (viewportSpace.x != m_viewportPanelSize.width ||
-        viewportSpace.y != m_viewportPanelSize.height) {
-        updateViewportSize({viewportSpace.x, viewportSpace.y});
+    if (m_focusNextFrame) {
+        ImGui::SetWindowFocus();
+        m_focusNextFrame = false;
     }
-    bool viewportHovered = ImGui::IsWindowHovered();
-    Application::get()->getImGuiLayer()->setBlockEvents(!viewportHovered);
+    ImVec2 viewportSpace = ImGui::GetContentRegionAvail();
+    if (m_viewportPanelSize != viewportSpace) {
+        updateViewportSize(viewportSpace);
+    }
+    m_focused = ImGui::IsWindowFocused();
+    bool hovered = ImGui::IsWindowHovered();
+    Application::get()->getImGuiLayer()->setBlockEvents(!hovered);
     ImGui::Image(
         (void *)(uintptr_t)m_colorAttachment.id,
-        ImVec2(m_viewportPanelSize.width, m_viewportPanelSize.height),
+        m_viewportPanelSize,
         ImVec2(0, 1),
-        ImVec2(1, 0)
+        ImVec2(1, 0),
+        m_focused ? ImVec4(1, 1, 1, 1) : ImVec4(1, 1, 1, 0.5)
     );
     ImGui::End();
+    ImGui::PopStyleVar();
 }
 
 void Viewport::setCamera(Camera *camera) {
     m_camera = camera;
     m_camera->setViewportSize(m_viewportPanelSize);
+}
+
+bool Viewport::isFocused() {
+    return m_focused;
+}
+
+void Viewport::focus() {
+    m_focusNextFrame = true;
 }
 
 } // namespace Panda

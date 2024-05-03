@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <imgui.h>
 
 namespace Panda {
 
@@ -23,6 +24,22 @@ struct Vec2 {
     Vec2(float x, float y)
         : x(x)
         , y(y) {}
+
+    Vec2(const ImVec2 &vec)
+        : x(vec.x)
+        , y(vec.y) {}
+
+    bool operator==(const Vec2 &l) {
+        return l.x == x && l.y == y;
+    }
+
+    bool operator!=(const Vec2 &l) {
+        return !(*this == l);
+    }
+
+    operator ImVec2() {
+        return {x, y};
+    }
 };
 
 struct Vec3 {

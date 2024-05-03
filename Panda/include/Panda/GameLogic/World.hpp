@@ -19,6 +19,7 @@ public:
     ~World();
     void initialize();
     void updateRuntime(double deltaTime);
+    void updateSimulation(double deltaTime, glm::mat4 viewProjectionMatrix);
     void updateEditor(double deltaTime, glm::mat4 viewProjectionMatrix);
     void onImGuiRender();
     Entity instantiateEntity();
@@ -36,6 +37,7 @@ public:
     Camera *getMainCamera();
 
 private:
+    void updateBasicComponents(float deltaTime);
     Entity getMainCameraEntity();
 
     bool m_isRunning;

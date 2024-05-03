@@ -57,7 +57,10 @@ void EditorLayer::onUpdate(double deltaTime) {
             break;
         }
         case SceneState::SIMULATE: {
-            // TODO: Implement
+            m_cameraController.update(deltaTime);
+            glm::mat4 view = m_cameraController.getViewMatrix();
+            glm::mat4 proj = m_editorCamera.getProjection();
+            m_world->updateSimulation(deltaTime, proj * view);
             break;
         }
     }
@@ -83,11 +86,12 @@ void EditorLayer::onImGuiRender() {
                 break;
             }
             case SceneState::SIMULATE:
-                play();
+                simulate();
                 break;
         }
         m_sceneState = pickedSceneState;
     }
+    m_cameraController.setActive(m_viewport.isFocused());
 }
 
 void EditorLayer::onEvent(Event *event) {
@@ -96,11 +100,18 @@ void EditorLayer::onEvent(Event *event) {
 
 void EditorLayer::play() {
     m_sceneState = SceneState::PLAY;
+    m_viewport.focus();
+}
+
+void EditorLayer::simulate() {
+    m_sceneState = SceneState::SIMULATE;
+    m_viewport.focus();
 }
 
 void EditorLayer::stop() {
     m_sceneState = SceneState::EDIT;
     m_viewport.setCamera(&m_editorCamera);
+    m_viewport.focus();
 }
 
 } // namespace Panda

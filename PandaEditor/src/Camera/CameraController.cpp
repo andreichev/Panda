@@ -15,11 +15,19 @@ CameraController::CameraController()
     , m_front()
     , m_up()
     , m_right()
-    , m_target() {
+    , m_target()
+    , m_cursorStarted(false)
+    , m_isActive(false)
+    , m_lastMouseX(0)
+    , m_lastMouseY(0) {
     updateVectors();
 }
 
 void CameraController::update(float deltaTime) {
+    if (!m_isActive) {
+        m_cursorStarted = false;
+        return;
+    }
     glm::vec3 cameraRotation = m_transform.getRotationEuler();
     glm::vec3 cameraPosition = m_transform.getPosition();
     float speed = m_moveSpeed * deltaTime;
@@ -41,16 +49,13 @@ void CameraController::update(float deltaTime) {
     if (Panda::Input::isKeyPressed(Panda::Key::LEFT_SHIFT)) {
         m_transform.translate(-m_up * speed);
     }
-    static double lastMouseX = Panda::Input::getMousePositionX();
-    static double lastMouseY = Panda::Input::getMousePositionY();
-    static bool cursorStarted = false;
     if (Input::isMouseButtonPressed(MouseButton::RIGHT)) {
         double mouseX = Panda::Input::getMousePositionX();
         double mouseY = Panda::Input::getMousePositionY();
-        double deltaX = mouseX - lastMouseX;
-        double deltaY = mouseY - lastMouseY;
-        if (!cursorStarted) {
-            cursorStarted = true;
+        double deltaX = mouseX - m_lastMouseX;
+        double deltaY = mouseY - m_lastMouseY;
+        if (!m_cursorStarted) {
+            m_cursorStarted = true;
             deltaX = 0;
             deltaY = 0;
         }
@@ -61,12 +66,12 @@ void CameraController::update(float deltaTime) {
             {-glm::radians(deltaY * m_mouseSpeed), -glm::radians(deltaX * m_mouseSpeed), 0.f}
         );
         updateVectors();
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
-        ImGui::SetNextFrameWantCaptureMouse(false);
+        m_lastMouseX = mouseX;
+        m_lastMouseY = mouseY;
+        // ImGui::SetNextFrameWantCaptureMouse(false);
     } else {
-        ImGui::SetNextFrameWantCaptureMouse(true);
-        cursorStarted = false;
+        // ImGui::SetNextFrameWantCaptureMouse(true);
+        m_cursorStarted = false;
     }
 
     double scroll = Input::getMouseScrollY();
@@ -89,6 +94,10 @@ const glm::mat4 CameraController::getViewMatrix() {
 
 void CameraController::setPosition(glm::vec3 position) {
     m_transform.setPosition(position);
+}
+
+void CameraController::setActive(bool flag) {
+    m_isActive = flag;
 }
 
 } // namespace Panda
