@@ -34,11 +34,11 @@ public:
         return m_renderer3d;
     }
 
-    Camera *getMainCamera();
+    Camera *findMainCamera();
 
 private:
     void updateBasicComponents(float deltaTime);
-    Entity getMainCameraEntity();
+    Entity findMainCameraEntity();
 
     bool m_isRunning;
     entt::registry m_registry;

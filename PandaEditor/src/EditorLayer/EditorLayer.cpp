@@ -13,7 +13,8 @@ EditorLayer::EditorLayer()
     , m_statisticsPanel(nullptr)
     , m_editorCamera()
     , m_cameraController()
-    , m_sceneState(SceneState::EDIT) {}
+    , m_sceneState(SceneState::EDIT)
+    , m_sceneFilePath() {}
 
 void EditorLayer::onAttach() {
     m_world = NEW(Foundation::getAllocator(), World);
@@ -52,7 +53,7 @@ void EditorLayer::onUpdate(double deltaTime) {
             break;
         }
         case SceneState::PLAY: {
-            m_viewport.setCamera(m_world->getMainCamera());
+            m_viewport.setCamera(m_world->findMainCamera());
             m_world->updateRuntime(deltaTime);
             break;
         }

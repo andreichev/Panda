@@ -37,7 +37,7 @@ void World::updateRuntime(double deltaTime) {
     }
     updateBasicComponents(deltaTime);
 
-    Entity cameraEntity = getMainCameraEntity();
+    Entity cameraEntity = findMainCameraEntity();
     if (cameraEntity.isValid()) {
         WorldCamera &camera = cameraEntity.getComponent<CameraComponent>().camera;
 
@@ -170,7 +170,7 @@ void World::destroy(Entity entity) {
     m_registry.destroy(static_cast<entt::entity>(entity.getId()));
 }
 
-Entity World::getMainCameraEntity() {
+Entity World::findMainCameraEntity() {
     auto view = m_registry.view<CameraComponent>();
     for (auto entity : view) {
         auto &comp = view.get<CameraComponent>(entity);
@@ -182,8 +182,8 @@ Entity World::getMainCameraEntity() {
     return {};
 }
 
-Camera *World::getMainCamera() {
-    Entity entity = getMainCameraEntity();
+Camera *World::findMainCamera() {
+    Entity entity = findMainCameraEntity();
     if (!entity.isValid()) {
         return nullptr;
     }

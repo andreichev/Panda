@@ -24,6 +24,7 @@ set(BIN_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 include(cmake/add_app.cmake)
 
 add_subdirectory(Foundation)
+add_subdirectory(Rain)
 add_subdirectory(Miren)
 add_subdirectory(Panda)
 add_subdirectory(PandaUI)

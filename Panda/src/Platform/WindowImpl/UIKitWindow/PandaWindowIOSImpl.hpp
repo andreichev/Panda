@@ -31,6 +31,8 @@ public:
     }
     bool isMaximized() override {}
     void setMaximized(bool isMaximized) override {}
+    const char *getClipboardText() override {}
+    void setClipboardText(const char *text) override {}
 
 private:
     Size m_size;

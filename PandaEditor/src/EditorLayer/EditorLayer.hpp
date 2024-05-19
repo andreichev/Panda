@@ -33,6 +33,7 @@ public:
 private:
     void initializeEmptyWorld();
 
+    std::string m_sceneFilePath;
     MenuBar m_menuBar;
     Toolbar m_toolbar;
     Dockspace m_dockspace;

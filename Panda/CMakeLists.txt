@@ -66,7 +66,9 @@ endif ()
 
 # Dependencies - Foundation
 target_link_libraries(Panda Foundation)
-target_include_directories(Panda PUBLIC ${FOUNDATION_DIRECTORY}/include)
+
+# Dependencies - Rain
+target_link_libraries(Panda Rain)
 
 # Dependencies - Miren
 target_link_libraries(Panda Miren)
