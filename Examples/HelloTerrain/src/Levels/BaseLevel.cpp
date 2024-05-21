@@ -1,0 +1,99 @@
+//
+// Created by Admin on 07.02.2022.
+//
+
+#include "pch.hpp"
+#include "BaseLevel.hpp"
+#include "Model/Vertex.hpp"
+#include "Components/CameraMove.hpp"
+#include "Components/FullScreenToggle.hpp"
+#include "Components/UI/RootView.hpp"
+#include "Model/PerlinNoise.hpp"
+
+#include <Panda.hpp>
+#include <PandaUI/PandaUI.hpp>
+#include <Miren/Miren.hpp>
+
+class CameraSizeObserver final : public Panda::NativeScript, Panda::WindowSizeObserver {
+public:
+    void initialize() override {
+        Panda::Application::get()->addWindowSizeObserver(this);
+    }
+
+    ~CameraSizeObserver() {
+        Panda::Application::get()->removeWindowSizeObserver(this);
+    }
+
+    void update(double deltaTime) override {}
+
+    void windowSizeChanged(Panda::Size size) override {
+        m_camera->setViewportSize(size);
+        PandaUI::Context::shared().updateViewportSize({size.width, size.height});
+    }
+
+    void setCamera(Panda::Camera *camera) {
+        m_camera = camera;
+    }
+
+private:
+    Panda::Camera *m_camera;
+};
+
+void BaseLevel::start(Panda::World *world) {
+    Miren::setViewClear(0, 0x3D75C9FF);
+    Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
+        "shaders/ground/ground_vertex.glsl", "shaders/ground/ground_fragment.glsl"
+    );
+    m_shader = Miren::createProgram(programAsset.getMirenProgramCreate());
+    LOG_INFO("MESH GENERATION STARTED");
+
+    Panda::TextureAsset textureAsset = Panda::AssetLoader::loadTexture("textures/BlocksTile.png");
+    Miren::TextureCreate textureCreate = textureAsset.getMirenTextureCreate();
+    m_heightMapTexture = Miren::createTexture(textureCreate);
+
+    Panda::Entity cameraEntity = world->instantiateEntity();
+    Panda::WorldCamera &camera = cameraEntity.addComponent<Panda::CameraComponent>().camera;
+    camera.setFieldOfView(60.f);
+    cameraEntity.addNativeScript<CameraMove>();
+    CameraSizeObserver &cameraSizeObserver = cameraEntity.addNativeScript<CameraSizeObserver>();
+    cameraSizeObserver.setCamera(&camera);
+
+    cameraEntity.addNativeScript<FullScreenToggle>();
+
+    Panda::Entity terrainEntity = world->instantiateEntity();
+    Panda::DynamicMeshComponent &meshComponent =
+        terrainEntity.getComponent<Panda::DynamicMeshComponent>();
+    Panda::DynamicMesh &dynamicMesh = meshComponent.meshes.emplace_back();
+
+    int width = 500;
+    int height = 500;
+    float *heightMap = (float *)ALLOC(Foundation::getAllocator(), sizeof(float) * width * height);
+    PerlinNoise::generate2DGlm(123, 4, 1.0f, heightMap, width, height);
+    Miren::VertexLayoutHandle layoutHandle =
+        Miren::createVertexLayout(Vertex::createBufferLayout());
+    Panda::MeshData meshData = m_meshGenerator.makeMesh(layoutHandle, width, height, heightMap);
+    FREE(Foundation::getAllocator(), heightMap);
+
+    cameraEntity.getTransform().setPosition({width / 2, 50, height / 2});
+    Foundation::Memory whiteTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
+    *(uint32_t *)whiteTextureData.data = 0xffffffff;
+    Miren::TextureCreate create;
+    create.m_data = whiteTextureData;
+    create.m_format = Miren::TextureFormat::RGBA8;
+    create.m_numMips = 0;
+    create.m_width = 1;
+    create.m_height = 1;
+    Miren::TextureHandle whiteTexture = Miren::createTexture(create);
+    dynamicMesh.create(meshData, whiteTexture, m_shader);
+
+    PandaUI::initialize();
+    Foundation::Shared<RootView> view = PandaUI::makeView<RootView>();
+    PandaUI::Context::shared().setRootView(view);
+
+    LOG_INFO("BASE LEVEL STARTED!");
+}
+
+BaseLevel::~BaseLevel() {
+    Miren::deleteProgram(m_shader);
+    Miren::deleteTexture(m_heightMapTexture);
+}
