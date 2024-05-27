@@ -17,7 +17,7 @@
             TypeInfo &typeInfo = findOrCreateType<ClassType>();
 
 #define RAIN_FIELD(name)                                                                           \
-    registerField<StripType<decltype(ClassType::name)>>(                                           \
+    registerField<decltype(ClassType::name)>(                                                      \
         typeInfo, #name, offsetof(ClassType, name), alignof(decltype(ClassType::name))             \
     );
 

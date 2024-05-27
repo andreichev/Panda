@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdlib>
-#include <string_view>
 #include <type_traits>
 
 namespace Rain {
@@ -42,5 +41,9 @@ struct StripTypeHelper {
 
 template<typename T>
 using StripType = typename StripTypeHelper<T>::Type;
+
+inline const void *addOffset(const void *data, size_t offset) {
+    return static_cast<const uint8_t *>(data) + offset;
+}
 
 } // namespace Rain

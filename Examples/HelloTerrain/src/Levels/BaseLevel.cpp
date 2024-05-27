@@ -47,9 +47,11 @@ void BaseLevel::start(Panda::World *world) {
     m_shader = Miren::createProgram(programAsset.getMirenProgramCreate());
     LOG_INFO("MESH GENERATION STARTED");
 
-    Panda::TextureAsset textureAsset = Panda::AssetLoader::loadTexture("textures/BlocksTile.png");
-    Miren::TextureCreate textureCreate = textureAsset.getMirenTextureCreate();
-    m_heightMapTexture = Miren::createTexture(textureCreate);
+    Panda::TextureAsset colorTextureAsset = Panda::AssetLoader::loadTexture("textures/grass1.png");
+    Miren::TextureCreate colorTextureCreate = colorTextureAsset.getMirenTextureCreate();
+    colorTextureCreate.m_numMips = 4;
+    colorTextureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
+    m_colorTexture = Miren::createTexture(colorTextureCreate);
 
     Panda::Entity cameraEntity = world->instantiateEntity();
     Panda::WorldCamera &camera = cameraEntity.addComponent<Panda::CameraComponent>().camera;
@@ -65,26 +67,26 @@ void BaseLevel::start(Panda::World *world) {
         terrainEntity.getComponent<Panda::DynamicMeshComponent>();
     Panda::DynamicMesh &dynamicMesh = meshComponent.meshes.emplace_back();
 
-    int width = 500;
-    int height = 500;
+    Panda::TextureAsset heightTextureAsset = Panda::AssetLoader::loadTexture("textures/map1.png");
+    int width = heightTextureAsset.m_width;
+    int height = heightTextureAsset.m_height;
     float *heightMap = (float *)ALLOC(Foundation::getAllocator(), sizeof(float) * width * height);
-    PerlinNoise::generate2DGlm(123, 4, 1.0f, heightMap, width, height);
+
+    uint8_t *data = (uint8_t *)heightTextureAsset.m_data.data;
+    for (int h = 0; h < height; h++) {
+        for (int w = 0; w < width; w++) {
+            int index = h * width + w;
+            heightMap[index] = data[index * 4] / 255.f;
+        }
+    }
+    // PerlinNoise::generate2DGlm(123, 4, 1.0f, heightMap, width, height);
+
     Miren::VertexLayoutHandle layoutHandle =
         Miren::createVertexLayout(Vertex::createBufferLayout());
     Panda::MeshData meshData = m_meshGenerator.makeMesh(layoutHandle, width, height, heightMap);
     FREE(Foundation::getAllocator(), heightMap);
 
-    cameraEntity.getTransform().setPosition({width / 2, 50, height / 2});
-    Foundation::Memory whiteTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
-    *(uint32_t *)whiteTextureData.data = 0xffffffff;
-    Miren::TextureCreate create;
-    create.m_data = whiteTextureData;
-    create.m_format = Miren::TextureFormat::RGBA8;
-    create.m_numMips = 0;
-    create.m_width = 1;
-    create.m_height = 1;
-    Miren::TextureHandle whiteTexture = Miren::createTexture(create);
-    dynamicMesh.create(meshData, whiteTexture, m_shader);
+    dynamicMesh.create(meshData, m_colorTexture, m_shader);
 
     PandaUI::initialize();
     Foundation::Shared<RootView> view = PandaUI::makeView<RootView>();
@@ -95,5 +97,5 @@ void BaseLevel::start(Panda::World *world) {
 
 BaseLevel::~BaseLevel() {
     Miren::deleteProgram(m_shader);
-    Miren::deleteTexture(m_heightMapTexture);
+    Miren::deleteTexture(m_colorTexture);
 }

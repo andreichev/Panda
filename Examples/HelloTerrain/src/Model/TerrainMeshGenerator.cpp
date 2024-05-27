@@ -14,10 +14,15 @@ void freeBuffer(void *data, void *userInfo) {
 void initVertices(
     Vertex *vertices, uint32_t &verticesCount, int width, int depth, float *heightMap
 ) {
+    float tileX = 10;
+    float tileY = 10;
+    float scale = 0.1f;
     for (int z = 0; z < depth; z++) {
         for (int x = 0; x < width; x++) {
-            float h = heightMap[x * width + z];
-            vertices[verticesCount++] = Vertex(x, h * 300, z, 0, 0, h * 2);
+            float h = heightMap[z * width + x] * 200.f;
+            float u = x * tileX / (float)width;
+            float v = z * tileY / (float)depth;
+            vertices[verticesCount++] = Vertex(x * scale, h * scale, z * scale, u, v, h / 100.f);
         }
     }
 }

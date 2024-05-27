@@ -7,4 +7,8 @@ GlobalData &getGlobalData() {
     return globalData;
 }
 
+TypeInfo &findInfo(TypeId id) {
+    return getGlobalData().findInfo(id);
+}
+
 } // namespace Rain

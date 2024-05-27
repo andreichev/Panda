@@ -12,3 +12,7 @@ add_library(Rain STATIC "${SOURCES}" "${INCLUDE}")
 
 target_include_directories(Rain PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(Rain PUBLIC ${PROJECT_SOURCE_DIR}/include)
+
+# Dependencies - RapidJSON
+target_link_libraries(Rain RapidJSON)
+target_include_directories(Rain PRIVATE ${VENDOR_DIRECTORY}/rapidjson/include)

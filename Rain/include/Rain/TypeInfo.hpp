@@ -2,43 +2,91 @@
 
 #include "Rain/Base.hpp"
 
+#include <string>
+
 namespace Rain {
 
 struct FieldInfo final {
+    static constexpr uint32_t ConstFlag = 1 << 0; /**< Flag that marks if the variable is const*/
+    static constexpr uint32_t ReferenceFlag =
+        1 << 1; /**< Flag that marks if the variable is a reference (&)*/
+    static constexpr uint32_t VolatileFlag =
+        1 << 2; /**< Flag that marks if the variable is volatile*/
+    static constexpr uint32_t RValReferenceFlag =
+        1 << 3; /**< Flag that marks if the variable is a right value reference (&&)*/
+
+    FieldInfo(TypeId typeId, std::string name, uint32_t offset, uint32_t align)
+        : typeId(typeId)
+        , name(std::move(name))
+        , offset(offset)
+        , align(align)
+        , m_traitFlags(0)
+        , m_pointerAmount(0) {}
+
+    constexpr void setConstFlag() {
+        m_traitFlags |= ConstFlag;
+    }
+    constexpr void setReferenceFlag() {
+        m_traitFlags |= ReferenceFlag;
+    }
+    constexpr void setVolatileFlag() {
+        m_traitFlags |= VolatileFlag;
+    }
+    constexpr void setRValReferenceFlag() {
+        m_traitFlags |= RValReferenceFlag;
+    }
+
+    constexpr void setPointerAmount(uint16_t amount) {
+        m_pointerAmount = amount;
+    }
+    constexpr uint32_t getPointerAmount() const {
+        return m_pointerAmount;
+    }
+
+    constexpr bool isConst() const {
+        return m_traitFlags & ConstFlag;
+    }
+    constexpr bool isReference() const {
+        return m_traitFlags & ReferenceFlag;
+    }
+    constexpr bool isVolatile() const {
+        return m_traitFlags & VolatileFlag;
+    }
+    constexpr bool isRValReference() const {
+        return m_traitFlags & RValReferenceFlag;
+    }
+    constexpr bool isPointer() const {
+        return m_pointerAmount;
+    }
+    constexpr bool isRefOrPointer() const {
+        return isPointer() || isReference() || isRValReference();
+    }
+
     TypeId typeId;
-    std::string_view name;
+    std::string name;
     uint32_t offset;
     uint32_t align;
 
-    FieldInfo(TypeId typeId, std::string_view name, uint32_t offset, uint32_t align)
-        : typeId(typeId)
-        , name(name)
-        , offset(offset)
-        , align(align) {}
+private:
+    uint16_t m_pointerAmount;
+    uint8_t m_traitFlags;
 };
 
 struct TypeInfo final {
-    TypeId id;
-    std::string_view name;
+    const TypeId id;
+    std::string name;
     uint32_t size;
     uint32_t align;
     std::vector<FieldInfo> fields;
+    uint8_t m_internal[64];
 
-    template<typename T>
-    static TypeInfo create(TypeId id, std::string_view name) {
-        TypeInfo info(id, name);
-        info.size = sizeof(T);
-        info.align = alignof(T);
-        return info;
-    }
-
-private:
-    explicit TypeInfo(TypeId id, std::string_view name)
+    explicit TypeInfo(TypeId id, std::string name)
         : id(id)
-        , name(name)
+        , name(std::move(name))
         , size(0)
         , align(0)
-        , fields() {}
+        , fields()
+        , m_internal() {}
 };
 
 } // namespace Rain
