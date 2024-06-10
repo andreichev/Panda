@@ -56,6 +56,9 @@ struct StaticMeshComponent final {
 
 struct DynamicMeshComponent final {
     std::vector<DynamicMesh> meshes;
+
+    DynamicMeshComponent(const DynamicMeshComponent&) = delete;
+    DynamicMeshComponent(DynamicMeshComponent&&) = default;
 };
 
 struct CameraComponent final {

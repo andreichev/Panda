@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <string>
+#include <cstring>
 
 #ifndef CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
 #    define CONFIG_ALLOCATOR_NATURAL_ALIGNMENT 8

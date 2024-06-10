@@ -3,6 +3,7 @@
 #include "Rain/Base.hpp"
 
 #include <string>
+#include <vector>
 
 namespace Rain {
 

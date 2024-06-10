@@ -153,7 +153,7 @@ void Thread::setThreadName(const char *_name) {
 #if defined(PLATFORM_OSX) || defined(PLATFORM_IOS)
     pthread_setname_np(_name);
 #elif defined(PLATFORM_LINUX)
-    prctl(PR_SET_NAME, _name, 0, 0, 0);
+    pthread_setname_np(ti->m_handle, _name);
 #elif defined(PLATFORM_WINDOWS)
     // Try to use the new thread naming API from Win10 Creators update onwards if we have it
     typedef HRESULT(WINAPI * SetThreadDescriptionProc)(HANDLE, PCWSTR);

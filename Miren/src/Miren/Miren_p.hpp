@@ -44,11 +44,6 @@ struct Context {
         m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE);
         m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
         frame();
-        // Вызвано из главного потока: можно стартовать поток отрисовки.
-#ifdef PLATFORM_DESKTOP
-        m_thread.init(renderThread, nullptr, 0, "Render thread");
-#endif
-        m_rendererSemaphore.post();
     }
 
     // Должно быть вызвано из главного потока и не из цикла обновления.
@@ -505,8 +500,8 @@ struct Context {
         m_views[id].m_frameBuffer = frameBuffer;
     }
 
-private:
     Foundation::Thread m_thread;
+private:
     RendererI *m_renderer;
     Frame m_frame[2];
     Frame *m_render;

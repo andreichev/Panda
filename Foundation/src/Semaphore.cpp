@@ -6,10 +6,8 @@
 #if defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
 #    include <dispatch/dispatch.h>
 #elif defined(PLATFORM_POSIX)
-#    include <errno.h>
-#    include <pthread.h>
 #    include <semaphore.h>
-#    include <time.h>
+#    include <fcntl.h>
 #elif defined(PLATFORM_WINDOWS)
 #    include <windows.h>
 #    include <limits.h>

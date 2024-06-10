@@ -2,6 +2,8 @@
 
 #include "Panda/GameLogic/World.hpp"
 
+#include <filesystem>
+
 namespace Panda {
 
 class WorldSerializer final {

@@ -16,6 +16,11 @@ void initialize() {
     MIREN_LOG("ALLOCATING MIREN CONTEXT, {} BYTES", sizeof(Context));
     MIREN_LOG("FRAME DATA SIZE: {} BYTES", sizeof(Frame));
     s_context = ALIGNED_NEW(Foundation::getAllocator(), Context, CONTEXT_ALIGNMENT);
+    // Вызвано из главного потока: можно стартовать поток отрисовки.
+#ifdef PLATFORM_DESKTOP
+    s_context->m_thread.init(s_context->renderThread, nullptr, 0, "Render thread");
+#endif
+    renderSemaphorePost();
     MIREN_LOG("MIREN INIT END");
 }
 
