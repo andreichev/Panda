@@ -65,9 +65,11 @@ RendererOpenGL::RendererOpenGL() {
     // glBlendEquation(GL_FUNC_ADD);
     // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    LOG_INFO("OPENGL VERSION {}", glGetString(GL_VERSION));
-    // glEnable(GL_DEBUG_OUTPUT);
-    // glDebugMessageCallback(gpuErrorCallback, nullptr);
+    MIREN_LOG("OPENGL VERSION {}", glGetString(GL_VERSION));
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(gpuErrorCallback, nullptr);
+#endif
     GL_CALL(glGenVertexArrays(1, &m_uselessVao));
     GL_CALL(glBindVertexArray(m_uselessVao));
 }

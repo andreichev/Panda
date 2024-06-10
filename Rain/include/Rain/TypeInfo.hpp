@@ -7,13 +7,10 @@
 namespace Rain {
 
 struct FieldInfo final {
-    static constexpr uint32_t ConstFlag = 1 << 0; /**< Flag that marks if the variable is const*/
-    static constexpr uint32_t ReferenceFlag =
-        1 << 1; /**< Flag that marks if the variable is a reference (&)*/
-    static constexpr uint32_t VolatileFlag =
-        1 << 2; /**< Flag that marks if the variable is volatile*/
-    static constexpr uint32_t RValReferenceFlag =
-        1 << 3; /**< Flag that marks if the variable is a right value reference (&&)*/
+    static constexpr uint32_t ConstFlag = 1 << 0;
+    static constexpr uint32_t ReferenceFlag = 1 << 1;
+    static constexpr uint32_t VolatileFlag = 1 << 2;
+    static constexpr uint32_t RValReferenceFlag = 1 << 3;
 
     FieldInfo(TypeId typeId, std::string name, uint32_t offset, uint32_t align)
         : typeId(typeId)

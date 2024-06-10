@@ -5,6 +5,8 @@
 #include "Panda/GameLogic/World.hpp"
 #include "Panda/GameLogic/NativeScript.hpp"
 
+#include <Rain/Rain.hpp>
+
 namespace Panda {
 
 World::World()

@@ -31,7 +31,7 @@ struct Context {
         , m_indexBuffersHandleAlloc(MAX_INDEX_BUFFERS)
         , m_preCommandQueue(300000)
         , m_postCommandQueue(300000)
-        , m_rendererSemaphore() {
+        , m_rendererSemaphore("Render semaphore") {
 
         m_render = &m_frame[0];
         m_submit = &m_frame[1];
@@ -76,6 +76,7 @@ struct Context {
     void rendererExecuteCommands(Foundation::CommandBuffer &commandBuffer) {
         Foundation::CommandBuffer::Command *command;
         while ((command = commandBuffer.read()) != nullptr) {
+            CMDBUF_LOG("COMMAND: {}", command->type);
             switch (command->type) {
                 case RendererCommandType::RendererInit: {
                     break;
@@ -207,11 +208,14 @@ struct Context {
                     break;
                 }
                 case RendererCommandType::DestroyVertexLayout: {
-                    CMDBUF_LOG("DESTROY VERTEX LAYOYT COMMAND");
+                    CMDBUF_LOG("DESTROY VERTEX LAYOUT COMMAND");
                     const DeleteVertexLayoutCommand *cmd =
                         static_cast<const DeleteVertexLayoutCommand *>(command);
                     m_renderer->deleteVertexLayout(cmd->handle);
                     break;
+                }
+                default: {
+                    LOG_CRITICAL("UNKNOWN COMMAND");
                 }
             }
         }
@@ -226,6 +230,7 @@ struct Context {
                 "First command should be RendererInit"
             );
             m_renderer = NEW(Foundation::getAllocator(), RendererOpenGL);
+            MIREN_LOG("RENDERER CREATED");
         }
     }
 
@@ -240,6 +245,7 @@ struct Context {
         if (m_renderer == nullptr) {
             m_preCommandQueue.reset();
             m_postCommandQueue.reset();
+            m_rendererSemaphore.post();
             return true;
         }
         rendererExecuteCommands(m_preCommandQueue);

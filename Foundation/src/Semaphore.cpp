@@ -22,6 +22,7 @@ struct SemaphoreInternal {
     dispatch_semaphore_t m_handle;
 #elif defined(PLATFORM_POSIX)
     sem_t *m_sem;
+    const char* name;
 #elif defined(PLATFORM_WINDOWS)
     HANDLE m_handle;
 #endif
@@ -29,7 +30,7 @@ struct SemaphoreInternal {
 
 #if defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
 
-Semaphore::Semaphore() {
+Semaphore::Semaphore(const char* name) {
     PND_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
 
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
@@ -60,12 +61,14 @@ bool Semaphore::wait(int32_t _msecs) {
 
 #elif defined(PLATFORM_POSIX)
 
-Semaphore::Semaphore() {
+Semaphore::Semaphore(const char* name) {
     PND_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
 
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
+    si->name = name;
 
-    si->m_sem = sem_open("/full_sem", O_CREAT, 0644, 0);
+    sem_unlink(name);
+    si->m_sem = sem_open(name, O_CREAT, 0644, 0);
     PND_ASSERT(si->m_sem != SEM_FAILED, "sem_open");
 }
 
@@ -74,6 +77,8 @@ Semaphore::~Semaphore() {
 
     int result = sem_close(si->m_sem);
     PND_ASSERT_F(0 == result, "sem_close %d", result);
+    result = sem_unlink(si->name);
+    PND_ASSERT_F(0 == result, "sem_unlink %d", result);
 }
 
 void Semaphore::post(uint32_t _count) {
@@ -98,7 +103,7 @@ bool Semaphore::wait(int32_t _msecs) {
 
 #elif defined(PLATFORM_WINDOWS)
 
-Semaphore::Semaphore() {
+Semaphore::Semaphore(const char* name) {
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
 
     // #if PLATFORM_WINRT \

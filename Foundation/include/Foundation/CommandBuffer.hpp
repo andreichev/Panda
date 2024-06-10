@@ -53,7 +53,7 @@ public:
 
     Command *read() {
         Header &header = readHeader();
-        if (header.size == COMMAND_BUFFER_FINISH_KEY) {
+        if (m_pos == 0 || header.size == COMMAND_BUFFER_FINISH_KEY) {
             return nullptr;
         }
         align(header.align);

@@ -33,15 +33,6 @@ struct RemoveAllPointersHelper<T *> {
 template<typename T>
 using RemoveAllPointers = typename RemoveAllPointersHelper<T>::Type;
 
-template<typename T>
-struct StripTypeHelper {
-    using Type = std::remove_cvref_t<
-        RemoveAllPointers<std::remove_reference_t<std::remove_all_extents_t<T>>>>;
-};
-
-template<typename T>
-using StripType = typename StripTypeHelper<T>::Type;
-
 inline const void *addOffset(const void *data, size_t offset) {
     return static_cast<const uint8_t *>(data) + offset;
 }

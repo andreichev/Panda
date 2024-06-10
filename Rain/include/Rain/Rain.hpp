@@ -10,14 +10,13 @@
 
 #define RAIN_FIELDS_BEGIN(T) RAIN_FIELDS_BEGIN_INTERNAL(T, __COUNTER__)
 #define RAIN_FIELDS_BEGIN_INTERNAL(T, ID)                                                          \
-    namespace Rain {                                                                               \
     struct _RAIN_CONCAT_(RainAutoRegisterClass_, ID) {                                             \
         _RAIN_CONCAT_(RainAutoRegisterClass_, ID)() {                                              \
             using ClassType = T;                                                                   \
-            TypeInfo &typeInfo = findOrCreateType<ClassType>();
+            Rain::TypeInfo &typeInfo = Rain::findOrCreateType<ClassType>();
 
 #define RAIN_FIELD(name)                                                                           \
-    registerField<decltype(ClassType::name)>(                                                      \
+    Rain::registerField<decltype(ClassType::name)>(                                                \
         typeInfo, #name, offsetof(ClassType, name), alignof(decltype(ClassType::name))             \
     );
 
@@ -25,8 +24,7 @@
 #define RAIN_FIELDS_END_INTERNAL(ID)                                                               \
     }                                                                                              \
     }                                                                                              \
-    _RAIN_CONCAT_(rainAutoRegister, ID);                                                           \
-    }
+    _RAIN_CONCAT_(rainAutoRegister, ID);
 // ---------------------------------------------------
 // ---------- MACRO REPLACEMENT EXAMPLE --------------
 // ---------------------------------------------------

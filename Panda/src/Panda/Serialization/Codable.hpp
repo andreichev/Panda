@@ -6,16 +6,4 @@
 
 #include <string>
 
-namespace Panda {
-
-class Encoder {};
-
-class Encodable {
-    void encode(Encoder e);
-};
-
-class Decodable {};
-
-class Codable : public Encodable, Decodable {};
-
-} // namespace Panda
+namespace Panda {} // namespace Panda

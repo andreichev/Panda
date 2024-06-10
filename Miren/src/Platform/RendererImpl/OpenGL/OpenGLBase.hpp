@@ -14,13 +14,13 @@ namespace Miren {
 
 const char *getGLErrorStr(GLenum err);
 
-#define _GL_CALL(call, assert)                                                                     \
+#define GL_CALL_INTERNAL(call, assert)                                                             \
     {                                                                                              \
         call;                                                                                      \
         const GLenum err = glGetError();                                                           \
         assert(GL_NO_ERROR == err, #call "; OPENGL ERROR {}", getGLErrorStr(err));                 \
     }
 
-#define GL_CALL(call) _GL_CALL(call, PND_ASSERT_F)
+#define GL_CALL(call) GL_CALL_INTERNAL(call, PND_ASSERT_F)
 
 } // namespace Miren
