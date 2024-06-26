@@ -501,6 +501,7 @@ struct Context {
     }
 
     Foundation::Thread m_thread;
+
 private:
     RendererI *m_renderer;
     Frame m_frame[2];

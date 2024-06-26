@@ -4,7 +4,7 @@
 
 #include "WorldSerializer.hpp"
 
-#include <Rain/Serializer.hpp>
+#include <Rain/Coders/JsonEncoder.hpp>
 
 namespace Panda {
 
@@ -13,7 +13,6 @@ WorldSerializer::WorldSerializer(World *world)
 
 void WorldSerializer::serialize(const std::filesystem::path &filepath) {
     std::fstream stream(filepath);
-    Rain::serialize(Rain::SerializerImpl::RAPID_JSON, stream, m_world);
 }
 
 bool WorldSerializer::deserialize(const std::filesystem::path &filepath) {

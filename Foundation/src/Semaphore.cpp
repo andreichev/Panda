@@ -20,7 +20,7 @@ struct SemaphoreInternal {
     dispatch_semaphore_t m_handle;
 #elif defined(PLATFORM_POSIX)
     sem_t *m_sem;
-    const char* name;
+    const char *name;
 #elif defined(PLATFORM_WINDOWS)
     HANDLE m_handle;
 #endif
@@ -28,7 +28,7 @@ struct SemaphoreInternal {
 
 #if defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
 
-Semaphore::Semaphore(const char* name) {
+Semaphore::Semaphore(const char *name) {
     PND_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
 
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
@@ -59,7 +59,7 @@ bool Semaphore::wait(int32_t _msecs) {
 
 #elif defined(PLATFORM_POSIX)
 
-Semaphore::Semaphore(const char* name) {
+Semaphore::Semaphore(const char *name) {
     PND_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal));
 
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
@@ -101,7 +101,7 @@ bool Semaphore::wait(int32_t _msecs) {
 
 #elif defined(PLATFORM_WINDOWS)
 
-Semaphore::Semaphore(const char* name) {
+Semaphore::Semaphore(const char *name) {
     SemaphoreInternal *si = (SemaphoreInternal *)m_internal;
 
     // #if PLATFORM_WINRT \

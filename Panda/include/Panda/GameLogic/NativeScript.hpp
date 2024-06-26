@@ -30,7 +30,7 @@ public:
 
     virtual void update(double deltaTime) = 0;
 
-    virtual void onImGuiRender(){};
+    virtual void onImGuiRender() {};
 
     bool m_isActive;
 

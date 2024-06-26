@@ -4,7 +4,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-DPROFILE)
 endif ()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 file(GLOB_RECURSE SOURCES src/Panda/*.cpp)
 file(GLOB_RECURSE INCLUDE src/Panda/*.hpp include/Panda/*.hpp)

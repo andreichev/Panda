@@ -8,14 +8,17 @@
 namespace Rain {
 
 struct FieldInfo final {
-    static constexpr uint32_t ConstFlag = 1 << 0;
-    static constexpr uint32_t ReferenceFlag = 1 << 1;
-    static constexpr uint32_t VolatileFlag = 1 << 2;
-    static constexpr uint32_t RValReferenceFlag = 1 << 3;
+    static constexpr uint32_t ConstFlag = 1 << 0; /**< Flag that marks if the variable is const*/
+    static constexpr uint32_t ReferenceFlag =
+        1 << 1; /**< Flag that marks if the variable is a reference (&)*/
+    static constexpr uint32_t VolatileFlag =
+        1 << 2; /**< Flag that marks if the variable is volatile*/
+    static constexpr uint32_t RValReferenceFlag =
+        1 << 3; /**< Flag that marks if the variable is a right value reference (&&)*/
 
-    FieldInfo(TypeId typeId, std::string name, uint32_t offset, uint32_t align)
-        : typeId(typeId)
-        , name(std::move(name))
+    constexpr FieldInfo(TypeId id, const char *name, uint32_t offset, uint32_t align)
+        : typeId(id)
+        , name(name)
         , offset(offset)
         , align(align)
         , m_traitFlags(0)
@@ -61,7 +64,7 @@ struct FieldInfo final {
     }
 
     TypeId typeId;
-    std::string name;
+    const char *name;
     uint32_t offset;
     uint32_t align;
 
@@ -70,21 +73,26 @@ private:
     uint8_t m_traitFlags;
 };
 
+class Encoder;
+class Decoder;
+
 struct TypeInfo final {
-    const TypeId id;
-    std::string name;
+    TypeId id;
+    const std::string name;
     uint32_t size;
     uint32_t align;
     std::vector<FieldInfo> fields;
-    uint8_t m_internal[64];
+    void (*encoderFunc)(const char *key, Encoder *, const TypeInfo &info, void *data);
+    void (*decoderFunc)(const char *key, Decoder *, const TypeInfo &info, void *data);
 
-    explicit TypeInfo(TypeId id, std::string name)
+    constexpr TypeInfo(TypeId id, const std::string &name)
         : id(id)
-        , name(std::move(name))
+        , name(name)
         , size(0)
         , align(0)
         , fields()
-        , m_internal() {}
+        , encoderFunc(nullptr)
+        , decoderFunc(nullptr) {}
 };
 
 } // namespace Rain

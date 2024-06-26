@@ -1,6 +1,6 @@
 project(PandaUI)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 file(GLOB_RECURSE SOURCES src/PandaUI/*.cpp)
 file(GLOB_RECURSE INCLUDE src/PandaUI/*.hpp include/PandaUI/*.hpp)

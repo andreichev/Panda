@@ -75,4 +75,5 @@ VoxelTextureData VoxelTextureMapper::s_data[] = {
     // ПЕСЧАНИК
     VoxelTextureData(VoxelType::SAND_STONE, 10),
     // ПЕСОК
-    VoxelTextureData(VoxelType::SAND, 11)};
+    VoxelTextureData(VoxelType::SAND, 11)
+};
