@@ -27,6 +27,13 @@ void YamlEncoder::beginObject(const char *key) {
     *out << YAML::BeginMap;
 }
 
+void YamlEncoder::encode(const char *key, const bool &data) {
+    if (key) {
+        *out << YAML::Key << key;
+    }
+    *out << YAML::Value << data;
+}
+
 void YamlEncoder::encode(const char *key, const int &data) {
     if (key) {
         *out << YAML::Key << key;

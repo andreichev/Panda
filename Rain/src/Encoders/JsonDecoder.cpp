@@ -76,6 +76,26 @@ bool JsonDecoder::decode(const char *key, int &data) {
     return true;
 }
 
+bool JsonDecoder::decode(const char *key, bool &data) {
+    if (m_isArray) {
+        const auto &member = *m_arrayIteratorStack.back();
+        if (!member.IsBool()) {
+            return false;
+        }
+        data = member.GetBool();
+    } else {
+        if (!currentObject().HasMember(key)) {
+            return false;
+        }
+        const auto &member = currentObject()[key];
+        if (!member.IsBool()) {
+            return false;
+        }
+        data = member.GetBool();
+    }
+    return true;
+}
+
 bool JsonDecoder::decode(const char *key, float &data) {
     if (m_isArray) {
         const auto &member = *m_arrayIteratorStack.back();

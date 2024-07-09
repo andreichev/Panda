@@ -214,6 +214,14 @@ struct TypeDecoder<int> {
     }
 };
 
+/** BOOL */
+template<>
+struct TypeDecoder<bool> {
+    static void decode(const char *key, Decoder *decoder, const TypeInfo &info, bool &data) {
+        decoder->decode(key, data);
+    }
+};
+
 /** VECTOR */
 template<typename T, typename Alloc>
 struct TypeDecoder<std::vector<T, Alloc>> {
@@ -271,6 +279,14 @@ struct TypeEncoder<std::basic_string<Elem, Traits, Alloc>> {
 template<>
 struct TypeEncoder<int> {
     static void encode(const char *key, Encoder *encoder, const TypeInfo &info, int &data) {
+        encoder->encode(key, data);
+    }
+};
+
+/** BOOL */
+template<>
+struct TypeEncoder<bool> {
+    static void encode(const char *key, Encoder *encoder, const TypeInfo &info, bool &data) {
         encoder->encode(key, data);
     }
 };

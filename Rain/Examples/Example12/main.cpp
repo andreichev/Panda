@@ -19,9 +19,11 @@ struct A : public Rain::Codable {
 
 struct B : public Rain::Codable {
     A a;
+    bool x;
 
     RAIN_FIELDS_BEGIN(B)
     RAIN_FIELD(a)
+    RAIN_FIELD(x)
     RAIN_FIELDS_END
 
     B()
@@ -46,21 +48,22 @@ int main() {
         {
             "a": {
                 "text": "HELLO!"
-            }
+            },
+            "x": true
         }
     ]
 }
     )teststr";
 
-    C p;
+    C c;
     std::stringstream stream1;
     stream1 << input;
     Rain::Decoder *decoder = new Rain::JsonDecoder;
-    decoder->decode(stream1, p);
+    decoder->decode(stream1, c);
 
     std::stringstream stream2;
     Rain::Encoder *encoder = new Rain::JsonEncoder(true);
-    encoder->encode(stream2, p);
+    encoder->encode(stream2, c);
     std::cout << stream2.str() << std::endl;
 
     return 0;

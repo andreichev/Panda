@@ -107,6 +107,12 @@ void JsonEncoder::encode(const char *key, const int &data) {
     addValue(key, value);
 }
 
+void JsonEncoder::encode(const char *key, const bool &data) {
+    rapidjson::Value value;
+    value = data;
+    addValue(key, value);
+}
+
 void JsonEncoder::encode(const char *key, const float &data) {
     rapidjson::Value value;
     value = data;

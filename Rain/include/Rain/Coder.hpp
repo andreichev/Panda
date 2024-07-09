@@ -18,6 +18,8 @@ public:
     virtual void encode(std::ostream &, void *data, TypeInfo info) = 0;
     /// Begin encoding object
     virtual void beginObject(const char *key) = 0;
+    /// Encode bool
+    virtual void encode(const char *key, const bool &data) = 0;
     /// Encode int
     virtual void encode(const char *key, const int &data) = 0;
     /// Encode float
@@ -45,6 +47,8 @@ public:
     virtual bool decode(std::istream &, void *data, TypeInfo info) = 0;
     /// Begin decoding object
     virtual bool beginObject(const char *key) = 0;
+    /// Decode bool
+    virtual bool decode(const char *key, bool &data) = 0;
     /// Decode int
     virtual bool decode(const char *key, int &data) = 0;
     /// Decode float

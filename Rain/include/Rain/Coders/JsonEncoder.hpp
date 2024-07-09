@@ -20,6 +20,7 @@ public:
 
     void encode(std::ostream &, void *data, TypeInfo info) override;
     void beginObject(const char *key) override;
+    void encode(const char *key, const bool &data) override;
     void encode(const char *key, const int &data) override;
     void encode(const char *key, const float &data) override;
     void encode(const char *key, const std::string &data) override;
