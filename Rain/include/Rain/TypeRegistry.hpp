@@ -76,7 +76,9 @@ public:
             info.decoderFunc =
                 [](const char *key, Decoder *decoder, const TypeInfo &info, void *data) {
                     static_assert(std::is_base_of<Codable, T>());
-                    decoder->beginObject(key);
+                    if (!decoder->beginObject(key)) {
+                        return;
+                    }
                     for (auto &field : info.fields) {
                         auto memberInfo = getTypeRegistry()->findInfo(field.typeId);
                         memberInfo.decoderFunc(
@@ -89,7 +91,7 @@ public:
     }
 
     template<typename T>
-    constexpr TypeInfo makeTypeInfo(TypeId id, const std::string &name) {
+    TypeInfo makeTypeInfo(TypeId id, const std::string &name) {
         // std::cout << "CREATE TYPE INFO: " << name << std::endl;
         TypeInfo info(id, name);
         info.size = sizeof(T);
@@ -121,7 +123,7 @@ public:
     }
 
     template<typename FieldType>
-    constexpr FieldInfo makeFieldInfo(const char *fieldName, uint32_t offset) {
+    FieldInfo makeFieldInfo(const char *fieldName, uint32_t offset) {
         TypeInfo fieldTypeInfo = findOrCreateType<FieldType>();
         TypeId fieldTypeId = fieldTypeInfo.id;
 
@@ -217,14 +219,17 @@ template<typename T, typename Alloc>
 struct TypeDecoder<std::vector<T, Alloc>> {
     static void
     decode(const char *key, Decoder *decoder, const TypeInfo &info, std::vector<T, Alloc> &data) {
-        decoder->beginArray(key);
         data.clear();
+        if (!decoder->beginArray(key)) {
+            return;
+        }
         auto memberInfo = getTypeRegistry()->findOrCreateType<T>();
-        do {
+        while (decoder->arrayHasElement()) {
             T value;
             memberInfo.decoderFunc(nullptr, decoder, memberInfo, &value);
             data.push_back(value);
-        } while (decoder->arrayNextElement());
+            decoder->arrayNext();
+        }
         decoder->endArray();
     }
 };

@@ -7,7 +7,7 @@ namespace Panda {
 
 struct FontConfiguration {
     std::string fontName;
-    std::string_view fileName;
+    std::string fileName;
     float size = 16.0f;
     const ImWchar *glyphRanges = nullptr;
     bool mergeWithLast = false;

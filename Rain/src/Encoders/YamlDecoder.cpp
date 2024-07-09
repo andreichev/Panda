@@ -132,14 +132,17 @@ bool YamlDecoder::beginArray(const char *key) {
     return true;
 }
 
-bool YamlDecoder::arrayNextElement() {
-    ++m_arrayIteratorStack.back();
+bool YamlDecoder::arrayHasElement() {
     if (m_arrayStack.empty() || m_arrayIteratorStack.back() == m_arrayStack.back().node.end()) {
         // std::cout << "ARRAY NO NEXT ELEMENT" << std::endl;
         return false;
     }
     // std::cout << "ARRAY NEXT ELEMENT" << std::endl;
     return true;
+}
+
+void YamlDecoder::arrayNext() {
+    ++m_arrayIteratorStack.back();
 }
 
 void YamlDecoder::endArray() {

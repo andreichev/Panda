@@ -16,6 +16,7 @@ public:
         pos.y += offsetY;
         ImGui::SetNextWindowPos(pos);
         ImVec2 size = viewport->WorkSize;
+        size.y -= offsetY;
         ImGui::SetNextWindowSize(size);
         ImGui::SetNextWindowViewport(viewport->ID);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);

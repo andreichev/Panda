@@ -85,7 +85,7 @@ struct TypeInfo final {
     void (*encoderFunc)(const char *key, Encoder *, const TypeInfo &info, void *data);
     void (*decoderFunc)(const char *key, Decoder *, const TypeInfo &info, void *data);
 
-    constexpr TypeInfo(TypeId id, const std::string &name)
+    TypeInfo(TypeId id, const std::string &name)
         : id(id)
         , name(name)
         , size(0)

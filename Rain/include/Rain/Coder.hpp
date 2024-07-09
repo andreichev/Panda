@@ -57,8 +57,10 @@ public:
     virtual void endObject() = 0;
     /// Begin decoding array
     virtual bool beginArray(const char *key) = 0;
+    /// Check if array has current element
+    virtual bool arrayHasElement() = 0;
     /// Go to next array element
-    virtual bool arrayNextElement() = 0;
+    virtual void arrayNext() = 0;
     /// End decoding array
     virtual void endArray() = 0;
 };

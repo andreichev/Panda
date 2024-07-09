@@ -27,7 +27,8 @@ public:
     bool decode(const char *key, const char *&data) override;
     void endObject() override;
     bool beginArray(const char *key) override;
-    bool arrayNextElement() override;
+    bool arrayHasElement() override;
+    void arrayNext() override;
     void endArray() override;
 
 private:

@@ -165,13 +165,16 @@ bool JsonDecoder::beginArray(const char *key) {
     return true;
 }
 
-bool JsonDecoder::arrayNextElement() {
+bool JsonDecoder::arrayHasElement() {
     // std::cout << "NEXT ARRAY ELEMENT" << std::endl;
-    ++m_arrayIteratorStack.back();
     if (m_arrayStack.empty() || m_arrayIteratorStack.back() == m_arrayStack.back().ref->End()) {
         return false;
     }
     return true;
+}
+
+void JsonDecoder::arrayNext() {
+    ++m_arrayIteratorStack.back();
 }
 
 void JsonDecoder::endArray() {
