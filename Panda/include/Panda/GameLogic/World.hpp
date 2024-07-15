@@ -17,6 +17,7 @@ class World final {
 public:
     World();
     ~World();
+    World &operator=(const World &other);
     void initialize();
     void updateRuntime(double deltaTime);
     void updateSimulation(double deltaTime, glm::mat4 viewProjectionMatrix);
@@ -33,6 +34,7 @@ public:
     Renderer3D &getRenderer3D() {
         return m_renderer3d;
     }
+    bool isEmpty();
 
     Camera *findMainCamera();
 

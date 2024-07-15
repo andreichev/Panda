@@ -10,6 +10,7 @@
 #include "Panda/Events/EventQueue.hpp"
 #include "Panda/Events/WindowSizeObserver.hpp"
 #include "Panda/ImGui/ImGuiLayer.hpp"
+#include "Panda/GameLogic/Level.hpp"
 
 namespace Panda {
 

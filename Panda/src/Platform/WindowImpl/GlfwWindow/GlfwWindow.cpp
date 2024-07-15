@@ -133,6 +133,14 @@ void GlfwWindow::setMaximized(bool _isMaximized) {
     }
 }
 
+void GlfwWindow::setResizable(bool isResizable) {
+    glfwSetWindowAttrib(m_windowHandle, GLFW_RESIZABLE, isResizable);
+}
+
+void GlfwWindow::setSize(Panda::Size size) {
+    glfwSetWindowSize(m_windowHandle, size.width, size.height);
+}
+
 void GlfwWindow::addEventHandlers() {
     glfwSetWindowUserPointer(m_windowHandle, this);
     glfwSetWindowSizeCallback(m_windowHandle, [](GLFWwindow *windowHandle, int width, int height) {

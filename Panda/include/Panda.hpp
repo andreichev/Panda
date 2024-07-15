@@ -6,7 +6,6 @@
 
 // Base
 #include "Panda/Application/Application.hpp"
-#include "Panda/Application/RunApp.hpp"
 #include "Panda/Application/ApplicationStartupSettings.hpp"
 #include "Panda/Application/Layer.hpp"
 

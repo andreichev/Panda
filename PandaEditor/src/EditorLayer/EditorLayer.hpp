@@ -6,9 +6,11 @@
 #include "Panels/WorldHierarchyPanel.hpp"
 #include "Panels/StatisticsPanel.hpp"
 #include "Panels/Toolbar.hpp"
+#include "Panels/StartPanel.hpp"
 #include "Camera/EditorCamera.hpp"
 #include "Camera/CameraController.hpp"
 #include "EditorLayer/SceneState.hpp"
+#include "ProjectLoader/ProjectLoader.hpp"
 
 #include <Panda.hpp>
 
@@ -32,6 +34,7 @@ public:
 
 private:
     void initializeEmptyWorld();
+    void setWorld(World *world);
 
     std::string m_sceneFilePath;
     MenuBar m_menuBar;
@@ -39,11 +42,13 @@ private:
     Dockspace m_dockspace;
     Viewport m_viewport;
     StatisticsPanel m_statisticsPanel;
+    StartPanel m_startPanel;
     WorldHierarchyPanel m_hierarchyPanel;
     EditorCamera m_editorCamera;
     CameraController m_cameraController;
-    World *m_world;
+    World m_world;
 
+    ProjectLoader m_loader;
     SceneState m_sceneState = SceneState::EDIT;
 };
 

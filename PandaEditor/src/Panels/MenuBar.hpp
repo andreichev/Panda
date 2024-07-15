@@ -27,9 +27,7 @@ public:
         );
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("Options")) {
-                if(ImGui::MenuItem("Save", NULL)) {
-
-                }
+                if (ImGui::MenuItem("Save", NULL)) {}
                 ImGui::MenuItem("Open", NULL);
                 ImGui::Separator();
 

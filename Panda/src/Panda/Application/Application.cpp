@@ -69,14 +69,8 @@ Application::Application(ApplicationStartupSettings &settings)
 #endif
     Miren::renderSemaphoreWait();
     Random::init();
-    if (settings.startupLevel != nullptr) {
-        startBasicGame(settings.startupLevel);
-    } else if (settings.startupLayer != nullptr) {
-        pushLayer(settings.startupLayer);
-    }
     m_ImGuiLayer = NEW(Foundation::getAllocator(), ImGuiLayer);
     pushOverlay(m_ImGuiLayer);
-    Miren::renderSemaphorePost();
 }
 
 void Application::startBasicGame(Level *level) {
@@ -84,6 +78,7 @@ void Application::startBasicGame(Level *level) {
 }
 
 void Application::loop() {
+    Miren::renderSemaphorePost();
     while (!m_isApplicationShouldClose) {
         uint64_t lastTime = m_timeMillis;
         m_timeMillis = getMillis();

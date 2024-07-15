@@ -1,5 +1,9 @@
 #pragma once
 
+static std::string getString(const char8_t *ptr) {
+    return (const char *)ptr;
+}
+
 #define FONT_ICON_FILE_NAME_FA "fontawesome-webfont.ttf"
 
 #define ICON_MIN 0xf000

@@ -192,4 +192,17 @@ Camera *World::findMainCamera() {
     return &entity.getComponent<CameraComponent>().camera;
 }
 
+World &World::operator=(const World &other) {
+    m_registry.assign(
+        other.m_registry.data(),
+        other.m_registry.data() + other.m_registry.size(),
+        other.m_registry.released()
+    );
+    return *this;
+}
+
+bool World::isEmpty() {
+    return m_registry.empty();
+}
+
 } // namespace Panda

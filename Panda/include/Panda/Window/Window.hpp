@@ -17,6 +17,8 @@ public:
     virtual void setFullScreen(bool isFullScreen) = 0;
     virtual bool isMaximized() = 0;
     virtual void setMaximized(bool isMaximized) = 0;
+    virtual void setResizable(bool isResizable) = 0;
+    virtual void setSize(Size size) = 0;
     virtual void pollEvents() = 0;
     virtual void toggleCursorLock() = 0;
     virtual bool isCursorLocked() = 0;

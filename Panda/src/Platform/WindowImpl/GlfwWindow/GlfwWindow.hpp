@@ -19,6 +19,8 @@ public:
     void setFullScreen(bool isFullScreen) override;
     bool isMaximized() override;
     void setMaximized(bool isMaximized) override;
+    void setResizable(bool isResizable) override;
+    void setSize(Size size) override;
     void pollEvents() override;
     void toggleCursorLock() override;
     bool isCursorLocked() override;
