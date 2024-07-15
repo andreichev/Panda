@@ -10,15 +10,11 @@ namespace Panda {
 
 class StartPanel final {
 public:
-    StartPanel();
-
+    StartPanel(ProjectLoader *loader);
     void onImGuiRender();
-    void setRecentProjects(std::vector<RecentProject> recentProjects) {
-        m_recentProjects = recentProjects;
-    }
 
 private:
-    void newProject();
+    void createProject(const std::string &name);
     void openProject();
     std::optional<std::string> openFolder();
 
@@ -26,7 +22,7 @@ private:
     Texture m_iconProject;
     bool m_newProjectMenu;
 
-    std::vector<RecentProject> m_recentProjects;
+    ProjectLoader *m_loader;
 };
 
 } // namespace Panda

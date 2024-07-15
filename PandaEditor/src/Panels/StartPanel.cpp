@@ -4,11 +4,11 @@
 
 namespace Panda {
 
-StartPanel::StartPanel()
+StartPanel::StartPanel(ProjectLoader *loader)
     : m_logoImage("ui/start/Logo.png")
     , m_iconProject("ui/start/Icon Project.png")
-    , m_recentProjects()
-    , m_newProjectMenu(false) {}
+    , m_newProjectMenu(false)
+    , m_loader(loader) {}
 
 void StartPanel::onImGuiRender() {
     ImGui::ShowDemoWindow();
@@ -36,7 +36,7 @@ void StartPanel::onImGuiRender() {
                     (getString(ICON_PLUS) + "  New Project").c_str(),
                     {ImGui::GetContentRegionAvail().x, 40}
                 )) {
-                newProject();
+                m_newProjectMenu = true;
             }
         }
         if (ImGui::Button(
@@ -68,11 +68,14 @@ void StartPanel::onImGuiRender() {
             ImGui::InputText("##", name.data(), name.size());
             if (ImGui::Button("Cancel")) {
                 m_newProjectMenu = false;
-                LOG_INFO("CREATE PROJECT WITH NAME {}", name);
+                name.clear();
             }
             ImGui::SameLine();
             if (ImGui::Button("Next")) {
-                LOG_INFO("CREATE PROJECT WITH NAME {}", name);
+                std::string clearName = name.substr(0, name.find('\0'));
+                LOG_INFO("CREATE PROJECT WITH NAME {}", clearName);
+                createProject(clearName);
+                name.clear();
             }
         } else {
             Fonts::pushFont("Bold");
@@ -80,31 +83,31 @@ void StartPanel::onImGuiRender() {
             Fonts::popFont();
             ImGui::Separator();
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 6);
-            if (m_recentProjects.empty()) {
+            auto recentProjects = m_loader->getRecentProjectsList();
+            if (recentProjects.empty()) {
                 Fonts::pushFont("Bold");
                 ImGui::TextColored({0.5, 0.5, 0.5, 1.0}, "No recent projects");
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 18);
                 if (ImGui::Button("Create New Project", {ImGui::GetContentRegionAvail().x, 40})) {
-                    newProject();
+                    m_newProjectMenu = true;
                 }
                 Fonts::popFont();
             }
-            for (int i = 0; i < m_recentProjects.size(); i++) {
+            for (int i = 0; i < recentProjects.size(); i++) {
                 ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 4);
                 ImGui::Image((void *)(uintptr_t)m_iconProject.getHandle().id, {40, 40});
                 ImGui::SameLine();
                 ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
                 ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, {0, 0.5});
                 if (ImGui::Button(
-                        m_recentProjects[i].name.c_str(),
-                        {ImGui::GetContentRegionAvail().x - 55, 40}
+                        recentProjects[i].name.c_str(), {ImGui::GetContentRegionAvail().x - 55, 40}
                     )) {
-                    LOG_INFO("OPEN PROJECT {}", m_recentProjects[i].name);
+                    LOG_INFO("OPEN PROJECT {}", recentProjects[i].name);
                 }
                 ImGui::PopStyleVar();
                 ImGui::SameLine();
                 if (ImGui::Button(getString(ICON_WINDOW_CLOSE).c_str(), {40, 40})) {
-                    LOG_INFO("REMOVE RECENT PROJECT {}", m_recentProjects[i].name);
+                    LOG_INFO("REMOVE RECENT PROJECT {}", recentProjects[i].name);
                 }
                 ImGui::PopStyleColor();
             }
@@ -116,14 +119,25 @@ void StartPanel::onImGuiRender() {
 }
 
 void StartPanel::openProject() {
-    auto path = openFolder();
-    if (!path.has_value()) {
+    auto pathOptional = openFolder();
+    if (!pathOptional.has_value()) {
         return;
     }
+    std::string path = pathOptional.value();
+    LOG_INFO("OPEN PROJECT AT PATH {}", path);
+    m_loader->openProject(path);
 }
 
-void StartPanel::newProject() {
-    m_newProjectMenu = true;
+void StartPanel::createProject(const std::string &name) {
+    m_newProjectMenu = false;
+    auto pathOptional = openFolder();
+    if (!pathOptional.has_value()) {
+        return;
+    }
+    std::string path = pathOptional.value();
+    path += std::filesystem::path::preferred_separator + name;
+    LOG_INFO("CREATE PROJECT AT PATH {}", path);
+    m_loader->createProject(path);
 }
 
 std::optional<std::string> StartPanel::openFolder() {

@@ -11,11 +11,11 @@ EditorLayer::EditorLayer()
     , m_viewport()
     , m_hierarchyPanel(nullptr)
     , m_statisticsPanel(nullptr)
+    , m_loader()
+    , m_startPanel(&m_loader)
     , m_editorCamera()
     , m_cameraController()
-    , m_sceneState(SceneState::EDIT)
-    , m_sceneFilePath()
-    , m_loader() {}
+    , m_sceneState(SceneState::EDIT) {}
 
 void EditorLayer::onAttach() {
     auto *window = Application::get()->getWindow();

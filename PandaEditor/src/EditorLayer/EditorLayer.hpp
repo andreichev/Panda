@@ -36,7 +36,7 @@ private:
     void initializeEmptyWorld();
     void setWorld(World *world);
 
-    std::string m_sceneFilePath;
+    ProjectLoader m_loader;
     MenuBar m_menuBar;
     Toolbar m_toolbar;
     Dockspace m_dockspace;
@@ -46,9 +46,8 @@ private:
     WorldHierarchyPanel m_hierarchyPanel;
     EditorCamera m_editorCamera;
     CameraController m_cameraController;
-    World m_world;
 
-    ProjectLoader m_loader;
+    World m_world;
     SceneState m_sceneState = SceneState::EDIT;
 };
 

@@ -13,6 +13,10 @@ struct RecentProject final : Rain::Codable {
     RAIN_FIELD(path)
     RAIN_FIELD(name)
     RAIN_FIELDS_END
+
+    bool operator==(const RecentProject &other) const {
+        return path == other.path;
+    }
 };
 
 } // namespace Panda
