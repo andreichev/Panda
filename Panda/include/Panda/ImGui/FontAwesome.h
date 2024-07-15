@@ -1,6 +1,6 @@
 #pragma once
 
-static std::string getString(const char8_t *ptr) {
+static inline std::string getString(const char8_t *ptr) {
     return (const char *)ptr;
 }
 
