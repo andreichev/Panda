@@ -1,4 +1,5 @@
 #include "StartPanel.hpp"
+#include "Common/ImGuiHelper.hpp"
 
 namespace Panda {
 
@@ -81,7 +82,7 @@ void StartPanel::onImGuiRender() {
             Fonts::popFont();
             ImGui::Separator();
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 6);
-            auto recentProjects = m_loader->getRecentProjectsList();
+            auto &recentProjects = m_loader->getRecentProjectsList();
             if (recentProjects.empty()) {
                 Fonts::pushFont("Bold");
                 ImGui::TextColored({0.5, 0.5, 0.5, 1.0}, "No recent projects");
@@ -100,13 +101,15 @@ void StartPanel::onImGuiRender() {
                 if (ImGui::Button(
                         recentProjects[i].name.c_str(), {ImGui::GetContentRegionAvail().x - 55, 40}
                     )) {
-                    LOG_INFO("OPEN PROJECT {}", recentProjects[i].name);
+                    m_loader->openProject(recentProjects[i].path);
                 }
                 ImGui::PopStyleVar();
                 ImGui::SameLine();
+                ImGui::PushID(("Delete " + recentProjects[i].name).c_str());
                 if (ImGui::Button(getString(ICON_WINDOW_CLOSE).c_str(), {40, 40})) {
-                    LOG_INFO("REMOVE RECENT PROJECT {}", recentProjects[i].name);
+                    m_loader->removeRecentProject(i);
                 }
+                ImGui::PopID();
                 ImGui::PopStyleColor();
             }
         }

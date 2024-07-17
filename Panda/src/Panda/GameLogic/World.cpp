@@ -213,4 +213,8 @@ void World::fillStartupData() {
     sprite1.color = {1.0f, 0.5f, 0.2f, 1.0f};
 }
 
+bool World::isChanged() {
+    return true;
+}
+
 } // namespace Panda

@@ -5,21 +5,19 @@
 
 namespace Panda {
 
-ProjectLoader::ProjectLoader()
-    : jsonEncoder(true)
+ProjectLoader::ProjectLoader(ProjectLoaderOutput *output)
+    : m_output(output)
+    , jsonEncoder(true)
     , jsonDecoder()
     , m_config()
     , m_projectPath()
-    , m_worldPath() {
-    loadData();
-    loadRecentProject();
-}
+    , m_worldPath() {}
 
 ProjectLoader::~ProjectLoader() {
     saveAppConfig();
 }
 
-void ProjectLoader::loadData() {
+void ProjectLoader::loadInitialData() {
     // Load general settings
     {
         std::ifstream file("config.json");
@@ -31,11 +29,15 @@ void ProjectLoader::loadData() {
             LOG_INFO("GENERAL SETTINGS NOT FOUND");
         }
     }
+    if (m_config.hasOpenedProject) {
+        loadRecentProject();
+    }
 }
 
 void ProjectLoader::saveAppConfig() {
     // Save general settings
     appendRecentProject();
+    m_config.hasOpenedProject = !m_projectPath.empty();
     std::ofstream file("config.json");
     if (file.is_open()) {
         Rain::Encoder *encoder = &jsonEncoder;
@@ -61,6 +63,7 @@ void ProjectLoader::openProject(const path_t &path) {
     }
     path_t projectConfigPath = pandaDirectoryPath;
     projectConfigPath.append("project.json");
+    m_output->loaderDidLoadProject();
 }
 
 bool ProjectLoader::hasOpenedProject() {
@@ -69,7 +72,8 @@ bool ProjectLoader::hasOpenedProject() {
 
 void ProjectLoader::createProject(const path_t &path) {
     std::filesystem::create_directory(path);
-    m_projectPath = path;
+    // TODO: Add necessary files
+    openProject(path);
 }
 
 void ProjectLoader::appendRecentProject() {
@@ -93,13 +97,33 @@ const std::vector<RecentProject> &ProjectLoader::getRecentProjectsList() {
     return m_config.recentProjects;
 }
 
-void ProjectLoader::saveWorld(World *world) {
+void ProjectLoader::saveWorld(const World &world) {
     if (m_worldPath.empty()) {
         saveWorldAs(world);
         return;
     }
 }
 
-void ProjectLoader::saveWorldAs(World *world) {}
+void ProjectLoader::saveWorldAs(const World &world) {
+    std::optional<path_t> optionalPath =
+        FileSystem::saveFileDialog("All\0*.pnd\0", nullptr, "world.pnd");
+    if (!optionalPath.has_value()) {
+        return;
+    }
+    m_worldPath = optionalPath.value();
+    saveWorld(world);
+}
+
+void ProjectLoader::closeProject() {
+    saveAppConfig();
+    m_worldPath.clear();
+    m_projectPath.clear();
+    m_output->loaderDidLoadCloseProject();
+}
+
+void ProjectLoader::removeRecentProject(int index) {
+    LOG_INFO("REMOVE PROJECT AT INDEX {}", index);
+    m_config.recentProjects.erase(std::next(m_config.recentProjects.begin(), index));
+}
 
 } // namespace Panda

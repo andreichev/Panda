@@ -139,6 +139,18 @@ void GlfwWindow::setResizable(bool isResizable) {
 
 void GlfwWindow::setSize(Panda::Size size) {
     glfwSetWindowSize(m_windowHandle, size.width, size.height);
+    m_windowSizeBackup = size;
+    int count;
+    GLFWmonitor **monitorsHandle = glfwGetMonitors(&count);
+    if (count > 1) {
+        return;
+    }
+    const GLFWvidmode *vidmode = glfwGetVideoMode(monitorsHandle[0]);
+    glfwSetWindowPos(
+        m_windowHandle,
+        (vidmode->width - m_windowSizeBackup.width) / 2,
+        (vidmode->height - m_windowSizeBackup.height) / 2
+    );
 }
 
 void GlfwWindow::addEventHandlers() {

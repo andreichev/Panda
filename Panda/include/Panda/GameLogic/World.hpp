@@ -26,6 +26,7 @@ public:
     void onImGuiRender();
     Entity instantiateEntity();
     void destroy(Entity entity);
+    bool isChanged();
     inline bool isRunning() {
         return m_isRunning;
     }

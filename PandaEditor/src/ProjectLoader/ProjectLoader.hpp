@@ -9,20 +9,30 @@
 
 namespace Panda {
 
+class ProjectLoaderOutput {
+public:
+    virtual ~ProjectLoaderOutput() = default;
+    virtual void loaderDidLoadProject() = 0;
+    virtual void loaderDidLoadCloseProject() = 0;
+    virtual void loaderDidLoadWorld(const World &world) = 0;
+};
+
 class ProjectLoader final {
 public:
-    ProjectLoader();
+    ProjectLoader(ProjectLoaderOutput *output);
     ~ProjectLoader();
-    void loadData();
+    void loadInitialData();
     void saveAppConfig();
     void openProject(const path_t &path);
+    void closeProject();
     void createProject(const path_t &path);
     const std::vector<RecentProject> &getRecentProjectsList();
     bool hasOpenedProject();
-    void saveWorld(World *world);
-    void saveWorldAs(World *world);
+    void saveWorld(const World &world);
+    void removeRecentProject(int index);
 
 private:
+    void saveWorldAs(const World &world);
     void loadRecentProject();
     void appendRecentProject();
 
@@ -31,6 +41,7 @@ private:
     EditorConfig m_config;
     path_t m_projectPath;
     path_t m_worldPath;
+    ProjectLoaderOutput *m_output;
 };
 
 } // namespace Panda

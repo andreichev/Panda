@@ -16,10 +16,21 @@
 
 namespace Panda {
 
-class EditorLayer : public Layer {
+class EditorLayer : public Layer, public ProjectLoaderOutput, public MenuBarOutput {
+    using PopupActionFunction = void (*)(void *userData);
+    struct EditorPopup {
+        const char *title;
+        const char *subtitle;
+        const char *yesText;
+        const char *noText;
+        PopupActionFunction yesAction;
+        PopupActionFunction noAction;
+        void *userData;
+    };
+
 public:
     EditorLayer();
-    virtual ~EditorLayer() = default;
+    ~EditorLayer() override = default;
 
     virtual void onAttach() override;
     virtual void onDetach() override;
@@ -32,8 +43,23 @@ public:
     void simulate();
     void stop();
 
+    // MARK: Project loader output
+
+    void loaderDidLoadProject() override;
+    void loaderDidLoadWorld(const World &world) override;
+    void loaderDidLoadCloseProject() override;
+
+    // MARK: Menu bar output
+
+    void menuBarOpenProject() override;
+    void menuBarCloseApp() override;
+    void menuBarSaveWorld() override;
+    void menuBarCloseProject() override;
+
 private:
-    void setWorld(World *world);
+    void saveWorld();
+    void imguiDrawPopup(EditorPopup &popup);
+    void updateWindowState();
 
     ProjectLoader m_loader;
     MenuBar m_menuBar;
@@ -45,6 +71,7 @@ private:
     WorldHierarchyPanel m_hierarchyPanel;
     EditorCamera m_editorCamera;
     CameraController m_cameraController;
+    std::vector<EditorPopup> m_popups;
 
     World m_world;
     SceneState m_sceneState = SceneState::EDIT;

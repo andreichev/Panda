@@ -11,9 +11,11 @@ EditorLayer::EditorLayer()
     , m_viewport()
     , m_hierarchyPanel(nullptr)
     , m_statisticsPanel(nullptr)
-    , m_loader()
+    , m_loader(this)
     , m_startPanel(&m_loader)
+    , m_menuBar(this)
     , m_editorCamera()
+    , m_popups()
     , m_cameraController()
     , m_sceneState(SceneState::EDIT) {
     m_viewport.init(&m_world);
@@ -24,16 +26,7 @@ EditorLayer::EditorLayer()
 }
 
 void EditorLayer::onAttach() {
-    auto *window = Application::get()->getWindow();
-    window->setResizable(m_loader.hasOpenedProject());
-    window->setMaximized(m_loader.hasOpenedProject());
-    if (!m_loader.hasOpenedProject()) {
-        window->setSize({600, 400});
-    }
-}
-
-void EditorLayer::setWorld(Panda::World *world) {
-    m_world = *world;
+    m_loader.loadInitialData();
 }
 
 void EditorLayer::onDetach() {}
@@ -66,10 +59,15 @@ void EditorLayer::onUpdate(double deltaTime) {
 }
 
 void EditorLayer::onImGuiRender() {
+    if (!m_popups.empty()) {
+        auto &popup = m_popups.back();
+        ImGui::OpenPopup(popup.title);
+        imguiDrawPopup(popup);
+    }
     if (m_loader.hasOpenedProject()) {
         m_menuBar.onImGuiRender();
-        SceneState pickedSceneState = m_toolbar.onImGuiRender(m_menuBar.height, m_sceneState);
-        m_dockspace.beginImGuiDockspace(m_toolbar.height + m_menuBar.height);
+        auto pickedSceneState = m_toolbar.onImGuiRender(m_menuBar.m_height, m_sceneState);
+        m_dockspace.beginImGuiDockspace(m_toolbar.height + m_menuBar.m_height);
         m_statisticsPanel.onImGuiRender();
         m_viewport.onImGuiRender();
         m_hierarchyPanel.onImGuiRender();
@@ -115,6 +113,100 @@ void EditorLayer::stop() {
     m_sceneState = SceneState::EDIT;
     m_viewport.setCamera(&m_editorCamera);
     m_viewport.focus();
+}
+
+void EditorLayer::loaderDidLoadProject() {
+    updateWindowState();
+}
+
+void EditorLayer::menuBarOpenProject() {
+    std::optional<path_t> optionalPath = FileSystem::openFolderDialog();
+    if (!optionalPath.has_value()) {
+        return;
+    }
+    path_t path = optionalPath.value();
+    m_loader.openProject(path);
+}
+
+void EditorLayer::menuBarCloseApp() {
+    Application::get()->close();
+}
+
+void EditorLayer::menuBarSaveWorld() {
+    saveWorld();
+}
+
+void EditorLayer::menuBarCloseProject() {
+    if (m_world.isChanged()) {
+        EditorPopup popup;
+        popup.yesAction = [](void *data) {
+            auto self = static_cast<EditorLayer *>(data);
+            self->saveWorld();
+            self->m_loader.closeProject();
+        };
+        popup.noAction = [](void *data) {
+            auto self = static_cast<EditorLayer *>(data);
+            self->m_loader.closeProject();
+        };
+        popup.userData = this;
+        popup.title = "Save current world?";
+        popup.subtitle = "Do you want to save your changes?";
+        popup.yesText = "Save";
+        popup.noText = "Ignore";
+        m_popups.emplace_back(popup);
+    } else {
+        m_loader.closeProject();
+    }
+}
+
+void EditorLayer::loaderDidLoadWorld(const World &world) {
+    m_world = world;
+}
+
+void EditorLayer::loaderDidLoadCloseProject() {
+    updateWindowState();
+}
+
+void EditorLayer::updateWindowState() {
+    auto *window = Application::get()->getWindow();
+    window->setResizable(m_loader.hasOpenedProject());
+    window->setMaximized(m_loader.hasOpenedProject());
+    if (!m_loader.hasOpenedProject()) {
+        window->setSize({600, 400});
+    }
+}
+
+void EditorLayer::imguiDrawPopup(EditorLayer::EditorPopup &popup) {
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 12.0f);
+    if (ImGui::BeginPopupModal(popup.title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::PopStyleVar();
+        ImGui::Text(popup.subtitle);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+        if (ImGui::Button(popup.yesText) || Input::isKeyPressed(Key::ENTER)) {
+            if (popup.yesAction) {
+                popup.yesAction(popup.userData);
+            }
+            m_popups.pop_back();
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(popup.noText)) {
+            if (popup.noAction) {
+                popup.noAction(popup.userData);
+            }
+            m_popups.pop_back();
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::EndPopup();
+    }
+    ImGui::PopStyleVar();
+}
+
+void EditorLayer::saveWorld() {
+    m_loader.saveWorld(m_world);
 }
 
 } // namespace Panda
