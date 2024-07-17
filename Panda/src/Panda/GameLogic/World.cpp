@@ -201,8 +201,16 @@ World &World::operator=(const World &other) {
     return *this;
 }
 
-bool World::isEmpty() {
-    return m_registry.empty();
+void World::fillStartupData() {
+    Entity cameraEntity = instantiateEntity();
+    cameraEntity.setName("Camera");
+    cameraEntity.getTransform().setPosition({0.f, 0.f, 4.f});
+    cameraEntity.addComponent<CameraComponent>();
+
+    Entity sprite1Entity = instantiateEntity();
+    sprite1Entity.setName("Orange Sprite");
+    auto &sprite1 = sprite1Entity.addComponent<SpriteRendererComponent>();
+    sprite1.color = {1.0f, 0.5f, 0.2f, 1.0f};
 }
 
 } // namespace Panda

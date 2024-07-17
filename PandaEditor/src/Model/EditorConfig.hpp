@@ -4,7 +4,7 @@
 
 namespace Panda {
 
-struct EditorConfig final : Rain::Codable {
+struct EditorConfig final : public Rain::Codable {
     std::vector<RecentProject> recentProjects;
 
     RAIN_FIELDS_BEGIN(EditorConfig)

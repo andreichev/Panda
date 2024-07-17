@@ -33,7 +33,6 @@ public:
     void stop();
 
 private:
-    void initializeEmptyWorld();
     void setWorld(World *world);
 
     ProjectLoader m_loader;

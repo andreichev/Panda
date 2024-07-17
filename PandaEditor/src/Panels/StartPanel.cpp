@@ -1,7 +1,5 @@
 #include "StartPanel.hpp"
 
-#include <nfd.hpp>
-
 namespace Panda {
 
 StartPanel::StartPanel(ProjectLoader *loader)
@@ -119,7 +117,7 @@ void StartPanel::onImGuiRender() {
 }
 
 void StartPanel::openProject() {
-    auto pathOptional = openFolder();
+    auto pathOptional = FileSystem::openFolderDialog();
     if (!pathOptional.has_value()) {
         return;
     }
@@ -130,31 +128,14 @@ void StartPanel::openProject() {
 
 void StartPanel::createProject(const std::string &name) {
     m_newProjectMenu = false;
-    auto pathOptional = openFolder();
+    auto pathOptional = FileSystem::openFolderDialog();
     if (!pathOptional.has_value()) {
         return;
     }
-    std::string path = pathOptional.value();
-    path += std::filesystem::path::preferred_separator + name;
-    LOG_INFO("CREATE PROJECT AT PATH {}", path);
+    path_t path = pathOptional.value();
+    path.append(name);
+    LOG_INFO("CREATE PROJECT AT PATH {}", path.string());
     m_loader->createProject(path);
-}
-
-std::optional<std::string> StartPanel::openFolder() {
-    NFD::Init();
-    nfdu8char_t *outPath;
-    nfdresult_t result = NFD::PickFolder(outPath);
-    std::optional<std::string> res;
-    if (result == NFD_OKAY) {
-        res = outPath;
-        NFD::FreePath(outPath);
-    } else if (result == NFD_CANCEL) {
-        LOG_INFO("User pressed cancel.");
-    } else {
-        LOG_ERROR("Error: %s", NFD::GetError());
-    }
-    NFD::Quit();
-    return res;
 }
 
 } // namespace Panda

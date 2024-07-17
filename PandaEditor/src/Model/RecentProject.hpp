@@ -5,7 +5,7 @@
 
 namespace Panda {
 
-struct RecentProject final : Rain::Codable {
+struct RecentProject final : public Rain::Codable {
     std::string path;
     std::string name;
 

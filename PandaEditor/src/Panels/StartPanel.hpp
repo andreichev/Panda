@@ -16,7 +16,6 @@ public:
 private:
     void createProject(const std::string &name);
     void openProject();
-    std::optional<std::string> openFolder();
 
     Texture m_logoImage;
     Texture m_iconProject;

@@ -15,7 +15,13 @@ EditorLayer::EditorLayer()
     , m_startPanel(&m_loader)
     , m_editorCamera()
     , m_cameraController()
-    , m_sceneState(SceneState::EDIT) {}
+    , m_sceneState(SceneState::EDIT) {
+    m_viewport.init(&m_world);
+    m_viewport.setCamera(&m_editorCamera);
+    m_hierarchyPanel.setWorld(&m_world);
+    m_statisticsPanel.setWorld(&m_world);
+    m_cameraController.setPosition({0.f, 0.f, 4.f});
+}
 
 void EditorLayer::onAttach() {
     auto *window = Application::get()->getWindow();
@@ -28,29 +34,12 @@ void EditorLayer::onAttach() {
 
 void EditorLayer::setWorld(Panda::World *world) {
     m_world = *world;
-    m_viewport.init(&m_world);
-    m_viewport.setCamera(&m_editorCamera);
-    m_hierarchyPanel.setWorld(&m_world);
-    m_statisticsPanel.setWorld(&m_world);
-    m_cameraController.setPosition({0.f, 0.f, 4.f});
-}
-
-void EditorLayer::initializeEmptyWorld() {
-    Entity cameraEntity = m_world.instantiateEntity();
-    cameraEntity.setName("Camera");
-    cameraEntity.getTransform().setPosition({0.f, 0.f, 4.f});
-    cameraEntity.addComponent<CameraComponent>();
-
-    Entity sprite1Entity = m_world.instantiateEntity();
-    sprite1Entity.setName("Orange Sprite");
-    auto &sprite1 = sprite1Entity.addComponent<SpriteRendererComponent>();
-    sprite1.color = {1.0f, 0.5f, 0.2f, 1.0f};
 }
 
 void EditorLayer::onDetach() {}
 
 void EditorLayer::onUpdate(double deltaTime) {
-    if (m_world.isEmpty()) {
+    if (!m_loader.hasOpenedProject()) {
         return;
     }
     switch (m_sceneState) {
@@ -77,7 +66,7 @@ void EditorLayer::onUpdate(double deltaTime) {
 }
 
 void EditorLayer::onImGuiRender() {
-    if (m_loader.hasOpenedWorld()) {
+    if (m_loader.hasOpenedProject()) {
         m_menuBar.onImGuiRender();
         SceneState pickedSceneState = m_toolbar.onImGuiRender(m_menuBar.height, m_sceneState);
         m_dockspace.beginImGuiDockspace(m_toolbar.height + m_menuBar.height);

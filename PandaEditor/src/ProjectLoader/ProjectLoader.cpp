@@ -11,6 +11,15 @@ ProjectLoader::ProjectLoader()
     , m_config()
     , m_projectPath()
     , m_worldPath() {
+    loadData();
+    loadRecentProject();
+}
+
+ProjectLoader::~ProjectLoader() {
+    saveAppConfig();
+}
+
+void ProjectLoader::loadData() {
     // Load general settings
     {
         std::ifstream file("config.json");
@@ -24,37 +33,41 @@ ProjectLoader::ProjectLoader()
     }
 }
 
-ProjectLoader::~ProjectLoader() {
+void ProjectLoader::saveAppConfig() {
     // Save general settings
-    {
-        appendRecentProject();
-        std::ofstream file("config.json");
-        if (file.is_open()) {
-            Rain::Encoder *encoder = &jsonEncoder;
-            encoder->encode(file, m_config);
-            file.close();
-        }
+    appendRecentProject();
+    std::ofstream file("config.json");
+    if (file.is_open()) {
+        Rain::Encoder *encoder = &jsonEncoder;
+        encoder->encode(file, m_config);
+        file.close();
     }
 }
 
-void ProjectLoader::openProject(const std::filesystem::path &path) {
+void ProjectLoader::loadRecentProject() {
+    if (m_config.recentProjects.empty()) {
+        return;
+    }
+    auto &recentProject = m_config.recentProjects.front();
+    openProject(recentProject.path);
+}
+
+void ProjectLoader::openProject(const path_t &path) {
     m_projectPath = path;
-}
-
-std::optional<World> ProjectLoader::openWorld(const std::filesystem::path &path) {
-    m_worldPath = path;
-    return {};
-}
-
-bool ProjectLoader::hasOpenedWorld() {
-    return !m_worldPath.empty();
+    path_t pandaDirectoryPath = path;
+    pandaDirectoryPath.append(".Panda");
+    if (!std::filesystem::exists(pandaDirectoryPath)) {
+        std::filesystem::create_directory(pandaDirectoryPath);
+    }
+    path_t projectConfigPath = pandaDirectoryPath;
+    projectConfigPath.append("project.json");
 }
 
 bool ProjectLoader::hasOpenedProject() {
     return !m_projectPath.empty();
 }
 
-void ProjectLoader::createProject(const std::filesystem::path &path) {
+void ProjectLoader::createProject(const path_t &path) {
     std::filesystem::create_directory(path);
     m_projectPath = path;
 }
@@ -79,5 +92,14 @@ void ProjectLoader::appendRecentProject() {
 const std::vector<RecentProject> &ProjectLoader::getRecentProjectsList() {
     return m_config.recentProjects;
 }
+
+void ProjectLoader::saveWorld(World *world) {
+    if (m_worldPath.empty()) {
+        saveWorldAs(world);
+        return;
+    }
+}
+
+void ProjectLoader::saveWorldAs(World *world) {}
 
 } // namespace Panda
