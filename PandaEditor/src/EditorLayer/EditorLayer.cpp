@@ -129,7 +129,25 @@ void EditorLayer::menuBarOpenProject() {
 }
 
 void EditorLayer::menuBarCloseApp() {
-    Application::get()->close();
+    if (m_world.isChanged()) {
+        EditorPopup popup;
+        popup.yesAction = [](void *data) {
+            auto self = static_cast<EditorLayer *>(data);
+            self->saveWorld();
+            Application::get()->close();
+        };
+        popup.noAction = [](void *data) {
+            Application::get()->close();
+        };
+        popup.userData = this;
+        popup.title = "Save current world?";
+        popup.subtitle = "Do you want to save your changes?";
+        popup.yesText = "Save";
+        popup.noText = "Ignore";
+        m_popups.emplace_back(popup);
+    } else {
+        Application::get()->close();
+    }
 }
 
 void EditorLayer::menuBarSaveWorld() {
@@ -184,6 +202,11 @@ void EditorLayer::imguiDrawPopup(EditorLayer::EditorPopup &popup) {
         ImGui::PopStyleVar();
         ImGui::Text(popup.subtitle);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+        if (ImGui::Button("Cancel")) {
+            m_popups.pop_back();
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
         if (ImGui::Button(popup.yesText) || Input::isKeyPressed(Key::ENTER)) {
             if (popup.yesAction) {
                 popup.yesAction(popup.userData);

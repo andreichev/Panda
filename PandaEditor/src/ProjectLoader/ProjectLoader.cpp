@@ -9,12 +9,13 @@ ProjectLoader::ProjectLoader(ProjectLoaderOutput *output)
     : m_output(output)
     , jsonEncoder(true)
     , jsonDecoder()
-    , m_config()
+    , m_editorSettings()
+    , m_projectSettings()
     , m_projectPath()
     , m_worldPath() {}
 
 ProjectLoader::~ProjectLoader() {
-    saveAppConfig();
+    saveAppSettings();
 }
 
 void ProjectLoader::loadInitialData() {
@@ -23,34 +24,34 @@ void ProjectLoader::loadInitialData() {
         std::ifstream file("config.json");
         if (file.is_open()) {
             Rain::Decoder *decoder = &jsonDecoder;
-            decoder->decode(file, m_config);
+            decoder->decode(file, m_editorSettings);
             file.close();
         } else {
             LOG_INFO("GENERAL SETTINGS NOT FOUND");
         }
     }
-    if (m_config.hasOpenedProject) {
+    if (m_editorSettings.hasOpenedProject) {
         loadRecentProject();
     }
 }
 
-void ProjectLoader::saveAppConfig() {
+void ProjectLoader::saveAppSettings() {
     // Save general settings
     appendRecentProject();
-    m_config.hasOpenedProject = !m_projectPath.empty();
+    m_editorSettings.hasOpenedProject = !m_projectPath.empty();
     std::ofstream file("config.json");
     if (file.is_open()) {
         Rain::Encoder *encoder = &jsonEncoder;
-        encoder->encode(file, m_config);
+        encoder->encode(file, m_editorSettings);
         file.close();
     }
 }
 
 void ProjectLoader::loadRecentProject() {
-    if (m_config.recentProjects.empty()) {
+    if (m_editorSettings.recentProjects.empty()) {
         return;
     }
-    auto &recentProject = m_config.recentProjects.front();
+    auto &recentProject = m_editorSettings.recentProjects.front();
     openProject(recentProject.path);
 }
 
@@ -63,7 +64,20 @@ void ProjectLoader::openProject(const path_t &path) {
     }
     path_t projectConfigPath = pandaDirectoryPath;
     projectConfigPath.append("project.json");
+    // Load project settings
+    {
+        std::ifstream file(projectConfigPath);
+        if (file.is_open()) {
+            ProjectSettings projectConfig;
+            Rain::Decoder *decoder = &jsonDecoder;
+            decoder->decode(file, projectConfig);
+            file.close();
+        } else {
+            LOG_INFO("PROJECT SETTINGS NOT FOUND");
+        }
+    }
     m_output->loaderDidLoadProject();
+
 }
 
 bool ProjectLoader::hasOpenedProject() {
@@ -83,18 +97,18 @@ void ProjectLoader::appendRecentProject() {
     RecentProject recentProject;
     recentProject.path = m_projectPath;
     recentProject.name = m_projectPath.filename();
-    auto &recentList = m_config.recentProjects;
+    auto &recentList = m_editorSettings.recentProjects;
     auto existing = std::find(recentList.begin(), recentList.end(), recentProject);
     if (existing != recentList.end()) {
         // Move existing recent project to last
         std::rotate(recentList.begin(), existing, existing + 1);
         return;
     }
-    m_config.recentProjects.push_back(recentProject);
+    m_editorSettings.recentProjects.push_back(recentProject);
 }
 
 const std::vector<RecentProject> &ProjectLoader::getRecentProjectsList() {
-    return m_config.recentProjects;
+    return m_editorSettings.recentProjects;
 }
 
 void ProjectLoader::saveWorld(const World &world) {
@@ -115,7 +129,7 @@ void ProjectLoader::saveWorldAs(const World &world) {
 }
 
 void ProjectLoader::closeProject() {
-    saveAppConfig();
+    saveAppSettings();
     m_worldPath.clear();
     m_projectPath.clear();
     m_output->loaderDidLoadCloseProject();
@@ -123,7 +137,11 @@ void ProjectLoader::closeProject() {
 
 void ProjectLoader::removeRecentProject(int index) {
     LOG_INFO("REMOVE PROJECT AT INDEX {}", index);
-    m_config.recentProjects.erase(std::next(m_config.recentProjects.begin(), index));
+    m_editorSettings.recentProjects.erase(std::next(m_editorSettings.recentProjects.begin(), index));
+}
+
+const ProjectSettings &ProjectLoader::getProjectSettings() {
+    return m_projectSettings;
 }
 
 } // namespace Panda

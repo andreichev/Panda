@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Panda/GameLogic/World.hpp"
-#include "Model/EditorConfig.hpp"
+#include "Model/EditorSettings.hpp"
 #include "FileSystem/FileSystem.hpp"
+#include "Model/ProjectSettings.hpp"
 
 #include <Rain/Coders/JsonEncoder.hpp>
 #include <Rain/Coders/JsonDecoder.hpp>
@@ -22,7 +23,7 @@ public:
     ProjectLoader(ProjectLoaderOutput *output);
     ~ProjectLoader();
     void loadInitialData();
-    void saveAppConfig();
+    void saveAppSettings();
     void openProject(const path_t &path);
     void closeProject();
     void createProject(const path_t &path);
@@ -30,6 +31,7 @@ public:
     bool hasOpenedProject();
     void saveWorld(const World &world);
     void removeRecentProject(int index);
+    const ProjectSettings & getProjectSettings();
 
 private:
     void saveWorldAs(const World &world);
@@ -38,7 +40,8 @@ private:
 
     Rain::JsonEncoder jsonEncoder;
     Rain::JsonDecoder jsonDecoder;
-    EditorConfig m_config;
+    EditorSettings m_editorSettings;
+    ProjectSettings m_projectSettings;
     path_t m_projectPath;
     path_t m_worldPath;
     ProjectLoaderOutput *m_output;
