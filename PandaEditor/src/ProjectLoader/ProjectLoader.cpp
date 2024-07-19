@@ -16,6 +16,7 @@ ProjectLoader::ProjectLoader(ProjectLoaderOutput *output)
 
 ProjectLoader::~ProjectLoader() {
     saveAppSettings();
+    saveProjectSettings();
 }
 
 void ProjectLoader::loadInitialData() {
@@ -68,16 +69,14 @@ void ProjectLoader::openProject(const path_t &path) {
     {
         std::ifstream file(projectConfigPath);
         if (file.is_open()) {
-            ProjectSettings projectConfig;
             Rain::Decoder *decoder = &jsonDecoder;
-            decoder->decode(file, projectConfig);
+            decoder->decode(file, m_projectSettings);
             file.close();
         } else {
             LOG_INFO("PROJECT SETTINGS NOT FOUND");
         }
     }
     m_output->loaderDidLoadProject();
-
 }
 
 bool ProjectLoader::hasOpenedProject() {
@@ -116,6 +115,7 @@ void ProjectLoader::saveWorld(const World &world) {
         saveWorldAs(world);
         return;
     }
+
 }
 
 void ProjectLoader::saveWorldAs(const World &world) {
@@ -130,6 +130,8 @@ void ProjectLoader::saveWorldAs(const World &world) {
 
 void ProjectLoader::closeProject() {
     saveAppSettings();
+    saveProjectSettings();
+    m_projectSettings.clear();
     m_worldPath.clear();
     m_projectPath.clear();
     m_output->loaderDidLoadCloseProject();
@@ -137,11 +139,37 @@ void ProjectLoader::closeProject() {
 
 void ProjectLoader::removeRecentProject(int index) {
     LOG_INFO("REMOVE PROJECT AT INDEX {}", index);
-    m_editorSettings.recentProjects.erase(std::next(m_editorSettings.recentProjects.begin(), index));
+    m_editorSettings.recentProjects.erase(std::next(m_editorSettings.recentProjects.begin(), index)
+    );
 }
 
 const ProjectSettings &ProjectLoader::getProjectSettings() {
     return m_projectSettings;
+}
+
+void ProjectLoader::saveProjectSettings() {
+    if (m_projectPath.empty()) {
+        return;
+    }
+    path_t pandaDirectoryPath = m_projectPath;
+    pandaDirectoryPath.append(".Panda");
+    if (!std::filesystem::exists(pandaDirectoryPath)) {
+        std::filesystem::create_directory(pandaDirectoryPath);
+    }
+    path_t projectConfigPath = pandaDirectoryPath;
+    projectConfigPath.append("project.json");
+    path_t worldPath = std::filesystem::relative(m_projectPath, m_worldPath);
+    // Save project settings
+    {
+        std::ofstream file(projectConfigPath);
+        if (file.is_open()) {
+            Rain::Encoder *encoder = &jsonEncoder;
+            encoder->encode(file, m_projectSettings);
+            file.close();
+        } else {
+            LOG_INFO("PROJECT SETTINGS SAVING ERROR");
+        }
+    }
 }
 
 } // namespace Panda

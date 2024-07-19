@@ -102,7 +102,7 @@ struct Vec4 {
         , w(w) {}
 };
 
-using id_t = uint64_t;
+using id_t = int32_t;
 using Size = Vec2;
 using Color = Vec4;
 

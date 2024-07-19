@@ -172,6 +172,10 @@ void World::destroy(Entity entity) {
     m_registry.destroy(static_cast<entt::entity>(entity.getId()));
 }
 
+void World::clear() {
+    // m_registry.remove_all();
+}
+
 Entity World::findMainCameraEntity() {
     auto view = m_registry.view<CameraComponent>();
     for (auto entity : view) {

@@ -24,6 +24,7 @@ public:
     ~ProjectLoader();
     void loadInitialData();
     void saveAppSettings();
+    void saveProjectSettings();
     void openProject(const path_t &path);
     void closeProject();
     void createProject(const path_t &path);
@@ -31,7 +32,7 @@ public:
     bool hasOpenedProject();
     void saveWorld(const World &world);
     void removeRecentProject(int index);
-    const ProjectSettings & getProjectSettings();
+    const ProjectSettings &getProjectSettings();
 
 private:
     void saveWorldAs(const World &world);

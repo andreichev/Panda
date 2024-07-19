@@ -6,11 +6,15 @@
 namespace Panda {
 
 struct ProjectSettings final : public Rain::Codable {
-    std::string lastWorld;
+    std::string worldPath;
 
     RAIN_FIELDS_BEGIN(ProjectSettings)
-    RAIN_FIELD(lastWorld)
+    RAIN_FIELD(worldPath)
     RAIN_FIELDS_END
+
+    void clear() {
+        worldPath.clear();
+    }
 };
 
 } // namespace Panda

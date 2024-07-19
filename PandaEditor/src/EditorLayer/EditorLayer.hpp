@@ -43,18 +43,22 @@ public:
     void simulate();
     void stop();
 
-    // MARK: Project loader output
+#pragma region Project loader output
 
     void loaderDidLoadProject() override;
     void loaderDidLoadWorld(const World &world) override;
     void loaderDidLoadCloseProject() override;
 
-    // MARK: Menu bar output
+#pragma endregion
+
+#pragma region Menu bar output
 
     void menuBarOpenProject() override;
     void menuBarCloseApp() override;
     void menuBarSaveWorld() override;
     void menuBarCloseProject() override;
+
+#pragma endregion
 
 private:
     void saveWorld();

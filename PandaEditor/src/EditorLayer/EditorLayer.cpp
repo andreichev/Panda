@@ -115,9 +115,23 @@ void EditorLayer::stop() {
     m_viewport.focus();
 }
 
+#pragma region Project loader output
+
 void EditorLayer::loaderDidLoadProject() {
     updateWindowState();
 }
+
+void EditorLayer::loaderDidLoadWorld(const World &world) {
+    m_world = world;
+}
+
+void EditorLayer::loaderDidLoadCloseProject() {
+    updateWindowState();
+}
+
+#pragma endregion
+
+#pragma region Menu bar output
 
 void EditorLayer::menuBarOpenProject() {
     std::optional<path_t> optionalPath = FileSystem::openFolderDialog();
@@ -136,14 +150,12 @@ void EditorLayer::menuBarCloseApp() {
             self->saveWorld();
             Application::get()->close();
         };
-        popup.noAction = [](void *data) {
-            Application::get()->close();
-        };
+        popup.noAction = [](void *data) { Application::get()->close(); };
         popup.userData = this;
         popup.title = "Save current world?";
         popup.subtitle = "Do you want to save your changes?";
         popup.yesText = "Save";
-        popup.noText = "Ignore";
+        popup.noText = "Not save";
         m_popups.emplace_back(popup);
     } else {
         Application::get()->close();
@@ -170,20 +182,14 @@ void EditorLayer::menuBarCloseProject() {
         popup.title = "Save current world?";
         popup.subtitle = "Do you want to save your changes?";
         popup.yesText = "Save";
-        popup.noText = "Ignore";
+        popup.noText = "Not save";
         m_popups.emplace_back(popup);
     } else {
         m_loader.closeProject();
     }
 }
 
-void EditorLayer::loaderDidLoadWorld(const World &world) {
-    m_world = world;
-}
-
-void EditorLayer::loaderDidLoadCloseProject() {
-    updateWindowState();
-}
+#pragma endregion
 
 void EditorLayer::updateWindowState() {
     auto *window = Application::get()->getWindow();
@@ -197,31 +203,31 @@ void EditorLayer::updateWindowState() {
 void EditorLayer::imguiDrawPopup(EditorLayer::EditorPopup &popup) {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 12.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 3.0f);
     if (ImGui::BeginPopupModal(popup.title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::PopStyleVar();
         ImGui::Text(popup.subtitle);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-        if (ImGui::Button("Cancel")) {
-            m_popups.pop_back();
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button(popup.yesText) || Input::isKeyPressed(Key::ENTER)) {
+        if (ImGui::Button(popup.yesText, {ImGui::GetContentRegionAvail().x, 24}) ||
+            Input::isKeyPressed(Key::ENTER)) {
             if (popup.yesAction) {
                 popup.yesAction(popup.userData);
             }
             m_popups.pop_back();
             ImGui::CloseCurrentPopup();
         }
-        ImGui::SameLine();
-        if (ImGui::Button(popup.noText)) {
+        if (ImGui::Button(popup.noText, {ImGui::GetContentRegionAvail().x, 24})) {
             if (popup.noAction) {
                 popup.noAction(popup.userData);
             }
             m_popups.pop_back();
             ImGui::CloseCurrentPopup();
         }
+        ImGui::Separator();
+        if (ImGui::Button("Cancel", {ImGui::GetContentRegionAvail().x, 24})) {
+            m_popups.pop_back();
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::PopStyleVar();
         ImGui::SetItemDefaultFocus();
         ImGui::EndPopup();
     }

@@ -9,15 +9,22 @@
 #include "Panda/GameLogic/Components/StaticMesh.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
+
 #include <Foundation/Foundation.hpp>
+#include <Rain/Rain.hpp>
+#include <Rain/Codable.hpp>
 
 namespace Panda {
 
-struct IdComponent final {
+struct IdComponent final: public Rain::Codable {
     id_t id = 0;
+
+    RAIN_FIELDS_BEGIN(IdComponent)
+    RAIN_FIELD(id)
+    RAIN_FIELDS_END
 };
 
-struct TagComponent final {
+struct TagComponent final: public Rain::Codable  {
     std::string tag;
 
     TagComponent() = default;
@@ -31,6 +38,10 @@ struct TagComponent final {
     operator const std::string &() const {
         return tag;
     }
+
+    RAIN_FIELDS_BEGIN(TagComponent)
+    RAIN_FIELD(tag)
+    RAIN_FIELDS_END
 };
 
 struct RelationshipComponent final {
