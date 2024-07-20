@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Panda/Serialization/WorldDto.hpp"
+#include "Panda/GameLogic/World.hpp"
 
 namespace Panda {
 
 class WorldMapper {
 public:
-    void fillWorld(World &world, const WorldDto &dto);
-    WorldDto toDto(const World &world);
+    static void fillWorld(World &world, const WorldDto &dto);
+    static WorldDto toDto(const World &world);
 };
 
 } // namespace Panda

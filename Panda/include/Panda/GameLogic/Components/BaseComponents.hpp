@@ -19,6 +19,11 @@ namespace Panda {
 struct IdComponent final : public Rain::Codable {
     id_t id = 0;
 
+    IdComponent() = default;
+    IdComponent(const IdComponent &other) = default;
+    IdComponent(const id_t &id)
+        : id(id) {}
+
     RAIN_FIELDS_BEGIN(IdComponent)
     RAIN_FIELD(id)
     RAIN_FIELDS_END

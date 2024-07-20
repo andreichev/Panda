@@ -26,6 +26,7 @@ public:
     void saveAppSettings();
     void saveProjectSettings();
     void openProject(const path_t &path);
+    void loadWorld();
     void closeProject();
     void createProject(const path_t &path);
     const std::vector<RecentProject> &getRecentProjectsList();

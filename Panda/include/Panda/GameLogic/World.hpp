@@ -17,7 +17,6 @@ class World final {
 public:
     World();
     ~World();
-    World &operator=(const World &other);
     void initialize();
     void fillStartupData();
     void updateRuntime(double deltaTime);
@@ -43,6 +42,8 @@ public:
 private:
     void updateBasicComponents(float deltaTime);
     Entity findMainCameraEntity();
+    Entity instantiateEntity(id_t id);
+    void fillEntity(Entity entity);
 
     bool m_isRunning;
     entt::registry m_registry;
@@ -50,6 +51,7 @@ private:
     Renderer3D m_renderer3d;
 
     friend class WorldHierarchyPanel;
+    friend class WorldMapper;
 };
 
 } // namespace Panda

@@ -78,11 +78,7 @@ public:
         return getComponent<TagComponent>().tag;
     }
 
-    void setName(std::string &name) {
-        getComponent<TagComponent>().tag = name;
-    }
-
-    void setName(std::string name) {
+    void setName(const std::string &name) {
         getComponent<TagComponent>().tag = name;
     }
 
@@ -104,6 +100,7 @@ private:
     friend class World;
     friend class NativeScript;
     friend class WorldHierarchyPanel;
+    friend class WorldMapper;
 };
 
 } // namespace Panda

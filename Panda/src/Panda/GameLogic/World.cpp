@@ -154,14 +154,25 @@ void World::initialize() {
 Entity World::instantiateEntity() {
     id_t entityId = static_cast<id_t>(m_registry.create());
     Entity entity = {&m_registry, entityId, this};
-    entity.addComponent<IdComponent>();
+    fillEntity(entity);
+    return entity;
+}
+
+Entity World::instantiateEntity(Panda::id_t id) {
+    m_registry.create(static_cast<entt::entity>(id));
+    Entity entity = {&m_registry, id, this};
+    fillEntity(entity);
+    return entity;
+}
+
+void World::fillEntity(Entity entity) {
+    entity.addComponent<IdComponent>(entity.m_id);
     entity.addComponent<TagComponent>("Entity");
     entity.addComponent<RelationshipComponent>();
     entity.addComponent<TransformComponent>();
     entity.addComponent<StaticMeshComponent>();
     entity.addComponent<DynamicMeshComponent>();
     entity.addComponent<NativeScriptListComponent>();
-    return entity;
 }
 
 void World::destroy(Entity entity) {
@@ -195,15 +206,6 @@ Camera *World::findMainCamera() {
         return nullptr;
     }
     return &entity.getComponent<CameraComponent>().camera;
-}
-
-World &World::operator=(const World &other) {
-    const entt::registry &source = other.m_registry;
-    entt::registry &destination = m_registry;
-    destination.storage<entt::entity>().push(
-        source.storage<entt::entity>()->begin(), source.storage<entt::entity>()->end()
-    );
-    return *this;
 }
 
 void World::fillStartupData() {

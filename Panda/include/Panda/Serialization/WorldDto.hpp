@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panda/GameLogic/World.hpp"
+#include "Panda/GameLogic/Components/BaseComponents.hpp"
 
 #include <Rain/Rain.hpp>
 #include <Rain/Codable.hpp>

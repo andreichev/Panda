@@ -1,4 +1,5 @@
 #include "ProjectLoader.hpp"
+#include "Panda/Serialization/WorldMapper.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -58,6 +59,7 @@ void ProjectLoader::loadRecentProject() {
 
 void ProjectLoader::openProject(const path_t &path) {
     m_projectPath = path;
+    m_worldPath.clear();
     path_t pandaDirectoryPath = path;
     pandaDirectoryPath.append(".Panda");
     if (!std::filesystem::exists(pandaDirectoryPath)) {
@@ -77,6 +79,12 @@ void ProjectLoader::openProject(const path_t &path) {
         }
     }
     m_output->loaderDidLoadProject();
+    if(m_projectSettings.worldPath.empty()) {
+        return;
+    }
+    m_worldPath = m_projectPath;
+    m_worldPath.append(m_projectSettings.worldPath);
+    loadWorld();
 }
 
 bool ProjectLoader::hasOpenedProject() {
@@ -115,6 +123,33 @@ void ProjectLoader::saveWorld(const World &world) {
         saveWorldAs(world);
         return;
     }
+    WorldDto worldDto = WorldMapper::toDto(world);
+    std::ofstream file(m_worldPath);
+    if (file.is_open()) {
+        Rain::Encoder *encoder = &jsonEncoder;
+        encoder->encode(file, worldDto);
+        file.close();
+    } else {
+        LOG_ERROR("ERROR SAVING WORLD AT PATH {}", m_worldPath.string());
+    }
+}
+
+void ProjectLoader::loadWorld() {
+    if(m_worldPath.empty()) {
+        return;
+    }
+    WorldDto worldDto;
+    std::ifstream file(m_worldPath);
+    if (file.is_open()) {
+        Rain::Decoder *decoder = &jsonDecoder;
+        decoder->decode(file, worldDto);
+        file.close();
+    } else {
+        LOG_INFO("CANNOT LOAD WORLD AT PATH {}", m_worldPath.string());
+    }
+    World world;
+    WorldMapper::fillWorld(world, worldDto);
+    m_output->loaderDidLoadWorld(world);
 }
 
 void ProjectLoader::saveWorldAs(const World &world) {
