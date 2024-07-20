@@ -55,6 +55,9 @@ bool YamlDecoder::decode(const char *key, bool &data) {
             return false;
         }
         const auto &member = currentObject()[key];
+        if(member.IsNull()) {
+            return false;
+        }
         data = member.as<bool>();
     }
     return true;
@@ -69,6 +72,9 @@ bool YamlDecoder::decode(const char *key, int &data) {
             return false;
         }
         const auto &member = currentObject()[key];
+        if(member.IsNull()) {
+            return false;
+        }
         data = member.as<int>();
     }
     return true;
@@ -83,6 +89,9 @@ bool YamlDecoder::decode(const char *key, float &data) {
             return false;
         }
         const auto &member = currentObject()[key];
+        if(member.IsNull()) {
+            return false;
+        }
         data = member.as<float>();
     }
     return true;
@@ -97,6 +106,9 @@ bool YamlDecoder::decode(const char *key, std::string &data) {
             return false;
         }
         const auto &member = currentObject()[key];
+        if(member.IsNull()) {
+            return false;
+        }
         data = member.as<std::string>();
     }
     return true;

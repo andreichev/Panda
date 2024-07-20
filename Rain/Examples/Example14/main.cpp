@@ -4,6 +4,8 @@
 #include "Rain/Rain.hpp"
 #include "Rain/Coders/JsonDecoder.hpp"
 #include "Rain/Coders/JsonEncoder.hpp"
+#include "Rain/Coders/YamlDecoder.hpp"
+#include "Rain/Coders/YamlEncoder.hpp"
 #include "Rain/Codable.hpp"
 
 struct A : public Rain::Codable {
@@ -45,23 +47,19 @@ struct C : public Rain::Codable {
 
 int main() {
     const char *input = R"teststr(
-{
-    "b": [
-        {
-            "a": {
-                "text": "HELLO!"
-            },
-            "x": true,
-            "y": 10
-        }
-    ]
-}
+---
+b:
+  - a:
+      text: HELLO!
+    x: true
+    y: ~
+...
     )teststr";
 
     C c;
     std::stringstream stream1;
     stream1 << input;
-    Rain::Decoder *decoder = new Rain::JsonDecoder;
+    Rain::Decoder *decoder = new Rain::YamlDecoder;
     decoder->decode(stream1, c);
 
     std::stringstream stream2;
