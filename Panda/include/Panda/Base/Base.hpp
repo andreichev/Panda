@@ -2,10 +2,12 @@
 
 #include <glm/glm.hpp>
 #include <imgui.h>
+#include <Rain/Rain.hpp>
+#include <Rain/Codable.hpp>
 
 namespace Panda {
 
-struct Vec2 {
+struct Vec2 : public Rain::Codable  {
     union {
         float x, width;
     };
@@ -40,9 +42,14 @@ struct Vec2 {
     operator ImVec2() {
         return {x, y};
     }
+
+    RAIN_FIELDS_BEGIN(Vec2)
+    RAIN_FIELD(x)
+    RAIN_FIELD(y)
+    RAIN_FIELDS_END
 };
 
-struct Vec3 {
+struct Vec3 : public Rain::Codable  {
     union {
         float x, r, width;
     };
@@ -67,9 +74,15 @@ struct Vec3 {
         : x(x)
         , y(y)
         , z(z) {}
+
+    RAIN_FIELDS_BEGIN(Vec3)
+    RAIN_FIELD(x)
+    RAIN_FIELD(y)
+    RAIN_FIELD(z)
+    RAIN_FIELDS_END
 };
 
-struct Vec4 {
+struct Vec4 : public Rain::Codable  {
     union {
         float x, r, width;
     };
@@ -100,6 +113,13 @@ struct Vec4 {
         , y(y)
         , z(z)
         , w(w) {}
+
+    RAIN_FIELDS_BEGIN(Vec4)
+    RAIN_FIELD(x)
+    RAIN_FIELD(y)
+    RAIN_FIELD(z)
+    RAIN_FIELD(w)
+    RAIN_FIELDS_END
 };
 
 using id_t = int32_t;

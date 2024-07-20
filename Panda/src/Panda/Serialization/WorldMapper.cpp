@@ -8,6 +8,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         Entity entity = world.instantiateEntity(entityDto.idComponent.id);
         entity.setName(entityDto.tagComponent.tag);
     }
+    world.resetChanged();
 }
 
 WorldDto WorldMapper::toDto(const World &world) {

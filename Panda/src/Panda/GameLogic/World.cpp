@@ -12,10 +12,12 @@ namespace Panda {
 
 World::World()
     : m_isRunning(false)
+    , m_isChanged(false)
     , m_registry() {}
 
 World::World(World&& world)
     : m_isRunning(world.m_isRunning)
+    , m_isChanged(world.m_isChanged)
     , m_renderer2d(std::move(world.m_renderer2d))
     , m_renderer3d(std::move(world.m_renderer3d))
     , m_registry(std::move(world.m_registry)) {
@@ -156,12 +158,14 @@ void World::onImGuiRender() {
 
 void World::initialize() {
     m_isRunning = true;
+    m_isChanged = false;
 }
 
 Entity World::instantiateEntity() {
     id_t entityId = static_cast<id_t>(m_registry.create());
     Entity entity = {&m_registry, entityId, this};
     fillEntity(entity);
+    m_isChanged = true;
     return entity;
 }
 
@@ -169,6 +173,7 @@ Entity World::instantiateEntity(Panda::id_t id) {
     m_registry.create(static_cast<entt::entity>(id));
     Entity entity = {&m_registry, id, this};
     fillEntity(entity);
+    m_isChanged = true;
     return entity;
 }
 
@@ -228,11 +233,21 @@ void World::fillStartupData() {
 }
 
 bool World::isChanged() {
-    return true;
+    return m_isChanged;
 }
+
+void World::resetChanged() {
+    m_isChanged = false;
+}
+
+void World::setChanged() {
+    m_isChanged = true;
+}
+
 World &World::operator=(World &&other) {
     m_registry = std::move(other.m_registry);
     m_isRunning = other.m_isRunning;
+    m_isChanged = other.m_isChanged;
     m_renderer2d = std::move(other.m_renderer2d);
     m_renderer3d = std::move(other.m_renderer3d);
     return *this;

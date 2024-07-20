@@ -28,6 +28,8 @@ public:
     void destroy(Entity entity);
     void clear();
     bool isChanged();
+    void resetChanged();
+    void setChanged();
     inline bool isRunning() {
         return m_isRunning;
     }
@@ -48,6 +50,7 @@ private:
     void fillEntity(Entity entity);
 
     bool m_isRunning;
+    bool m_isChanged;
     entt::registry m_registry;
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;

@@ -126,6 +126,7 @@ void EditorLayer::loaderDidLoadWorld(World &&world) {
 }
 
 void EditorLayer::loaderDidLoadCloseProject() {
+    m_world.clear();
     updateWindowState();
 }
 

@@ -49,7 +49,7 @@ struct TagComponent final : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-struct RelationshipComponent final {
+struct RelationshipComponent final : public Rain::Codable {
     id_t parentHandle = -1;
     std::vector<id_t> children;
 
@@ -57,13 +57,22 @@ struct RelationshipComponent final {
     RelationshipComponent(const RelationshipComponent &other) = default;
     RelationshipComponent(id_t parent)
         : parentHandle(parent) {}
+
+    RAIN_FIELDS_BEGIN(RelationshipComponent)
+    RAIN_FIELD(parentHandle)
+    RAIN_FIELD(children)
+    RAIN_FIELDS_END
 };
 
-struct SpriteRendererComponent final {
+struct SpriteRendererComponent final : public Rain::Codable {
     Color color;
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const SpriteRendererComponent &other) = default;
+
+    RAIN_FIELDS_BEGIN(SpriteRendererComponent)
+    RAIN_FIELD(color)
+    RAIN_FIELDS_END
 };
 
 struct StaticMeshComponent final {
