@@ -227,22 +227,30 @@ template<typename T>
 struct TypeDecoder<std::optional<T>> {
     static void
     decode(const char *key, Decoder *decoder, const TypeInfo &info, std::optional<T> &data) {
-        static_assert(std::is_base_of<Codable, T>());
-        if (!decoder->beginObject(key)) {
-            data = {};
-            return;
-        }
-        TypeInfo typeInfo = getTypeRegistry()->findOrCreateType<T>();
-        T value;
-        for (auto &field : typeInfo.fields) {
-            auto memberInfo = getTypeRegistry()->findInfo(field.typeId);
+        if constexpr (std::is_base_of<Codable, T>()) {
+            if (!decoder->beginObject(key)) {
+                data = {};
+                return;
+            }
+            TypeInfo typeInfo = getTypeRegistry()->findOrCreateType<T>();
+            T value;
+            for (auto &field : typeInfo.fields) {
+                auto memberInfo = getTypeRegistry()->findInfo(field.typeId);
 
-            memberInfo.decoderFunc(
-                field.name, decoder, memberInfo, addOffset(&value, field.offset)
-            );
+                memberInfo.decoderFunc(
+                    field.name, decoder, memberInfo, addOffset(&value, field.offset)
+                );
+            }
+            data = value;
+            decoder->endObject();
+        } else {
+            T value;
+            if (decoder->decode(key, value)) {
+                data = value;
+            } else {
+                data = {};
+            }
         }
-        data = value;
-        decoder->endObject();
     }
 };
 
@@ -321,16 +329,19 @@ struct TypeEncoder<std::optional<T>> {
     static void
     encode(const char *key, Encoder *encoder, const TypeInfo &info, std::optional<T> &data) {
         if (data.has_value()) {
-            static_assert(std::is_base_of<Codable, T>());
-            encoder->beginObject(key);
-            TypeInfo typeInfo = getTypeRegistry()->findOrCreateType<T>();
-            for (auto &field : typeInfo.fields) {
-                auto memberInfo = getTypeRegistry()->findInfo(field.typeId);
-                memberInfo.encoderFunc(
-                    field.name, encoder, memberInfo, addOffset(&data.value(), field.offset)
-                );
+            if constexpr (std::is_base_of<Codable, T>()) {
+                encoder->beginObject(key);
+                TypeInfo typeInfo = getTypeRegistry()->findOrCreateType<T>();
+                for (auto &field : typeInfo.fields) {
+                    auto memberInfo = getTypeRegistry()->findInfo(field.typeId);
+                    memberInfo.encoderFunc(
+                        field.name, encoder, memberInfo, addOffset(&data.value(), field.offset)
+                    );
+                }
+                encoder->endObject();
+            } else {
+                encoder->encode(key, data.value());
             }
-            encoder->endObject();
         } else {
             encoder->encodeNull(key);
         }
