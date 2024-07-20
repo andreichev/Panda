@@ -6,6 +6,7 @@
 #include "Panda/GameLogic/NativeScript.hpp"
 
 #include <Rain/Rain.hpp>
+#include <entt/entt.hpp>
 
 namespace Panda {
 
@@ -173,7 +174,7 @@ void World::destroy(Entity entity) {
 }
 
 void World::clear() {
-    // m_registry.remove_all();
+    m_registry.clear();
 }
 
 Entity World::findMainCameraEntity() {
@@ -197,10 +198,10 @@ Camera *World::findMainCamera() {
 }
 
 World &World::operator=(const World &other) {
-    m_registry.assign(
-        other.m_registry.data(),
-        other.m_registry.data() + other.m_registry.size(),
-        other.m_registry.released()
+    const entt::registry &source = other.m_registry;
+    entt::registry &destination = m_registry;
+    destination.storage<entt::entity>().push(
+        source.storage<entt::entity>()->begin(), source.storage<entt::entity>()->end()
     );
     return *this;
 }

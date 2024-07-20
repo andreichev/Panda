@@ -115,7 +115,6 @@ void ProjectLoader::saveWorld(const World &world) {
         saveWorldAs(world);
         return;
     }
-
 }
 
 void ProjectLoader::saveWorldAs(const World &world) {

@@ -16,7 +16,7 @@
 
 namespace Panda {
 
-struct IdComponent final: public Rain::Codable {
+struct IdComponent final : public Rain::Codable {
     id_t id = 0;
 
     RAIN_FIELDS_BEGIN(IdComponent)
@@ -24,7 +24,7 @@ struct IdComponent final: public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-struct TagComponent final: public Rain::Codable  {
+struct TagComponent final : public Rain::Codable {
     std::string tag;
 
     TagComponent() = default;

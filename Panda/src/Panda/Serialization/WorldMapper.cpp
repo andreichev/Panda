@@ -2,12 +2,10 @@
 
 namespace Panda {
 
-void WorldMapper::fillWorld(World& world, const WorldDto& dto) {
+void WorldMapper::fillWorld(World &world, const WorldDto &dto) {}
 
-}
-
-WorldDto WorldMapper::toDto(const World& world) {
+WorldDto WorldMapper::toDto(const World &world) {
     return WorldDto();
 }
 
-}
+} // namespace Panda

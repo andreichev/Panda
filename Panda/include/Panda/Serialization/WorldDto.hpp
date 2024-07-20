@@ -25,4 +25,4 @@ struct WorldDto : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-}
+} // namespace Panda
