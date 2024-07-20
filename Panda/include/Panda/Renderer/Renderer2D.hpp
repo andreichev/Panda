@@ -84,7 +84,7 @@ public:
     };
 
     Renderer2D();
-    Renderer2D(Renderer2D&& other);
+    Renderer2D(Renderer2D &&other);
     ~Renderer2D();
     void begin();
     void drawRect(RectData rect);

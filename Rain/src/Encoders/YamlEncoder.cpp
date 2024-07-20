@@ -20,6 +20,13 @@ void YamlEncoder::encode(std::ostream &ostream, void *data, TypeInfo info) {
     out = nullptr;
 }
 
+void YamlEncoder::encodeNull(const char *key) {
+    if (key) {
+        *out << YAML::Key << key;
+    }
+    *out << YAML::Value << YAML::Null;
+}
+
 void YamlEncoder::beginObject(const char *key) {
     if (key) {
         *out << YAML::Key << key;

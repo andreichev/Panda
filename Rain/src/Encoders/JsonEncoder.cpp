@@ -34,6 +34,12 @@ void JsonEncoder::encode(std::ostream &stream, void *data, Rain::TypeInfo info) 
     }
 }
 
+void JsonEncoder::encodeNull(const char *key) {
+    rapidjson::Value value;
+    value.SetNull();
+    addValue(key, value);
+}
+
 void JsonEncoder::beginObject(const char *key) {
     // if (key) {
     //     std::cout << "BEGIN OBJECT " << key << std::endl;

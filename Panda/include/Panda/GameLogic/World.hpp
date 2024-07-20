@@ -15,7 +15,7 @@ namespace Panda {
 
 class World final {
 public:
-    World(World&& world);
+    World(World &&world);
     World();
     ~World();
     void initialize();
@@ -41,7 +41,7 @@ public:
     }
 
     Camera *findMainCamera();
-    World& operator=(World&& other);
+    World &operator=(World &&other);
 
 private:
     void updateBasicComponents(float deltaTime);

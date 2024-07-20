@@ -14,6 +14,7 @@ public:
     ~YamlEncoder() override = default;
 
     void encode(std::ostream &, void *data, TypeInfo info) override;
+    void encodeNull(const char *key) override;
     void beginObject(const char *key) override;
     void encode(const char *key, const bool &data) override;
     void encode(const char *key, const int &data) override;

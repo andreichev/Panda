@@ -23,7 +23,7 @@ struct WorldCameraDto : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-struct CameraComponentDto: public Rain::Codable {
+struct CameraComponentDto : public Rain::Codable {
     bool isPrimary;
     WorldCameraDto camera;
 
@@ -33,4 +33,4 @@ struct CameraComponentDto: public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-}
+} // namespace Panda

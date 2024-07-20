@@ -50,20 +50,20 @@ Renderer2D::Renderer2D(Panda::Renderer2D &&other)
 }
 
 Renderer2D::~Renderer2D() {
-    if(m_drawData.shader.isValid()) {
+    if (m_drawData.shader.isValid()) {
         Miren::deleteProgram(m_drawData.shader);
     }
-    if(m_drawData.layout.isValid()) {
+    if (m_drawData.layout.isValid()) {
         Miren::deleteVertexLayout(m_drawData.layout);
     }
     for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i) {
         m_drawData.textures[i] = nullptr;
     }
     m_drawData.whiteTexture = nullptr;
-    if(m_drawData.vertices) {
+    if (m_drawData.vertices) {
         FREE(Foundation::getAllocator(), m_drawData.vertices);
     }
-    if(m_drawData.indices) {
+    if (m_drawData.indices) {
         FREE(Foundation::getAllocator(), m_drawData.indices);
     }
 }

@@ -15,13 +15,12 @@ World::World()
     , m_isChanged(false)
     , m_registry() {}
 
-World::World(World&& world)
+World::World(World &&world)
     : m_isRunning(world.m_isRunning)
     , m_isChanged(world.m_isChanged)
     , m_renderer2d(std::move(world.m_renderer2d))
     , m_renderer3d(std::move(world.m_renderer3d))
-    , m_registry(std::move(world.m_registry)) {
-}
+    , m_registry(std::move(world.m_registry)) {}
 
 World::~World() {}
 

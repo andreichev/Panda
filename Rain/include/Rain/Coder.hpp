@@ -16,6 +16,8 @@ public:
 
     /// General encode
     virtual void encode(std::ostream &, void *data, TypeInfo info) = 0;
+    /// Encode null
+    virtual void encodeNull(const char *key) = 0;
     /// Begin encoding object
     virtual void beginObject(const char *key) = 0;
     /// Encode bool

@@ -7,7 +7,7 @@
 
 namespace Panda {
 
-struct Vec2 : public Rain::Codable  {
+struct Vec2 : public Rain::Codable {
     union {
         float x, width;
     };
@@ -49,7 +49,7 @@ struct Vec2 : public Rain::Codable  {
     RAIN_FIELDS_END
 };
 
-struct Vec3 : public Rain::Codable  {
+struct Vec3 : public Rain::Codable {
     union {
         float x, r, width;
     };
@@ -82,7 +82,7 @@ struct Vec3 : public Rain::Codable  {
     RAIN_FIELDS_END
 };
 
-struct Vec4 : public Rain::Codable  {
+struct Vec4 : public Rain::Codable {
     union {
         float x, r, width;
     };

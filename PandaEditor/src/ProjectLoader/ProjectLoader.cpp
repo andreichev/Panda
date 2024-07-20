@@ -83,7 +83,7 @@ void ProjectLoader::openProject(const path_t &path) {
         }
     }
     m_output->loaderDidLoadProject();
-    if(m_projectSettings.worldPath.empty()) {
+    if (m_projectSettings.worldPath.empty()) {
         return;
     }
     m_worldPath = m_projectPath;
@@ -139,7 +139,7 @@ void ProjectLoader::saveWorld(const World &world) {
 }
 
 void ProjectLoader::loadWorld() {
-    if(m_worldPath.empty()) {
+    if (m_worldPath.empty()) {
         return;
     }
     WorldDto worldDto;

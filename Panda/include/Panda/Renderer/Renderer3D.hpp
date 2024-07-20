@@ -25,7 +25,7 @@ public:
     };
 
     Renderer3D();
-    Renderer3D(Renderer3D&& other);
+    Renderer3D(Renderer3D &&other);
     ~Renderer3D() = default;
     void begin();
     void submit(TransformComponent *transform, StaticMesh *mesh);

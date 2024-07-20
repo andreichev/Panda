@@ -13,7 +13,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
 
 WorldDto WorldMapper::toDto(const World &world) {
     WorldDto worldDto;
-    World& _world = const_cast<World&>(world);
+    World &_world = const_cast<World &>(world);
     for (auto entityId : _world.m_registry.storage<entt::entity>()) {
         Entity entity(&_world.m_registry, (id_t)(entityId), &_world);
         EntityDto entityDto;
