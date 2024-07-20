@@ -84,6 +84,7 @@ public:
     };
 
     Renderer2D();
+    Renderer2D(Renderer2D&& other);
     ~Renderer2D();
     void begin();
     void drawRect(RectData rect);
@@ -91,6 +92,7 @@ public:
     Statistics getStats();
     void setViewId(Miren::ViewId id);
     void setViewProj(glm::mat4 viewProj);
+    Renderer2D &operator=(Renderer2D &&other);
 
 private:
     glm::mat4 m_viewProj;

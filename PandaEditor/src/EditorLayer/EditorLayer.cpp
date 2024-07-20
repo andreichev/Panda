@@ -121,8 +121,8 @@ void EditorLayer::loaderDidLoadProject() {
     updateWindowState();
 }
 
-void EditorLayer::loaderDidLoadWorld(const World &world) {
-    m_world = world;
+void EditorLayer::loaderDidLoadWorld(World &&world) {
+    m_world = std::move(world);
 }
 
 void EditorLayer::loaderDidLoadCloseProject() {

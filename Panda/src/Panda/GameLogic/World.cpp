@@ -14,6 +14,13 @@ World::World()
     : m_isRunning(false)
     , m_registry() {}
 
+World::World(World&& world)
+    : m_isRunning(world.m_isRunning)
+    , m_renderer2d(std::move(world.m_renderer2d))
+    , m_renderer3d(std::move(world.m_renderer3d))
+    , m_registry(std::move(world.m_registry)) {
+}
+
 World::~World() {}
 
 void World::updateRuntime(double deltaTime) {
@@ -222,6 +229,13 @@ void World::fillStartupData() {
 
 bool World::isChanged() {
     return true;
+}
+World &World::operator=(World &&other) {
+    m_registry = std::move(other.m_registry);
+    m_isRunning = other.m_isRunning;
+    m_renderer2d = std::move(other.m_renderer2d);
+    m_renderer3d = std::move(other.m_renderer3d);
+    return *this;
 }
 
 } // namespace Panda

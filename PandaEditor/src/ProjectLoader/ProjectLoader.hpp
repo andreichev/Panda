@@ -15,7 +15,7 @@ public:
     virtual ~ProjectLoaderOutput() = default;
     virtual void loaderDidLoadProject() = 0;
     virtual void loaderDidLoadCloseProject() = 0;
-    virtual void loaderDidLoadWorld(const World &world) = 0;
+    virtual void loaderDidLoadWorld(World &&world) = 0;
 };
 
 class ProjectLoader final {

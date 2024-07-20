@@ -25,6 +25,7 @@ public:
     };
 
     Renderer3D();
+    Renderer3D(Renderer3D&& other);
     ~Renderer3D() = default;
     void begin();
     void submit(TransformComponent *transform, StaticMesh *mesh);
@@ -33,6 +34,8 @@ public:
     Statistics getStats();
     void setViewProj(glm::mat4 viewProj);
     void setViewId(Miren::ViewId id);
+
+    Renderer3D &operator=(Renderer3D &&other);
 
 private:
     DrawData m_drawData;

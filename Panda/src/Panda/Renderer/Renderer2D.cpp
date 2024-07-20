@@ -39,15 +39,33 @@ Renderer2D::Renderer2D()
     );
 }
 
+Renderer2D::Renderer2D(Panda::Renderer2D &&other)
+    : m_viewId(other.m_viewId)
+    , m_viewProj(other.m_viewProj)
+    , m_drawData(other.m_drawData) {
+    other.m_drawData.shader = MIREN_INVALID_HANDLE;
+    other.m_drawData.layout = MIREN_INVALID_HANDLE;
+    other.m_drawData.vertices = nullptr;
+    other.m_drawData.indices = nullptr;
+}
+
 Renderer2D::~Renderer2D() {
-    Miren::deleteProgram(m_drawData.shader);
-    Miren::deleteVertexLayout(m_drawData.layout);
+    if(m_drawData.shader.isValid()) {
+        Miren::deleteProgram(m_drawData.shader);
+    }
+    if(m_drawData.layout.isValid()) {
+        Miren::deleteVertexLayout(m_drawData.layout);
+    }
     for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i) {
         m_drawData.textures[i] = nullptr;
     }
     m_drawData.whiteTexture = nullptr;
-    FREE(Foundation::getAllocator(), m_drawData.vertices);
-    FREE(Foundation::getAllocator(), m_drawData.indices);
+    if(m_drawData.vertices) {
+        FREE(Foundation::getAllocator(), m_drawData.vertices);
+    }
+    if(m_drawData.indices) {
+        FREE(Foundation::getAllocator(), m_drawData.indices);
+    }
 }
 
 void Renderer2D::begin() {
@@ -162,6 +180,17 @@ void Renderer2D::setViewId(Miren::ViewId id) {
 
 void Renderer2D::setViewProj(glm::mat4 viewProj) {
     m_viewProj = viewProj;
+}
+
+Renderer2D &Renderer2D::operator=(Renderer2D &&other) {
+    m_viewId = other.m_viewId;
+    m_viewProj = other.m_viewProj;
+    m_drawData = other.m_drawData;
+    other.m_drawData.shader = MIREN_INVALID_HANDLE;
+    other.m_drawData.layout = MIREN_INVALID_HANDLE;
+    other.m_drawData.vertices = nullptr;
+    other.m_drawData.indices = nullptr;
+    return *this;
 }
 
 } // namespace Panda

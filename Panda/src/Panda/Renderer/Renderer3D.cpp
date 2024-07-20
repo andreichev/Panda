@@ -7,7 +7,13 @@ namespace Panda {
 
 Renderer3D::Renderer3D()
     : m_viewId(0)
-    , m_viewProj(1.f) {}
+    , m_viewProj(1.f)
+    , m_drawData() {}
+
+Renderer3D::Renderer3D(Panda::Renderer3D &&other)
+    : m_viewId(other.m_viewId)
+    , m_viewProj(other.m_viewProj)
+    , m_drawData(other.m_drawData) {}
 
 void updateModel(Panda::TransformComponent *transform, glm::mat4 &model) {
     model = transform->getTransform();
@@ -67,6 +73,12 @@ void Renderer3D::setViewId(Miren::ViewId id) {
 
 void Renderer3D::setViewProj(glm::mat4 viewProj) {
     m_viewProj = viewProj;
+}
+
+Renderer3D &Renderer3D::operator=(Renderer3D &&other) {
+    m_viewId = other.m_viewId;
+    m_viewProj = other.m_viewProj;
+    return *this;
 }
 
 } // namespace Panda
