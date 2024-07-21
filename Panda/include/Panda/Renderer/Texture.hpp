@@ -8,6 +8,9 @@
 namespace Panda {
 class Texture {
 public:
+    Texture()
+        : m_handle(MIREN_INVALID_HANDLE) {}
+
     Texture(const char *path) {
         TextureAsset asset = AssetLoader::loadTexture(path);
         m_handle = Miren::createTexture(asset.getMirenTextureCreate());
@@ -24,10 +27,20 @@ public:
         m_handle = Miren::createTexture(create);
         LOG_INFO("CREATED TEXTURE, w: {}, h: {}", width, height);
     }
-    ~Texture() {
-        Miren::deleteTexture(m_handle);
-        LOG_INFO("DELETED TEXTURE");
+
+    Texture(Texture &&other) {
+        m_handle = other.m_handle;
+        other.m_handle = MIREN_INVALID_HANDLE;
+        LOG_INFO("MOVED TEXTURE");
     }
+
+    ~Texture() {
+        if (m_handle.isValid()) {
+            Miren::deleteTexture(m_handle);
+            LOG_INFO("DELETED TEXTURE");
+        }
+    }
+
     inline Miren::TextureHandle getHandle() {
         return m_handle;
     }

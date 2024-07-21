@@ -7,6 +7,7 @@
 #include "Panels/StatisticsPanel.hpp"
 #include "Panels/Toolbar.hpp"
 #include "Panels/StartPanel.hpp"
+#include "Panels/ContentBrowser/ContentBrowser.hpp"
 #include "Camera/EditorCamera.hpp"
 #include "Camera/CameraController.hpp"
 #include "EditorLayer/SceneState.hpp"
@@ -45,7 +46,7 @@ public:
 
 #pragma region Project loader output
 
-    void loaderDidLoadProject() override;
+    void loaderDidLoadProject(const path_t &path) override;
     void loaderDidLoadWorld() override;
     void loaderDidLoadCloseProject() override;
     void loaderCreateSampleWorld() override;
@@ -74,6 +75,7 @@ private:
     StatisticsPanel m_statisticsPanel;
     StartPanel m_startPanel;
     WorldHierarchyPanel m_hierarchyPanel;
+    ContentBrowser m_contentBrowser;
     EditorCamera m_editorCamera;
     CameraController m_cameraController;
     std::vector<EditorPopup> m_popups;

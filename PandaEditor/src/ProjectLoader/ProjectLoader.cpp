@@ -89,7 +89,7 @@ void ProjectLoader::openProject(const path_t &path) {
             LOG_INFO("PROJECT SETTINGS NOT FOUND");
         }
     }
-    m_output->loaderDidLoadProject();
+    m_output->loaderDidLoadProject(m_projectPath);
     LOG_INFO("LOADED PROJECT AT PATH {}", m_projectPath.string());
     if (m_projectSettings.worldPath.empty()) {
         m_output->loaderCreateSampleWorld();
@@ -173,7 +173,7 @@ void ProjectLoader::loadWorld() {
 
 void ProjectLoader::saveWorldAs() {
     std::optional<path_t> optionalPath =
-        FileSystem::saveFileDialog("All\0*.pnd\0", m_projectPath.c_str(), "world.pnd");
+        SystemTools::saveFileDialog("All\0*.pnd\0", m_projectPath.c_str(), "world.pnd");
     if (!optionalPath.has_value()) {
         return;
     }

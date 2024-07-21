@@ -14,6 +14,7 @@ EditorLayer::EditorLayer()
     , m_loader(&m_world, this)
     , m_startPanel(&m_loader)
     , m_menuBar(this)
+    , m_contentBrowser()
     , m_editorCamera()
     , m_popups()
     , m_cameraController()
@@ -71,6 +72,7 @@ void EditorLayer::onImGuiRender() {
         m_statisticsPanel.onImGuiRender();
         m_viewport.onImGuiRender();
         m_hierarchyPanel.onImGuiRender();
+        m_contentBrowser.onImGuiRender();
         m_dockspace.endImGuiDockspace();
 
         if (pickedSceneState != m_sceneState) {
@@ -117,8 +119,9 @@ void EditorLayer::stop() {
 
 #pragma region Project loader output
 
-void EditorLayer::loaderDidLoadProject() {
+void EditorLayer::loaderDidLoadProject(const path_t &path) {
     updateWindowState();
+    m_contentBrowser.setBaseDirectory(path);
 }
 
 void EditorLayer::loaderDidLoadWorld() {
@@ -141,7 +144,7 @@ void EditorLayer::loaderCreateSampleWorld() {
 #pragma region Menu bar output
 
 void EditorLayer::menuBarOpenProject() {
-    std::optional<path_t> optionalPath = FileSystem::openFolderDialog();
+    std::optional<path_t> optionalPath = SystemTools::openFolderDialog();
     if (!optionalPath.has_value()) {
         return;
     }

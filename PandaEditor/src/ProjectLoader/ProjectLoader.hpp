@@ -2,7 +2,7 @@
 
 #include "Panda/GameLogic/World.hpp"
 #include "Model/EditorSettings.hpp"
-#include "FileSystem/FileSystem.hpp"
+#include "SystemTools/SystemTools.hpp"
 #include "Model/ProjectSettings.hpp"
 
 #include <Rain/Coders/JsonEncoder.hpp>
@@ -13,7 +13,7 @@ namespace Panda {
 class ProjectLoaderOutput {
 public:
     virtual ~ProjectLoaderOutput() = default;
-    virtual void loaderDidLoadProject() = 0;
+    virtual void loaderDidLoadProject(const path_t &path) = 0;
     virtual void loaderDidLoadCloseProject() = 0;
     virtual void loaderDidLoadWorld() = 0;
     virtual void loaderCreateSampleWorld() = 0;
