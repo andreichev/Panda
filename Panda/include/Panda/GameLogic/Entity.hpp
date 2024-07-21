@@ -71,7 +71,7 @@ public:
     }
 
     bool isValid() {
-        return m_id != -1;
+        return m_id != -1 && m_registry->valid(static_cast<entt::entity>(m_id));
     }
 
     std::string &getName() {

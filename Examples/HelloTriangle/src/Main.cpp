@@ -13,7 +13,9 @@ int startApp(int argc, char **argv) {
     settings.windowTitle = "Hello triangle";
     settings.windowSize = {900, 600};
     settings.isFullScreen = false;
-    settings.startupLevel = new TriangleLevel();
-    runPandaApplication(settings);
+    auto application = new Panda::Application(settings);
+    application->startBasicGame(new TriangleLevel);
+    application->loop();
+    delete application;
     return 0;
 }

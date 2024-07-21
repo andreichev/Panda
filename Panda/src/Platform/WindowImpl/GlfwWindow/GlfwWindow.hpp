@@ -17,6 +17,7 @@ public:
     ~GlfwWindow() override;
     bool isFullScreen() override;
     void setFullScreen(bool isFullScreen) override;
+    void setTitle(const char *title) override;
     bool isMaximized() override;
     void setMaximized(bool isMaximized) override;
     void setResizable(bool isResizable) override;

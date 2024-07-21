@@ -63,7 +63,7 @@ public:
         glm::vec3 pos;
         glm::vec2 textureCoords;
         float textureIndex;
-        Color color;
+        glm::vec4 color;
     };
 
     struct DrawCallData {
@@ -84,7 +84,7 @@ public:
     };
 
     Renderer2D();
-    Renderer2D(Renderer2D &&other);
+    Renderer2D(Renderer2D &other) = delete;
     ~Renderer2D();
     void begin();
     void drawRect(RectData rect);
@@ -92,7 +92,7 @@ public:
     Statistics getStats();
     void setViewId(Miren::ViewId id);
     void setViewProj(glm::mat4 viewProj);
-    Renderer2D &operator=(Renderer2D &&other);
+    Renderer2D &operator=(Renderer2D &other) = delete;
 
 private:
     glm::mat4 m_viewProj;

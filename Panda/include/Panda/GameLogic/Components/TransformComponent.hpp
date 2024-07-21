@@ -12,9 +12,9 @@ struct TransformComponent {
 public:
     TransformComponent();
     // ------- Rotation -------
-    void setRotationEuler(glm::vec3 rot);
+    void setRotationEuler(glm::vec3 degrees);
     glm::vec3 getRotationEuler();
-    void rotateEuler(glm::vec3 offset);
+    void rotateEuler(glm::vec3 degrees);
     void setRotation(glm::quat quat);
     glm::quat getRotation();
     glm::mat4 getRotationMatrix();
@@ -24,9 +24,13 @@ public:
     void translate(glm::vec3 offset);
     void setPosition(glm::vec3 pos);
     glm::mat4 getTransform() const;
+    // ------- Scale -------
+    glm::vec3 getScale();
+    void setScale(glm::vec3 scale);
 
 private:
     glm::quat rotation;
+    // rotation in degrees
     glm::vec3 rotationEuler;
     glm::vec3 position;
     glm::vec3 scale;

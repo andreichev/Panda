@@ -12,18 +12,18 @@ TransformComponent::TransformComponent()
     , position(0.0f, 0.0f, 0.0f)
     , scale(1.0f, 1.0f, 1.0f) {}
 
-void TransformComponent::setRotationEuler(glm::vec3 rot) {
-    rotationEuler = rot;
+void TransformComponent::setRotationEuler(glm::vec3 degrees) {
+    rotationEuler = glm::radians(degrees);
     rotation = glm::quat(rotationEuler);
 }
 
-void TransformComponent::rotateEuler(glm::vec3 offset) {
-    rotationEuler += offset;
+void TransformComponent::rotateEuler(glm::vec3 degrees) {
+    rotationEuler += glm::radians(degrees);
     rotation = glm::quat(rotationEuler);
 }
 
 glm::vec3 TransformComponent::getRotationEuler() {
-    return rotationEuler;
+    return glm::degrees(rotationEuler);
 }
 
 void TransformComponent::setRotation(glm::quat quat) {
@@ -58,6 +58,14 @@ glm::vec4 TransformComponent::getPositionHomogeneous() {
 glm::mat4 TransformComponent::getTransform() const {
     return glm::translate(glm::mat4(1.0f), position) * glm::toMat4(rotation) *
            glm::scale(glm::mat4(1.0f), scale);
+}
+
+glm::vec3 TransformComponent::getScale() {
+    return scale;
+}
+
+void TransformComponent::setScale(glm::vec3 _scale) {
+    scale = _scale;
 }
 
 } // namespace Panda

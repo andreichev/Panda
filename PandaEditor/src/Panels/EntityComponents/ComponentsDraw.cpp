@@ -87,9 +87,8 @@ void drawComponents(Entity entity) {
         drawVec3Control("Translation", position);
         component.setPosition(position);
         glm::vec3 rotation = component.getRotationEuler();
-        glm::vec3 degrees = glm::degrees(rotation);
-        drawVec3Control("Rotation", degrees);
-        component.setRotationEuler(glm::radians(degrees));
+        drawVec3Control("Rotation", rotation);
+        component.setRotationEuler(rotation);
     });
     drawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto &component) {
         beginPropertiesGrid();

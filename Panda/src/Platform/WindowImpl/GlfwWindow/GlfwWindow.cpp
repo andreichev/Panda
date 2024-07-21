@@ -118,6 +118,10 @@ void GlfwWindow::setFullScreen(bool isFullScreen) {
     }
 }
 
+void GlfwWindow::setTitle(const char *title) {
+    glfwSetWindowTitle(m_windowHandle, title);
+}
+
 bool GlfwWindow::isMaximized() {
     return glfwGetWindowAttrib(m_windowHandle, GLFW_MAXIMIZED) == GLFW_TRUE;
 }

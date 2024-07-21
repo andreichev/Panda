@@ -13,7 +13,9 @@ int startApp(int argc, char **argv) {
     settings.windowTitle = "Hello Cube";
     settings.windowSize = {900, 600};
     settings.isFullScreen = false;
-    settings.startupLevel = new CubeLevel();
-    runPandaApplication(settings);
+    auto application = new Panda::Application(settings);
+    application->startBasicGame(new CubeLevel);
+    application->loop();
+    delete application;
     return 0;
 }

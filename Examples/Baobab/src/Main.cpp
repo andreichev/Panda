@@ -15,7 +15,9 @@ int startApp(int argc, char **argv) {
     settings.windowSize = {900, 600};
     settings.isFullScreen = false;
     settings.isMaximized = false;
-    settings.startupLevel = new BaseLevel();
-    runPandaApplication(settings);
+    auto application = new Panda::Application(settings);
+    application->startBasicGame(new BaseLevel);
+    application->loop();
+    delete application;
     return 0;
 }

@@ -4,7 +4,8 @@ namespace Panda {
 
 Renderer2D::Renderer2D()
     : m_viewId(0)
-    , m_viewProj(1.f) {
+    , m_viewProj(1.f)
+    , m_drawData() {
     m_drawData.vbSize = 0;
     m_drawData.indicesCount = 0;
     m_drawData.vertices =
@@ -37,16 +38,6 @@ Renderer2D::Renderer2D()
     Miren::setUniform(
         m_drawData.shader, "u_textures", m_drawData.samplers, Miren::UniformDataType::IntArray
     );
-}
-
-Renderer2D::Renderer2D(Panda::Renderer2D &&other)
-    : m_viewId(other.m_viewId)
-    , m_viewProj(other.m_viewProj)
-    , m_drawData(other.m_drawData) {
-    other.m_drawData.shader = MIREN_INVALID_HANDLE;
-    other.m_drawData.layout = MIREN_INVALID_HANDLE;
-    other.m_drawData.vertices = nullptr;
-    other.m_drawData.indices = nullptr;
 }
 
 Renderer2D::~Renderer2D() {
@@ -180,17 +171,6 @@ void Renderer2D::setViewId(Miren::ViewId id) {
 
 void Renderer2D::setViewProj(glm::mat4 viewProj) {
     m_viewProj = viewProj;
-}
-
-Renderer2D &Renderer2D::operator=(Renderer2D &&other) {
-    m_viewId = other.m_viewId;
-    m_viewProj = other.m_viewProj;
-    m_drawData = other.m_drawData;
-    other.m_drawData.shader = MIREN_INVALID_HANDLE;
-    other.m_drawData.layout = MIREN_INVALID_HANDLE;
-    other.m_drawData.vertices = nullptr;
-    other.m_drawData.indices = nullptr;
-    return *this;
 }
 
 } // namespace Panda

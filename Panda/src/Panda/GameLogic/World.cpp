@@ -15,13 +15,6 @@ World::World()
     , m_isChanged(false)
     , m_registry() {}
 
-World::World(World &&world)
-    : m_isRunning(world.m_isRunning)
-    , m_isChanged(world.m_isChanged)
-    , m_renderer2d(std::move(world.m_renderer2d))
-    , m_renderer3d(std::move(world.m_renderer3d))
-    , m_registry(std::move(world.m_registry)) {}
-
 World::~World() {}
 
 void World::updateRuntime(double deltaTime) {
@@ -34,6 +27,9 @@ void World::updateRuntime(double deltaTime) {
     {
         auto view = m_registry.view<NativeScriptListComponent>();
         for (auto entityHandle : view) {
+            if (!m_registry.valid(entityHandle)) {
+                continue;
+            }
             auto &component = view.get<NativeScriptListComponent>(entityHandle);
             for (auto &container : component.scripts) {
                 if (!container.initialized) {
@@ -70,6 +66,9 @@ void World::updateSimulation(double deltaTime, glm::mat4 viewProjectionMatrix) {
     {
         auto view = m_registry.view<NativeScriptListComponent>();
         for (auto entityHandle : view) {
+            if (!m_registry.valid(entityHandle)) {
+                continue;
+            }
             auto &component = view.get<NativeScriptListComponent>(entityHandle);
             for (auto &container : component.scripts) {
                 if (!container.initialized) {
@@ -109,6 +108,9 @@ void World::updateBasicComponents(float deltaTime) {
     {
         auto view = m_registry.view<SpriteRendererComponent, TransformComponent>();
         for (auto entityHandle : view) {
+            if (!m_registry.valid(entityHandle)) {
+                continue;
+            }
             auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
             auto &transform = view.get<TransformComponent>(entityHandle);
             Panda::Renderer2D::RectData rect;
@@ -123,6 +125,9 @@ void World::updateBasicComponents(float deltaTime) {
     {
         auto view = m_registry.view<StaticMeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
+            if (!m_registry.valid(entityHandle)) {
+                continue;
+            }
             auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
             auto &transform = view.get<TransformComponent>(entityHandle);
             for (auto &mesh : staticMeshComponent.meshes) {
@@ -134,6 +139,9 @@ void World::updateBasicComponents(float deltaTime) {
     {
         auto view = m_registry.view<DynamicMeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
+            if (!m_registry.valid(entityHandle)) {
+                continue;
+            }
             auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
             auto &transform = view.get<TransformComponent>(entityHandle);
             for (auto &mesh : dynamicMeshComponent.meshes) {
@@ -146,6 +154,9 @@ void World::updateBasicComponents(float deltaTime) {
 void World::onImGuiRender() {
     auto view = m_registry.view<NativeScriptListComponent>();
     for (auto entityHandle : view) {
+        if (!m_registry.valid(entityHandle)) {
+            continue;
+        }
         auto &component = view.get<NativeScriptListComponent>(entityHandle);
         for (auto &container : component.scripts) {
             if (container.initialized) {
@@ -190,18 +201,27 @@ void World::destroy(Entity entity) {
     entity.removeFromParent();
     for (id_t childHandle : entity.getChildEntities()) {
         Entity child = Entity(&m_registry, childHandle, this);
+        if (!child.isValid()) {
+            continue;
+        }
         destroy(child);
     }
     m_registry.destroy(static_cast<entt::entity>(entity.getId()));
 }
 
 void World::clear() {
+    for (auto id : m_registry.storage<entt::entity>()) {
+        m_registry.destroy(id);
+    }
     m_registry.clear();
 }
 
 Entity World::findMainCameraEntity() {
     auto view = m_registry.view<CameraComponent>();
     for (auto entity : view) {
+        if (!m_registry.valid(entity)) {
+            continue;
+        }
         auto &comp = view.get<CameraComponent>(entity);
         if (comp.isPrimary) {
             id_t id = static_cast<id_t>(entity);
@@ -229,6 +249,7 @@ void World::fillStartupData() {
     sprite1Entity.setName("Orange Sprite");
     auto &sprite1 = sprite1Entity.addComponent<SpriteRendererComponent>();
     sprite1.color = {1.0f, 0.5f, 0.2f, 1.0f};
+    m_isChanged = true;
 }
 
 bool World::isChanged() {
@@ -241,15 +262,6 @@ void World::resetChanged() {
 
 void World::setChanged() {
     m_isChanged = true;
-}
-
-World &World::operator=(World &&other) {
-    m_registry = std::move(other.m_registry);
-    m_isRunning = other.m_isRunning;
-    m_isChanged = other.m_isChanged;
-    m_renderer2d = std::move(other.m_renderer2d);
-    m_renderer3d = std::move(other.m_renderer3d);
-    return *this;
 }
 
 } // namespace Panda

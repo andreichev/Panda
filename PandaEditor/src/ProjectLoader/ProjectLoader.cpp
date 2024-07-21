@@ -6,8 +6,14 @@
 
 namespace Panda {
 
-ProjectLoader::ProjectLoader(ProjectLoaderOutput *output)
+bool isSubpath(const path_t &path, const path_t &base) {
+    auto rel = std::filesystem::relative(path, base);
+    return !rel.empty() && rel.native()[0] != '.';
+}
+
+ProjectLoader::ProjectLoader(World *world, ProjectLoaderOutput *output)
     : m_output(output)
+    , m_world(world)
     , jsonEncoder(true)
     , jsonDecoder()
     , m_editorSettings()
@@ -59,7 +65,7 @@ void ProjectLoader::loadRecentProject() {
 
 void ProjectLoader::openProject(const path_t &path) {
     if (!std::filesystem::exists(path)) {
-        LOG_INFO("PROJECT NOT FOUND");
+        LOG_INFO("PROJECT NOT FOUND AT PATH {}", path.string());
         return;
     }
     m_projectPath = path;
@@ -79,11 +85,14 @@ void ProjectLoader::openProject(const path_t &path) {
             decoder->decode(file, m_projectSettings);
             file.close();
         } else {
+            m_projectSettings.clear();
             LOG_INFO("PROJECT SETTINGS NOT FOUND");
         }
     }
     m_output->loaderDidLoadProject();
+    LOG_INFO("LOADED PROJECT AT PATH {}", m_projectPath.string());
     if (m_projectSettings.worldPath.empty()) {
+        m_output->loaderCreateSampleWorld();
         return;
     }
     m_worldPath = m_projectPath;
@@ -122,17 +131,18 @@ const std::vector<RecentProject> &ProjectLoader::getRecentProjectsList() {
     return m_editorSettings.recentProjects;
 }
 
-void ProjectLoader::saveWorld(const World &world) {
+void ProjectLoader::saveWorld() {
     if (m_worldPath.empty()) {
-        saveWorldAs(world);
+        saveWorldAs();
         return;
     }
-    WorldDto worldDto = WorldMapper::toDto(world);
+    WorldDto worldDto = WorldMapper::toDto(*m_world);
     std::ofstream file(m_worldPath);
     if (file.is_open()) {
         Rain::Encoder *encoder = &jsonEncoder;
         encoder->encode(file, worldDto);
         file.close();
+        m_world->resetChanged();
     } else {
         LOG_ERROR("ERROR SAVING WORLD AT PATH {}", m_worldPath.string());
     }
@@ -140,6 +150,7 @@ void ProjectLoader::saveWorld(const World &world) {
 
 void ProjectLoader::loadWorld() {
     if (m_worldPath.empty()) {
+        m_output->loaderCreateSampleWorld();
         return;
     }
     WorldDto worldDto;
@@ -152,20 +163,22 @@ void ProjectLoader::loadWorld() {
         LOG_INFO("CANNOT LOAD WORLD AT PATH {}", m_worldPath.string());
         m_worldPath.clear();
         m_projectSettings.worldPath.clear();
+        m_output->loaderCreateSampleWorld();
+        return;
     }
-    World world;
-    WorldMapper::fillWorld(world, worldDto);
-    m_output->loaderDidLoadWorld(std::move(world));
+    WorldMapper::fillWorld(*m_world, worldDto);
+    LOG_INFO("LOADED WORLD AT PATH {}", m_worldPath.string());
+    m_output->loaderDidLoadWorld();
 }
 
-void ProjectLoader::saveWorldAs(const World &world) {
+void ProjectLoader::saveWorldAs() {
     std::optional<path_t> optionalPath =
-        FileSystem::saveFileDialog("All\0*.pnd\0", nullptr, "world.pnd");
+        FileSystem::saveFileDialog("All\0*.pnd\0", m_projectPath.c_str(), "world.pnd");
     if (!optionalPath.has_value()) {
         return;
     }
     m_worldPath = optionalPath.value();
-    saveWorld(world);
+    saveWorld();
 }
 
 void ProjectLoader::closeProject() {
@@ -198,8 +211,12 @@ void ProjectLoader::saveProjectSettings() {
     }
     path_t projectConfigPath = pandaDirectoryPath;
     projectConfigPath.append("project.json");
-    path_t worldPath = std::filesystem::relative(m_worldPath, m_projectPath);
-    m_projectSettings.worldPath = worldPath;
+    if (isSubpath(m_worldPath, m_projectPath)) {
+        path_t worldPath = std::filesystem::relative(m_worldPath, m_projectPath);
+        m_projectSettings.worldPath = worldPath;
+    } else {
+        m_projectSettings.worldPath.clear();
+    }
     // Save project settings
     {
         std::ofstream file(projectConfigPath);

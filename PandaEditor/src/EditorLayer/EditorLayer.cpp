@@ -11,7 +11,7 @@ EditorLayer::EditorLayer()
     , m_viewport()
     , m_hierarchyPanel(nullptr)
     , m_statisticsPanel(nullptr)
-    , m_loader(this)
+    , m_loader(&m_world, this)
     , m_startPanel(&m_loader)
     , m_menuBar(this)
     , m_editorCamera()
@@ -121,13 +121,19 @@ void EditorLayer::loaderDidLoadProject() {
     updateWindowState();
 }
 
-void EditorLayer::loaderDidLoadWorld(World &&world) {
-    m_world = std::move(world);
+void EditorLayer::loaderDidLoadWorld() {
+    Application::get()->getWindow()->setTitle(m_loader.getProjectSettings().worldPath.c_str());
 }
 
 void EditorLayer::loaderDidLoadCloseProject() {
     m_world.clear();
     updateWindowState();
+}
+
+void EditorLayer::loaderCreateSampleWorld() {
+    Application::get()->getWindow()->setTitle("Untitled World");
+    m_world.clear();
+    m_world.fillStartupData();
 }
 
 #pragma endregion
@@ -197,6 +203,7 @@ void EditorLayer::updateWindowState() {
     window->setResizable(m_loader.hasOpenedProject());
     window->setMaximized(m_loader.hasOpenedProject());
     if (!m_loader.hasOpenedProject()) {
+        Application::get()->getWindow()->setTitle("Welcome");
         window->setSize({600, 400});
     }
 }
@@ -236,7 +243,7 @@ void EditorLayer::imguiDrawPopup(EditorLayer::EditorPopup &popup) {
 }
 
 void EditorLayer::saveWorld() {
-    m_loader.saveWorld(m_world);
+    m_loader.saveWorld();
 }
 
 } // namespace Panda

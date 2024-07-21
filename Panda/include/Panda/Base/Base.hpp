@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <imgui.h>
 #include <Rain/Rain.hpp>
 #include <Rain/Codable.hpp>
@@ -43,6 +44,10 @@ struct Vec2 : public Rain::Codable {
         return {x, y};
     }
 
+    operator glm::vec2() {
+        return {x, y};
+    }
+
     RAIN_FIELDS_BEGIN(Vec2)
     RAIN_FIELD(x)
     RAIN_FIELD(y)
@@ -74,6 +79,10 @@ struct Vec3 : public Rain::Codable {
         : x(x)
         , y(y)
         , z(z) {}
+
+    operator glm::vec3() {
+        return {x, y, z};
+    }
 
     RAIN_FIELDS_BEGIN(Vec3)
     RAIN_FIELD(x)
@@ -108,11 +117,30 @@ struct Vec4 : public Rain::Codable {
         , z(c.z)
         , w(c.w) {}
 
+    Vec4(glm::quat c)
+        : x(c.x)
+        , y(c.y)
+        , z(c.z)
+        , w(c.w) {}
+
     Vec4(float x, float y, float z, float w)
         : x(x)
         , y(y)
         , z(z)
         , w(w) {}
+
+    operator glm::vec4() {
+        return {x, y, z, w};
+    }
+
+    operator glm::quat() {
+        glm::quat q;
+        q.x = x;
+        q.y = y;
+        q.z = z;
+        q.w = w;
+        return q;
+    }
 
     RAIN_FIELDS_BEGIN(Vec4)
     RAIN_FIELD(x)
@@ -125,5 +153,6 @@ struct Vec4 : public Rain::Codable {
 using id_t = int32_t;
 using Size = Vec2;
 using Color = Vec4;
+using Quat = Vec4;
 
 } // namespace Panda

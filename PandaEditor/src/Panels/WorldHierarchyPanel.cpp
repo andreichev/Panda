@@ -18,6 +18,9 @@ void WorldHierarchyPanel::onImGuiRender() {
     if (m_world) {
         for (auto entityId : m_world->m_registry.storage<entt::entity>()) {
             Entity entity(&m_world->m_registry, (id_t)entityId, m_world);
+            if (!entity.isValid()) {
+                continue;
+            }
             drawEntityNode(entity);
         }
     }

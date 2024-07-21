@@ -15,28 +15,29 @@ public:
     virtual ~ProjectLoaderOutput() = default;
     virtual void loaderDidLoadProject() = 0;
     virtual void loaderDidLoadCloseProject() = 0;
-    virtual void loaderDidLoadWorld(World &&world) = 0;
+    virtual void loaderDidLoadWorld() = 0;
+    virtual void loaderCreateSampleWorld() = 0;
 };
 
 class ProjectLoader final {
 public:
-    ProjectLoader(ProjectLoaderOutput *output);
+    ProjectLoader(World *world, ProjectLoaderOutput *output);
     ~ProjectLoader();
     void loadInitialData();
     void saveAppSettings();
     void saveProjectSettings();
     void openProject(const path_t &path);
     void loadWorld();
+    void saveWorld();
     void closeProject();
     void createProject(const path_t &path);
     const std::vector<RecentProject> &getRecentProjectsList();
     bool hasOpenedProject();
-    void saveWorld(const World &world);
     void removeRecentProject(int index);
     const ProjectSettings &getProjectSettings();
 
 private:
-    void saveWorldAs(const World &world);
+    void saveWorldAs();
     void loadRecentProject();
     void appendRecentProject();
 
@@ -46,6 +47,7 @@ private:
     ProjectSettings m_projectSettings;
     path_t m_projectPath;
     path_t m_worldPath;
+    World *m_world;
     ProjectLoaderOutput *m_output;
 };
 

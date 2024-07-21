@@ -46,8 +46,9 @@ public:
 #pragma region Project loader output
 
     void loaderDidLoadProject() override;
-    void loaderDidLoadWorld(World &&world) override;
+    void loaderDidLoadWorld() override;
     void loaderDidLoadCloseProject() override;
+    void loaderCreateSampleWorld() override;
 
 #pragma endregion
 

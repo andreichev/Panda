@@ -13,6 +13,7 @@ namespace Panda {
 class Window {
 public:
     virtual ~Window() = default;
+    virtual void setTitle(const char *title) = 0;
     virtual bool isFullScreen() = 0;
     virtual void setFullScreen(bool isFullScreen) = 0;
     virtual bool isMaximized() = 0;
