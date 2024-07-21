@@ -97,7 +97,7 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     float textureIndex = 0.0f;
     if (rect.texture != nullptr) {
         for (uint32_t i = 1; i < m_drawData.textureSlotIndex; i++) {
-            if (*m_drawData.textures[i] == *rect.texture) {
+            if ((*rect.texture).getHandle().id == (*m_drawData.textures[i]).getHandle().id) {
                 textureIndex = (float)i;
                 break;
             }
