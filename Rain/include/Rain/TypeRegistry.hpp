@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <optional>
 #include <utility>
 
 namespace Rain {

@@ -115,8 +115,8 @@ void ProjectLoader::appendRecentProject() {
         return;
     }
     RecentProject recentProject;
-    recentProject.path = m_projectPath;
-    recentProject.name = m_projectPath.filename();
+    recentProject.path = m_projectPath.string();
+    recentProject.name = m_projectPath.filename().string();
     auto &recentList = m_editorSettings.recentProjects;
     auto existing = std::find(recentList.begin(), recentList.end(), recentProject);
     if (existing != recentList.end()) {
@@ -173,7 +173,7 @@ void ProjectLoader::loadWorld() {
 
 void ProjectLoader::saveWorldAs() {
     std::optional<path_t> optionalPath =
-        SystemTools::saveFileDialog("All\0*.pnd\0", m_projectPath.c_str(), "world.pnd");
+        SystemTools::saveFileDialog("All\0*.pnd\0", m_projectPath.string().c_str(), "world.pnd");
     if (!optionalPath.has_value()) {
         return;
     }
@@ -213,7 +213,7 @@ void ProjectLoader::saveProjectSettings() {
     projectConfigPath.append("project.json");
     if (isSubpath(m_worldPath, m_projectPath)) {
         path_t worldPath = std::filesystem::relative(m_worldPath, m_projectPath);
-        m_projectSettings.worldPath = worldPath;
+        m_projectSettings.worldPath = worldPath.string();
     } else {
         m_projectSettings.worldPath.clear();
     }

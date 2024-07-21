@@ -51,7 +51,7 @@ void SystemTools::copyFolder(const path_t &sourcePath, const path_t &newPath) {
     std::string command = "cp -rf " + sourcePath.string() + " " + newPath.string();
     system(command.c_str());
 #elif defined(PLATFORM_WINDOWS)
-    std::string command = "copy " + sourcePath + " " + newPath;
+    std::string command = "copy " + sourcePath.string() + " " + newPath.string();
     system(command.c_str());
 #else
 #    error Unsupported platrofm
@@ -63,7 +63,7 @@ void SystemTools::open(const path_t &path) {
     std::string command = "open " + path.string();
     system(command.c_str());
 #elif defined(PLATFORM_WINDOWS)
-    std::string command = "start " + path;
+    std::string command = "start " + path.string();
     system(command.c_str());
 #else
 #    error Unsupported platrofm

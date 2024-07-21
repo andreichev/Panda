@@ -1,6 +1,8 @@
 #include "StartPanel.hpp"
 #include "Common/ImGuiHelper.hpp"
 
+#include <optional>
+
 namespace Panda {
 
 StartPanel::StartPanel(ProjectLoader *loader)
@@ -124,7 +126,7 @@ void StartPanel::openProject() {
     if (!pathOptional.has_value()) {
         return;
     }
-    std::string path = pathOptional.value();
+    std::string path = pathOptional.value().string();
     LOG_INFO("OPEN PROJECT AT PATH {}", path);
     m_loader->openProject(path);
 }
