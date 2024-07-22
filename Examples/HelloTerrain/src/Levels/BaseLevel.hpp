@@ -17,5 +17,6 @@ private:
     Miren::ProgramHandle m_shader;
     Miren::TextureHandle m_heightMapTexture;
     Miren::TextureHandle m_colorTexture;
+    Miren::TextureHandle m_skyTexture;
     Miren::TextureHandle m_patternTexture;
 };

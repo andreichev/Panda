@@ -52,6 +52,8 @@ enum TextureFormat {
     DEPTH24STENCIL8
 };
 
+enum TextureWrapMode { CLAMP, REPEAT };
+
 enum TextureFiltering {
     NEAREST,
     LINEAR,
@@ -70,19 +72,38 @@ struct TextureCreate {
     TextureFormat m_format;
     TextureFiltering m_minFiltering;
     TextureFiltering m_magFiltering;
+    TextureWrapMode m_wrap;
     uint16_t m_width;
     uint16_t m_height;
     uint8_t m_numMips;
+    bool m_isCubeMap;
     Foundation::Memory m_data;
 
     TextureCreate()
         : m_format(TextureFormat::None)
         , m_minFiltering(TextureFiltering::NEAREST)
         , m_magFiltering(TextureFiltering::NEAREST)
+        , m_wrap(TextureWrapMode::REPEAT)
         , m_width(1)
         , m_height(1)
         , m_numMips(0)
+        , m_isCubeMap(false)
         , m_data(nullptr) {}
+
+    size_t bytesPerColor() const {
+        switch (m_format) {
+            case None:
+                return 0;
+            case RGB8:
+                return 3;
+            case RGBA8:
+                return 4;
+            case RED_INTEGER:
+                return 1;
+            case DEPTH24STENCIL8:
+                return 4;
+        }
+    }
 };
 
 enum class UniformDataType { Int, Mat4, IntArray };

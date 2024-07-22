@@ -72,6 +72,16 @@ void BaseLevel::start(Panda::World *world) {
     int height = heightTextureAsset.m_height;
     float *heightMap = (float *)ALLOC(Foundation::getAllocator(), sizeof(float) * width * height);
 
+    Panda::TextureAsset skyTextureAsset = Panda::AssetLoader::loadCubeMapTexture(
+        {"textures/skybox/back.jpg",
+         "textures/skybox/bottom.jpg",
+         "textures/skybox/front.jpg",
+         "textures/skybox/left.jpg",
+         "textures/skybox/right.jpg",
+         "textures/skybox/top.jpg"}
+    );
+    m_skyTexture = Miren::createTexture(skyTextureAsset.getMirenTextureCreate());
+
     uint8_t *data = (uint8_t *)heightTextureAsset.m_data.data;
     for (int h = 0; h < height; h++) {
         for (int w = 0; w < width; w++) {

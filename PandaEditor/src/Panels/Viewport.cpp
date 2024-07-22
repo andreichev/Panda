@@ -88,7 +88,7 @@ void Viewport::onImGuiRender() {
         updateViewportSize(viewportSpace);
     }
     bool hovered = ImGui::IsWindowHovered();
-    if(hovered && Input::isMouseButtonPressed(MouseButton::RIGHT) || m_focusNextFrame) {
+    if (hovered && Input::isMouseButtonPressed(MouseButton::RIGHT) || m_focusNextFrame) {
         ImGui::SetWindowFocus();
         m_focusNextFrame = false;
     }
@@ -97,10 +97,7 @@ void Viewport::onImGuiRender() {
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 1);
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
     ImGui::Image(
-        (void *)(uintptr_t)m_colorAttachment.id,
-        m_viewportPanelSize,
-        ImVec2(0, 1),
-        ImVec2(1, 0)
+        (void *)(uintptr_t)m_colorAttachment.id, m_viewportPanelSize, ImVec2(0, 1), ImVec2(1, 0)
     );
     ImGui::End();
     ImGui::PopStyleVar();
