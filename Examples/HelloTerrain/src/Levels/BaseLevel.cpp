@@ -67,7 +67,7 @@ void BaseLevel::start(Panda::World *world) {
         terrainEntity.getComponent<Panda::DynamicMeshComponent>();
     Panda::DynamicMesh &dynamicMesh = meshComponent.meshes.emplace_back();
 
-    Panda::TextureAsset heightTextureAsset = Panda::AssetLoader::loadTexture("textures/map1.png");
+    Panda::TextureAsset heightTextureAsset = Panda::AssetLoader::loadTexture("textures/map2.png");
     int width = heightTextureAsset.m_width;
     int height = heightTextureAsset.m_height;
     float *heightMap = (float *)ALLOC(Foundation::getAllocator(), sizeof(float) * width * height);

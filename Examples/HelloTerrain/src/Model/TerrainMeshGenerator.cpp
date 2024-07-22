@@ -19,10 +19,10 @@ void initVertices(
     float scale = 0.1f;
     for (int z = 0; z < depth; z++) {
         for (int x = 0; x < width; x++) {
-            float h = heightMap[z * width + x] * 200.f;
+            float h = heightMap[z * width + x] * 50.f;
             float u = x * tileX / (float)width;
             float v = z * tileY / (float)depth;
-            vertices[verticesCount++] = Vertex(x * scale, h * scale, z * scale, u, v, h / 100.f);
+            vertices[verticesCount++] = Vertex(x * scale, h * scale, z * scale, u, v, h / 30.f);
         }
     }
 }

@@ -82,27 +82,25 @@ void Viewport::updateViewportSize(Vec2 size) {
 void Viewport::onImGuiRender() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
     ImGui::Begin("Viewport");
-    if (m_focusNextFrame) {
-        ImGui::SetWindowFocus();
-        m_focusNextFrame = false;
-    }
     ImVec2 viewportSpace = ImGui::GetContentRegionAvail();
     viewportSpace = ImVec2(viewportSpace.x - 4, viewportSpace.y - 4);
     if (m_viewportPanelSize != viewportSpace) {
         updateViewportSize(viewportSpace);
     }
-    m_focused = ImGui::IsWindowFocused();
     bool hovered = ImGui::IsWindowHovered();
-    Application::get()->getImGuiLayer()->setBlockEvents(!hovered);
+    if(hovered && Input::isMouseButtonPressed(MouseButton::RIGHT) || m_focusNextFrame) {
+        ImGui::SetWindowFocus();
+        m_focusNextFrame = false;
+    }
+    m_focused = ImGui::IsWindowFocused();
+    // Application::get()->getImGuiLayer()->setBlockEvents(!hovered);
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 1);
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
     ImGui::Image(
         (void *)(uintptr_t)m_colorAttachment.id,
         m_viewportPanelSize,
         ImVec2(0, 1),
-        ImVec2(1, 0),
-        ImVec4(1, 1, 1, 1),
-        m_focused ? ImVec4(0, 1, 1, 1) : ImVec4(0, 0, 0, 0)
+        ImVec2(1, 0)
     );
     ImGui::End();
     ImGui::PopStyleVar();
