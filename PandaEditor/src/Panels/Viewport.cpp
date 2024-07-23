@@ -93,7 +93,7 @@ void Viewport::onImGuiRender() {
         m_focusNextFrame = false;
     }
     m_focused = ImGui::IsWindowFocused();
-    // Application::get()->getImGuiLayer()->setBlockEvents(!hovered);
+    Application::get()->getImGuiLayer()->setBlockEvents(!hovered);
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 1);
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
     ImGui::Image(
