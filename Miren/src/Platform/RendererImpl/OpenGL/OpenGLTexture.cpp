@@ -21,6 +21,7 @@ void OpenGLTexture::create(const TextureCreate &create) {
     GL_CALL(glGenTextures(1, &m_id));
 
     GLenum target = create.m_isCubeMap ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D;
+    m_target = target;
     GL_CALL(glBindTexture(target, m_id));
 
     GLenum format = s_textureFormat[create.m_format].m_fmt;
@@ -29,7 +30,7 @@ void OpenGLTexture::create(const TextureCreate &create) {
 
     GLenum imageTarget = m_create.m_isCubeMap ? GL_TEXTURE_CUBE_MAP_POSITIVE_X : GL_TEXTURE_2D;
     const uint16_t numSides = create.m_isCubeMap ? 6 : 1;
-    size_t imageSize = create.bytesPerColor() * create.m_width * create.m_height;
+    size_t imageSize = create.bytesPerTexel() * create.m_width * create.m_height;
     uint8_t *data = (uint8_t *)create.m_data.data;
     for (uint16_t side = 0; side < numSides; ++side) {
         GL_CALL(glTexImage2D(
@@ -78,11 +79,11 @@ void OpenGLTexture::terminate() {
 void OpenGLTexture::bind(unsigned int slot) {
     PND_ASSERT(m_id != -1, "TEXTURE IS NOT CREATED");
     GL_CALL(glActiveTexture(GL_TEXTURE0 + slot));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, m_id));
+    GL_CALL(glBindTexture(m_target, m_id));
 }
 
 void OpenGLTexture::unbind() {
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
+    GL_CALL(glBindTexture(m_target, 0));
 }
 
 } // namespace Miren

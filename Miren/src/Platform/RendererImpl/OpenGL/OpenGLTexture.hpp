@@ -33,6 +33,7 @@ public:
 private:
     TextureCreate m_create;
     uint32_t m_id;
+    uint32_t m_target;
 };
 
 } // namespace Miren

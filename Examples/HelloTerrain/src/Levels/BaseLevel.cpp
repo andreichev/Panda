@@ -16,13 +16,9 @@
 
 struct SkyVertex {
     glm::vec3 pos;
-    glm::vec2 uv;
-    float light;
 
-    SkyVertex(float x, float y, float z, float u, float v, float light)
-        : pos(x, y, z)
-        , uv(u, v)
-        , light(light) {}
+    SkyVertex(float x, float y, float z)
+        : pos(x, y, z) {}
 };
 
 class SkyComponent final : public Panda::NativeScript {
@@ -31,35 +27,35 @@ public:
         using namespace Miren;
         auto vertices = new SkyVertex[24]{
             // Front
-            SkyVertex(-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f), // 0
-            SkyVertex(1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f),  // 1
-            SkyVertex(1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f),   // 2
-            SkyVertex(-1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f),  // 3
+            SkyVertex(-1.0f, -1.0f, 1.0f), // 0
+            SkyVertex(1.0f, -1.0f, 1.0f),  // 1
+            SkyVertex(1.0f, 1.0f, 1.0f),   // 2
+            SkyVertex(-1.0f, 1.0f, 1.0f),  // 3
             // Back
-            SkyVertex(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f), // 4
-            SkyVertex(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f),  // 5
-            SkyVertex(1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f),   // 6
-            SkyVertex(1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f),  // 7
+            SkyVertex(-1.0f, -1.0f, -1.0f), // 4
+            SkyVertex(-1.0f, 1.0f, -1.0f),  // 5
+            SkyVertex(1.0f, 1.0f, -1.0f),   // 6
+            SkyVertex(1.0f, -1.0f, -1.0f),  // 7
             // Top
-            SkyVertex(-1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f), // 8
-            SkyVertex(-1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f),  // 11
-            SkyVertex(1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f),   // 10
-            SkyVertex(1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f),  // 9
+            SkyVertex(-1.0f, 1.0f, -1.0f), // 8
+            SkyVertex(-1.0f, 1.0f, 1.0f),  // 11
+            SkyVertex(1.0f, 1.0f, 1.0f),   // 10
+            SkyVertex(1.0f, 1.0f, -1.0f),  // 9
             // Bottom
-            SkyVertex(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f), // 12
-            SkyVertex(1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f),  // 13
-            SkyVertex(1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 1.0f),   // 14
-            SkyVertex(-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f),  // 15
+            SkyVertex(-1.0f, -1.0f, -1.0f), // 12
+            SkyVertex(1.0f, -1.0f, -1.0f),  // 13
+            SkyVertex(1.0f, -1.0f, 1.0f),   // 14
+            SkyVertex(-1.0f, -1.0f, 1.0f),  // 15
             // Left
-            SkyVertex(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f), // 16
-            SkyVertex(-1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f),  // 17
-            SkyVertex(-1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f),   // 18
-            SkyVertex(-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f),  // 19
+            SkyVertex(-1.0f, -1.0f, -1.0f), // 16
+            SkyVertex(-1.0f, -1.0f, 1.0f),  // 17
+            SkyVertex(-1.0f, 1.0f, 1.0f),   // 18
+            SkyVertex(-1.0f, 1.0f, -1.0f),  // 19
             // Right
-            SkyVertex(1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f), // 20
-            SkyVertex(1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 1.0f),  // 23
-            SkyVertex(1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f),   // 22
-            SkyVertex(1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f)   // 21
+            SkyVertex(1.0f, -1.0f, -1.0f), // 20
+            SkyVertex(1.0f, 1.0f, -1.0f),  // 23
+            SkyVertex(1.0f, 1.0f, 1.0f),   // 22
+            SkyVertex(1.0f, -1.0f, 1.0f)   // 21
         };
 
         // clang-format off
@@ -75,26 +71,22 @@ public:
 
         Miren::VertexBufferLayoutData layoutData;
         layoutData.pushVec3();
-        layoutData.pushVec2();
-        layoutData.pushFloat(1);
         Miren::VertexLayoutHandle layoutHandle = Miren::createVertexLayout(layoutData);
         vertexBuffer = Miren::createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
         indexBuffer = Miren::createIndexBuffer(indices, Miren::BufferElementType::UnsignedInt, 36);
 
-        Panda::TextureAsset skyTextureAsset = Panda::AssetLoader::loadCubeMapTexture(
-            {"textures/skybox/back.jpg",
-             "textures/skybox/bottom.jpg",
-             "textures/skybox/front.jpg",
-             "textures/skybox/left.jpg",
-             "textures/skybox/right.jpg",
-             "textures/skybox/top.jpg"}
-        );
-        m_skyTexture = Miren::createTexture(skyTextureAsset.getMirenTextureCreate());
-        
-        texture = Miren::createTexture(textureAsset.getMirenTextureCreate());
+        Panda::TextureAsset skyTextureAsset = Panda::AssetLoader::loadCubeMapTexture({
+            "textures/skybox/px.png",
+            "textures/skybox/nx.png",
+            "textures/skybox/py.png",
+            "textures/skybox/ny.png",
+            "textures/skybox/pz.png",
+            "textures/skybox/nz.png",
+        });
+        skyTexture = Miren::createTexture(skyTextureAsset.getMirenTextureCreate());
+
         Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
-            "default-shaders/renderer3d/base_vertex.glsl",
-            "default-shaders/renderer3d/base_fragment.glsl"
+            "shaders/sky/sky_vertex.glsl", "shaders/sky/sky_fragment.glsl"
         );
         shader = Miren::createProgram(programAsset.getMirenProgramCreate());
         Miren::setShader(shader);
@@ -107,7 +99,7 @@ public:
         projection = glm::perspective<float>(
             40.f, (float)windowSize.width / (float)windowSize.height, 0.1f, 1000.0f
         );
-        // projectionMatrix = glm::perspective(90.f, 1.0f, 0.1f, 1000.0f);
+        // projection = glm::perspective(90.f, 1.0f, 0.1f, 1000.0f);
         model = glm::mat4(1.f);
         translate = glm::vec3(0.f, 0.f, 0.f);
         viewProjection = projection * view;
@@ -115,18 +107,21 @@ public:
         Miren::setUniform(
             shader, "projViewMtx", &viewProjection[0][0], Miren::UniformDataType::Mat4
         );
+        m_time = 0;
     }
 
     void update(double deltaTime) override {
+        m_time += deltaTime;
         model = glm::mat4(1.f);
-        model =
-            glm::scale(glm::mat4(1.f), glm::vec3(abs(sin(time)) + 1.f, abs(sin(time)) + 1.f, 1.f));
+        model = glm::scale(
+            glm::mat4(1.f), glm::vec3(abs(sin(m_time)) + 1.f, abs(sin(m_time)) + 1.f, 1.f)
+        );
         model = glm::translate(model, translate);
-        model = glm::rotate(model, (float)time, glm::vec3(1.f, 1.f, 0.f));
+        model = glm::rotate(model, (float)m_time, glm::vec3(1.f, 1.f, 0.f));
         viewProjection = projection * view;
 
         Miren::setShader(shader);
-        Miren::setTexture(texture, 0);
+        Miren::setTexture(skyTexture, 0);
         Miren::setUniform(shader, "model", &model[0][0], Miren::UniformDataType::Mat4);
         Miren::setUniform(
             shader, "projViewMtx", &viewProjection[0][0], Miren::UniformDataType::Mat4
@@ -144,7 +139,8 @@ private:
     glm::mat4 projection;
     glm::mat4 viewProjection;
 
-    Miren::TextureHandle texture;
+    float m_time;
+    Miren::TextureHandle skyTexture;
     Miren::ProgramHandle shader;
     Miren::IndexBufferHandle indexBuffer;
     Miren::VertexBufferHandle vertexBuffer;

@@ -90,7 +90,7 @@ struct TextureCreate {
         , m_isCubeMap(false)
         , m_data(nullptr) {}
 
-    size_t bytesPerColor() const {
+    size_t bytesPerTexel() const {
         switch (m_format) {
             case None:
                 return 0;

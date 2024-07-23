@@ -48,7 +48,8 @@ TextureAsset AssetLoader::loadCubeMapTexture(std::array<std::string, 6> paths) {
         std::string texturePath = AssetLoader::getResourcesPath() + path;
         void *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
         if (image == nullptr) {
-            LOG_ERROR("Failed to load a texture file! {}", stbi_failure_reason());
+            LOG_ERROR("Failed to load a texture file at path {}", path);
+            continue;
         }
         if (channels == 1) {
             texture.m_format = Miren::TextureFormat::RED_INTEGER;
