@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Base.hpp"
+#include "MirenStates.hpp"
 #include "VertexBufferLayoutData.hpp"
 
 namespace Miren {

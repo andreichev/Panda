@@ -90,6 +90,10 @@ const glm::mat4 CameraController::getViewMatrix() {
     return glm::inverse(m_transform.getTransform());
 }
 
+const glm::mat4 CameraController::getSkyViewMatrix() {
+    return glm::inverse(m_transform.getSkyTransform());
+}
+
 void CameraController::setPosition(glm::vec3 position) {
     m_transform.setPosition(position);
 }

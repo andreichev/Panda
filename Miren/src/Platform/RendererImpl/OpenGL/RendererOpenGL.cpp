@@ -201,7 +201,7 @@ void RendererOpenGL::setUniform(const Uniform &uniform) {
             );
             return;
         case UniformDataType::Int:
-            shaders[uniform.handle.id].setUniformInt(uniform.name, (int)(intptr_t)uniform.value);
+            shaders[uniform.handle.id].setUniformInt(uniform.name, *(int *)uniform.value);
             return;
         case UniformDataType::IntArray:
             shaders[uniform.handle.id].setUniformIntArray(uniform.name, (int *)uniform.value);

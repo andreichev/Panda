@@ -41,7 +41,9 @@ void EditorLayer::onUpdate(double deltaTime) {
             m_cameraController.update(deltaTime);
             glm::mat4 view = m_cameraController.getViewMatrix();
             glm::mat4 proj = m_editorCamera.getProjection();
-            m_world.updateEditor(deltaTime, proj * view);
+            glm::mat4 cameraViewProj = proj * m_cameraController.getSkyViewMatrix();
+            glm::mat4 viewProj = proj * view;
+            m_world.updateEditor(deltaTime, viewProj, cameraViewProj);
             break;
         }
         case SceneState::PLAY: {
@@ -53,7 +55,9 @@ void EditorLayer::onUpdate(double deltaTime) {
             m_cameraController.update(deltaTime);
             glm::mat4 view = m_cameraController.getViewMatrix();
             glm::mat4 proj = m_editorCamera.getProjection();
-            m_world.updateSimulation(deltaTime, proj * view);
+            glm::mat4 cameraViewProj = proj * m_cameraController.getSkyViewMatrix();
+            glm::mat4 viewProj = proj * view;
+            m_world.updateSimulation(deltaTime, viewProj, cameraViewProj);
             break;
         }
     }

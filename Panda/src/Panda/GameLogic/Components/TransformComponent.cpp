@@ -60,6 +60,10 @@ glm::mat4 TransformComponent::getTransform() const {
            glm::scale(glm::mat4(1.0f), scale);
 }
 
+glm::mat4 TransformComponent::getSkyTransform() const {
+    return glm::toMat4(rotation) * glm::scale(glm::mat4(1.0f), scale);
+}
+
 glm::vec3 TransformComponent::getScale() {
     return scale;
 }

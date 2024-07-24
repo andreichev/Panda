@@ -44,8 +44,7 @@ void Viewport::init(World *world) {
     );
     Miren::setViewClear(m_sceneViewId, 0x12212bff);
     Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
-    m_world->getRenderer2D().setViewId(m_sceneViewId);
-    m_world->getRenderer3D().setViewId(m_sceneViewId);
+    m_world->setViewId(m_sceneViewId);
     PandaUI::Context::shared().updateViewId(m_sceneViewId);
 }
 

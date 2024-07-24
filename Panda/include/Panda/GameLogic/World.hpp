@@ -9,6 +9,7 @@
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Renderer/Renderer3D.hpp"
 
+#include <Miren/Miren.hpp>
 #include <entt/entt.hpp>
 
 namespace Panda {
@@ -21,8 +22,8 @@ public:
     void initialize();
     void fillStartupData();
     void updateRuntime(double deltaTime);
-    void updateSimulation(double deltaTime, glm::mat4 viewProjectionMatrix);
-    void updateEditor(double deltaTime, glm::mat4 viewProjectionMatrix);
+    void updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
+    void updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     void onImGuiRender();
     Entity instantiateEntity();
     void destroy(Entity entity);
@@ -39,12 +40,12 @@ public:
     Renderer3D &getRenderer3D() {
         return m_renderer3d;
     }
-
+    void setViewId(Miren::ViewId id);
     Camera *findMainCamera();
     World &operator=(World &other) = delete;
 
 private:
-    void updateBasicComponents(float deltaTime);
+    void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     Entity findMainCameraEntity();
     Entity instantiateEntity(id_t id);
     void fillEntity(Entity entity);
@@ -54,6 +55,7 @@ private:
     entt::registry m_registry;
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;
+    Miren::ViewId m_renderingViewId;
 
     friend class WorldHierarchyPanel;
     friend class WorldMapper;

@@ -23,10 +23,12 @@ public:
     glm::vec4 getPositionHomogeneous();
     void translate(glm::vec3 offset);
     void setPosition(glm::vec3 pos);
-    glm::mat4 getTransform() const;
     // ------- Scale -------
     glm::vec3 getScale();
     void setScale(glm::vec3 scale);
+    // ------- Matrices -------
+    glm::mat4 getTransform() const;
+    glm::mat4 getSkyTransform() const;
 
 private:
     glm::quat rotation;

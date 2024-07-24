@@ -13,6 +13,7 @@ public:
     CameraController();
     void update(float deltaTime);
     const glm::mat4 getViewMatrix();
+    const glm::mat4 getSkyViewMatrix();
     void setPosition(glm::vec3 position);
     void setActive(bool flag);
 

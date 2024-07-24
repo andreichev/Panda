@@ -4,6 +4,7 @@
 
 #include "Panda/GameLogic/World.hpp"
 #include "Panda/GameLogic/NativeScript.hpp"
+#include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 #include <Rain/Rain.hpp>
 #include <entt/entt.hpp>
@@ -23,44 +24,52 @@ void World::updateRuntime(double deltaTime) {
     }
     m_renderer2d.begin();
     m_renderer3d.begin();
-    // Update native scripts
-    {
-        auto view = m_registry.view<NativeScriptListComponent>();
-        for (auto entityHandle : view) {
-            if (!m_registry.valid(entityHandle)) {
-                continue;
-            }
-            auto &component = view.get<NativeScriptListComponent>(entityHandle);
-            for (auto &container : component.scripts) {
-                if (!container.initialized) {
-                    id_t entityId = static_cast<id_t>(entityHandle);
-                    container.instance->setEntity({&m_registry, entityId, this});
-                    container.instance->initialize();
-                    container.initialized = true;
-                }
-                container.instance->update(deltaTime);
-            }
-        }
-    }
-    updateBasicComponents(deltaTime);
 
+    glm::mat4 viewProjMtx;
+    glm::mat4 skyViewProjMtx;
     Entity cameraEntity = findMainCameraEntity();
     if (cameraEntity.isValid()) {
         WorldCamera &camera = cameraEntity.getComponent<CameraComponent>().camera;
 
-        glm::mat4 view = glm::inverse(cameraEntity.getTransform().getTransform());
-        glm::mat4 viewProj = camera.getProjection() * view;
-        m_renderer2d.setViewProj(viewProj);
-        m_renderer3d.setViewProj(viewProj);
+        glm::mat4 viewMtx = glm::inverse(cameraEntity.getTransform().getTransform());
+        glm::mat4 skyViewMtx = glm::inverse(cameraEntity.getTransform().getSkyTransform());
+        glm::mat4 projMtx = camera.getProjection();
+
+        viewProjMtx = projMtx * viewMtx;
+        skyViewProjMtx = projMtx * skyViewMtx;
+        m_renderer2d.setViewProj(viewProjMtx);
+        m_renderer3d.setViewProj(viewProjMtx);
+    }
+    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
+    // Update native scripts
+    {
+        auto view = m_registry.view<NativeScriptListComponent>();
+        for (auto entityHandle : view) {
+            if (!m_registry.valid(entityHandle)) {
+                continue;
+            }
+            auto &component = view.get<NativeScriptListComponent>(entityHandle);
+            for (auto &container : component.scripts) {
+                if (!container.initialized) {
+                    id_t entityId = static_cast<id_t>(entityHandle);
+                    container.instance->setEntity({&m_registry, entityId, this});
+                    container.instance->initialize();
+                    container.initialized = true;
+                }
+                container.instance->update(deltaTime);
+            }
+        }
     }
 
     m_renderer2d.end();
     m_renderer3d.end();
 }
 
-void World::updateSimulation(double deltaTime, glm::mat4 viewProjectionMatrix) {
+void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
     m_renderer2d.begin();
     m_renderer3d.begin();
+
+    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
 
     // Update native scripts
     {
@@ -81,29 +90,42 @@ void World::updateSimulation(double deltaTime, glm::mat4 viewProjectionMatrix) {
             }
         }
     }
-    updateBasicComponents(deltaTime);
 
-    m_renderer2d.setViewProj(viewProjectionMatrix);
-    m_renderer3d.setViewProj(viewProjectionMatrix);
+    m_renderer2d.setViewProj(viewProjMtx);
+    m_renderer3d.setViewProj(viewProjMtx);
 
     m_renderer2d.end();
     m_renderer3d.end();
 }
 
-void World::updateEditor(double deltaTime, glm::mat4 viewProjectionMatrix) {
+void World::updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
     m_renderer2d.begin();
     m_renderer3d.begin();
 
-    updateBasicComponents(deltaTime);
+    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
 
-    m_renderer2d.setViewProj(viewProjectionMatrix);
-    m_renderer3d.setViewProj(viewProjectionMatrix);
+    m_renderer2d.setViewProj(viewProjMtx);
+    m_renderer3d.setViewProj(viewProjMtx);
 
     m_renderer2d.end();
     m_renderer3d.end();
 }
 
-void World::updateBasicComponents(float deltaTime) {
+void World::updateBasicComponents(
+    float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx
+) {
+    // Draw sky
+    {
+        auto view = m_registry.view<SkyComponent>();
+        for (auto &entityHandle : view) {
+            if (!m_registry.valid(entityHandle)) {
+                continue;
+            }
+            auto &sky = view.get<SkyComponent>(entityHandle);
+            sky.setViewId(m_renderingViewId);
+            sky.update(skyViewProjMtx);
+        }
+    }
     // Render Sprites
     {
         auto view = m_registry.view<SpriteRendererComponent, TransformComponent>();
@@ -249,6 +271,10 @@ void World::fillStartupData() {
     sprite1Entity.setName("Orange Sprite");
     auto &sprite1 = sprite1Entity.addComponent<SpriteRendererComponent>();
     sprite1.color = {1.0f, 0.5f, 0.2f, 1.0f};
+
+    Entity skyEntity = instantiateEntity();
+    skyEntity.setName("Sky");
+    skyEntity.addComponent<SkyComponent>();
     m_isChanged = true;
 }
 
@@ -262,6 +288,12 @@ void World::resetChanged() {
 
 void World::setChanged() {
     m_isChanged = true;
+}
+
+void World::setViewId(Miren::ViewId id) {
+    m_renderer2d.setViewId(id);
+    m_renderer3d.setViewId(id);
+    m_renderingViewId = id;
 }
 
 } // namespace Panda
