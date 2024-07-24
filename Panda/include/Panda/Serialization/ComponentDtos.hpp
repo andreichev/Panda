@@ -62,4 +62,9 @@ struct CameraComponentDto : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
+struct CubeMapDto: public Rain::Codable {
+    RAIN_FIELDS_BEGIN(CubeMapDto)
+    RAIN_FIELDS_END
+};
+
 } // namespace Panda

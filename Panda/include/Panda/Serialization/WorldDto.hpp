@@ -11,6 +11,7 @@ struct EntityDto : public Rain::Codable {
     TransformComponentDto transformComponent;
     std::optional<CameraComponentDto> cameraComponent;
     std::optional<SpriteRendererComponent> spriteRendererComponent;
+    std::optional<CubeMapDto> cubeMap;
 
     RAIN_FIELDS_BEGIN(EntityDto)
     RAIN_FIELD(idComponent)
@@ -18,6 +19,7 @@ struct EntityDto : public Rain::Codable {
     RAIN_FIELD(transformComponent)
     RAIN_FIELD(cameraComponent)
     RAIN_FIELD(spriteRendererComponent)
+    RAIN_FIELD(cubeMap)
     RAIN_FIELDS_END
 };
 

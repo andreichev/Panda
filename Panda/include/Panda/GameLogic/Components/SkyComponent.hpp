@@ -102,6 +102,10 @@ public:
         Miren::deleteTexture(m_skyTexture);
     }
 
+    Miren::TextureHandle getSkyTexture() {
+        return m_skyTexture;
+    }
+
     void update(glm::mat4 &viewProjection) {
         m_viewProjection = viewProjection;
         Miren::setShader(m_shader);

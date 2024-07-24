@@ -4,6 +4,7 @@
 
 #include "Panels/Common/ImGuiHelper.hpp"
 #include "ComponentsDraw.hpp"
+#include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 namespace Panda {
 
@@ -80,6 +81,7 @@ void drawComponents(Entity entity) {
     if (ImGui::BeginPopup("AddComponent")) {
         displayAddComponentEntry<CameraComponent>(entity, "Camera");
         displayAddComponentEntry<SpriteRendererComponent>(entity, "Sprite Renderer");
+        displayAddComponentEntry<SkyComponent>(entity, "Cube Map Rendering");
         ImGui::EndPopup();
     }
     drawComponent<TransformComponent>("Transform", entity, [](auto &component) {
@@ -142,6 +144,7 @@ void drawComponents(Entity entity) {
             camera.setFar(far);
         }
     });
+    drawComponent<SkyComponent>("Cube Map Rendering", entity, [](auto &component) {});
 }
 
 } // namespace Panda

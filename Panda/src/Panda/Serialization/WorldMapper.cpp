@@ -1,4 +1,5 @@
 #include "Panda/Serialization/WorldMapper.hpp"
+#include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 namespace Panda {
 
@@ -28,9 +29,13 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
             cameraComponent.camera.setFieldOfView(worldCameraDto.fieldOfView);
             cameraComponent.camera.setOrthoSize(worldCameraDto.orthoSize);
         }
-        // SPRITE RENDERER
+        // SPRITE RENDERER COMPONENT
         if (entityDto.spriteRendererComponent.has_value()) {
             entity.addComponent<SpriteRendererComponent>(entityDto.spriteRendererComponent.value());
+        }
+        // CUBE MAP COMPONENT
+        if (entityDto.cubeMap.has_value()) {
+            entity.addComponent<SkyComponent>();
         }
     }
     world.resetChanged();
@@ -74,6 +79,10 @@ WorldDto WorldMapper::toDto(const World &world) {
         // SPRITE RENDERER COMPONENT
         if (entity.hasComponent<SpriteRendererComponent>()) {
             entityDto.spriteRendererComponent = entity.getComponent<SpriteRendererComponent>();
+        }
+        // CUBE MAP COMPONENT
+        if (entity.hasComponent<SkyComponent>()) {
+            entityDto.cubeMap = CubeMapDto();
         }
         worldDto.entities.push_back(entityDto);
     }
