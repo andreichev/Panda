@@ -8,8 +8,8 @@
 struct Vertex {
     glm::vec3 pos;
     glm::vec2 uv;
+    glm::vec3 normal;
     glm::vec4 color;
-
     float light;
 
     Vertex()
@@ -18,15 +18,28 @@ struct Vertex {
         , color()
         , light() {}
 
-    Vertex(float x, float y, float z, float u, float v, float light)
-        : pos(x, y, z)
-        , uv(u, v)
+    Vertex(glm::vec3 pos, glm::vec2 uv, glm::vec3 normal, float light)
+        : pos(pos)
+        , uv(uv)
+        , normal(normal)
         , color(1.f, 1.f, 1.f, 1.f)
         , light(light) {}
 
-    Vertex(float x, float y, float z, float u, float v, uint32_t rgba, float light)
+    Vertex(
+        float x,
+        float y,
+        float z,
+        float u,
+        float v,
+        uint32_t rgba,
+        float nx,
+        float ny,
+        float nz,
+        float light
+    )
         : pos(x, y, z)
         , uv(u, v)
+        , normal(nx, ny, nz)
         , color()
         , light(light) {
         uint8_t r = rgba >> 24;
@@ -41,9 +54,15 @@ struct Vertex {
 
     inline static Miren::VertexBufferLayoutData createBufferLayout() {
         Miren::VertexBufferLayoutData data;
+        // pos
         data.pushVec3();
+        // uv
         data.pushVec2();
+        // normal
+        data.pushVec3();
+        // color
         data.pushVec4();
+        // light
         data.pushFloat(1);
         return data;
     }

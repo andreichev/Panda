@@ -5,6 +5,7 @@
 #pragma once
 
 #include <Panda.hpp>
+#include <Miren/Miren.hpp>
 
 class CameraMove : public Panda::NativeScript {
 public:
@@ -13,12 +14,15 @@ public:
     glm::vec4 getFront() {
         return m_front;
     }
+    void setShader(Miren::ProgramHandle programHandle) {
+        m_programHandle = programHandle;
+    }
 
 private:
     void updateVectors();
 
     float m_mouseSpeed = 0.2f;
-    float m_moveSpeed = 40.0f;
+    float m_moveSpeed = 70.0f;
     Panda::TransformComponent *m_transform;
     glm::mat4 m_rotationMatrix;
     glm::vec4 m_front;
@@ -26,4 +30,5 @@ private:
     glm::vec4 m_right;
     glm::vec3 m_target;
     Panda::Window *m_window;
+    Miren::ProgramHandle m_programHandle;
 };

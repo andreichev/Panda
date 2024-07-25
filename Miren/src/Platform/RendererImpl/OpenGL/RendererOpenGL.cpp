@@ -61,6 +61,7 @@ RendererOpenGL::RendererOpenGL() {
     context->create();
     GL_CALL(glEnable(GL_BLEND));
     GL_CALL(glDisable(GL_STENCIL_TEST));
+    // GL_CALL(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
     GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     // glBlendEquation(GL_FUNC_ADD);
     // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -200,11 +201,20 @@ void RendererOpenGL::setUniform(const Uniform &uniform) {
                 uniform.name, static_cast<float *>(uniform.value)
             );
             return;
+        case UniformDataType::Vec3:
+            shaders[uniform.handle.id].setUniformVec3(
+                uniform.name, static_cast<float *>(uniform.value)
+            );
+            return;
         case UniformDataType::Int:
-            shaders[uniform.handle.id].setUniformInt(uniform.name, *(int *)uniform.value);
+            shaders[uniform.handle.id].setUniformInt(
+                uniform.name, *static_cast<int *>(uniform.value)
+            );
             return;
         case UniformDataType::IntArray:
-            shaders[uniform.handle.id].setUniformIntArray(uniform.name, (int *)uniform.value);
+            shaders[uniform.handle.id].setUniformIntArray(
+                uniform.name, static_cast<int *>(uniform.value)
+            );
             return;
     }
     LOG_ERROR("UNIFORM TYPE IS UNDEFINED");

@@ -58,7 +58,10 @@ void CameraMove::update(double deltaTime) {
         m_window->toggleCursorLock();
         cursorStarted = false;
     }
+    static glm::vec3 cameraPos;
+    cameraPos = m_transform->getPosition();
     ImGui::SetNextFrameWantCaptureMouse(!m_window->isCursorLocked());
+    Miren::setUniform(m_programHandle, "cameraPos", &cameraPos, Miren::UniformDataType::Vec3);
 }
 
 void CameraMove::updateVectors() {

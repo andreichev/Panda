@@ -106,7 +106,7 @@ struct TextureCreate {
     }
 };
 
-enum class UniformDataType { Int, Mat4, IntArray };
+enum class UniformDataType { Int, Vec3, Mat4, IntArray };
 
 struct FrameBufferAttachment {
     FrameBufferAttachment()

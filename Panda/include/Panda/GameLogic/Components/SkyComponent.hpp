@@ -89,6 +89,7 @@ public:
         Miren::TextureCreate m_skyTextureConfig = m_skyTextureAsset.getMirenTextureCreate();
         m_skyTextureConfig.m_minFiltering = NEAREST;
         m_skyTextureConfig.m_magFiltering = LINEAR;
+        m_skyTextureConfig.m_wrap = CLAMP;
         m_skyTexture = Miren::createTexture(m_skyTextureConfig);
 
         Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(

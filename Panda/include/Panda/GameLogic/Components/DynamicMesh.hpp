@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Panda/Renderer/MeshData.hpp"
+#include "Panda/Renderer/TextureBinding.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -14,14 +15,13 @@ class DynamicMesh {
 public:
     ~DynamicMesh();
     DynamicMesh();
-    DynamicMesh(DynamicMesh &&source);
-    DynamicMesh(DynamicMesh &source);
 
-    void create(const MeshData &data, std::vector<Miren::TextureHandle> textures, Miren::ProgramHandle shader);
+    void
+    create(const MeshData &data, std::vector<TextureBinding> bindings, Miren::ProgramHandle shader);
     void update(const MeshData &data);
 
 private:
-    std::vector<Miren::TextureHandle> m_textures;
+    std::vector<TextureBinding> m_bindings;
     Miren::ProgramHandle m_shaderHandle;
     Miren::VertexLayoutHandle m_bufferLayoutHandle;
     Miren::IndexBufferHandle m_indexBufferHandle;

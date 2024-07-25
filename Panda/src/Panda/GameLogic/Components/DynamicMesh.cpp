@@ -15,42 +15,21 @@ DynamicMesh::~DynamicMesh() {
     }
 }
 
-DynamicMesh::DynamicMesh(DynamicMesh &&source)
-    : m_model(source.m_model)
-    , m_bufferLayoutHandle(source.m_bufferLayoutHandle)
-    , m_indexBufferHandle(source.m_indexBufferHandle)
-    , m_vertexBufferHandle(source.m_vertexBufferHandle)
-    , m_indicesCount(source.m_indicesCount)
-    , m_textures(source.m_textures)
-    , m_shaderHandle(source.m_shaderHandle) {
-    source.m_vertexBufferHandle = MIREN_INVALID_HANDLE;
-    source.m_indexBufferHandle = MIREN_INVALID_HANDLE;
-}
-
 DynamicMesh::DynamicMesh()
     : m_model(1.f)
     , m_bufferLayoutHandle(MIREN_INVALID_HANDLE)
     , m_indexBufferHandle(MIREN_INVALID_HANDLE)
     , m_vertexBufferHandle(MIREN_INVALID_HANDLE)
     , m_indicesCount(0)
-    , m_textures()
+    , m_bindings()
     , m_shaderHandle(MIREN_INVALID_HANDLE) {}
 
-DynamicMesh::DynamicMesh(DynamicMesh &source)
-    : m_model(source.m_model)
-    , m_bufferLayoutHandle(source.m_bufferLayoutHandle)
-    , m_indexBufferHandle(source.m_indexBufferHandle)
-    , m_vertexBufferHandle(source.m_vertexBufferHandle)
-    , m_indicesCount(source.m_indicesCount)
-    , m_textures(source.m_textures)
-    , m_shaderHandle(source.m_shaderHandle) {}
-
 void DynamicMesh::create(
-    const Panda::MeshData &data, std::vector<Miren::TextureHandle> textures, Miren::ProgramHandle shader
+    const Panda::MeshData &data, std::vector<TextureBinding> bindings, Miren::ProgramHandle shader
 ) {
     PND_ASSERT(shader.isValid(), "Invalid shader for mesh");
     m_shaderHandle = shader;
-    m_textures = textures;
+    m_bindings = bindings;
     m_indicesCount = data.indicesCount;
     m_bufferLayoutHandle = data.layoutHandle;
     m_vertexBufferHandle = Miren::createDynamicVertexBuffer(

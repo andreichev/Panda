@@ -57,7 +57,8 @@ void BaseLevel::start(Panda::World *world) {
     Panda::Entity cameraEntity = world->instantiateEntity();
     Panda::WorldCamera &camera = cameraEntity.addComponent<Panda::CameraComponent>().camera;
     camera.setFieldOfView(60.f);
-    cameraEntity.addNativeScript<CameraMove>();
+    auto &cameraMove = cameraEntity.addNativeScript<CameraMove>();
+    cameraMove.setShader(m_shader);
     CameraSizeObserver &cameraSizeObserver = cameraEntity.addNativeScript<CameraSizeObserver>();
     cameraSizeObserver.setCamera(&camera);
 
@@ -68,13 +69,13 @@ void BaseLevel::start(Panda::World *world) {
         terrainEntity.getComponent<Panda::DynamicMeshComponent>();
     Panda::DynamicMesh &dynamicMesh = meshComponent.meshes.emplace_back();
 
-    terrainEntity.addComponent<Panda::SkyComponent>();
+    auto &sky = terrainEntity.addComponent<Panda::SkyComponent>();
 
+#ifdef HEIGHT_MAP
     Panda::TextureAsset heightTextureAsset = Panda::AssetLoader::loadTexture("textures/map2.png");
     int width = heightTextureAsset.m_width;
     int height = heightTextureAsset.m_height;
     float *heightMap = (float *)ALLOC(Foundation::getAllocator(), sizeof(float) * width * height);
-
     uint8_t *data = (uint8_t *)heightTextureAsset.m_data.data;
     for (int h = 0; h < height; h++) {
         for (int w = 0; w < width; w++) {
@@ -82,14 +83,21 @@ void BaseLevel::start(Panda::World *world) {
             heightMap[index] = data[index * 4] / 255.f;
         }
     }
-    // PerlinNoise::generate2DGlm(123, 4, 1.0f, heightMap, width, height);
+#else
+    int width = 256;
+    int height = 256;
+    float *heightMap = (float *)ALLOC(Foundation::getAllocator(), sizeof(float) * width * height);
+    PerlinNoise::generate2DGlm(123, 4, 1.0f, heightMap, width, height);
+#endif
 
     Miren::VertexLayoutHandle layoutHandle =
         Miren::createVertexLayout(Vertex::createBufferLayout());
     Panda::MeshData meshData = m_meshGenerator.makeMesh(layoutHandle, width, height, heightMap);
     FREE(Foundation::getAllocator(), heightMap);
 
-    dynamicMesh.create(meshData, {m_colorTexture}, m_shader);
+    dynamicMesh.create(
+        meshData, {{"texture1", m_colorTexture}, {"iSky", sky.getSkyTexture()}}, m_shader
+    );
 
     PandaUI::initialize();
     Foundation::Shared<RootView> view = PandaUI::makeView<RootView>();

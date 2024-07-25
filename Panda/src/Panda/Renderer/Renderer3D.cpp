@@ -52,8 +52,15 @@ void Renderer3D::submit(TransformComponent *transform, DynamicMesh *mesh) {
     Miren::setUniform(
         mesh->m_shaderHandle, "projViewMtx", (void *)&m_viewProj, Miren::UniformDataType::Mat4
     );
-    for(int i = 0; i < mesh->m_textures.size(); i++) {
-        Miren::setTexture(mesh->m_textures[i], 0);
+    static int values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    for (int i = 0; i < mesh->m_bindings.size(); i++) {
+        Miren::setTexture(mesh->m_bindings[i].texture, values[i]);
+        Miren::setUniform(
+            mesh->m_shaderHandle,
+            mesh->m_bindings[i].name.c_str(),
+            &values[i],
+            Miren::UniformDataType::Int
+        );
     }
     PND_ASSERT(mesh->m_vertexBufferHandle.isValid(), "Invalid vertex buffer for mesh");
     Miren::setVertexBuffer(mesh->m_vertexBufferHandle);

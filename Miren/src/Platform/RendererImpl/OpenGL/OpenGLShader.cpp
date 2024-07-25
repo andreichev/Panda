@@ -126,6 +126,10 @@ void OpenGLShader::setUniformMat4(const char *name, float *value) {
     GL_CALL(glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, value));
 }
 
+void OpenGLShader::setUniformVec3(const char *name, float *value) {
+    GL_CALL(glUniform3fv(getUniformLocation(name), 1, value));
+}
+
 void OpenGLShader::setUniformInt(const char *name, int value) {
     GL_CALL(glUniform1i(getUniformLocation(name), value));
 }
