@@ -67,7 +67,7 @@ void BaseLevel::start(Panda::World *world) {
                 Panda::DynamicMeshComponent &meshComponent =
                     chunkEntity.getComponent<Panda::DynamicMeshComponent>();
                 Panda::DynamicMesh &dynamicMesh = meshComponent.meshes.emplace_back();
-                dynamicMesh.create(meshData, m_blocksTileTexture, m_groundShader);
+                dynamicMesh.create(meshData, {m_blocksTileTexture}, m_groundShader);
                 m_chunksStorage
                     ->chunks
                         [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +

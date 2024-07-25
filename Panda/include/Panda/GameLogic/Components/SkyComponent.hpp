@@ -86,7 +86,10 @@ public:
             "default-textures/skybox/pz.png",
             "default-textures/skybox/nz.png",
         });
-        m_skyTexture = Miren::createTexture(m_skyTextureAsset.getMirenTextureCreate());
+        Miren::TextureCreate m_skyTextureConfig = m_skyTextureAsset.getMirenTextureCreate();
+        m_skyTextureConfig.m_minFiltering = NEAREST;
+        m_skyTextureConfig.m_magFiltering = LINEAR;
+        m_skyTexture = Miren::createTexture(m_skyTextureConfig);
 
         Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
             "default-shaders/sky/sky_vertex.glsl", "default-shaders/sky/sky_fragment.glsl"

@@ -89,7 +89,7 @@ void BaseLevel::start(Panda::World *world) {
     Panda::MeshData meshData = m_meshGenerator.makeMesh(layoutHandle, width, height, heightMap);
     FREE(Foundation::getAllocator(), heightMap);
 
-    dynamicMesh.create(meshData, m_colorTexture, m_shader);
+    dynamicMesh.create(meshData, {m_colorTexture}, m_shader);
 
     PandaUI::initialize();
     Foundation::Shared<RootView> view = PandaUI::makeView<RootView>();

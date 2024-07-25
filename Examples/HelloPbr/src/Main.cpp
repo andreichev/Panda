@@ -10,8 +10,8 @@
 
 int startApp(int argc, char **argv) {
     Panda::ApplicationStartupSettings settings;
-    settings.name = "HelloTerrain";
-    settings.windowTitle = "Hello Terrain";
+    settings.name = "HelloPbr";
+    settings.windowTitle = "Hello Pbr";
     settings.windowSize = {900, 600};
     settings.isFullScreen = false;
     settings.isMaximized = false;

@@ -1,4 +1,4 @@
-project(HelloTerrain)
+project(HelloPbr)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -30,34 +30,34 @@ endif()
 
 list(FILTER RESOURCE_FOLDERS EXCLUDE REGEX "\\.DS_Store")
 
-# HelloTerrain target
+# HelloPbr target
 
-add_app(HelloTerrain "${SOURCES}" "${INCLUDE}" "${RESOURCE_FOLDERS}")
+add_app(HelloPbr "${SOURCES}" "${INCLUDE}" "${RESOURCE_FOLDERS}")
 
-target_precompile_headers(HelloTerrain PRIVATE src/pch.hpp)
-target_include_directories(HelloTerrain PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_precompile_headers(HelloPbr PRIVATE src/pch.hpp)
+target_include_directories(HelloPbr PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 # set output directories for all builds (Debug, Release, etc.)
 foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
     string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
-    set_target_properties(HelloTerrain
+    set_target_properties(HelloPbr
         PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${BIN_DIRECTORY}
     )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
-set_target_properties(HelloTerrain
+set_target_properties(HelloPbr
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${BIN_DIRECTORY}
 )
 
-set_target_properties(HelloTerrain
+set_target_properties(HelloPbr
     PROPERTIES 
     VS_DEBUGGER_WORKING_DIRECTORY ${BIN_DIRECTORY}
 )
 
 # Dependencies - Panda
-target_link_libraries(HelloTerrain Panda)
+target_link_libraries(HelloPbr Panda)
 
 # Dependencies - PandaUI
-target_link_libraries(HelloTerrain PandaUI)
+target_link_libraries(HelloPbr PandaUI)
