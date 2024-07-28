@@ -113,12 +113,12 @@ public:
     void update(glm::mat4 &viewProjection) {
         m_viewProjection = viewProjection;
         Miren::setShader(m_shader);
-        static int samplerCube = 0;
+        int samplerCube = 0;
         Miren::setTexture(m_skyTexture, samplerCube);
-        Miren::setUniform(m_shader, "skyTexture", &samplerCube, Miren::UniformDataType::Int);
-        Miren::setUniform(m_shader, "model", &m_model[0][0], Miren::UniformDataType::Mat4);
+        Miren::setUniform(m_shader, "skyTexture", &samplerCube, Miren::UniformType::Sampler);
+        Miren::setUniform(m_shader, "model", &m_model[0][0], Miren::UniformType::Mat4);
         Miren::setUniform(
-            m_shader, "projViewMtx", &m_viewProjection[0][0], Miren::UniformDataType::Mat4
+            m_shader, "projViewMtx", &m_viewProjection[0][0], Miren::UniformType::Mat4
         );
         Miren::setVertexBuffer(m_vertexBuffer);
         Miren::setIndexBuffer(m_indexBuffer, 0, 36);

@@ -36,7 +36,11 @@ Renderer2D::Renderer2D()
         m_drawData.samplers[i] = i;
     }
     Miren::setUniform(
-        m_drawData.shader, "u_textures", m_drawData.samplers, Miren::UniformDataType::IntArray
+        m_drawData.shader,
+        "u_textures",
+        m_drawData.samplers,
+        Miren::UniformType::Sampler,
+        MAX_TEXTURE_SLOTS
     );
 }
 
@@ -142,7 +146,7 @@ void Renderer2D::end() {
     }
     Miren::setShader(m_drawData.shader);
     Miren::setUniform(
-        m_drawData.shader, "projViewMtx", (void *)&m_viewProj, Miren::UniformDataType::Mat4
+        m_drawData.shader, "projViewMtx", (void *)&m_viewProj, Miren::UniformType::Mat4
     );
 
     Miren::TransientVertexBuffer tvb;

@@ -28,10 +28,10 @@ void Renderer3D::submit(TransformComponent *transform, StaticMesh *mesh) {
     Miren::setShader(mesh->m_shaderHandle);
     updateModel(transform, mesh->m_model);
     Miren::setUniform(
-        mesh->m_shaderHandle, "model", &mesh->m_model[0][0], Miren::UniformDataType::Mat4
+        mesh->m_shaderHandle, "model", &mesh->m_model[0][0], Miren::UniformType::Mat4
     );
     Miren::setUniform(
-        mesh->m_shaderHandle, "projViewMtx", (void *)&m_viewProj, Miren::UniformDataType::Mat4
+        mesh->m_shaderHandle, "projViewMtx", (void *)&m_viewProj, Miren::UniformType::Mat4
     );
     Miren::setTexture(mesh->m_textureHandle, 0);
     PND_ASSERT(mesh->m_vertexBufferHandle.isValid(), "Invalid vertex buffer for mesh");
@@ -47,19 +47,15 @@ void Renderer3D::submit(TransformComponent *transform, DynamicMesh *mesh) {
     Miren::setShader(mesh->m_shaderHandle);
     updateModel(transform, mesh->m_model);
     Miren::setUniform(
-        mesh->m_shaderHandle, "model", &mesh->m_model[0][0], Miren::UniformDataType::Mat4
+        mesh->m_shaderHandle, "model", &mesh->m_model[0][0], Miren::UniformType::Mat4
     );
     Miren::setUniform(
-        mesh->m_shaderHandle, "projViewMtx", (void *)&m_viewProj, Miren::UniformDataType::Mat4
+        mesh->m_shaderHandle, "projViewMtx", (void *)&m_viewProj, Miren::UniformType::Mat4
     );
-    static int values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     for (int i = 0; i < mesh->m_bindings.size(); i++) {
-        Miren::setTexture(mesh->m_bindings[i].texture, values[i]);
+        Miren::setTexture(mesh->m_bindings[i].texture, i);
         Miren::setUniform(
-            mesh->m_shaderHandle,
-            mesh->m_bindings[i].name.c_str(),
-            &values[i],
-            Miren::UniformDataType::Int
+            mesh->m_shaderHandle, mesh->m_bindings[i].name.c_str(), &i, Miren::UniformType::Sampler
         );
     }
     PND_ASSERT(mesh->m_vertexBufferHandle.isValid(), "Invalid vertex buffer for mesh");

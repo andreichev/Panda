@@ -43,7 +43,6 @@ MIREN_HANDLE(VertexBufferHandle)
 MIREN_HANDLE(VertexLayoutHandle)
 
 enum TextureFormat {
-    None = 0,
     // Color
     RGB8,
     RGBA8,
@@ -80,7 +79,7 @@ struct TextureCreate {
     Foundation::Memory m_data;
 
     TextureCreate()
-        : m_format(TextureFormat::None)
+        : m_format(TextureFormat::RGBA8)
         , m_minFiltering(TextureFiltering::NEAREST)
         , m_magFiltering(TextureFiltering::NEAREST)
         , m_wrap(TextureWrapMode::REPEAT)
@@ -92,8 +91,6 @@ struct TextureCreate {
 
     size_t bytesPerTexel() const {
         switch (m_format) {
-            case None:
-                return 0;
             case RGB8:
                 return 3;
             case RGBA8:
@@ -106,7 +103,7 @@ struct TextureCreate {
     }
 };
 
-enum class UniformDataType { Int, Vec3, Mat4, IntArray };
+enum UniformType { Sampler, Vec4, Mat3, Mat4, Count };
 
 struct FrameBufferAttachment {
     FrameBufferAttachment()

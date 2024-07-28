@@ -6,7 +6,7 @@
 
 #include "Miren/Base.hpp"
 #include "Miren/MirenStates.hpp"
-#include "Uniform.hpp"
+#include "UniformBuffer.hpp"
 
 namespace Miren {
 
@@ -29,7 +29,6 @@ struct RenderDraw {
         : m_isSubmitted(false)
         , m_state(MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST)
         , m_numIndices(0)
-        , m_uniformsCount(0)
         , m_textureBindingsCount(0)
         , m_indicesOffset(0)
         , m_verticesOffset(0)
@@ -38,13 +37,13 @@ struct RenderDraw {
         , m_indexBuffer(MIREN_INVALID_HANDLE)
         , m_vertexBuffer(MIREN_INVALID_HANDLE)
         , m_vertexLayout(MIREN_INVALID_HANDLE)
-        , m_scissorRect(Rect::zero()) {}
+        , m_scissorRect(Rect::zero())
+        , m_uniformBuffer(1000) {}
 
     void reset() {
         m_isSubmitted = false;
         m_state = MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST;
         m_numIndices = 0;
-        m_uniformsCount = 0;
         m_textureBindingsCount = 0;
         m_indicesOffset = 0;
         m_verticesOffset = 0;
@@ -54,10 +53,13 @@ struct RenderDraw {
         m_vertexBuffer = MIREN_INVALID_HANDLE;
         m_vertexLayout = MIREN_INVALID_HANDLE;
         m_scissorRect = Rect::zero();
+        m_uniformBuffer.reset();
     }
 
-    void addUniform(ProgramHandle handle, const char *name, void *value, UniformDataType type) {
-        m_uniformBuffer[m_uniformsCount++] = Uniform(handle, name, value, type);
+    void
+    addUniform(ProgramHandle handle, const char *name, void *value, UniformType type, int count) {
+        Uniform uniform(handle, name, value, type, count);
+        m_uniformBuffer.writeUniform(uniform);
     }
 
     void setTexture(TextureHandle textureHandle, uint32_t slot) {
@@ -72,8 +74,7 @@ struct RenderDraw {
     IndexBufferHandle m_indexBuffer;
     VertexBufferHandle m_vertexBuffer;
     VertexLayoutHandle m_vertexLayout;
-    uint32_t m_uniformsCount;
-    Uniform m_uniformBuffer[MAX_UNIFORMS];
+    UniformBuffer m_uniformBuffer;
     uint32_t m_textureBindingsCount;
     TextureBinding m_textureBindings[MAX_TEXTURE_BINDINGS];
     Rect m_scissorRect;

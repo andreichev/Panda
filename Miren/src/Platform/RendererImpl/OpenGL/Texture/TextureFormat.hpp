@@ -18,8 +18,7 @@ struct TextureFormatInfo {
     GLenum m_type;
 };
 
-static TextureFormatInfo s_textureFormat[] = {
-    {GL_NONE, GL_NONE, GL_NONE},           // None = 0,
+const static TextureFormatInfo s_textureFormat[] = {
     {GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE},   // RGB8
     {GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE}, // RGBA8
     {GL_R8I, GL_RED, GL_BYTE},             // RED_INTEGER

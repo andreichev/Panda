@@ -31,8 +31,8 @@ Context::Context()
     if (m_rootView) {
         m_rootView->setBackgroundColor(Color(0x00000000));
     }
-    YGConfigRef config = YGConfigNew();
-    YGConfigSetUseWebDefaults(config, false);
+    // YGConfigRef config = YGConfigNew();
+    // YGConfigSetUseWebDefaults(config, false);
 }
 
 void Context::update(double deltaTime) {

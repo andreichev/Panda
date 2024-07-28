@@ -38,9 +38,9 @@ static void ImGui_ImplMiren_SetProjMat(ImDrawData *draw_data, int fb_width, int 
     float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
 
     projMat = glm::ortho(L, R, B, T);
-    static int textureIndex = 0;
-    Miren::setUniform(shader, "Texture", &textureIndex, UniformDataType::Int);
-    Miren::setUniform(shader, "ProjMtx", &projMat[0], UniformDataType::Mat4);
+    int textureIndex = 0;
+    Miren::setUniform(shader, "Texture", &textureIndex, UniformType::Sampler);
+    Miren::setUniform(shader, "ProjMtx", &projMat[0], UniformType::Mat4);
 }
 
 IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {

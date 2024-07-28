@@ -196,25 +196,27 @@ void RendererOpenGL::deleteVertexLayout(VertexLayoutHandle handle) {}
 void RendererOpenGL::setUniform(const Uniform &uniform) {
     shaders[uniform.handle.id].bind();
     switch (uniform.type) {
-        case UniformDataType::Mat4:
-            shaders[uniform.handle.id].setUniformMat4(
-                uniform.name, static_cast<float *>(uniform.value)
-            );
-            return;
-        case UniformDataType::Vec3:
-            shaders[uniform.handle.id].setUniformVec3(
-                uniform.name, static_cast<float *>(uniform.value)
-            );
-            return;
-        case UniformDataType::Int:
+        case UniformType::Sampler:
             shaders[uniform.handle.id].setUniformInt(
-                uniform.name, *static_cast<int *>(uniform.value)
+                uniform.name, static_cast<int *>(uniform.data), uniform.count
             );
             return;
-        case UniformDataType::IntArray:
-            shaders[uniform.handle.id].setUniformIntArray(
-                uniform.name, static_cast<int *>(uniform.value)
+        case UniformType::Mat3:
+            shaders[uniform.handle.id].setUniformMat3(
+                uniform.name, static_cast<float *>(uniform.data), uniform.count
             );
+            return;
+        case UniformType::Mat4:
+            shaders[uniform.handle.id].setUniformMat4(
+                uniform.name, static_cast<float *>(uniform.data), uniform.count
+            );
+            return;
+        case UniformType::Vec4:
+            shaders[uniform.handle.id].setUniformVec4(
+                uniform.name, static_cast<float *>(uniform.data), uniform.count
+            );
+            return;
+        case UniformType::Count:
             return;
     }
     LOG_ERROR("UNIFORM TYPE IS UNDEFINED");
@@ -281,9 +283,10 @@ void RendererOpenGL::viewChanged(View &view) {
 void RendererOpenGL::submit(RenderDraw *draw) {
     // TODO: Capture time
     shaders[draw->m_shader.id].bind();
-    for (size_t u = 0; u < draw->m_uniformsCount; u++) {
-        Uniform &uniform = draw->m_uniformBuffer[u];
-        setUniform(uniform);
+    draw->m_uniformBuffer.finishWriting();
+    Uniform *uniform;
+    while ((uniform = draw->m_uniformBuffer.readUniform()) != nullptr) {
+        setUniform(*uniform);
     }
     for (size_t t = 0; t < draw->m_textureBindingsCount; t++) {
         TextureBinding &textureBinding = draw->m_textureBindings[t];
