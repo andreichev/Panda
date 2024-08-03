@@ -46,7 +46,7 @@ TextureAsset AssetLoader::loadCubeMapTexture(std::array<std::string, 6> paths) {
         const std::string &path = paths[side];
         int width, height, channels;
         std::string texturePath = AssetLoader::getResourcesPath() + path;
-        void *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
+        void *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 0);
         if (image == nullptr) {
             LOG_ERROR("Failed to load a texture file at path {}", path);
             continue;

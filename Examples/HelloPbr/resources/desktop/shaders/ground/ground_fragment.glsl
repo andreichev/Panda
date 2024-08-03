@@ -16,5 +16,5 @@ void main()
 	vec3 I = normalize(Pos - cameraPos.xyz);
 	vec3 R = reflect(I, normalize(Normal));
 	vec4 sky = texture(iSky, R);
-	FragColor = mix(sky, texture(texture1, TexCoord), 0.4);
+	FragColor = mix(sky, texture(texture1, TexCoord), 0.4) * 1.2;
 }

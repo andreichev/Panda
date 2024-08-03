@@ -88,3 +88,9 @@ target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/entt/src)
 # Dependencies - Dear ImGui
 target_link_libraries(Panda imgui)
 target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/imgui)
+
+# Dependencies - dylib
+target_link_libraries(Panda dylib)
+
+# Dependencies - ScriptHook
+target_link_libraries(Panda ScriptHook)

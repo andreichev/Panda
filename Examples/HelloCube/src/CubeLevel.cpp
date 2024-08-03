@@ -95,9 +95,7 @@ public:
         translate = glm::vec3(0.f, 0.f, 0.f);
         viewProjection = projection * view;
 
-        Miren::setUniform(
-            shader, "projViewMtx", &viewProjection[0][0], Miren::UniformType::Mat4
-        );
+        Miren::setUniform(shader, "projViewMtx", &viewProjection[0][0], Miren::UniformType::Mat4);
         time = 0;
     }
 
@@ -113,9 +111,7 @@ public:
         Miren::setShader(shader);
         Miren::setTexture(texture, 0);
         Miren::setUniform(shader, "model", &model[0][0], Miren::UniformType::Mat4);
-        Miren::setUniform(
-            shader, "projViewMtx", &viewProjection[0][0], Miren::UniformType::Mat4
-        );
+        Miren::setUniform(shader, "projViewMtx", &viewProjection[0][0], Miren::UniformType::Mat4);
 
         Miren::setVertexBuffer(vertexBuffer);
         Miren::setIndexBuffer(indexBuffer, 0, 36);

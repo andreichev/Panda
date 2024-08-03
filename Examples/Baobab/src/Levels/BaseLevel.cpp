@@ -10,6 +10,7 @@
 #include "Components/BlocksCreation.hpp"
 #include "Components/FullScreenToggle.hpp"
 #include "Components/UI/RootView.hpp"
+#include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 #include <Panda.hpp>
 #include <PandaUI/PandaUI.hpp>
@@ -89,6 +90,7 @@ void BaseLevel::start(Panda::World *world) {
          ChunksStorage::WORLD_SIZE_Z / 2}
     );
     cameraEntity.getTransform().rotateEuler({glm::degrees(25.f), 0.f, 0.f});
+    cameraEntity.addComponent<Panda::SkyComponent>();
 
     BlocksCreation &blocksCreation = cameraEntity.addNativeScript<BlocksCreation>();
     blocksCreation.setChunksStorage(m_chunksStorage);
