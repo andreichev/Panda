@@ -17,7 +17,10 @@
 
 namespace Panda {
 
-class EditorLayer : public Layer, public ProjectLoaderOutput, public MenuBarOutput {
+class EditorLayer : public Layer,
+                    public ProjectLoaderOutput,
+                    public MenuBarOutput,
+                    public ComponentsDrawOutput {
     using PopupActionFunction = void (*)(void *userData);
     struct EditorPopup {
         const char *title;
@@ -59,6 +62,12 @@ public:
     void menuBarCloseApp() override;
     void menuBarSaveWorld() override;
     void menuBarCloseProject() override;
+
+#pragma endregion
+
+#pragma region Components draw output
+
+    void addScriptToEntity(Entity entity) override;
 
 #pragma endregion
 

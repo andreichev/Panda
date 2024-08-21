@@ -73,7 +73,17 @@ static void displayAddComponentEntry(Entity entity, const std::string &entryName
     }
 }
 
-void drawComponents(Entity entity) {
+void ComponentsDraw::displayAddScriptMenuItem(Entity entity) {
+    if (ImGui::MenuItem("Add Script")) {
+        m_output->addScriptToEntity(entity);
+        ImGui::CloseCurrentPopup();
+    }
+}
+
+ComponentsDraw::ComponentsDraw(Panda::ComponentsDrawOutput *output)
+    : m_output(output) {}
+
+void ComponentsDraw::drawComponents(Entity entity) {
     drawTag(entity);
     if (ImGui::Button("Add Component")) {
         ImGui::OpenPopup("AddComponent");
@@ -82,6 +92,7 @@ void drawComponents(Entity entity) {
         displayAddComponentEntry<CameraComponent>(entity, "Camera");
         displayAddComponentEntry<SpriteRendererComponent>(entity, "Sprite Renderer");
         displayAddComponentEntry<SkyComponent>(entity, "Cube Map Rendering");
+        displayAddScriptMenuItem(entity);
         ImGui::EndPopup();
     }
     drawComponent<TransformComponent>("Transform", entity, [](auto &component) {
@@ -143,6 +154,12 @@ void drawComponents(Entity entity) {
         if (ImGui::DragFloat("Far", &far)) {
             camera.setFar(far);
         }
+    });
+    drawComponent<ScriptListComponent>("Scripts", entity, [](auto &component) {
+        for (auto &script : component.scripts) {
+            ImGui::Text("%s", script.getName());
+        }
+        ImGui::Text("%lu scripts", component.scripts.size());
     });
     drawComponent<SkyComponent>("Cube Map Rendering", entity, [](auto &component) {});
 }

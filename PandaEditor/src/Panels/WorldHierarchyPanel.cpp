@@ -9,8 +9,9 @@
 
 namespace Panda {
 
-WorldHierarchyPanel::WorldHierarchyPanel(World *world)
+WorldHierarchyPanel::WorldHierarchyPanel(World *world, ComponentsDrawOutput *componentsDrawOutput)
     : m_world(world)
+    , m_componentsDraw(componentsDrawOutput)
     , m_selected() {}
 
 void WorldHierarchyPanel::onImGuiRender() {
@@ -34,7 +35,7 @@ void WorldHierarchyPanel::onImGuiRender() {
 
     ImGui::Begin("Properties");
     if (m_selected.isValid()) {
-        drawComponents(m_selected);
+        m_componentsDraw.drawComponents(m_selected);
     }
     ImGui::End();
 }

@@ -26,6 +26,14 @@ namespace InternalCalls {
         }
         script->update(deltaTime);
     }
+
+    std::vector<const char *> getAvailableScripts() {
+        std::vector<const char *> result;
+        for (auto &clazz : getScriptRegistry()->m_scriptClasses) {
+            result.push_back(clazz.name);
+        }
+        return result;
+    }
 } // namespace InternalCalls
 
 std::unordered_map<std::string, void *> g_scriptSymbols;
@@ -34,6 +42,7 @@ void initScriptHook() {
     using namespace InternalCalls;
     g_scriptSymbols["createScriptWithName"] = (void *)createScriptWithName;
     g_scriptSymbols["invokeUpdateAtScript"] = (void *)invokeUpdateAtScript;
+    g_scriptSymbols["getAvailableScripts"] = (void *)getAvailableScripts;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -62,7 +71,7 @@ LIB_EXPORT void *loadInternalCall(const char *name) {
         initScriptHook();
     }
     if (g_scriptSymbols.find(name) == g_scriptSymbols.end()) {
-        std::cerr << "SCRIPT ENGINE ERROR: Outer functions binding done.\n";
+        std::cerr << "SCRIPT ENGINE ERROR: Outer function not found: " << name << "\n";
         return nullptr;
     }
     return g_scriptSymbols.at(name);

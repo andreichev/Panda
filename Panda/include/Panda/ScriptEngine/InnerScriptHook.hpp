@@ -12,6 +12,9 @@ namespace ExternalCalls {
 
     using InvokeUpdateAtScriptFunc = void (*)(Panda::ScriptHandle handle, float deltaTime);
     extern InvokeUpdateAtScriptFunc invokeUpdateAtScriptFunc;
+
+    using GetAvailableScripts = std::vector<const char *> (*)();
+    extern GetAvailableScripts getAvailableScripts;
 } // namespace ExternalCalls
 
 //////////////////////////////////////////////////////////////////

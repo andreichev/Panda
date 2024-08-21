@@ -9,7 +9,7 @@ EditorLayer::EditorLayer()
     , m_toolbar()
     , m_dockspace()
     , m_viewport()
-    , m_hierarchyPanel(nullptr)
+    , m_hierarchyPanel(nullptr, this)
     , m_statisticsPanel(nullptr)
     , m_loader(&m_world, this)
     , m_startPanel(&m_loader)
@@ -202,6 +202,12 @@ void EditorLayer::menuBarCloseProject() {
         m_loader.closeProject();
     }
 }
+
+#pragma endregion
+
+#pragma region Components draw output
+
+void EditorLayer::addScriptToEntity(Entity entity) {}
 
 #pragma endregion
 

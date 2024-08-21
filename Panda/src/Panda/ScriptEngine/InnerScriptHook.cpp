@@ -20,6 +20,7 @@ void initScriptHook() {
 namespace ExternalCalls {
     AddScriptFunc addScriptFunc = nullptr;
     InvokeUpdateAtScriptFunc invokeUpdateAtScriptFunc = nullptr;
+    GetAvailableScripts getAvailableScripts = nullptr;
 } // namespace ExternalCalls
 
 //////////////////////////////////////////////////////////////////
@@ -42,6 +43,7 @@ int loadExternalCalls(SymbolsLoadFunc load) {
     using namespace ExternalCalls;
     addScriptFunc = (AddScriptFunc)load("createScriptWithName");
     invokeUpdateAtScriptFunc = (InvokeUpdateAtScriptFunc)load("invokeUpdateAtScript");
+    getAvailableScripts = (GetAvailableScripts)load("getAvailableScripts");
     LOG_INFO("SCRIPT ENGINE: Inner functions binding done.");
     return 0;
 }
