@@ -91,6 +91,3 @@ target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/imgui)
 
 # Dependencies - dylib
 target_link_libraries(Panda dylib)
-
-# Dependencies - ScriptHook
-target_link_libraries(Panda ScriptHook)

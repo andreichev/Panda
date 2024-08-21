@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Panda/GameLogic/NativeScript.hpp"
 #include "Panda/Renderer/Renderer2D.hpp"
 
 namespace Panda {
@@ -15,13 +14,9 @@ struct ParticleProps {
     float lifeTime = 1.0f;
 };
 
-class ParticleSystem : public NativeScript {
+class ParticleSystem {
 public:
-    ParticleSystem();
-    ~ParticleSystem() = default;
-
-    void initialize() override;
-    void update(double deltaTime) override;
+    void update(Renderer2D *renderer, double deltaTime);
     void emit(const ParticleProps &particleProps);
 
 private:

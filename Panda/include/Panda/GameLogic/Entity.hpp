@@ -18,10 +18,9 @@ class Entity final {
 public:
     Entity();
 
-    template<typename T>
-    T &addNativeScript() {
-        NativeScriptListComponent &component = getComponent<NativeScriptListComponent>();
-        return component.add<T>();
+    void addScript(ExternalScript script) {
+        ScriptListComponent &component = getComponent<ScriptListComponent>();
+        return component.add(script);
     }
 
     template<typename T, typename... Args>
@@ -98,7 +97,6 @@ private:
     id_t m_id;
 
     friend class World;
-    friend class NativeScript;
     friend class WorldHierarchyPanel;
     friend class WorldMapper;
 };

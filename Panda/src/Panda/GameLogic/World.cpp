@@ -3,7 +3,6 @@
 //
 
 #include "Panda/GameLogic/World.hpp"
-#include "Panda/GameLogic/NativeScript.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 #include <Rain/Rain.hpp>
@@ -43,20 +42,16 @@ void World::updateRuntime(double deltaTime) {
     updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
     // Update native scripts
     {
-        auto view = m_registry.view<NativeScriptListComponent>();
+        auto view = m_registry.view<ScriptListComponent>();
         for (auto entityHandle : view) {
             if (!m_registry.valid(entityHandle)) {
                 continue;
             }
-            auto &component = view.get<NativeScriptListComponent>(entityHandle);
+            auto &component = view.get<ScriptListComponent>(entityHandle);
             for (auto &container : component.scripts) {
-                if (!container.initialized) {
-                    id_t entityId = static_cast<id_t>(entityHandle);
-                    container.instance->setEntity({&m_registry, entityId, this});
-                    container.instance->initialize();
-                    container.initialized = true;
-                }
-                container.instance->update(deltaTime);
+                // id_t entityId = static_cast<id_t>(entityHandle);
+                // container.invokeUpdate(entityId, deltaTime, true);
+                container.invokeUpdate(deltaTime);
             }
         }
     }
@@ -73,20 +68,16 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
 
     // Update native scripts
     {
-        auto view = m_registry.view<NativeScriptListComponent>();
+        auto view = m_registry.view<ScriptListComponent>();
         for (auto entityHandle : view) {
             if (!m_registry.valid(entityHandle)) {
                 continue;
             }
-            auto &component = view.get<NativeScriptListComponent>(entityHandle);
+            auto &component = view.get<ScriptListComponent>(entityHandle);
             for (auto &container : component.scripts) {
-                if (!container.initialized) {
-                    id_t entityId = static_cast<id_t>(entityHandle);
-                    container.instance->setEntity({&m_registry, entityId, this});
-                    container.instance->initialize();
-                    container.initialized = true;
-                }
-                container.instance->update(deltaTime);
+                // id_t entityId = static_cast<id_t>(entityHandle);
+                // container.invokeUpdate(entityId, deltaTime, false);
+                container.invokeUpdate(deltaTime);
             }
         }
     }
@@ -173,21 +164,6 @@ void World::updateBasicComponents(
     }
 }
 
-void World::onImGuiRender() {
-    auto view = m_registry.view<NativeScriptListComponent>();
-    for (auto entityHandle : view) {
-        if (!m_registry.valid(entityHandle)) {
-            continue;
-        }
-        auto &component = view.get<NativeScriptListComponent>(entityHandle);
-        for (auto &container : component.scripts) {
-            if (container.initialized) {
-                container.instance->onImGuiRender();
-            }
-        }
-    }
-}
-
 void World::initialize() {
     m_isRunning = true;
     m_isChanged = false;
@@ -216,7 +192,7 @@ void World::fillEntity(Entity entity) {
     entity.addComponent<TransformComponent>();
     entity.addComponent<StaticMeshComponent>();
     entity.addComponent<DynamicMeshComponent>();
-    entity.addComponent<NativeScriptListComponent>();
+    entity.addComponent<ScriptListComponent>();
 }
 
 void World::destroy(Entity entity) {

@@ -9,6 +9,7 @@
 #include "Panda/GameLogic/Components/StaticMesh.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
+#include "Panda/GameLogic/ExternalScript.hpp"
 
 #include <Foundation/Foundation.hpp>
 #include <Rain/Rain.hpp>
@@ -92,29 +93,11 @@ struct CameraComponent final {
     WorldCamera camera;
 };
 
-class NativeScript;
+struct ScriptListComponent final {
+    std::vector<ExternalScript> scripts;
 
-struct NativeScriptContainer final {
-    Foundation::Shared<NativeScript> instance = nullptr;
-    bool initialized = false;
-    const char *scriptName;
-
-    template<typename T>
-    T &bind() {
-        Foundation::Shared<T> script = Foundation::makeShared<T>();
-        instance = script;
-        scriptName = typeid(T).name();
-        return *script;
-    }
-};
-
-struct NativeScriptListComponent final {
-    std::vector<NativeScriptContainer> scripts;
-
-    template<typename T>
-    T &add() {
-        NativeScriptContainer &container = scripts.emplace_back();
-        return container.bind<T>();
+    void add(ExternalScript script) {
+        scripts.emplace_back(script);
     }
 };
 

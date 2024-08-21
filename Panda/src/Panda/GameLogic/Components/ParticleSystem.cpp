@@ -7,11 +7,7 @@
 
 namespace Panda {
 
-ParticleSystem::ParticleSystem() {}
-
-void ParticleSystem::initialize() {}
-
-void ParticleSystem::update(double deltaTime) {
+void ParticleSystem::update(Renderer2D *renderer, double deltaTime) {
     for (Particle &particle : m_particlePool) {
         if (!particle.active)
             continue;
@@ -33,7 +29,7 @@ void ParticleSystem::update(double deltaTime) {
         float size = glm::lerp(particle.sizeEnd, particle.sizeBegin, life);
         rect.size = Size(size, size);
         rect.rotation = particle.rotation;
-        getEntity().getWorld()->getRenderer2D().drawRect(rect);
+        renderer->drawRect(rect);
     }
 }
 

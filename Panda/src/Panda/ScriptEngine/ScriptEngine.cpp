@@ -3,7 +3,7 @@
 //
 
 #include "ScriptEngine.hpp"
-#include "ScriptGlue.hpp"
+#include "InnerScriptHook.hpp"
 
 #include <Foundation/Foundation.hpp>
 #include <dylib.hpp>
@@ -15,11 +15,19 @@ void *ScriptEngine::lib = nullptr;
 bool ScriptEngine::init(ScriptEngineConfig config) {
     try {
         dylib *pDylib = NEW(Foundation::getAllocator(), dylib)(config.scriptsDllPath.c_str());
-        auto loader = pDylib->get_function<int(PandaScriptHook::ScriptsLoadFunc load)>(
-            "scriptSymbolsBindWithLoader"
-        );
-        loader(loadScriptFunc);
         lib = pDylib;
+        // ------------
+        // OUTER LOADER
+        // ------------
+        auto outerExternalLoader =
+            pDylib->get_function<int(Panda::SymbolsLoadFunc load)>("loadExternalCalls");
+        outerExternalLoader(loadInternalCall);
+
+        // ------------
+        // INNER LOADER
+        // ------------
+        auto outerInternalLoader = pDylib->get_function<void *(const char *)>("loadInternalCall");
+        loadExternalCalls(outerInternalLoader);
     } catch (...) { return false; }
     return true;
 }

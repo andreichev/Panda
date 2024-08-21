@@ -21,9 +21,7 @@ void BasicGameLayer::onUpdate(double deltaTime) {
     m_world->updateRuntime(deltaTime);
 }
 
-void BasicGameLayer::onImGuiRender() {
-    m_world->onImGuiRender();
-}
+void BasicGameLayer::onImGuiRender() {}
 
 void BasicGameLayer::onEvent(Event *event) {}
 
