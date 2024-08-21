@@ -15,7 +15,7 @@ void initialize() {
     PND_ASSERT(
         !Context::isInitialized(), "UICONTEXT ALREADY INITIALIZED. IT CAN BE INITIALIZED ONLY ONCE"
     );
-    app->pushOverlay(NEW(Foundation::getAllocator(), Layer));
+    app->pushOverlay(F_NEW(Foundation::getAllocator(), Layer));
 }
 
 } // namespace PandaUI

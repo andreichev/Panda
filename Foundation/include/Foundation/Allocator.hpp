@@ -15,21 +15,21 @@
 #    define ALIGNED_DELETE(_allocator, _ptr, _align)                                               \
         Foundation::deleteObject(_allocator, _ptr, _align, __FILE__, __LINE__)
 #else
-#    define ALLOC(allocator, size) Foundation::alloc(allocator, size, 0)
-#    define FREE(allocator, ptr) Foundation::free(allocator, ptr, 0)
-#    define DELETE(_allocator, _ptr)                                                               \
+#    define F_ALLOC(allocator, size) Foundation::alloc(allocator, size, 0)
+#    define F_FREE(allocator, ptr) Foundation::free(allocator, ptr, 0)
+#    define F_DELETE(_allocator, _ptr)                                                             \
         Foundation::deleteObject(_allocator, _ptr, 0, __FILE__, __LINE__)
 
-#    define ALIGNED_ALLOC(_allocator, _size, _align) Foundation::alloc(_allocator, _size, _align)
-#    define ALIGNED_FREE(_allocator, _ptr, _align) Foundation::free(_allocator, _ptr, _align)
-#    define ALIGNED_DELETE(_allocator, _ptr, _align)                                               \
+#    define F_ALIGNED_ALLOC(_allocator, _size, _align) Foundation::alloc(_allocator, _size, _align)
+#    define F_ALIGNED_FREE(_allocator, _ptr, _align) Foundation::free(_allocator, _ptr, _align)
+#    define F_ALIGNED_DELETE(_allocator, _ptr, _align)                                             \
         Foundation::deleteObject(_allocator, _ptr, _align)
 #endif
 
-#define NEW(_allocator, _type) PLACEMENT_NEW(ALLOC(_allocator, sizeof(_type)), _type)
-#define ALIGNED_NEW(_allocator, _type, _align)                                                     \
-    PLACEMENT_NEW(ALIGNED_ALLOC(_allocator, sizeof(_type), _align), _type)
-#define PLACEMENT_NEW(_ptr, _type) ::new (Foundation::PlacementNewTag(), _ptr) _type
+#define F_NEW(_allocator, _type) F_PLACEMENT_NEW(F_ALLOC(_allocator, sizeof(_type)), _type)
+#define F_ALIGNED_NEW(_allocator, _type, _align)                                                   \
+    F_PLACEMENT_NEW(F_ALIGNED_ALLOC(_allocator, sizeof(_type), _align), _type)
+#define F_PLACEMENT_NEW(_ptr, _type) ::new (Foundation::PlacementNewTag(), _ptr) _type
 
 namespace Foundation {
 struct PlacementNewTag {};

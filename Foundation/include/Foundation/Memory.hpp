@@ -21,23 +21,23 @@ struct Memory {
         if (releaseFn != nullptr) {
             releaseFn(data, userData);
         } else if (data != nullptr) {
-            FREE(Foundation::getAllocator(), data);
+            F_FREE(Foundation::getAllocator(), data);
         }
     }
 
     /// Create memory copying some data
     static Memory copying(void *src, uint32_t size) {
-        void *data = ALLOC(Foundation::getAllocator(), size);
+        void *data = F_ALLOC(Foundation::getAllocator(), size);
         memcpy(data, src, size);
         return Memory(data, nullptr, [](void *ptr, void *) {
-            FREE(Foundation::getAllocator(), ptr);
+            F_FREE(Foundation::getAllocator(), ptr);
         });
     }
 
     static Memory alloc(uint32_t size) {
-        void *data = ALLOC(Foundation::getAllocator(), size);
+        void *data = F_ALLOC(Foundation::getAllocator(), size);
         return Memory(data, nullptr, [](void *ptr, void *) {
-            FREE(Foundation::getAllocator(), ptr);
+            F_FREE(Foundation::getAllocator(), ptr);
         });
     }
 };

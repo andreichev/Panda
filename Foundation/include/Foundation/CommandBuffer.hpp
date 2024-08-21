@@ -35,11 +35,11 @@ public:
     CommandBuffer(uint32_t size)
         : m_size(size)
         , m_pos(0) {
-        m_data = (uint8_t *)ALLOC(getAllocator(), size);
+        m_data = (uint8_t *)F_ALLOC(getAllocator(), size);
     }
 
     ~CommandBuffer() {
-        FREE(getAllocator(), m_data);
+        F_FREE(getAllocator(), m_data);
     }
 
     template<typename CMD>

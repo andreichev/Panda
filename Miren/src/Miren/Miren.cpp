@@ -15,7 +15,7 @@ void initialize() {
     MIREN_LOG("MIREN INIT BEGIN");
     MIREN_LOG("ALLOCATING MIREN CONTEXT, {} BYTES", sizeof(Context));
     MIREN_LOG("FRAME DATA SIZE: {} BYTES", sizeof(Frame));
-    s_context = ALIGNED_NEW(Foundation::getAllocator(), Context, CONTEXT_ALIGNMENT);
+    s_context = F_ALIGNED_NEW(Foundation::getAllocator(), Context, CONTEXT_ALIGNMENT);
     // Вызвано из главного потока: можно стартовать поток отрисовки.
 #ifdef PLATFORM_DESKTOP
     s_context->m_thread.init(s_context->renderThread, nullptr, 0, "Render thread");
@@ -26,7 +26,7 @@ void initialize() {
 
 void terminate() {
     MIREN_LOG("MIREN SHUTDOWN BEGIN");
-    ALIGNED_DELETE(Foundation::getAllocator(), s_context, CONTEXT_ALIGNMENT);
+    F_ALIGNED_DELETE(Foundation::getAllocator(), s_context, CONTEXT_ALIGNMENT);
     s_context = nullptr;
     MIREN_LOG("MIREN SHUTDOWN END");
 }

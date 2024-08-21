@@ -20,11 +20,11 @@ public:
     UniformBuffer(uint32_t size)
         : m_size(size)
         , m_pos(0) {
-        m_data = (uint8_t *)ALLOC(Foundation::getAllocator(), size);
+        m_data = (uint8_t *)F_ALLOC(Foundation::getAllocator(), size);
     }
 
     ~UniformBuffer() {
-        FREE(Foundation::getAllocator(), m_data);
+        F_FREE(Foundation::getAllocator(), m_data);
     }
 
     void writeUniform(Uniform &uniform) {

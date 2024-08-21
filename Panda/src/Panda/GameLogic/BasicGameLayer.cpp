@@ -7,14 +7,14 @@ BasicGameLayer::BasicGameLayer(Level *startupLevel) {
 }
 
 void BasicGameLayer::onAttach() {
-    m_world = NEW(Foundation::getAllocator(), World);
+    m_world = F_NEW(Foundation::getAllocator(), World);
     m_currentLevel->start(m_world);
     m_world->initialize();
 }
 
 void BasicGameLayer::onDetach() {
-    DELETE(Foundation::getAllocator(), m_currentLevel);
-    DELETE(Foundation::getAllocator(), m_world);
+    F_DELETE(Foundation::getAllocator(), m_currentLevel);
+    F_DELETE(Foundation::getAllocator(), m_world);
 }
 
 void BasicGameLayer::onUpdate(double deltaTime) {

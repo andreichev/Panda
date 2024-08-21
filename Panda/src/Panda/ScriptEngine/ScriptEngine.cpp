@@ -16,7 +16,7 @@ ScriptEngine::~ScriptEngine() {
 
 void ScriptEngine::terminate() {
     if (lib) {
-        DELETE(Foundation::getAllocator(), (dylib *)lib);
+        F_DELETE(Foundation::getAllocator(), (dylib *)lib);
         lib = nullptr;
     }
 }
@@ -24,9 +24,9 @@ void ScriptEngine::terminate() {
 bool ScriptEngine::reload(ScriptEngineConfig config) {
     terminate();
     try {
-        dylib *pDylib =
-            NEW(Foundation::getAllocator(),
-                dylib)(config.dllPath.c_str(), config.dllName.c_str(), true);
+        dylib *pDylib = F_NEW(Foundation::getAllocator(), dylib)(
+            config.dllPath.c_str(), config.dllName.c_str(), true
+        );
         lib = pDylib;
         // ------------
         // OUTER LOADER

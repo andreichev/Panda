@@ -75,7 +75,7 @@ void BaseLevel::start(Panda::World *world) {
     Panda::TextureAsset heightTextureAsset = Panda::AssetLoader::loadTexture("textures/map2.png");
     int width = heightTextureAsset.m_width;
     int height = heightTextureAsset.m_height;
-    float *heightMap = (float *)ALLOC(Foundation::getAllocator(), sizeof(float) * width * height);
+    float *heightMap = (float *)F_ALLOC(Foundation::getAllocator(), sizeof(float) * width * height);
     uint8_t *data = (uint8_t *)heightTextureAsset.m_data.data;
     for (int h = 0; h < height; h++) {
         for (int w = 0; w < width; w++) {
@@ -86,14 +86,14 @@ void BaseLevel::start(Panda::World *world) {
 #else
     int width = 256;
     int height = 256;
-    float *heightMap = (float *)ALLOC(Foundation::getAllocator(), sizeof(float) * width * height);
+    float *heightMap = (float *)F_ALLOC(Foundation::getAllocator(), sizeof(float) * width * height);
     PerlinNoise::generate2DGlm(123, 4, 1.0f, heightMap, width, height);
 #endif
 
     Miren::VertexLayoutHandle layoutHandle =
         Miren::createVertexLayout(Vertex::createBufferLayout());
     Panda::MeshData meshData = m_meshGenerator.makeMesh(layoutHandle, width, height, heightMap);
-    FREE(Foundation::getAllocator(), heightMap);
+    F_FREE(Foundation::getAllocator(), heightMap);
 
     dynamicMesh.create(
         meshData, {{"texture1", m_colorTexture}, {"iSky", sky.getSkyTexture()}}, m_shader

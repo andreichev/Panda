@@ -78,7 +78,7 @@ struct Context {
                 }
                 case RendererCommandType::RendererShutdown: {
                     CMDBUF_LOG("RENDERER SHUTDOWN COMMAND");
-                    DELETE(Foundation::getAllocator(), m_renderer);
+                    F_DELETE(Foundation::getAllocator(), m_renderer);
                     m_renderer = nullptr;
                     return;
                 }
@@ -224,7 +224,7 @@ struct Context {
                 command->type == RendererCommandType::RendererInit,
                 "First command should be RendererInit"
             );
-            m_renderer = NEW(Foundation::getAllocator(), RendererOpenGL);
+            m_renderer = F_NEW(Foundation::getAllocator(), RendererOpenGL);
             MIREN_LOG("RENDERER CREATED");
         }
     }
@@ -384,17 +384,17 @@ struct Context {
 
     void destroyTransientVertexBuffer(TransientVertexBuffer &tvb) {
         deleteVertexBuffer(tvb.handle);
-        ALIGNED_FREE(Foundation::getAllocator(), tvb.data, 16);
+        F_ALIGNED_FREE(Foundation::getAllocator(), tvb.data, 16);
     }
 
     void destroyTransientIndexBuffer(TransientIndexBuffer &tib) {
         deleteIndexBuffer(tib.handle);
-        ALIGNED_FREE(Foundation::getAllocator(), tib.data, 16);
+        F_ALIGNED_FREE(Foundation::getAllocator(), tib.data, 16);
     }
 
     TransientIndexBuffer createTransientIndexBuffer(uint32_t size) {
         TransientIndexBuffer tib;
-        tib.data = (uint8_t *)ALIGNED_ALLOC(Foundation::getAllocator(), size, 16);
+        tib.data = (uint8_t *)F_ALIGNED_ALLOC(Foundation::getAllocator(), size, 16);
         tib.size = size;
         tib.startIndex = 0;
         tib.handle = createDynamicIndexBuffer(nullptr, BufferElementType::UnsignedShort, size / 2);
@@ -404,7 +404,7 @@ struct Context {
 
     TransientVertexBuffer createTransientVertexBuffer(uint32_t size) {
         TransientVertexBuffer tvb;
-        tvb.data = (uint8_t *)ALIGNED_ALLOC(Foundation::getAllocator(), size, 16);
+        tvb.data = (uint8_t *)F_ALIGNED_ALLOC(Foundation::getAllocator(), size, 16);
         tvb.size = size;
         tvb.startVertex = 0;
         tvb.handle = createDynamicVertexBuffer(nullptr, size);

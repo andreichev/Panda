@@ -129,7 +129,7 @@ public:
     inline void reserve(int new_capacity) {
         if (new_capacity <= m_capacity)
             return;
-        T *new_data = (T *)ALLOC(getAllocator(), (size_t)new_capacity * sizeof(T));
+        T *new_data = (T *)F_ALLOC(getAllocator(), (size_t)new_capacity * sizeof(T));
         if (m_data) {
             memcpy(new_data, m_data, (size_t)m_size * sizeof(T));
             FREE(getAllocator(), m_data);
@@ -143,7 +143,7 @@ public:
             return;
         if (m_data)
             FREE(getAllocator(), m_data);
-        m_data = (T *)ALLOC(getAllocator(), (size_t)new_capacity * sizeof(T));
+        m_data = (T *)F_ALLOC(getAllocator(), (size_t)new_capacity * sizeof(T));
         m_capacity = new_capacity;
     }
 

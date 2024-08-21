@@ -9,9 +9,9 @@ Renderer2D::Renderer2D()
     m_drawData.vbSize = 0;
     m_drawData.indicesCount = 0;
     m_drawData.vertices =
-        (Vertex2D *)ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
+        (Vertex2D *)F_ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
     m_drawData.indices =
-        (uint16_t *)ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
+        (uint16_t *)F_ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
     Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
         "default-shaders/renderer2d/renderer2d_vertex.glsl",
         "default-shaders/renderer2d/renderer2d_fragment.glsl"
@@ -56,10 +56,10 @@ Renderer2D::~Renderer2D() {
     }
     m_drawData.whiteTexture = nullptr;
     if (m_drawData.vertices) {
-        FREE(Foundation::getAllocator(), m_drawData.vertices);
+        F_FREE(Foundation::getAllocator(), m_drawData.vertices);
     }
     if (m_drawData.indices) {
-        FREE(Foundation::getAllocator(), m_drawData.indices);
+        F_FREE(Foundation::getAllocator(), m_drawData.indices);
     }
 }
 

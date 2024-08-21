@@ -9,7 +9,7 @@
 #include <Panda.hpp>
 
 void freeBuffer(void *data, void *userInfo) {
-    FREE(Foundation::getAllocator(), data);
+    F_FREE(Foundation::getAllocator(), data);
 }
 
 glm::vec2 getUV(uint8_t tileIndex) {
@@ -37,8 +37,8 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
     Chunk &chunk = chunks.chunks
                        [chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                         chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ];
-    Vertex *vertices = (Vertex *)ALLOC(Foundation::getAllocator(), sizeof(Vertex) * 20000);
-    uint32_t *indices = (uint32_t *)ALLOC(Foundation::getAllocator(), sizeof(uint32_t) * 20000);
+    Vertex *vertices = (Vertex *)F_ALLOC(Foundation::getAllocator(), sizeof(Vertex) * 20000);
+    uint32_t *indices = (uint32_t *)F_ALLOC(Foundation::getAllocator(), sizeof(uint32_t) * 20000);
     uint32_t verticesCount = 0;
     uint32_t indicesCount = 0;
     for (int voxelIndexX = 0; voxelIndexX < Chunk::SIZE_X; voxelIndexX++) {

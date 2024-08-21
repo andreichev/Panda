@@ -54,9 +54,9 @@ const char *getGLErrorStr(GLenum err) {
 RendererOpenGL::RendererOpenGL() {
     s_instance = this;
 #ifdef PLATFORM_IOS
-    context = NEW(Foundation::getAllocator(), GlesContext);
+    context = F_NEW(Foundation::getAllocator(), GlesContext);
 #elif defined(PLATFORM_DESKTOP)
-    context = NEW(Foundation::getAllocator(), OpenGLContext);
+    context = F_NEW(Foundation::getAllocator(), OpenGLContext);
 #endif
     context->create();
     GL_CALL(glEnable(GL_BLEND));
@@ -77,7 +77,7 @@ RendererOpenGL::RendererOpenGL() {
 
 RendererOpenGL::~RendererOpenGL() {
     GL_CALL(glDeleteVertexArrays(1, &m_uselessVao));
-    DELETE(Foundation::getAllocator(), context);
+    F_DELETE(Foundation::getAllocator(), context);
     s_instance = nullptr;
 }
 

@@ -8,7 +8,7 @@
 #include <Panda.hpp>
 
 void freeBuffer(void *data, void *userInfo) {
-    FREE(Foundation::getAllocator(), data);
+    F_FREE(Foundation::getAllocator(), data);
 }
 
 float height(glm::vec2 P, int width, int depth, float *heightMap) {
@@ -71,9 +71,10 @@ Panda::MeshData TerrainMeshGenerator::makeMesh(
 ) {
     using namespace Miren;
     using namespace Panda;
-    Vertex *vertices = (Vertex *)ALLOC(Foundation::getAllocator(), sizeof(Vertex) * width * depth);
+    Vertex *vertices =
+        (Vertex *)F_ALLOC(Foundation::getAllocator(), sizeof(Vertex) * width * depth);
     uint32_t *indices =
-        (uint32_t *)ALLOC(Foundation::getAllocator(), sizeof(uint32_t) * width * depth * 6);
+        (uint32_t *)F_ALLOC(Foundation::getAllocator(), sizeof(uint32_t) * width * depth * 6);
     uint32_t verticesCount = 0;
     uint32_t indicesCount = 0;
 
