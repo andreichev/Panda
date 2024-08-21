@@ -1,5 +1,5 @@
-#include "InnerScriptHook.hpp"
-#include "Panda.hpp"
+#include "Panda/ScriptEngine/InnerScriptHook.hpp"
+#include "Panda/Application/Application.hpp"
 
 #include <unordered_map>
 

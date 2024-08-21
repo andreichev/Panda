@@ -9,7 +9,7 @@ endif ()
 file(GLOB_RECURSE SOURCES src/*.cpp)
 file(GLOB_RECURSE INCLUDE include/*.hpp)
 
-add_library(ScriptCoreCpp STATIC "${SOURCES}" "${INCLUDE}")
+add_library(ScriptCoreCpp STATIC "${SOURCES}" ScriptCoreCpp.def "${INCLUDE}")
 
 target_include_directories(ScriptCoreCpp PUBLIC ${PROJECT_SOURCE_DIR}/include)
 

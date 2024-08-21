@@ -2,7 +2,6 @@
 // Created by Michael Andreichev on 02.08.2024.
 //
 
-#include "OuterScriptHook.hpp"
 #include "ScriptRegistry.hpp"
 
 #include <iostream>
@@ -67,6 +66,11 @@ LIB_EXPORT void *loadInternalCall(const char *name) {
         return nullptr;
     }
     return g_scriptSymbols.at(name);
+}
+
+LIB_EXPORT void hookFunc() {
+    loadExternalCalls(nullptr);
+    loadInternalCall(nullptr);
 }
 }
 

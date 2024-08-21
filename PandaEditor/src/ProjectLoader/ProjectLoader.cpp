@@ -97,6 +97,7 @@ void ProjectLoader::openProject(const path_t &path) {
     }
     m_worldPath = m_projectPath;
     m_worldPath.append(m_projectSettings.worldPath);
+    m_scriptEngine.reload({"", "TestProject"});
     loadWorld();
 }
 

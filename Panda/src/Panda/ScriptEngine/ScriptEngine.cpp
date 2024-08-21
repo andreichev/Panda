@@ -2,19 +2,31 @@
 // Created by Michael Andreichev on 01.08.2024.
 //
 
-#include "ScriptEngine.hpp"
-#include "InnerScriptHook.hpp"
+#include "Panda/ScriptEngine/ScriptEngine.hpp"
+#include "Panda/ScriptEngine/InnerScriptHook.hpp"
 
 #include <Foundation/Foundation.hpp>
 #include <dylib.hpp>
 
 namespace Panda {
 
-void *ScriptEngine::lib = nullptr;
+ScriptEngine::~ScriptEngine() {
+    terminate();
+}
 
-bool ScriptEngine::init(ScriptEngineConfig config) {
+void ScriptEngine::terminate() {
+    if (lib) {
+        DELETE(Foundation::getAllocator(), (dylib *)lib);
+        lib = nullptr;
+    }
+}
+
+bool ScriptEngine::reload(ScriptEngineConfig config) {
+    terminate();
     try {
-        dylib *pDylib = NEW(Foundation::getAllocator(), dylib)(config.scriptsDllPath.c_str());
+        dylib *pDylib =
+            NEW(Foundation::getAllocator(),
+                dylib)(config.dllPath.c_str(), config.dllName.c_str(), true);
         lib = pDylib;
         // ------------
         // OUTER LOADER
@@ -28,15 +40,15 @@ bool ScriptEngine::init(ScriptEngineConfig config) {
         // ------------
         auto outerInternalLoader = pDylib->get_function<void *(const char *)>("loadInternalCall");
         loadExternalCalls(outerInternalLoader);
-    } catch (...) { return false; }
-    return true;
-}
-
-void ScriptEngine::terminate() {
-    if (lib) {
-        DELETE(Foundation::getAllocator(), (dylib *)lib);
-        lib = nullptr;
+    } catch (...) {
+        LOG_ERROR(
+            "SCRIPT ENGINE: Can't load script dynamic library at path {}/{}",
+            config.dllPath.c_str(),
+            config.dllName.c_str()
+        );
+        return false;
     }
+    return true;
 }
 
 } // namespace Panda

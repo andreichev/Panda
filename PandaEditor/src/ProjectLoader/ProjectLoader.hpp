@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Panda/GameLogic/World.hpp"
+#include "Panda/ScriptEngine/ScriptEngine.hpp"
 #include "Model/EditorSettings.hpp"
 #include "SystemTools/SystemTools.hpp"
 #include "Model/ProjectSettings.hpp"
@@ -49,6 +50,7 @@ private:
     path_t m_worldPath;
     World *m_world;
     ProjectLoaderOutput *m_output;
+    ScriptEngine m_scriptEngine;
 };
 
 } // namespace Panda

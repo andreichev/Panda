@@ -9,7 +9,7 @@ endif ()
 file(GLOB_RECURSE SOURCES src/*.cpp)
 file(GLOB_RECURSE INCLUDE src/*.hpp)
 
-add_library(TestProject SHARED "${SOURCES}" "${INCLUDE}")
+add_library(TestProject SHARED "${SOURCES}" TestProject.def "${INCLUDE}")
 
 if(PLATFORM_IOS OR PLATFORM_MACOS)
     add_custom_command(TARGET TestProject POST_BUILD
@@ -25,3 +25,4 @@ target_include_directories(TestProject PUBLIC ${PROJECT_SOURCE_DIR}/src)
 
 # Dependencies - ScriptCore
 target_link_libraries(TestProject ScriptCoreCpp)
+

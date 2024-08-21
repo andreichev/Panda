@@ -1,12 +1,10 @@
 #pragma once
 
+#include <stdint.h>
+
 namespace Panda {
 
 using ScriptHandle = uint32_t;
-
-namespace InternalCalls {
-    void application_Quit();
-} // namespace InternalCalls
 
 namespace ExternalCalls {
     using AddScriptFunc = ScriptHandle (*)(const char *name);
