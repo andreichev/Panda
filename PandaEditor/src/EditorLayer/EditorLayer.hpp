@@ -11,6 +11,7 @@
 #include "Camera/EditorCamera.hpp"
 #include "Camera/CameraController.hpp"
 #include "EditorLayer/SceneState.hpp"
+#include "Panels/Popups/EditorPopup.hpp"
 #include "ProjectLoader/ProjectLoader.hpp"
 
 #include <Panda.hpp>
@@ -21,17 +22,6 @@ class EditorLayer : public Layer,
                     public ProjectLoaderOutput,
                     public MenuBarOutput,
                     public ComponentsDrawOutput {
-    using PopupActionFunction = void (*)(void *userData);
-    struct EditorPopup {
-        const char *title;
-        const char *subtitle;
-        const char *yesText;
-        const char *noText;
-        PopupActionFunction yesAction;
-        PopupActionFunction noAction;
-        void *userData;
-    };
-
 public:
     EditorLayer();
     ~EditorLayer() override = default;
@@ -73,7 +63,6 @@ public:
 
 private:
     void saveWorld();
-    void imguiDrawPopup(EditorPopup &popup);
     void updateWindowState();
 
     ProjectLoader m_loader;
@@ -87,7 +76,7 @@ private:
     ContentBrowser m_contentBrowser;
     EditorCamera m_editorCamera;
     CameraController m_cameraController;
-    std::vector<EditorPopup> m_popups;
+    std::vector<EditorPopup *> m_popups;
 
     World m_world;
     SceneState m_sceneState = SceneState::EDIT;

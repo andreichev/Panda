@@ -33,6 +33,9 @@ public:
     inline bool isRunning() {
         return m_isRunning;
     }
+    inline bool setRunning(bool isRunning) {
+        m_isRunning = isRunning;
+    }
     Renderer2D &getRenderer2D() {
         return m_renderer2d;
     }

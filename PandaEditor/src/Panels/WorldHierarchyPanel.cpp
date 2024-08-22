@@ -49,6 +49,15 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     if (ImGui::IsItemClicked()) {
         m_selected = entity;
     }
+    if (ImGui::BeginPopupContextItem()) {
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+        if (ImGui::Button("Rename", ImVec2(75, ImGui::GetTextLineHeight() + 5))) {
+
+        } else if (ImGui::Button("Delete", ImVec2(75, ImGui::GetTextLineHeight() + 5))) {
+        }
+        ImGui::PopStyleVar();
+        ImGui::EndPopup();
+    }
     if (opened) {
         ImGui::TreePop();
     }

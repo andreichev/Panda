@@ -12,8 +12,17 @@
 class SampleScript : public Panda::Script {
 public:
     void update(float dt) override {
-        std::cout << "HELLO, WORLD!" << std::endl;
+        std::cout << "Hello from Sample script!" << std::endl;
     }
 };
 
 REGISTER_SCRIPT(SampleScript)
+
+class TestScript : public Panda::Script {
+public:
+    void update(float dt) override {
+        std::cout << "Hello from test script!" << std::endl;
+    }
+};
+
+REGISTER_SCRIPT(TestScript)

@@ -1,6 +1,8 @@
 #include "EditorLayer.hpp"
 
 #include "Panels/Common/ImGuiHelper.hpp"
+#include "Panels/Popups/EditorYesNoPopup.hpp"
+#include "Panels/Popups/PickScriptPopup.hpp"
 
 namespace Panda {
 
@@ -66,8 +68,7 @@ void EditorLayer::onUpdate(double deltaTime) {
 void EditorLayer::onImGuiRender() {
     if (!m_popups.empty()) {
         auto &popup = m_popups.back();
-        ImGui::OpenPopup(popup.title);
-        imguiDrawPopup(popup);
+        popup->onImGuiRender();
     }
     if (m_loader.hasOpenedProject()) {
         m_menuBar.onImGuiRender();
@@ -107,17 +108,20 @@ void EditorLayer::onEvent(Event *event) {
 
 void EditorLayer::play() {
     m_sceneState = SceneState::PLAY;
+    m_world.setRunning(true);
     m_viewport.focus();
 }
 
 void EditorLayer::simulate() {
     m_sceneState = SceneState::SIMULATE;
+    m_world.setRunning(true);
     m_viewport.focus();
 }
 
 void EditorLayer::stop() {
     m_sceneState = SceneState::EDIT;
     m_viewport.setCamera(&m_editorCamera);
+    m_world.setRunning(false);
     m_viewport.focus();
 }
 
@@ -158,18 +162,30 @@ void EditorLayer::menuBarOpenProject() {
 
 void EditorLayer::menuBarCloseApp() {
     if (m_world.isChanged()) {
-        EditorPopup popup;
-        popup.yesAction = [](void *data) {
+        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
+        popup->yesAction = [](void *data) {
             auto self = static_cast<EditorLayer *>(data);
             self->saveWorld();
             Application::get()->close();
+            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+            self->m_popups.pop_back();
         };
-        popup.noAction = [](void *data) { Application::get()->close(); };
-        popup.userData = this;
-        popup.title = "Save current world?";
-        popup.subtitle = "Do you want to save your changes?";
-        popup.yesText = "Save";
-        popup.noText = "Not save";
+        popup->noAction = [](void *data) {
+            Application::get()->close();
+            auto self = static_cast<EditorLayer *>(data);
+            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+            self->m_popups.pop_back();
+        };
+        popup->closeAction = [](void *data) {
+            auto self = static_cast<EditorLayer *>(data);
+            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+            self->m_popups.pop_back();
+        };
+        popup->userData = this;
+        popup->title = "Save current world?";
+        popup->subtitle = "Do you want to save your changes?";
+        popup->yesText = "Save";
+        popup->noText = "Not save";
         m_popups.emplace_back(popup);
     } else {
         Application::get()->close();
@@ -182,21 +198,30 @@ void EditorLayer::menuBarSaveWorld() {
 
 void EditorLayer::menuBarCloseProject() {
     if (m_world.isChanged()) {
-        EditorPopup popup;
-        popup.yesAction = [](void *data) {
+        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
+        popup->yesAction = [](void *data) {
             auto self = static_cast<EditorLayer *>(data);
             self->saveWorld();
             self->m_loader.closeProject();
+            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+            self->m_popups.pop_back();
         };
-        popup.noAction = [](void *data) {
+        popup->noAction = [](void *data) {
             auto self = static_cast<EditorLayer *>(data);
             self->m_loader.closeProject();
+            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+            self->m_popups.pop_back();
         };
-        popup.userData = this;
-        popup.title = "Save current world?";
-        popup.subtitle = "Do you want to save your changes?";
-        popup.yesText = "Save";
-        popup.noText = "Not save";
+        popup->closeAction = [](void *data) {
+            auto self = static_cast<EditorLayer *>(data);
+            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+            self->m_popups.pop_back();
+        };
+        popup->userData = this;
+        popup->title = "Save current world?";
+        popup->subtitle = "Do you want to save your changes?";
+        popup->yesText = "Save";
+        popup->noText = "Not save";
         m_popups.emplace_back(popup);
     } else {
         m_loader.closeProject();
@@ -207,7 +232,28 @@ void EditorLayer::menuBarCloseProject() {
 
 #pragma region Components draw output
 
-void EditorLayer::addScriptToEntity(Entity entity) {}
+void EditorLayer::addScriptToEntity(Entity entity) {
+    PickScriptPopup *popup = F_NEW(Foundation::getAllocator(), PickScriptPopup);
+    popup->closeAction = [](void *data) {
+        auto self = static_cast<EditorLayer *>(data);
+        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+        self->m_popups.pop_back();
+    };
+    popup->selectAction = [](void *data, Entity entity, const char *scriptName) {
+        auto self = static_cast<EditorLayer *>(data);
+        ScriptHandle id = ExternalCalls::addScriptFunc(scriptName);
+        if (id) {
+            entity.addScript(Panda::ExternalScript(id, scriptName));
+        }
+        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+        self->m_popups.pop_back();
+    };
+    popup->userData = this;
+    popup->entity = entity;
+    popup->title = "Add Script";
+    popup->subtitle = "Pick a script from available Script classes list.";
+    m_popups.emplace_back(popup);
+}
 
 #pragma endregion
 
@@ -219,40 +265,6 @@ void EditorLayer::updateWindowState() {
         Application::get()->getWindow()->setTitle("Welcome");
         window->setSize({600, 400});
     }
-}
-
-void EditorLayer::imguiDrawPopup(EditorLayer::EditorPopup &popup) {
-    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 3.0f);
-    if (ImGui::BeginPopupModal(popup.title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::Text(popup.subtitle);
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-        if (ImGui::Button(popup.yesText, {ImGui::GetContentRegionAvail().x, 24}) ||
-            Input::isKeyPressed(Key::ENTER)) {
-            if (popup.yesAction) {
-                popup.yesAction(popup.userData);
-            }
-            m_popups.pop_back();
-            ImGui::CloseCurrentPopup();
-        }
-        if (ImGui::Button(popup.noText, {ImGui::GetContentRegionAvail().x, 24})) {
-            if (popup.noAction) {
-                popup.noAction(popup.userData);
-            }
-            m_popups.pop_back();
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::Separator();
-        if (ImGui::Button("Cancel", {ImGui::GetContentRegionAvail().x, 24})) {
-            m_popups.pop_back();
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::PopStyleVar();
-        ImGui::SetItemDefaultFocus();
-        ImGui::EndPopup();
-    }
-    ImGui::PopStyleVar();
 }
 
 void EditorLayer::saveWorld() {
