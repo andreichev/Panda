@@ -2,38 +2,38 @@
 
 #include "EditorPopup.hpp"
 
-#include <Panda/GameLogic/Input.hpp>
+#include <string>
 #include <imgui.h>
 
 namespace Panda {
 
-class EditorYesNoPopup : public EditorPopup {
+using EnteringDoneFunction = void (*)(void *userData, std::string text);
+
+class EnterNamePopup : public EditorPopup {
 public:
     void onImGuiRender() override {
+        static std::string text;
+
         ImGui::OpenPopup(title);
         ImVec2 center = ImGui::GetMainViewport()->GetCenter();
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 3.0f);
         if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("%s", subtitle.c_str());
+            ImGui::Text("%s", subtitle);
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-            if (ImGui::Button(yesText.c_str(), {ImGui::GetContentRegionAvail().x, 24}) ||
-                Input::isKeyPressed(Key::ENTER)) {
-                if (yesAction) {
-                    yesAction(userData);
+
+            text.resize(40);
+            ImGui::InputText("##", text.data(), text.size());
+
+            if (ImGui::Button("Done", {ImGui::GetContentRegionAvail().x, 24})) {
+                if (doneAction) {
+                    std::string clearText = text.substr(0, text.find('\0'));
+                    doneAction(userData, clearText);
                 }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();
-                return;
-            }
-            if (ImGui::Button(noText.c_str(), {ImGui::GetContentRegionAvail().x, 24})) {
-                if (noAction) {
-                    noAction(userData);
-                }
-                ImGui::CloseCurrentPopup();
-                ImGui::PopStyleVar(2);
-                ImGui::EndPopup();
+                text.clear();
                 return;
             }
             ImGui::Separator();
@@ -44,8 +44,10 @@ public:
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();
+                text.clear();
                 return;
             }
+
             ImGui::PopStyleVar();
             ImGui::SetItemDefaultFocus();
             ImGui::EndPopup();
@@ -53,11 +55,8 @@ public:
         ImGui::PopStyleVar();
     }
 
-    std::string subtitle;
-    std::string yesText;
-    std::string noText;
-    PopupActionFunction yesAction;
-    PopupActionFunction noAction;
+    const char *subtitle;
+    EnteringDoneFunction doneAction;
     PopupActionFunction closeAction;
     void *userData;
 };

@@ -6,8 +6,9 @@
 
 namespace Panda {
 
-ContentBrowser::ContentBrowser()
-    : m_baseDirectory()
+ContentBrowser::ContentBrowser(ContentBrowserOutput *output)
+    : m_output(output)
+    , m_baseDirectory()
     , m_currentDirectory()
     , m_defaultFileIcon("ui/icons/_plain.png")
     , m_directoryIcon("ui/icons/DirectoryIcon.png")
@@ -49,6 +50,18 @@ void ContentBrowser::onImGuiRender() {
         if (ImGui::Button(getString(ICON_ARROW_LEFT).c_str())) {
             m_currentDirectory = m_currentDirectory.parent_path();
         }
+    }
+    if (ImGui::BeginPopupContextWindow()) {
+        if (ImGui::BeginMenu("Create")) {
+            if (ImGui::MenuItem("Folder", NULL)) {
+                m_output->createFolderShowEnterNamePopup();
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::MenuItem("Open in Finder", NULL)) {
+            SystemTools::open(m_currentDirectory);
+        }
+        ImGui::EndPopup();
     }
     static bool showHiddenFiles = false;
     // ImGui::SameLine();
@@ -113,7 +126,10 @@ void ContentBrowser::onImGuiRender() {
         if (ImGui::BeginPopupContextItem()) {
             if (ImGui::MenuItem("Show in Finder")) {
                 SystemTools::show(path.c_str());
-                //                LOG_INFO("PATH: {}", path.c_str());
+            }
+            if (ImGui::MenuItem("Delete")) {
+                m_deletingDirectory = path;
+                m_output->deleteFileShowPopup(path);
             }
             ImGui::EndPopup();
         }
@@ -134,6 +150,14 @@ void ContentBrowser::onImGuiRender() {
 void ContentBrowser::setBaseDirectory(const path_t &path) {
     m_baseDirectory = path;
     m_currentDirectory = path;
+}
+
+void ContentBrowser::createFolder(std::string name) {
+    std::filesystem::create_directory(m_currentDirectory / name);
+}
+
+void ContentBrowser::confirmDeletion() {
+    std::filesystem::remove_all(m_deletingDirectory);
 }
 
 } // namespace Panda

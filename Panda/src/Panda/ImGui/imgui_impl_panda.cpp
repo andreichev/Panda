@@ -307,6 +307,8 @@ IMGUI_IMPL_API bool ImGui_ImplPanda_Init() {
 IMGUI_IMPL_API void ImGui_ImplPanda_Shutdown() {
     ImGui_PandaPlatformData *bd = ImGui_ImplGlfw_GetBackendData();
     IM_DELETE(bd);
+    ImGuiIO &io = ImGui::GetIO();
+    io.BackendPlatformUserData = nullptr;
 }
 
 IMGUI_IMPL_API void ImGui_ImplPanda_NewFrame(double deltaTime) {

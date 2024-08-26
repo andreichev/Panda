@@ -22,7 +22,8 @@ namespace Panda {
 class EditorLayer : public Layer,
                     public ProjectLoaderOutput,
                     public MenuBarOutput,
-                    public ComponentsDrawOutput {
+                    public ComponentsDrawOutput,
+                    public ContentBrowserOutput {
 public:
     EditorLayer();
     ~EditorLayer() override = default;
@@ -59,6 +60,13 @@ public:
 #pragma region Components draw output
 
     void addScriptToEntity(Entity entity) override;
+
+#pragma endregion
+
+#pragma region Content browser output
+
+    void createFolderShowEnterNamePopup() override;
+    void deleteFileShowPopup(path_t path) override;
 
 #pragma endregion
 

@@ -8,17 +8,28 @@
 
 namespace Panda {
 
+class ContentBrowserOutput {
+public:
+    virtual ~ContentBrowserOutput() = default;
+    virtual void createFolderShowEnterNamePopup() = 0;
+    virtual void deleteFileShowPopup(path_t path) = 0;
+};
+
 class ContentBrowser {
 public:
-    ContentBrowser();
+    ContentBrowser(ContentBrowserOutput *output);
     void onImGuiRender();
     void setBaseDirectory(const path_t &path);
+    void createFolder(std::string name);
+    void confirmDeletion();
 
 private:
     path_t m_baseDirectory;
     path_t m_currentDirectory;
+    path_t m_deletingDirectory;
     Texture m_directoryIcon;
     Texture m_defaultFileIcon;
+    ContentBrowserOutput *m_output;
     std::map<std::string, Texture> m_fileIcons;
 };
 

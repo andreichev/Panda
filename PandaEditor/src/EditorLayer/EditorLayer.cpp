@@ -3,6 +3,7 @@
 #include "Panels/Common/ImGuiHelper.hpp"
 #include "Panels/Popups/EditorYesNoPopup.hpp"
 #include "Panels/Popups/PickScriptPopup.hpp"
+#include "Panels/Popups/EnterNamePopup.hpp"
 
 namespace Panda {
 
@@ -17,7 +18,7 @@ EditorLayer::EditorLayer()
     , m_loader(&m_world, this)
     , m_startPanel(&m_loader)
     , m_menuBar(this)
-    , m_contentBrowser()
+    , m_contentBrowser(this)
     , m_editorCamera()
     , m_popups()
     , m_cameraController()
@@ -74,7 +75,7 @@ void EditorLayer::onImGuiRender() {
     if (m_loader.hasOpenedProject()) {
         m_menuBar.onImGuiRender();
         auto pickedSceneState = m_toolbar.onImGuiRender(m_menuBar.m_height, m_sceneState);
-        m_dockspace.beginImGuiDockspace(m_toolbar.height + m_menuBar.m_height);
+        m_dockspace.beginImGuiDockspace(m_toolbar.height + m_menuBar.m_height + 2);
         m_statisticsPanel.onImGuiRender();
         m_viewport.onImGuiRender();
         m_hierarchyPanel.onImGuiRender();
@@ -256,6 +257,53 @@ void EditorLayer::addScriptToEntity(Entity entity) {
     popup->entity = entity;
     popup->title = "Add Script";
     popup->subtitle = "Pick a script from available Script classes list.";
+    m_popups.emplace_back(popup);
+}
+
+#pragma endregion
+
+#pragma region Content browser output
+
+void EditorLayer::createFolderShowEnterNamePopup() {
+    EnterNamePopup *popup = F_NEW(Foundation::getAllocator(), EnterNamePopup);
+    popup->closeAction = [](void *data) {
+        auto self = static_cast<EditorLayer *>(data);
+        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+        self->m_popups.pop_back();
+    };
+    popup->doneAction = [](void *data, std::string text) {
+        auto self = static_cast<EditorLayer *>(data);
+        if (!text.empty()) {
+            self->m_contentBrowser.createFolder(text);
+        }
+        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+        self->m_popups.pop_back();
+    };
+    popup->userData = this;
+    popup->title = "Create folder";
+    popup->subtitle = "Enter folder name:";
+    m_popups.emplace_back(popup);
+}
+
+void EditorLayer::deleteFileShowPopup(path_t path) {
+    EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
+    popup->yesAction = [](void *data) {
+        auto self = static_cast<EditorLayer *>(data);
+        self->m_contentBrowser.confirmDeletion();
+        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+        self->m_popups.pop_back();
+    };
+    popup->noAction = [](void *data) {
+        auto self = static_cast<EditorLayer *>(data);
+        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+        self->m_popups.pop_back();
+    };
+    popup->closeAction = popup->noAction;
+    popup->userData = this;
+    popup->title = "Delete";
+    popup->subtitle = "Delete \"" + path.filename().string() + "\"?";
+    popup->yesText = "Yes";
+    popup->noText = "No";
     m_popups.emplace_back(popup);
 }
 
