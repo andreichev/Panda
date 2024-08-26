@@ -18,6 +18,10 @@ public:
         return name;
     }
 
+    bool operator==(const ExternalScript &rhs) const {
+        return id == rhs.id;
+    }
+
 private:
     uint32_t id;
     std::string name;

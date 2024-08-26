@@ -4,12 +4,14 @@
 
 #include "Panels/Common/ImGuiHelper.hpp"
 #include "ComponentsDraw.hpp"
-#include "Panda/GameLogic/Components/SkyComponent.hpp"
+
+#include <Panda/GameLogic/Components/SkyComponent.hpp>
+#include <Panda/ImGui/FontAwesome.h>
 
 namespace Panda {
 
 template<typename T>
-using UIFunction = void (*)(T &);
+using UIFunction = void (*)(Entity entity, T &);
 
 template<typename T>
 static void drawComponent(const std::string &name, Entity entity, UIFunction<T> uiFunction) {
@@ -39,7 +41,7 @@ static void drawComponent(const std::string &name, Entity entity, UIFunction<T> 
             ImGui::EndPopup();
         }
         if (open) {
-            uiFunction(component);
+            uiFunction(entity, component);
             ImGui::TreePop();
         }
         if (removeComponent) {
@@ -95,7 +97,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
         displayAddScriptMenuItem(entity);
         ImGui::EndPopup();
     }
-    drawComponent<TransformComponent>("Transform", entity, [](auto &component) {
+    drawComponent<TransformComponent>("Transform", entity, [](Entity entity, auto &component) {
         glm::vec3 position = component.getPosition();
         drawVec3Control("Translation", position);
         component.setPosition(position);
@@ -103,18 +105,22 @@ void ComponentsDraw::drawComponents(Entity entity) {
         drawVec3Control("Rotation", rotation);
         component.setRotationEuler(rotation);
     });
-    drawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto &component) {
-        beginPropertiesGrid();
-        propertyColor("Color", component.color);
-        endPropertiesGrid();
-    });
-    drawComponent<DynamicMeshComponent>("Dynamic Mesh", entity, [](auto &component) {
+    drawComponent<SpriteRendererComponent>(
+        "Sprite Renderer",
+        entity,
+        [](Entity entity, auto &component) {
+            beginPropertiesGrid();
+            propertyColor("Color", component.color);
+            endPropertiesGrid();
+        }
+    );
+    drawComponent<DynamicMeshComponent>("Dynamic Mesh", entity, [](Entity entity, auto &component) {
         ImGui::Text("Meshes count: %d", (int)component.meshes.size());
     });
-    drawComponent<StaticMeshComponent>("Static Mesh", entity, [](auto &component) {
+    drawComponent<StaticMeshComponent>("Static Mesh", entity, [](Entity entity, auto &component) {
         ImGui::Text("Meshes count: %d", (int)component.meshes.size());
     });
-    drawComponent<CameraComponent>("Camera", entity, [](auto &component) {
+    drawComponent<CameraComponent>("Camera", entity, [](Entity entity, auto &component) {
         auto &camera = component.camera;
         ImGui::Checkbox("Primary", &component.isPrimary);
 
@@ -155,13 +161,19 @@ void ComponentsDraw::drawComponents(Entity entity) {
             camera.setFar(far);
         }
     });
-    drawComponent<ScriptListComponent>("Scripts", entity, [](auto &component) {
+    drawComponent<ScriptListComponent>("Scripts", entity, [](Entity entity, auto &component) {
         for (auto &script : component.scripts) {
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 4);
             ImGui::Text("%s", script.getName().c_str());
+            ImGui::SameLine();
+            if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+                entity.removeScript(script);
+            }
         }
         ImGui::Text("%lu scripts", component.scripts.size());
     });
-    drawComponent<SkyComponent>("Cube Map Rendering", entity, [](auto &component) {});
+    drawComponent<SkyComponent>("Cube Map Rendering", entity, [](Entity entity, auto &component) {
+    });
 }
 
 } // namespace Panda

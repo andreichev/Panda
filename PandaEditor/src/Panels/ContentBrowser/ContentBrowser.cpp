@@ -50,6 +50,9 @@ void ContentBrowser::onImGuiRender() {
             m_currentDirectory = m_currentDirectory.parent_path();
         }
     }
+    static bool showHiddenFiles = false;
+    // ImGui::SameLine();
+    // ImGui::Checkbox("Show Hidden Files", &showHiddenFiles);
     static float padding = 8.0f;
     static float thumbnailSize = 90.0f;
     float cellSize = thumbnailSize + padding;
@@ -80,6 +83,10 @@ void ContentBrowser::onImGuiRender() {
         const auto &path = directoryEntry.path();
         std::string filenameString = path.filename().string();
 
+        if (!showHiddenFiles && filenameString[0] == '.') {
+            continue;
+        }
+
         ImGui::PushID(filenameString.c_str());
         Texture *icon;
         if (directoryEntry.is_directory()) {
@@ -100,6 +107,13 @@ void ContentBrowser::onImGuiRender() {
             if (directoryEntry.is_directory()) {
                 m_currentDirectory /= path.filename();
             }
+        }
+        if (ImGui::BeginPopupContextItem()) {
+            if (ImGui::MenuItem("Show in Finder")) {
+                SystemTools::show(path.c_str());
+                //                LOG_INFO("PATH: {}", path.c_str());
+            }
+            ImGui::EndPopup();
         }
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) &&
             !is_directory(path)) {

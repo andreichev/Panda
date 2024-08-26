@@ -70,4 +70,16 @@ void SystemTools::open(const path_t &path) {
 #endif
 }
 
+void SystemTools::show(const Panda::path_t &path) {
+#ifdef PLATFORM_POSIX
+    std::string command = "open -R \"" + path.string() + "\"";
+    system(command.c_str());
+#elif defined(PLATFORM_WINDOWS)
+    std::string command = "explorer /select, \"" + path.string() + "\"";
+    system(command.c_str());
+#else
+#    error Unsupported platrofm
+#endif
+}
+
 } // namespace Panda

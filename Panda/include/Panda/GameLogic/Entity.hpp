@@ -23,6 +23,11 @@ public:
         return component.add(script);
     }
 
+    void removeScript(ExternalScript script) {
+        ScriptListComponent &component = getComponent<ScriptListComponent>();
+        return component.remove(script);
+    }
+
     template<typename T, typename... Args>
     T &addComponent(Args &&...args) {
         PND_ASSERT(!hasComponent<T>(), "Entity already has component!");

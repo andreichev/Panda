@@ -99,6 +99,10 @@ struct ScriptListComponent final {
     void add(ExternalScript script) {
         scripts.emplace_back(script);
     }
+
+    void remove(ExternalScript script) {
+        scripts.erase(std::remove(scripts.begin(), scripts.end(), script), scripts.end());
+    }
 };
 
 } // namespace Panda

@@ -18,6 +18,7 @@ public:
     );
     static void copyFolder(const path_t &sourcePath, const path_t &newPath);
     static void open(const path_t &path);
+    static void show(const path_t &path);
 };
 
 } // namespace Panda
