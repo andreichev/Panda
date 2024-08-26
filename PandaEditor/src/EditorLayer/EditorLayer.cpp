@@ -13,6 +13,7 @@ EditorLayer::EditorLayer()
     , m_viewport()
     , m_hierarchyPanel(nullptr, this)
     , m_statisticsPanel(nullptr)
+    , m_consolePanel()
     , m_loader(&m_world, this)
     , m_startPanel(&m_loader)
     , m_menuBar(this)
@@ -78,6 +79,7 @@ void EditorLayer::onImGuiRender() {
         m_viewport.onImGuiRender();
         m_hierarchyPanel.onImGuiRender();
         m_contentBrowser.onImGuiRender();
+        m_consolePanel.onImGuiRender();
         m_dockspace.endImGuiDockspace();
 
         if (pickedSceneState != m_sceneState) {

@@ -14,7 +14,8 @@ template<typename T>
 using UIFunction = void (*)(Entity entity, T &);
 
 template<typename T>
-static void drawComponent(const std::string &name, Entity entity, UIFunction<T> uiFunction) {
+static void
+drawComponent(const std::string &name, Entity entity, bool canRemove, UIFunction<T> uiFunction) {
     const ImGuiTreeNodeFlags treeNodeFlags =
         ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen |
         ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap |
@@ -29,14 +30,18 @@ static void drawComponent(const std::string &name, Entity entity, UIFunction<T> 
         style.IndentSpacing = 0.f;
         bool open =
             ImGui::TreeNodeEx((void *)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
-        ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-        if (ImGui::Button("+", ImVec2(lineHeight, lineHeight))) {
-            ImGui::OpenPopup("ComponentSettings");
+        if (canRemove) {
+            ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+            if (ImGui::Button(getString(ICON_COG).c_str(), ImVec2(lineHeight, lineHeight))) {
+                ImGui::OpenPopup("ComponentSettings");
+            }
         }
         bool removeComponent = false;
         if (ImGui::BeginPopup("ComponentSettings")) {
-            if (ImGui::MenuItem("Remove component")) {
-                removeComponent = true;
+            if (canRemove) {
+                if (ImGui::MenuItem("Remove component")) {
+                    removeComponent = true;
+                }
             }
             ImGui::EndPopup();
         }
@@ -97,30 +102,46 @@ void ComponentsDraw::drawComponents(Entity entity) {
         displayAddScriptMenuItem(entity);
         ImGui::EndPopup();
     }
-    drawComponent<TransformComponent>("Transform", entity, [](Entity entity, auto &component) {
-        glm::vec3 position = component.getPosition();
-        drawVec3Control("Translation", position);
-        component.setPosition(position);
-        glm::vec3 rotation = component.getRotationEuler();
-        drawVec3Control("Rotation", rotation);
-        component.setRotationEuler(rotation);
-    });
+    drawComponent<TransformComponent>(
+        "Transform",
+        entity,
+        false,
+        [](Entity entity, auto &component) {
+            glm::vec3 position = component.getPosition();
+            drawVec3Control("Translation", position);
+            component.setPosition(position);
+            glm::vec3 rotation = component.getRotationEuler();
+            drawVec3Control("Rotation", rotation);
+            component.setRotationEuler(rotation);
+        }
+    );
     drawComponent<SpriteRendererComponent>(
         "Sprite Renderer",
         entity,
+        true,
         [](Entity entity, auto &component) {
             beginPropertiesGrid();
             propertyColor("Color", component.color);
             endPropertiesGrid();
         }
     );
-    drawComponent<DynamicMeshComponent>("Dynamic Mesh", entity, [](Entity entity, auto &component) {
-        ImGui::Text("Meshes count: %d", (int)component.meshes.size());
-    });
-    drawComponent<StaticMeshComponent>("Static Mesh", entity, [](Entity entity, auto &component) {
-        ImGui::Text("Meshes count: %d", (int)component.meshes.size());
-    });
-    drawComponent<CameraComponent>("Camera", entity, [](Entity entity, auto &component) {
+    drawComponent<DynamicMeshComponent>(
+        "Dynamic Mesh",
+        entity,
+        false,
+        [](Entity entity, auto &component) {
+            ImGui::Text("Meshes count: %d", (int)component.meshes.size());
+        }
+    );
+    drawComponent<StaticMeshComponent>(
+        "Static Mesh",
+        entity,
+        false,
+        [](Entity entity, auto &component) {
+            ImGui::Text("Meshes count: %d", (int)component.meshes.size());
+        }
+    );
+    drawComponent<CameraComponent>("Camera", entity, true, [](Entity entity, auto &component) {
         auto &camera = component.camera;
         ImGui::Checkbox("Primary", &component.isPrimary);
 
@@ -161,19 +182,30 @@ void ComponentsDraw::drawComponents(Entity entity) {
             camera.setFar(far);
         }
     });
-    drawComponent<ScriptListComponent>("Scripts", entity, [](Entity entity, auto &component) {
-        for (auto &script : component.scripts) {
-            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 4);
-            ImGui::Text("%s", script.getName().c_str());
-            ImGui::SameLine();
-            if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
-                entity.removeScript(script);
+    drawComponent<ScriptListComponent>(
+        "Scripts",
+        entity,
+        false,
+        [](Entity entity, auto &component) {
+            for (auto &script : component.scripts) {
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
+                ImGui::Text("%s", script.getName().c_str());
+                ImGui::SameLine();
+                if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+                    entity.removeScript(script);
+                }
+            }
+            if (component.scripts.empty()) {
+                ImGui::Text("No scripts attached to entity");
+            } else {
+                ImGui::Separator();
+                ImGui::Text("%lu scripts", component.scripts.size());
             }
         }
-        ImGui::Text("%lu scripts", component.scripts.size());
-    });
-    drawComponent<SkyComponent>("Cube Map Rendering", entity, [](Entity entity, auto &component) {
-    });
+    );
+    drawComponent<SkyComponent>(
+        "Cube Map Rendering", entity, true, [](Entity entity, auto &component) {}
+    );
 }
 
 } // namespace Panda

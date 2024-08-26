@@ -5,6 +5,7 @@
 #include "Panels/Dockspace.hpp"
 #include "Panels/WorldHierarchyPanel.hpp"
 #include "Panels/StatisticsPanel.hpp"
+#include "Panels/Console/ConsolePanel.hpp"
 #include "Panels/Toolbar.hpp"
 #include "Panels/StartPanel.hpp"
 #include "Panels/ContentBrowser/ContentBrowser.hpp"
@@ -71,6 +72,7 @@ private:
     Dockspace m_dockspace;
     Viewport m_viewport;
     StatisticsPanel m_statisticsPanel;
+    ConsolePanel m_consolePanel;
     StartPanel m_startPanel;
     WorldHierarchyPanel m_hierarchyPanel;
     ContentBrowser m_contentBrowser;

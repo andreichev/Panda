@@ -100,7 +100,9 @@ void ContentBrowser::onImGuiRender() {
         }
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         ImGui::ImageButton(
-            (ImTextureID)(intptr_t)icon->getHandle().id, {thumbnailSize, thumbnailSize}
+            filenameString.c_str(),
+            (ImTextureID)(intptr_t)icon->getHandle().id,
+            {thumbnailSize, thumbnailSize}
         );
         ImGui::PopStyleColor();
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
