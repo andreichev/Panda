@@ -1,5 +1,5 @@
-//
-// Created by Michael Andreichev on 03.08.2024.
-//
-
 #include "SampleScript.hpp"
+
+void SampleScript::update(float dt) {
+    Panda::ExternalCalls::consoleLog("Hello from Sample script!");
+}

@@ -157,7 +157,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
     });
     drawComponent<ScriptListComponent>("Scripts", entity, [](auto &component) {
         for (auto &script : component.scripts) {
-            ImGui::Text("%s", script.getName());
+            ImGui::Text("%s", script.getName().c_str());
         }
         ImGui::Text("%lu scripts", component.scripts.size());
     });

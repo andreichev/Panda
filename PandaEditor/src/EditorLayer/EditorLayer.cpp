@@ -241,9 +241,11 @@ void EditorLayer::addScriptToEntity(Entity entity) {
     };
     popup->selectAction = [](void *data, Entity entity, const char *scriptName) {
         auto self = static_cast<EditorLayer *>(data);
-        ScriptHandle id = ExternalCalls::addScriptFunc(scriptName);
-        if (id) {
-            entity.addScript(Panda::ExternalScript(id, scriptName));
+        if (scriptName) {
+            ScriptHandle id = ExternalCalls::addScriptFunc(scriptName);
+            if (id) {
+                entity.addScript(Panda::ExternalScript(id, scriptName));
+            }
         }
         F_DELETE(Foundation::getAllocator(), self->m_popups.back());
         self->m_popups.pop_back();

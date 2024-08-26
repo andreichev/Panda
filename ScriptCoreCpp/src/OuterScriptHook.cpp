@@ -10,7 +10,7 @@ namespace Panda {
 
 namespace ExternalCalls {
     ApplicationQuit applicationQuit = nullptr;
-
+    ConsoleLog consoleLog = nullptr;
 } // namespace ExternalCalls
 
 namespace InternalCalls {
@@ -62,6 +62,7 @@ using SymbolsLoadFunc = void *(*)(const char *name);
 LIB_EXPORT int loadExternalCalls(SymbolsLoadFunc load) {
     using namespace ExternalCalls;
     applicationQuit = (ApplicationQuit)load("applicationQuit");
+    consoleLog = (ConsoleLog)load("consoleLog");
     std::cout << "SCRIPT ENGINE: Outer functions binding done.\n";
     return 0;
 }

@@ -9,12 +9,17 @@ namespace InternalCalls {
     void applicationQuit() {
         Panda::Application::get()->close();
     }
+
+    void consoleLog(const char *message) {
+        LOG_INFO(message);
+    }
 } // namespace InternalCalls
 
 std::unordered_map<std::string, void *> g_scriptSymbols;
 
 void initScriptHook() {
     g_scriptSymbols["applicationQuit"] = (void *)InternalCalls::applicationQuit;
+    g_scriptSymbols["consoleLog"] = (void *)InternalCalls::consoleLog;
 }
 
 namespace ExternalCalls {

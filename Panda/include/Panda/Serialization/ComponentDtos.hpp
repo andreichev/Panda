@@ -67,4 +67,26 @@ struct CubeMapDto : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
+struct ExternalScriptDto : public Rain::Codable {
+    std::string name;
+
+    ExternalScriptDto()
+        : name() {}
+
+    ExternalScriptDto(const std::string &name)
+        : name(name) {}
+
+    RAIN_FIELDS_BEGIN(ExternalScriptDto)
+    RAIN_FIELD(name)
+    RAIN_FIELDS_END
+};
+
+struct ScriptListComponentDto : public Rain::Codable {
+    std::vector<ExternalScriptDto> scripts;
+
+    RAIN_FIELDS_BEGIN(ScriptListComponentDto)
+    RAIN_FIELD(scripts)
+    RAIN_FIELDS_END
+};
+
 } // namespace Panda

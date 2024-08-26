@@ -46,7 +46,7 @@ public:
 
     ScriptHandle instantiateWithName(const char *name) {
         for (auto clazz : m_scriptClasses) {
-            if (strcmp(name, clazz.name)) {
+            if (strcmp(name, clazz.name) == 0) {
                 m_lastHandle++;
                 m_instances[m_lastHandle] = (Script *)clazz.instantiateFunc();
                 return m_lastHandle;

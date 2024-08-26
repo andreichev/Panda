@@ -34,8 +34,18 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
             entity.addComponent<SpriteRendererComponent>(entityDto.spriteRendererComponent.value());
         }
         // CUBE MAP COMPONENT
-        if (entityDto.cubeMap.has_value()) {
+        if (entityDto.cubeMapComponent.has_value()) {
             entity.addComponent<SkyComponent>();
+        }
+        // SCRIPT LIST COMPONENT
+        {
+            ScriptListComponentDto scriptsComponentDto = entityDto.scriptListComponent;
+            for (auto &scriptDto : scriptsComponentDto.scripts) {
+                ScriptHandle id = ExternalCalls::addScriptFunc(scriptDto.name.c_str());
+                if (id) {
+                    entity.addScript(Panda::ExternalScript(id, scriptDto.name));
+                }
+            }
         }
     }
     world.resetChanged();
@@ -82,7 +92,15 @@ WorldDto WorldMapper::toDto(const World &world) {
         }
         // CUBE MAP COMPONENT
         if (entity.hasComponent<SkyComponent>()) {
-            entityDto.cubeMap = CubeMapDto();
+            entityDto.cubeMapComponent = CubeMapDto();
+        }
+        // SCRIPT LIST COMPONENT
+        {
+            ScriptListComponentDto &scriptsComponentDto = entityDto.scriptListComponent;
+            ScriptListComponent &scriptsComponent = entity.getComponent<ScriptListComponent>();
+            for (auto &script : scriptsComponent.scripts) {
+                scriptsComponentDto.scripts.emplace_back(script.getName());
+            }
         }
         worldDto.entities.push_back(entityDto);
     }

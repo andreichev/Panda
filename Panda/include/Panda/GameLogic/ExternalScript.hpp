@@ -6,7 +6,7 @@ namespace Panda {
 
 class ExternalScript {
 public:
-    ExternalScript(uint32_t id, const char *name)
+    ExternalScript(uint32_t id, const std::string &name)
         : id(id)
         , name(name) {}
 
@@ -14,13 +14,13 @@ public:
         ExternalCalls::invokeUpdateAtScriptFunc(id, deltaTime);
     };
 
-    const char *getName() {
+    const std::string &getName() {
         return name;
     }
 
 private:
     uint32_t id;
-    const char *name;
+    std::string name;
 };
 
 } // namespace Panda
