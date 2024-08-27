@@ -11,14 +11,24 @@ struct ConsolePanel {
     ImGuiTextFilter Filter;
     bool AutoScroll;
     bool ScrollToBottom;
+    static ConsolePanel *s_instance;
 
     ConsolePanel() {
         ClearLog();
         AutoScroll = true;
         ScrollToBottom = false;
+        s_instance = this;
     }
     ~ConsolePanel() {
         ClearLog();
+        s_instance = nullptr;
+    }
+
+    static void loggerCallback(std::string_view message) {
+        if (!s_instance) {
+            return;
+        }
+        s_instance->AddLog(message);
     }
 
     // Portable helpers
@@ -68,6 +78,14 @@ struct ConsolePanel {
         buf[IM_ARRAYSIZE(buf) - 1] = 0;
         va_end(args);
         Items.push_back(Strdup(buf));
+    }
+
+    void AddLog(std::string_view message) {
+        size_t len = message.size() + 1;
+        void *buf = ImGui::MemAlloc(len);
+        char *str = (char *)memcpy(buf, (const void *)message.data(), len - 1);
+        str[len] = 0;
+        Items.push_back(str);
     }
 
     void onImGuiRender() {

@@ -1,3 +1,7 @@
 #include "ConsolePanel.hpp"
 
-namespace Panda {}
+namespace Panda {
+
+ConsolePanel *ConsolePanel::s_instance;
+
+}

@@ -20,6 +20,27 @@ private:
     static std::shared_ptr<spdlog::logger> s_logger;
 };
 
+class EditorLogger {
+public:
+    using EditorLoggerCallback = void (*)(std::string_view message);
+
+    static void init(EditorLoggerCallback callback);
+    static void log(std::string_view message);
+
+    template<typename... Args>
+    using format_string_t = fmt::format_string<Args...>;
+
+    template<typename... Args>
+    static void log(format_string_t<Args...> fmt, Args &&...args) {
+        fmt::basic_memory_buffer<char, 250> buf;
+        fmt::vformat_to(fmt::appender(buf), fmt, fmt::make_format_args(args...));
+        log(std::string_view(buf.data(), buf.size()));
+    }
+
+private:
+    static EditorLoggerCallback s_callback;
+};
+
 } // namespace Foundation
 
 #define LOG_TRACE(...) ::Foundation::Logger::getLogger()->trace(__VA_ARGS__)
@@ -27,3 +48,5 @@ private:
 #define LOG_WARN(...) ::Foundation::Logger::getLogger()->warn(__VA_ARGS__)
 #define LOG_ERROR(...) ::Foundation::Logger::getLogger()->error(__VA_ARGS__)
 #define LOG_CRITICAL(...) ::Foundation::Logger::getLogger()->critical(__VA_ARGS__)
+
+#define LOG_EDITOR(...) ::Foundation::EditorLogger::log(__VA_ARGS__)

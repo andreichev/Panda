@@ -31,7 +31,9 @@ EditorLayer::EditorLayer()
 }
 
 void EditorLayer::onAttach() {
+    Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
     m_loader.loadInitialData();
+    LOG_EDITOR("EDITOR INITIALIZED");
 }
 
 void EditorLayer::onDetach() {}

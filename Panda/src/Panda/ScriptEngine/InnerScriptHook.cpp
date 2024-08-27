@@ -11,7 +11,7 @@ namespace InternalCalls {
     }
 
     void consoleLog(const char *message) {
-        LOG_INFO(message);
+        LOG_EDITOR(message);
     }
 } // namespace InternalCalls
 
