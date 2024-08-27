@@ -45,6 +45,8 @@ public:
     void loaderDidLoadWorld() override;
     void loaderDidLoadCloseProject() override;
     void loaderCreateSampleWorld() override;
+    EditorCameraSettings getEditorCameraSettings() override;
+    void setEditorCameraSettings(EditorCameraSettings settings) override;
 
 #pragma endregion
 

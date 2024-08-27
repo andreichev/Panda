@@ -89,6 +89,8 @@ void ProjectLoader::openProject(const path_t &path) {
             LOG_INFO("PROJECT SETTINGS NOT FOUND");
         }
     }
+    // Load editor camera location
+    { m_output->setEditorCameraSettings(m_projectSettings.editorCameraSettings); }
     m_output->loaderDidLoadProject(m_projectPath);
     LOG_INFO("LOADED PROJECT AT PATH {}", m_projectPath.string());
     if (m_projectSettings.worldPath.empty()) {
@@ -218,6 +220,8 @@ void ProjectLoader::saveProjectSettings() {
     } else {
         m_projectSettings.worldPath.clear();
     }
+    // Save editor camera location
+    { m_projectSettings.editorCameraSettings = m_output->getEditorCameraSettings(); }
     // Save project settings
     {
         std::ofstream file(projectConfigPath);

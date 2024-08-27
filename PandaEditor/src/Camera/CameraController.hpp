@@ -14,7 +14,10 @@ public:
     void update(float deltaTime);
     const glm::mat4 getViewMatrix();
     const glm::mat4 getSkyViewMatrix();
+    glm::vec3 getPosition();
     void setPosition(glm::vec3 position);
+    glm::quat getRotation();
+    void setRotation(glm::quat quat);
     void setActive(bool flag);
 
 private:

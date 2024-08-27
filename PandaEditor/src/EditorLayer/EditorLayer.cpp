@@ -150,6 +150,18 @@ void EditorLayer::loaderCreateSampleWorld() {
     m_world.fillStartupData();
 }
 
+EditorCameraSettings EditorLayer::getEditorCameraSettings() {
+    EditorCameraSettings settings;
+    settings.position = m_cameraController.getPosition();
+    settings.rotation = m_cameraController.getRotation();
+    return settings;
+}
+
+void EditorLayer::setEditorCameraSettings(EditorCameraSettings settings) {
+    m_cameraController.setPosition(settings.position);
+    m_cameraController.setRotation(settings.rotation);
+}
+
 #pragma endregion
 
 #pragma region Menu bar output

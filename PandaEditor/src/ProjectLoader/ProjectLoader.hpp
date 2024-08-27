@@ -18,6 +18,8 @@ public:
     virtual void loaderDidLoadCloseProject() = 0;
     virtual void loaderDidLoadWorld() = 0;
     virtual void loaderCreateSampleWorld() = 0;
+    virtual EditorCameraSettings getEditorCameraSettings() = 0;
+    virtual void setEditorCameraSettings(EditorCameraSettings settings) = 0;
 };
 
 class ProjectLoader final {

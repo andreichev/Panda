@@ -94,8 +94,20 @@ const glm::mat4 CameraController::getSkyViewMatrix() {
     return glm::inverse(m_transform.getSkyTransform());
 }
 
+glm::vec3 CameraController::getPosition() {
+    return m_transform.getPosition();
+}
+
 void CameraController::setPosition(glm::vec3 position) {
     m_transform.setPosition(position);
+}
+
+glm::quat CameraController::getRotation() {
+    return m_transform.getRotation();
+}
+
+void CameraController::setRotation(glm::quat quat) {
+    m_transform.setRotation(quat);
 }
 
 void CameraController::setActive(bool flag) {
