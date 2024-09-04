@@ -11,7 +11,7 @@ namespace Panda {
 class ContentBrowserOutput {
 public:
     virtual ~ContentBrowserOutput() = default;
-    virtual void createFolderShowEnterNamePopup() = 0;
+    virtual void showCreateFolderPopup() = 0;
     virtual void deleteFileShowPopup(path_t path) = 0;
 };
 

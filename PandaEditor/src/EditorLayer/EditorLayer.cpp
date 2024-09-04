@@ -177,6 +177,18 @@ void EditorLayer::menuBarOpenProject() {
     m_loader.openProject(path);
 }
 
+void EditorLayer::menuBarOpenProject(const RecentProject &project) {
+    m_loader.openProject(project.path);
+}
+
+const std::vector<RecentProject> &EditorLayer::menuBarGetRecentProjectsList() {
+    return m_loader.getRecentProjectsList();
+}
+
+const path_t &EditorLayer::menuBarGetOpenedProjectPath() {
+    return m_loader.getOpenedProjectPath();
+}
+
 void EditorLayer::menuBarCloseApp() {
     if (m_world.isChanged()) {
         EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
@@ -278,7 +290,7 @@ void EditorLayer::addScriptToEntity(Entity entity) {
 
 #pragma region Content browser output
 
-void EditorLayer::createFolderShowEnterNamePopup() {
+void EditorLayer::showCreateFolderPopup() {
     EnterNamePopup *popup = F_NEW(Foundation::getAllocator(), EnterNamePopup);
     popup->closeAction = [](void *data) {
         auto self = static_cast<EditorLayer *>(data);
@@ -328,7 +340,7 @@ void EditorLayer::updateWindowState() {
     window->setResizable(m_loader.hasOpenedProject());
     window->setMaximized(m_loader.hasOpenedProject());
     if (!m_loader.hasOpenedProject()) {
-        Application::get()->getWindow()->setTitle("Welcome");
+        window->setTitle("Welcome");
         window->setSize({600, 400});
     }
 }

@@ -12,7 +12,7 @@ StartPanel::StartPanel(ProjectLoader *loader)
     , m_loader(loader) {}
 
 void StartPanel::onImGuiRender() {
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
     ImGui::SetNextWindowPos({0, 0});
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
     auto size = Application::get()->getWindow()->getSize();
@@ -140,7 +140,7 @@ void StartPanel::createProject(const std::string &name) {
     path_t path = pathOptional.value();
     path.append(name);
     LOG_INFO("CREATE PROJECT AT PATH {}", path.string());
-    m_loader->createProject(path);
+    m_loader->createProject(name, path);
 }
 
 } // namespace Panda

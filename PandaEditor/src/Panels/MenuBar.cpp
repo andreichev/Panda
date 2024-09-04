@@ -29,6 +29,28 @@ void MenuBar::onImGuiRender() {
             if (ImGui::MenuItem("Open Project", NULL)) {
                 m_output->menuBarOpenProject();
             }
+            const std::vector<RecentProject> &recentProjects =
+                m_output->menuBarGetRecentProjectsList();
+            if (!recentProjects.empty()) {
+                if (ImGui::BeginMenu("Recent Projects")) {
+                    for (auto &project : recentProjects) {
+                        if (project.path.empty()) {
+                            continue;
+                        }
+                        path_t projectPath = project.path;
+                        std::string projectName = projectPath.filename();
+                        path_t openedProjectPath = m_output->menuBarGetOpenedProjectPath();
+                        if (ImGui::MenuItem(
+                                projectName.c_str(), nullptr, projectPath == openedProjectPath
+                            )) {
+                            if (projectPath != openedProjectPath) {
+                                m_output->menuBarOpenProject(project);
+                            }
+                        }
+                    }
+                    ImGui::EndMenu();
+                }
+            }
             if (ImGui::MenuItem("Close Project", NULL)) {
                 m_output->menuBarCloseProject();
             }

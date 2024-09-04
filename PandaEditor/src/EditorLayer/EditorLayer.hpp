@@ -32,7 +32,7 @@ public:
     virtual void onDetach() override;
 
     void onUpdate(double deltaTime) override;
-    virtual void onImGuiRender() override;
+    void onImGuiRender() override;
     void onEvent(Event *event) override;
 
     void play();
@@ -53,6 +53,9 @@ public:
 #pragma region Menu bar output
 
     void menuBarOpenProject() override;
+    void menuBarOpenProject(const RecentProject &project) override;
+    const std::vector<RecentProject> &menuBarGetRecentProjectsList() override;
+    const path_t &menuBarGetOpenedProjectPath() override;
     void menuBarCloseApp() override;
     void menuBarSaveWorld() override;
     void menuBarCloseProject() override;
@@ -67,7 +70,7 @@ public:
 
 #pragma region Content browser output
 
-    void createFolderShowEnterNamePopup() override;
+    void showCreateFolderPopup() override;
     void deleteFileShowPopup(path_t path) override;
 
 #pragma endregion

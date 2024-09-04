@@ -33,9 +33,10 @@ public:
     void loadWorld();
     void saveWorld();
     void closeProject();
-    void createProject(const path_t &path);
+    void createProject(const std::string &name, const path_t &path);
     const std::vector<RecentProject> &getRecentProjectsList();
     bool hasOpenedProject();
+    const path_t &getOpenedProjectPath();
     void removeRecentProject(int index);
     const ProjectSettings &getProjectSettings();
 

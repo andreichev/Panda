@@ -54,7 +54,7 @@ void ContentBrowser::onImGuiRender() {
     if (ImGui::BeginPopupContextWindow()) {
         if (ImGui::BeginMenu("Create")) {
             if (ImGui::MenuItem("Folder", NULL)) {
-                m_output->createFolderShowEnterNamePopup();
+                m_output->showCreateFolderPopup();
             }
             ImGui::EndMenu();
         }

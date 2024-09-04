@@ -45,7 +45,6 @@ void ProjectLoader::loadInitialData() {
 
 void ProjectLoader::saveAppSettings() {
     // Save general settings
-    appendRecentProject();
     m_editorSettings.hasOpenedProject = !m_projectPath.empty();
     std::ofstream file("config.json");
     if (file.is_open()) {
@@ -101,14 +100,22 @@ void ProjectLoader::openProject(const path_t &path) {
     m_worldPath.append(m_projectSettings.worldPath);
     m_scriptEngine.reload({"", "TestProject"});
     loadWorld();
+    appendRecentProject();
 }
 
 bool ProjectLoader::hasOpenedProject() {
     return !m_projectPath.empty();
 }
 
-void ProjectLoader::createProject(const path_t &path) {
+const path_t &ProjectLoader::getOpenedProjectPath() {
+    return m_projectPath;
+}
+
+void ProjectLoader::createProject(const std::string &name, const path_t &path) {
     std::filesystem::create_directory(path);
+    std::filesystem::create_directory(path / "Assets");
+    std::filesystem::create_directory(path / "Scripts");
+    std::filesystem::create_directory(path / "Scripts" / name);
     // TODO: Add necessary files
     openProject(path);
 }
@@ -127,7 +134,7 @@ void ProjectLoader::appendRecentProject() {
         std::rotate(recentList.begin(), existing, existing + 1);
         return;
     }
-    m_editorSettings.recentProjects.push_back(recentProject);
+    recentList.insert(recentList.begin(), recentProject);
 }
 
 const std::vector<RecentProject> &ProjectLoader::getRecentProjectsList() {
