@@ -68,6 +68,7 @@ void ProjectLoader::openProject(const path_t &path) {
         return;
     }
     m_projectPath = path;
+    std::string projectName = path.filename();
     m_worldPath.clear();
     path_t pandaDirectoryPath = path;
     pandaDirectoryPath.append(".Panda");
@@ -90,7 +91,7 @@ void ProjectLoader::openProject(const path_t &path) {
     }
     // Load editor camera location
     { m_output->setEditorCameraSettings(m_projectSettings.editorCameraSettings); }
-    m_output->loaderDidLoadProject(m_projectPath);
+    m_output->loaderDidLoadProject(projectName, m_projectPath);
     LOG_INFO("LOADED PROJECT AT PATH {}", m_projectPath.string());
     if (m_projectSettings.worldPath.empty()) {
         m_output->loaderCreateSampleWorld();
@@ -98,9 +99,14 @@ void ProjectLoader::openProject(const path_t &path) {
     }
     m_worldPath = m_projectPath;
     m_worldPath.append(m_projectSettings.worldPath);
-    m_scriptEngine.reload({"", "TestProject"});
+    reloadScriptsDll();
     loadWorld();
     appendRecentProject();
+}
+
+void ProjectLoader::reloadScriptsDll() {
+    std::string projectName = m_projectPath.filename();
+    m_scriptEngine.reload({m_projectPath / "Scripts" / projectName / "bin", projectName});
 }
 
 bool ProjectLoader::hasOpenedProject() {
@@ -112,12 +118,9 @@ const path_t &ProjectLoader::getOpenedProjectPath() {
 }
 
 void ProjectLoader::createProject(const std::string &name, const path_t &path) {
-    std::filesystem::create_directory(path);
-    std::filesystem::create_directory(path / "Assets");
-    std::filesystem::create_directory(path / "Scripts");
-    std::filesystem::create_directory(path / "Scripts" / name);
-    // TODO: Add necessary files
+    m_projectCreator.createProject(name, path);
     openProject(path);
+    SystemTools::openCppProject(path / "Scripts" / name);
 }
 
 void ProjectLoader::appendRecentProject() {
@@ -182,8 +185,9 @@ void ProjectLoader::loadWorld() {
 }
 
 void ProjectLoader::saveWorldAs() {
-    std::optional<path_t> optionalPath =
-        SystemTools::saveFileDialog("All\0*.pnd\0", m_projectPath.string().c_str(), "world.pnd");
+    std::optional<path_t> optionalPath = SystemTools::saveFileDialog(
+        "All\0*.pnd\0", (m_projectPath / "Assets").string().c_str(), "world.pnd"
+    );
     if (!optionalPath.has_value()) {
         return;
     }

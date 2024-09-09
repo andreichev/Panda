@@ -82,4 +82,11 @@ void SystemTools::show(const Panda::path_t &path) {
 #endif
 }
 
+void SystemTools::openCppProject(const Panda::path_t &path) {
+#ifdef PLATFORM_MACOS
+    std::string command = "/Applications/CLion.app/Contents/MacOS/clion \"" + path.string() + "\"";
+    system(command.c_str());
+#endif
+}
+
 } // namespace Panda

@@ -6,7 +6,7 @@
 #include "Panels/WorldHierarchyPanel.hpp"
 #include "Panels/StatisticsPanel.hpp"
 #include "Panels/Console/ConsolePanel.hpp"
-#include "Panels/Toolbar.hpp"
+#include "Panels/Toolbar/Toolbar.hpp"
 #include "Panels/StartPanel.hpp"
 #include "Panels/ContentBrowser/ContentBrowser.hpp"
 #include "Camera/EditorCamera.hpp"
@@ -23,7 +23,8 @@ class EditorLayer : public Layer,
                     public ProjectLoaderOutput,
                     public MenuBarOutput,
                     public ComponentsDrawOutput,
-                    public ContentBrowserOutput {
+                    public ContentBrowserOutput,
+                    public ToolbarOutput {
 public:
     EditorLayer();
     ~EditorLayer() override = default;
@@ -41,7 +42,7 @@ public:
 
 #pragma region Project loader output
 
-    void loaderDidLoadProject(const path_t &path) override;
+    void loaderDidLoadProject(const std::string &name, const path_t &path) override;
     void loaderDidLoadWorld() override;
     void loaderDidLoadCloseProject() override;
     void loaderCreateSampleWorld() override;
@@ -72,6 +73,14 @@ public:
 
     void showCreateFolderPopup() override;
     void deleteFileShowPopup(path_t path) override;
+
+#pragma endregion
+
+#pragma region Toolbar output
+
+    void toolbarDidPickSceneState(SceneState state) override;
+    void toolbarDidTapReloadScripts() override;
+    SceneState toolbarGetCurrentSceneState() override;
 
 #pragma endregion
 

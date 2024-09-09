@@ -3,7 +3,7 @@
 #include "Panda/GameLogic/World.hpp"
 #include "Panda/ScriptEngine/ScriptEngine.hpp"
 #include "Model/EditorSettings.hpp"
-#include "SystemTools/SystemTools.hpp"
+#include "SystemTools/ProjectCreator.hpp"
 #include "Model/ProjectSettings.hpp"
 
 #include <Rain/Coders/JsonEncoder.hpp>
@@ -14,7 +14,7 @@ namespace Panda {
 class ProjectLoaderOutput {
 public:
     virtual ~ProjectLoaderOutput() = default;
-    virtual void loaderDidLoadProject(const path_t &path) = 0;
+    virtual void loaderDidLoadProject(const std::string &name, const path_t &path) = 0;
     virtual void loaderDidLoadCloseProject() = 0;
     virtual void loaderDidLoadWorld() = 0;
     virtual void loaderCreateSampleWorld() = 0;
@@ -30,6 +30,7 @@ public:
     void saveAppSettings();
     void saveProjectSettings();
     void openProject(const path_t &path);
+    void reloadScriptsDll();
     void loadWorld();
     void saveWorld();
     void closeProject();
@@ -49,6 +50,7 @@ private:
     Rain::JsonDecoder jsonDecoder;
     EditorSettings m_editorSettings;
     ProjectSettings m_projectSettings;
+    ProjectCreator m_projectCreator;
     path_t m_projectPath;
     path_t m_worldPath;
     World *m_world;

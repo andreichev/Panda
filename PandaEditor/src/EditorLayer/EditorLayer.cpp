@@ -9,7 +9,7 @@ namespace Panda {
 
 EditorLayer::EditorLayer()
     : m_world()
-    , m_toolbar()
+    , m_toolbar(this)
     , m_dockspace()
     , m_viewport()
     , m_hierarchyPanel(nullptr, this)
@@ -76,31 +76,14 @@ void EditorLayer::onImGuiRender() {
     }
     if (m_loader.hasOpenedProject()) {
         m_menuBar.onImGuiRender();
-        auto pickedSceneState = m_toolbar.onImGuiRender(m_menuBar.m_height, m_sceneState);
-        m_dockspace.beginImGuiDockspace(m_toolbar.height + m_menuBar.m_height + 2);
+        m_toolbar.onImGuiRender(m_menuBar.m_height);
+        m_dockspace.beginImGuiDockspace(m_toolbar.getHeight() + m_menuBar.m_height + 2);
         m_statisticsPanel.onImGuiRender();
         m_viewport.onImGuiRender();
         m_hierarchyPanel.onImGuiRender();
         m_contentBrowser.onImGuiRender();
         m_consolePanel.onImGuiRender();
         m_dockspace.endImGuiDockspace();
-
-        if (pickedSceneState != m_sceneState) {
-            switch (pickedSceneState) {
-                case SceneState::EDIT: {
-                    stop();
-                    break;
-                }
-                case SceneState::PLAY: {
-                    play();
-                    break;
-                }
-                case SceneState::SIMULATE:
-                    simulate();
-                    break;
-            }
-            m_sceneState = pickedSceneState;
-        }
         m_cameraController.setActive(m_viewport.isFocused());
     } else {
         m_startPanel.onImGuiRender();
@@ -132,9 +115,9 @@ void EditorLayer::stop() {
 
 #pragma region Project loader output
 
-void EditorLayer::loaderDidLoadProject(const path_t &path) {
+void EditorLayer::loaderDidLoadProject(const std::string &name, const path_t &path) {
     updateWindowState();
-    m_contentBrowser.setBaseDirectory(path);
+    m_contentBrowser.setBaseDirectory(path / "Assets");
 }
 
 void EditorLayer::loaderDidLoadWorld() {
@@ -331,6 +314,35 @@ void EditorLayer::deleteFileShowPopup(path_t path) {
     popup->yesText = "Yes";
     popup->noText = "No";
     m_popups.emplace_back(popup);
+}
+
+#pragma endregion
+
+#pragma region Toolbar output
+
+void EditorLayer::toolbarDidPickSceneState(SceneState state) {
+    switch (state) {
+        case SceneState::EDIT: {
+            stop();
+            break;
+        }
+        case SceneState::PLAY: {
+            play();
+            break;
+        }
+        case SceneState::SIMULATE:
+            simulate();
+            break;
+    }
+    m_sceneState = state;
+}
+
+void EditorLayer::toolbarDidTapReloadScripts() {
+    m_loader.reloadScriptsDll();
+}
+
+SceneState EditorLayer::toolbarGetCurrentSceneState() {
+    return m_sceneState;
 }
 
 #pragma endregion

@@ -3,8 +3,11 @@
 #include <Miren/Base.hpp>
 
 #include <string>
+#include <filesystem>
 
 namespace Panda {
+
+using path_t = std::filesystem::path;
 
 struct TextureAsset {
     Miren::TextureFormat m_format;
@@ -37,19 +40,19 @@ struct ProgramAsset {
 
 class AssetLoader {
 public:
-    static TextureAsset loadTexture(const std::string &path);
-    static TextureAsset loadCubeMapTexture(std::array<std::string, 6> paths);
-    static ProgramAsset loadProgram(const std::string &vertexPath, const std::string &fragmentPath);
+    static TextureAsset loadTexture(const path_t &path);
+    static TextureAsset loadCubeMapTexture(std::array<path_t, 6> paths);
+    static ProgramAsset loadProgram(const path_t &vertexPath, const path_t &fragmentPath);
 
     static void setResourcesPath(std::string path) {
-        resourcesPath = path + "/";
+        resourcesPath = path;
     }
 
-    static const std::string &getResourcesPath() {
+    static const path_t &getResourcesPath() {
         return resourcesPath;
     }
 
 private:
-    static std::string resourcesPath;
+    static path_t resourcesPath;
 };
 } // namespace Panda

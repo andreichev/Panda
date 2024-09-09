@@ -5,16 +5,16 @@
 
 namespace Panda {
 
-std::string AssetLoader::resourcesPath;
+path_t AssetLoader::resourcesPath;
 
 void releaseImage(void *data, void *userInfo) {
     stbi_image_free(data);
 }
 
-TextureAsset AssetLoader::loadTexture(const std::string &path) {
+TextureAsset AssetLoader::loadTexture(const path_t &path) {
     // stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
-    std::string texturePath = AssetLoader::getResourcesPath() + path;
+    std::string texturePath = AssetLoader::getResourcesPath() / path;
     void *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 0);
 
     if (image == nullptr) {
@@ -38,14 +38,14 @@ TextureAsset AssetLoader::loadTexture(const std::string &path) {
     return texture;
 }
 
-TextureAsset AssetLoader::loadCubeMapTexture(std::array<std::string, 6> paths) {
+TextureAsset AssetLoader::loadCubeMapTexture(std::array<path_t, 6> paths) {
     TextureAsset texture;
     std::array<void *, 6> images;
     int bytesPerColor;
     for (uint16_t side = 0; side < 6; ++side) {
         const std::string &path = paths[side];
         int width, height, channels;
-        std::string texturePath = AssetLoader::getResourcesPath() + path;
+        path_t texturePath = AssetLoader::getResourcesPath() / path;
         void *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 0);
         if (image == nullptr) {
             LOG_ERROR("Failed to load a texture file at path {}", path);
@@ -78,8 +78,7 @@ TextureAsset AssetLoader::loadCubeMapTexture(std::array<std::string, 6> paths) {
     return texture;
 }
 
-ProgramAsset
-AssetLoader::loadProgram(const std::string &vertexPath, const std::string &fragmentPath) {
+ProgramAsset AssetLoader::loadProgram(const path_t &vertexPath, const path_t &fragmentPath) {
     std::string vertexCode, fragmentCode;
     std::ifstream vShaderFile, fShaderFile;
     // ensure ifstream objects can throw exceptions:
@@ -87,8 +86,8 @@ AssetLoader::loadProgram(const std::string &vertexPath, const std::string &fragm
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         // open files
-        vShaderFile.open(AssetLoader::getResourcesPath() + vertexPath);
-        fShaderFile.open(AssetLoader::getResourcesPath() + fragmentPath);
+        vShaderFile.open(AssetLoader::getResourcesPath() / vertexPath);
+        fShaderFile.open(AssetLoader::getResourcesPath() / fragmentPath);
         std::stringstream vShaderStream, fShaderStream;
         // read file's buffer contents into streams
         vShaderStream << vShaderFile.rdbuf();
@@ -101,7 +100,10 @@ AssetLoader::loadProgram(const std::string &vertexPath, const std::string &fragm
         fragmentCode = fShaderStream.str();
     } catch (std::ifstream::failure &e) {
         PND_ASSERT_F(
-            false, "SHADER::FILE {} or {} NOT SUCCESSFULLY READ", vertexPath, fragmentPath
+            false,
+            "SHADER::FILE {} or {} NOT SUCCESSFULLY READ",
+            vertexPath.c_str(),
+            fragmentPath.c_str()
         );
     }
     Foundation::Memory vertexData =

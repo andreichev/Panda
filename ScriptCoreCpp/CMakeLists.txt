@@ -11,5 +11,10 @@ file(GLOB_RECURSE INCLUDE include/*.hpp)
 
 add_library(ScriptCoreCpp STATIC "${SOURCES}" ScriptCoreCpp.def "${INCLUDE}")
 
+set_target_properties(ScriptCoreCpp
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY ${BIN_DIRECTORY}
+)
+
 target_include_directories(ScriptCoreCpp PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
