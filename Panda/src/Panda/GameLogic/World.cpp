@@ -185,6 +185,31 @@ Entity World::instantiateEntity(Panda::id_t id) {
     return entity;
 }
 
+void World::rebindScriptsAndFields() {
+    auto view = m_registry.view<ScriptListComponent>();
+    for (auto entityHandle : view) {
+        if (!m_registry.valid(entityHandle)) {
+            continue;
+        }
+        auto &component = view.get<ScriptListComponent>(entityHandle);
+        for (auto &container : component.scripts) {
+            ScriptHandle scriptId = ExternalCalls::addScriptFunc(container.getName().c_str());
+            if (scriptId) {
+                container.rebindId(scriptId);
+            } else {
+                component.remove(container);
+                id_t entityId = static_cast<id_t>(entityHandle);
+                Entity entity = Entity(&m_registry, entityId, this);
+                LOG_EDITOR(
+                    "SCRIPT {} NOT FOUND. REMOVED FROM ENTITY {}.",
+                    container.getName(),
+                    entity.getName()
+                );
+            }
+        }
+    }
+}
+
 void World::fillEntity(Entity entity) {
     entity.addComponent<IdComponent>(entity.m_id);
     entity.addComponent<TagComponent>("Entity");

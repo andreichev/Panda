@@ -58,6 +58,7 @@ public:
     const std::vector<RecentProject> &menuBarGetRecentProjectsList() override;
     const path_t &menuBarGetOpenedProjectPath() override;
     void menuBarCloseApp() override;
+    void menuBarOpenCppProject() override;
     void menuBarSaveWorld() override;
     void menuBarCloseProject() override;
 

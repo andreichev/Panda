@@ -25,6 +25,7 @@ public:
     void updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     void updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     Entity instantiateEntity();
+    void rebindScriptsAndFields();
     void destroy(Entity entity);
     void clear();
     bool isChanged();

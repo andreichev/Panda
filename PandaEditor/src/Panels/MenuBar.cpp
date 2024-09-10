@@ -1,5 +1,7 @@
 #include "MenuBar.hpp"
 
+#include <Foundation/PlatformDetection.hpp>
+
 namespace Panda {
 
 MenuBar::MenuBar(Panda::MenuBarOutput *output)
@@ -51,6 +53,11 @@ void MenuBar::onImGuiRender() {
                     ImGui::EndMenu();
                 }
             }
+#ifdef PLATFORM_MACOS
+            if (ImGui::MenuItem("Open C++ Project", NULL)) {
+                m_output->menuBarOpenCppProject();
+            }
+#endif
             if (ImGui::MenuItem("Close Project", NULL)) {
                 m_output->menuBarCloseProject();
             }

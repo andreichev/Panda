@@ -30,6 +30,7 @@ public:
     void saveAppSettings();
     void saveProjectSettings();
     void openProject(const path_t &path);
+    void openCppProject();
     void reloadScriptsDll();
     void loadWorld();
     void saveWorld();

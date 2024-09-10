@@ -204,6 +204,10 @@ void EditorLayer::menuBarCloseApp() {
     }
 }
 
+void EditorLayer::menuBarOpenCppProject() {
+    m_loader.openCppProject();
+}
+
 void EditorLayer::menuBarSaveWorld() {
     saveWorld();
 }

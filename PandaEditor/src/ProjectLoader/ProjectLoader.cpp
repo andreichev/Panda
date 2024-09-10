@@ -107,6 +107,7 @@ void ProjectLoader::openProject(const path_t &path) {
 void ProjectLoader::reloadScriptsDll() {
     std::string projectName = m_projectPath.filename();
     m_scriptEngine.reload({m_projectPath / "Scripts" / projectName / "bin", projectName});
+    m_world->rebindScriptsAndFields();
 }
 
 bool ProjectLoader::hasOpenedProject() {
@@ -120,7 +121,11 @@ const path_t &ProjectLoader::getOpenedProjectPath() {
 void ProjectLoader::createProject(const std::string &name, const path_t &path) {
     m_projectCreator.createProject(name, path);
     openProject(path);
-    SystemTools::openCppProject(path / "Scripts" / name);
+}
+
+void ProjectLoader::openCppProject() {
+    std::string name = m_projectPath.filename();
+    SystemTools::openCppProject(m_projectPath / "Scripts" / name);
 }
 
 void ProjectLoader::appendRecentProject() {

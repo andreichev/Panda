@@ -22,6 +22,10 @@ public:
         return id == rhs.id;
     }
 
+    void rebindId(uint32_t _id) {
+        id = _id;
+    }
+
 private:
     uint32_t id;
     std::string name;
