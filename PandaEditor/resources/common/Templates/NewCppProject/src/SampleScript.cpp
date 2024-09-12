@@ -1,5 +1,7 @@
 #include "SampleScript.hpp"
 
+#include <Logger.hpp>
+
 void SampleScript::update(float dt) {
-    Panda::ExternalCalls::consoleLog("Hello from Sample script!");
+    LOG("Hello from Sample script!");
 }

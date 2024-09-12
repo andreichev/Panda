@@ -16,5 +16,6 @@ set_target_properties(ScriptCoreCpp
         ARCHIVE_OUTPUT_DIRECTORY ${BIN_DIRECTORY}
 )
 
+target_include_directories(ScriptCoreCpp PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(ScriptCoreCpp PUBLIC ${PROJECT_SOURCE_DIR}/include)
 

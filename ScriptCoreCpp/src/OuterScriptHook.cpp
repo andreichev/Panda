@@ -3,13 +3,18 @@
 //
 
 #include "ScriptRegistry.hpp"
+#include "OuterScriptHook.hpp"
 
 #include <iostream>
 
 namespace Panda {
 
 namespace ExternalCalls {
+    /// APPLICATION
     ApplicationQuit applicationQuit = nullptr;
+    ApplicationGetWidth applicationGetWidth = nullptr;
+    ApplicationGetHeight applicationGetHeight = nullptr;
+    /// CONSOLE
     ConsoleLog consoleLog = nullptr;
 } // namespace ExternalCalls
 
@@ -62,6 +67,8 @@ using SymbolsLoadFunc = void *(*)(const char *name);
 LIB_EXPORT int loadExternalCalls(SymbolsLoadFunc load) {
     using namespace ExternalCalls;
     applicationQuit = (ApplicationQuit)load("applicationQuit");
+    applicationGetWidth = (ApplicationGetWidth)load("applicationGetWidth");
+    applicationGetHeight = (ApplicationGetHeight)load("applicationGetHeight");
     consoleLog = (ConsoleLog)load("consoleLog");
     std::cout << "SCRIPT ENGINE: Outer functions binding done.\n";
     return 0;

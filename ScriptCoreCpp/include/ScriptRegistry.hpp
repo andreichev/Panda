@@ -1,12 +1,13 @@
 #pragma once
 
 #include "ScriptCore.hpp"
-#include "OuterScriptHook.hpp"
 
 #include <vector>
 #include <unordered_map>
 
 namespace Panda {
+
+using ScriptHandle = uint32_t;
 
 using InstantiateFunction = void *(*)();
 

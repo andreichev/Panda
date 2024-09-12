@@ -6,10 +6,20 @@
 namespace Panda {
 
 namespace InternalCalls {
+    /// APPLICATION
     void applicationQuit() {
         Panda::Application::get()->close();
     }
 
+    uint32_t applicationGetWidth() {
+        return Panda::Application::get()->getWindow()->getSize().width;
+    }
+
+    uint32_t applicationGetHeight() {
+        return Panda::Application::get()->getWindow()->getSize().height;
+    }
+
+    /// CONSOLE
     void consoleLog(const char *message) {
         LOG_EDITOR(message);
     }
@@ -19,6 +29,8 @@ std::unordered_map<std::string, void *> g_scriptSymbols;
 
 void initScriptHook() {
     g_scriptSymbols["applicationQuit"] = (void *)InternalCalls::applicationQuit;
+    g_scriptSymbols["applicationGetWidth"] = (void *)InternalCalls::applicationGetWidth;
+    g_scriptSymbols["applicationGetHeight"] = (void *)InternalCalls::applicationGetHeight;
     g_scriptSymbols["consoleLog"] = (void *)InternalCalls::consoleLog;
 }
 
