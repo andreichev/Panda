@@ -5,15 +5,15 @@
 namespace Panda {
 
 uint32_t Application::getWidth() {
-    return ExternalCalls::applicationGetWidth();
+    return ExternalCalls::application_GetWidth();
 }
 
 uint32_t Application::getHeight() {
-    return ExternalCalls::applicationGetHeight();
+    return ExternalCalls::application_GetHeight();
 }
 
 void Application::quit() {
-    ExternalCalls::applicationQuit();
+    ExternalCalls::application_Quit();
 }
 
 } // namespace Panda

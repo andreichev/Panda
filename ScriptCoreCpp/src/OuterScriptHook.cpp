@@ -11,11 +11,16 @@ namespace Panda {
 
 namespace ExternalCalls {
     /// APPLICATION
-    ApplicationQuit applicationQuit = nullptr;
-    ApplicationGetWidth applicationGetWidth = nullptr;
-    ApplicationGetHeight applicationGetHeight = nullptr;
+    Application_Quit application_Quit = nullptr;
+    Application_GetWidth application_GetWidth = nullptr;
+    Application_GetHeight application_GetHeight = nullptr;
+    /// WORLD
+    World_Load world_Load = nullptr;
+    /// INPUT
+    Input_IsKeyPressed input_IsKeyPressed = nullptr;
+    Input_IsKeyJustPressed input_IsKeyJustPressed = nullptr;
     /// CONSOLE
-    ConsoleLog consoleLog = nullptr;
+    Console_Log console_Log = nullptr;
 } // namespace ExternalCalls
 
 namespace InternalCalls {
@@ -66,10 +71,13 @@ using SymbolsLoadFunc = void *(*)(const char *name);
 
 LIB_EXPORT int loadExternalCalls(SymbolsLoadFunc load) {
     using namespace ExternalCalls;
-    applicationQuit = (ApplicationQuit)load("applicationQuit");
-    applicationGetWidth = (ApplicationGetWidth)load("applicationGetWidth");
-    applicationGetHeight = (ApplicationGetHeight)load("applicationGetHeight");
-    consoleLog = (ConsoleLog)load("consoleLog");
+    application_Quit = (Application_Quit)load("application_Quit");
+    application_GetWidth = (Application_GetWidth)load("application_GetWidth");
+    application_GetHeight = (Application_GetHeight)load("application_GetHeight");
+    input_IsKeyPressed = (Input_IsKeyPressed)load("input_IsKeyPressed");
+    input_IsKeyJustPressed = (Input_IsKeyJustPressed)load("input_IsKeyJustPressed");
+    world_Load = (World_Load)load("world_Load");
+    console_Log = (Console_Log)load("console_Log");
     std::cout << "SCRIPT ENGINE: Outer functions binding done.\n";
     return 0;
 }

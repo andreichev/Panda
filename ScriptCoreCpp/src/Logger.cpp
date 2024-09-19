@@ -2,5 +2,5 @@
 #include "OuterScriptHook.hpp"
 
 void Logger::log(std::string message) {
-    Panda::ExternalCalls::consoleLog(message.c_str());
+    Panda::ExternalCalls::console_Log(message.c_str());
 }
