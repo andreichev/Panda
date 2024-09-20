@@ -10,6 +10,10 @@ public:
         : id(id)
         , name(name) {}
 
+    void invokeStart() {
+        ExternalCalls::invokeStartAtScriptFunc(id);
+    }
+
     void invokeUpdate(float deltaTime) {
         ExternalCalls::invokeUpdateAtScriptFunc(id, deltaTime);
     };

@@ -1,5 +1,6 @@
 #include "EditorLayer.hpp"
 
+#include "Panda/GameLogic/GameContext.hpp"
 #include "Panels/Common/ImGuiHelper.hpp"
 #include "Panels/Popups/EditorYesNoPopup.hpp"
 #include "Panels/Popups/PickScriptPopup.hpp"
@@ -33,10 +34,13 @@ EditorLayer::EditorLayer()
 void EditorLayer::onAttach() {
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
     m_loader.loadInitialData();
+    GameContext::s_currentWorld = &m_world;
     LOG_EDITOR("EDITOR INITIALIZED");
 }
 
-void EditorLayer::onDetach() {}
+void EditorLayer::onDetach() {
+    GameContext::s_currentWorld = nullptr;
+}
 
 void EditorLayer::onUpdate(double deltaTime) {
     if (!m_loader.hasOpenedProject()) {
@@ -96,20 +100,20 @@ void EditorLayer::onEvent(Event *event) {
 
 void EditorLayer::play() {
     m_sceneState = SceneState::PLAY;
-    m_world.setRunning(true);
+    m_world.startRunning();
     m_viewport.focus();
 }
 
 void EditorLayer::simulate() {
     m_sceneState = SceneState::SIMULATE;
-    m_world.setRunning(true);
+    m_world.startRunning();
     m_viewport.focus();
 }
 
 void EditorLayer::stop() {
     m_sceneState = SceneState::EDIT;
     m_viewport.setCamera(&m_editorCamera);
-    m_world.setRunning(false);
+    m_world.finishRunning();
     m_viewport.focus();
 }
 
@@ -258,7 +262,7 @@ void EditorLayer::addScriptToEntity(Entity entity) {
     popup->selectAction = [](void *data, Entity entity, const char *scriptName) {
         auto self = static_cast<EditorLayer *>(data);
         if (scriptName) {
-            ScriptHandle id = ExternalCalls::addScriptFunc(scriptName);
+            ScriptHandle id = ExternalCalls::addScriptFunc(entity.getId(), scriptName);
             if (id) {
                 entity.addScript(Panda::ExternalScript(id, scriptName));
             }

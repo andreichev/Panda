@@ -17,6 +17,27 @@ World::World()
 
 World::~World() {}
 
+void World::startRunning() {
+    // Update native scripts
+    {
+        auto view = m_registry.view<ScriptListComponent>();
+        for (auto entityHandle : view) {
+            if (!m_registry.valid(entityHandle)) {
+                continue;
+            }
+            auto &component = view.get<ScriptListComponent>(entityHandle);
+            for (auto &container : component.scripts) {
+                container.invokeStart();
+            }
+        }
+    }
+    m_isRunning = true;
+}
+
+void World::finishRunning() {
+    m_isRunning = false;
+}
+
 void World::updateRuntime(double deltaTime) {
     if (!m_isRunning) {
         return;
@@ -49,8 +70,9 @@ void World::updateRuntime(double deltaTime) {
             }
             auto &component = view.get<ScriptListComponent>(entityHandle);
             for (auto &container : component.scripts) {
-                // id_t entityId = static_cast<id_t>(entityHandle);
-                // container.invokeUpdate(entityId, deltaTime, true);
+                if (!m_registry.valid(entityHandle)) {
+                    break;
+                }
                 container.invokeUpdate(deltaTime);
             }
         }
@@ -75,8 +97,6 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
             }
             auto &component = view.get<ScriptListComponent>(entityHandle);
             for (auto &container : component.scripts) {
-                // id_t entityId = static_cast<id_t>(entityHandle);
-                // container.invokeUpdate(entityId, deltaTime, false);
                 container.invokeUpdate(deltaTime);
             }
         }
@@ -164,11 +184,6 @@ void World::updateBasicComponents(
     }
 }
 
-void World::initialize() {
-    m_isRunning = true;
-    m_isChanged = false;
-}
-
 Entity World::instantiateEntity() {
     id_t entityId = static_cast<id_t>(m_registry.create());
     Entity entity = {&m_registry, entityId, this};
@@ -177,7 +192,7 @@ Entity World::instantiateEntity() {
     return entity;
 }
 
-Entity World::instantiateEntity(Panda::id_t id) {
+Entity World::instantiateEntity(id_t id) {
     m_registry.create(static_cast<entt::entity>(id));
     Entity entity = {&m_registry, id, this};
     fillEntity(entity);
@@ -192,13 +207,14 @@ void World::rebindScriptsAndFields() {
             continue;
         }
         auto &component = view.get<ScriptListComponent>(entityHandle);
+        id_t entityId = static_cast<id_t>(entityHandle);
         for (auto &container : component.scripts) {
-            ScriptHandle scriptId = ExternalCalls::addScriptFunc(container.getName().c_str());
+            ScriptHandle scriptId =
+                ExternalCalls::addScriptFunc(entityId, container.getName().c_str());
             if (scriptId) {
                 container.rebindId(scriptId);
             } else {
                 component.remove(container);
-                id_t entityId = static_cast<id_t>(entityHandle);
                 Entity entity = Entity(&m_registry, entityId, this);
                 LOG_EDITOR(
                     "SCRIPT {} NOT FOUND. REMOVED FROM ENTITY {}.",
@@ -289,6 +305,26 @@ void World::resetChanged() {
 
 void World::setChanged() {
     m_isChanged = true;
+}
+
+Entity World::findByTag(const char *tag) {
+    auto view = m_registry.view<TagComponent>();
+    for (auto entityHandle : view) {
+        if (!m_registry.valid(entityHandle)) {
+            continue;
+        }
+        auto &tagComponent = view.get<TagComponent>(entityHandle);
+        id_t entityId = static_cast<id_t>(entityHandle);
+        if (tagComponent.tag == tag) {
+            return Entity(&m_registry, entityId, this);
+        }
+    }
+    return Entity();
+}
+
+Entity World::getById(id_t id) {
+    PND_ASSERT(m_registry.valid(static_cast<entt::entity>(id)), "ENTITY DOES NOT EXISTS");
+    return Entity(&m_registry, id, this);
 }
 
 void World::setViewId(Miren::ViewId id) {

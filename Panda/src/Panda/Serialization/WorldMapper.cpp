@@ -41,7 +41,8 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         {
             ScriptListComponentDto scriptsComponentDto = entityDto.scriptListComponent;
             for (auto &scriptDto : scriptsComponentDto.scripts) {
-                ScriptHandle id = ExternalCalls::addScriptFunc(scriptDto.name.c_str());
+                ScriptHandle id =
+                    ExternalCalls::addScriptFunc(entity.getId(), scriptDto.name.c_str());
                 if (id) {
                     entity.addScript(Panda::ExternalScript(id, scriptDto.name));
                 }

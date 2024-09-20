@@ -16,6 +16,9 @@ namespace ExternalCalls {
     Application_GetHeight application_GetHeight = nullptr;
     /// WORLD
     World_Load world_Load = nullptr;
+    World_FindByTag world_FindByTag = nullptr;
+    World_CreateEntity world_CreateEntity = nullptr;
+    World_DestroyEntity world_DestroyEntity = nullptr;
     /// INPUT
     Input_IsKeyPressed input_IsKeyPressed = nullptr;
     Input_IsKeyJustPressed input_IsKeyJustPressed = nullptr;
@@ -24,8 +27,8 @@ namespace ExternalCalls {
 } // namespace ExternalCalls
 
 namespace InternalCalls {
-    Panda::ScriptHandle createScriptWithName(const char *name) {
-        return Panda::getScriptRegistry()->instantiateWithName(name);
+    Panda::ScriptHandle addScriptFunc(id_t entityId, const char *name) {
+        return Panda::getScriptRegistry()->instantiate(Entity(entityId), name);
     }
 
     void invokeUpdateAtScript(Panda::ScriptHandle handle, float deltaTime) {
@@ -35,6 +38,15 @@ namespace InternalCalls {
             return;
         }
         script->update(deltaTime);
+    }
+
+    void invokeStartAtScript(Panda::ScriptHandle handle) {
+        Panda::Script *script = Panda::getScriptRegistry()->getScriptWithId(handle);
+        if (!script) {
+            // assert(false);
+            return;
+        }
+        script->start();
     }
 
     std::vector<const char *> getAvailableScripts() {
@@ -50,8 +62,9 @@ std::unordered_map<std::string, void *> g_scriptSymbols;
 
 void initScriptHook() {
     using namespace InternalCalls;
-    g_scriptSymbols["createScriptWithName"] = (void *)createScriptWithName;
+    g_scriptSymbols["addScriptFunc"] = (void *)addScriptFunc;
     g_scriptSymbols["invokeUpdateAtScript"] = (void *)invokeUpdateAtScript;
+    g_scriptSymbols["invokeStartAtScript"] = (void *)invokeStartAtScript;
     g_scriptSymbols["getAvailableScripts"] = (void *)getAvailableScripts;
 }
 
@@ -77,6 +90,9 @@ LIB_EXPORT int loadExternalCalls(SymbolsLoadFunc load) {
     input_IsKeyPressed = (Input_IsKeyPressed)load("input_IsKeyPressed");
     input_IsKeyJustPressed = (Input_IsKeyJustPressed)load("input_IsKeyJustPressed");
     world_Load = (World_Load)load("world_Load");
+    world_FindByTag = (World_FindByTag)load("world_FindByTag");
+    world_CreateEntity = (World_CreateEntity)load("world_CreateEntity");
+    world_DestroyEntity = (World_DestroyEntity)load("world_DestroyEntity");
     console_Log = (Console_Log)load("console_Log");
     std::cout << "SCRIPT ENGINE: Outer functions binding done.\n";
     return 0;

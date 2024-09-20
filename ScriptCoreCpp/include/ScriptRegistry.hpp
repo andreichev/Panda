@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ScriptCore.hpp"
+#include "Panda/Script.hpp"
 
 #include <vector>
 #include <unordered_map>
@@ -9,7 +9,7 @@ namespace Panda {
 
 using ScriptHandle = uint32_t;
 
-using InstantiateFunction = void *(*)();
+using InstantiateFunction = void *(*)(Entity entity);
 
 struct ScriptClassContainer {
     const char *name;
@@ -27,7 +27,11 @@ public:
 
     template<typename T>
     void registerScriptClass(const char *name) {
-        m_scriptClasses.emplace_back(name, []() { return (void *)new T(); });
+        m_scriptClasses.emplace_back(name, [](Entity entity) {
+            T *script = new T();
+            script->m_entity = entity;
+            return (void *)script;
+        });
     }
 
     Script *getScriptWithId(ScriptHandle id) {
@@ -45,11 +49,11 @@ public:
         m_instances.erase(id);
     }
 
-    ScriptHandle instantiateWithName(const char *name) {
+    ScriptHandle instantiate(Entity entity, const char *name) {
         for (auto clazz : m_scriptClasses) {
             if (strcmp(name, clazz.name) == 0) {
                 m_lastHandle++;
-                m_instances[m_lastHandle] = (Script *)clazz.instantiateFunc();
+                m_instances[m_lastHandle] = (Script *)clazz.instantiateFunc(entity);
                 return m_lastHandle;
             }
         }

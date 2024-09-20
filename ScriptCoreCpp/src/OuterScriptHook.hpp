@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include "Panda/Base.hpp"
 
 namespace Panda {
 
@@ -15,6 +15,12 @@ namespace ExternalCalls {
     /// WORLD
     using World_Load = void (*)(const char *name);
     extern World_Load world_Load;
+    using World_FindByTag = id_t (*)(const char *tag);
+    extern World_FindByTag world_FindByTag;
+    using World_CreateEntity = id_t (*)(const char *tag);
+    extern World_CreateEntity world_CreateEntity;
+    using World_DestroyEntity = void (*)(id_t id);
+    extern World_DestroyEntity world_DestroyEntity;
     /// INPUT
     using Input_IsKeyPressed = bool (*)(int key);
     extern Input_IsKeyPressed input_IsKeyPressed;

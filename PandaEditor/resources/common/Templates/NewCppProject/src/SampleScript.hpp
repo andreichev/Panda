@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ScriptCore.hpp>
+#include <Script.hpp>
 #include <ScriptRegistry.hpp>
 
 class SampleScript : public Panda::Script {

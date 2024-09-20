@@ -19,8 +19,9 @@ public:
     World();
     World(World &world) = delete;
     ~World();
-    void initialize();
     void fillStartupData();
+    void startRunning();
+    void finishRunning();
     void updateRuntime(double deltaTime);
     void updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     void updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
@@ -31,11 +32,10 @@ public:
     bool isChanged();
     void resetChanged();
     void setChanged();
+    Entity findByTag(const char *tag);
+    Entity getById(id_t id);
     inline bool isRunning() {
         return m_isRunning;
-    }
-    inline bool setRunning(bool isRunning) {
-        m_isRunning = isRunning;
     }
     Renderer2D &getRenderer2D() {
         return m_renderer2d;

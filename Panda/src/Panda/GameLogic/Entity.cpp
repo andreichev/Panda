@@ -38,8 +38,10 @@ void Entity::removeChildEntity(Entity entity) {
 
 void Entity::removeFromParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    Entity parent = Entity(m_registry, thisRelationship.parentHandle, m_world);
-    parent.removeChildEntity(*this);
+    if (thisRelationship.parentHandle != -1) {
+        Entity parent = Entity(m_registry, thisRelationship.parentHandle, m_world);
+        parent.removeChildEntity(*this);
+    }
 }
 
 Entity Entity::getParent() {
