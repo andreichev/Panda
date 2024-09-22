@@ -12,16 +12,16 @@ class Viewport final {
 public:
     Viewport();
 
-    void init(World *world);
+    void init();
     void setCamera(Camera *camera);
     void onImGuiRender();
     void focus();
     bool isFocused();
+    Miren::ViewId getViewId();
 
 private:
     void updateViewportSize(Size size);
 
-    World *m_world;
     Miren::FrameBufferHandle m_sceneFB;
     Miren::FrameBufferSpecification m_sceneFbSpecification;
     Miren::ViewId m_sceneViewId;

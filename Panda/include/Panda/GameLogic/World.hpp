@@ -29,6 +29,7 @@ public:
     void rebindScriptsAndFields();
     void destroy(Entity entity);
     void clear();
+    bool isEmpty();
     bool isChanged();
     void resetChanged();
     void setChanged();
@@ -45,7 +46,8 @@ public:
     }
     void setViewId(Miren::ViewId id);
     Camera *findMainCamera();
-    World &operator=(World &other) = delete;
+    World &operator=(World &other);
+    void debugPrint();
 
 private:
     void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
@@ -60,6 +62,7 @@ private:
     Renderer3D m_renderer3d;
     Miren::ViewId m_renderingViewId;
 
+    friend class Entity;
     friend class WorldHierarchyPanel;
     friend class WorldMapper;
 };

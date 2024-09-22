@@ -16,9 +16,9 @@ WorldHierarchyPanel::WorldHierarchyPanel(World *world, ComponentsDrawOutput *com
 
 void WorldHierarchyPanel::onImGuiRender() {
     ImGui::Begin("World Hierarchy");
-    if (m_world) {
+    if (m_world && !m_world->isEmpty()) {
         for (auto entityId : m_world->m_registry.storage<entt::entity>()) {
-            Entity entity(&m_world->m_registry, (id_t)entityId, m_world);
+            Entity entity((id_t)entityId, m_world);
             if (!entity.isValid()) {
                 continue;
             }

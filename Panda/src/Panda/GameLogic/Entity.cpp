@@ -3,18 +3,21 @@
 //
 
 #include "Panda/GameLogic/Entity.hpp"
+#include "Panda/GameLogic/World.hpp"
 
 namespace Panda {
 
-Entity::Entity(entt::registry *registry, id_t id, World *world)
-    : m_registry(registry)
-    , m_id(id)
+Entity::Entity(id_t id, World *world)
+    : m_id(id)
     , m_world(world) {}
 
 Entity::Entity()
-    : m_registry(nullptr)
-    , m_id(-1)
+    : m_id(-1)
     , m_world(nullptr) {}
+
+entt::registry &Entity::worldGetRegistry(Panda::World *world) {
+    return world->m_registry;
+}
 
 TransformComponent &Entity::getTransform() {
     return getComponent<TransformComponent>();
@@ -39,14 +42,14 @@ void Entity::removeChildEntity(Entity entity) {
 void Entity::removeFromParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
     if (thisRelationship.parentHandle != -1) {
-        Entity parent = Entity(m_registry, thisRelationship.parentHandle, m_world);
+        Entity parent = Entity(thisRelationship.parentHandle, m_world);
         parent.removeChildEntity(*this);
     }
 }
 
 Entity Entity::getParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    return Entity(m_registry, thisRelationship.parentHandle, m_world);
+    return Entity(thisRelationship.parentHandle, m_world);
 }
 
 } // namespace Panda

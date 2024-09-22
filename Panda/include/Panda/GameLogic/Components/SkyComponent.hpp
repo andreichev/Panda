@@ -17,10 +17,28 @@ struct SkyVertex {
 
 class SkyComponent final {
 public:
-    SkyComponent(SkyComponent &other) = delete;
+    SkyComponent(SkyComponent &other)
+        : m_sceneViewId(other.m_sceneViewId) {
+        initResources();
+    }
 
     SkyComponent()
         : m_sceneViewId(0) {
+        initResources();
+    }
+
+    ~SkyComponent() {
+        Miren::deleteVertexBuffer(m_vertexBuffer);
+        Miren::deleteIndexBuffer(m_indexBuffer);
+        Miren::deleteProgram(m_shader);
+        Miren::deleteTexture(m_skyTexture);
+    }
+
+    Miren::TextureHandle getSkyTexture() {
+        return m_skyTexture;
+    }
+
+    void initResources() {
         using namespace Miren;
         SkyVertex vertices[24] = {
             // Front
@@ -97,17 +115,6 @@ public:
         );
         m_shader = Miren::createProgram(programAsset.getMirenProgramCreate());
         m_model = glm::mat4(1.f);
-    }
-
-    ~SkyComponent() {
-        Miren::deleteVertexBuffer(m_vertexBuffer);
-        Miren::deleteIndexBuffer(m_indexBuffer);
-        Miren::deleteProgram(m_shader);
-        Miren::deleteTexture(m_skyTexture);
-    }
-
-    Miren::TextureHandle getSkyTexture() {
-        return m_skyTexture;
     }
 
     void update(glm::mat4 &viewProjection) {

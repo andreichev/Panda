@@ -103,7 +103,11 @@ private:
     CameraController m_cameraController;
     std::vector<EditorPopup *> m_popups;
 
-    World m_world;
+    // World that is visible by default in editor but never played.
+    World m_editingWorld;
+    // World that is visible only when state is PLAY.
+    World m_playingWorld;
+    World *m_currentWorld;
     SceneState m_sceneState = SceneState::EDIT;
 };
 

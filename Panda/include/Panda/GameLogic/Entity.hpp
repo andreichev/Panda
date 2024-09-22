@@ -15,6 +15,9 @@ namespace Panda {
 class World;
 
 class Entity final {
+private:
+    inline entt::registry &worldGetRegistry(World *world);
+
 public:
     Entity();
 
@@ -32,28 +35,31 @@ public:
     T &addComponent(Args &&...args) {
         PND_ASSERT(!hasComponent<T>(), "Entity already has component!");
         entt::entity entity = static_cast<entt::entity>(m_id);
-        T &component = m_registry->emplace<T>(entity, std::forward<Args>(args)...);
+        entt::registry &registry = worldGetRegistry(m_world);
+        T &component = registry.emplace<T>(entity, std::forward<Args>(args)...);
         return component;
     }
 
     template<typename T>
     void removeComponent() {
         entt::entity entityHandle = static_cast<entt::entity>(m_id);
-        m_registry->remove<T>(entityHandle);
+        entt::registry &registry = worldGetRegistry(m_world);
+        registry.remove<T>(entityHandle);
     }
 
     template<typename T>
     T &getComponent() {
         PND_ASSERT(hasComponent<T>(), "Entity doesn't have component!");
-        entt::registry &registry = *reinterpret_cast<entt::registry *>(m_registry);
         entt::entity entityHandle = static_cast<entt::entity>(m_id);
+        entt::registry &registry = worldGetRegistry(m_world);
         return registry.get<T>(entityHandle);
     }
 
     template<typename T>
     bool hasComponent() {
         entt::entity entityHandle = static_cast<entt::entity>(m_id);
-        return m_registry->any_of<T>(entityHandle);
+        entt::registry &registry = worldGetRegistry(m_world);
+        return registry.any_of<T>(entityHandle);
     }
 
     void addChildEntity(Entity entity);
@@ -75,7 +81,8 @@ public:
     }
 
     bool isValid() {
-        return m_id != -1 && m_registry->valid(static_cast<entt::entity>(m_id));
+        entt::registry &registry = worldGetRegistry(m_world);
+        return m_id != -1 && registry.valid(static_cast<entt::entity>(m_id));
     }
 
     std::string &getName() {
@@ -95,9 +102,8 @@ public:
     }
 
 private:
-    Entity(entt::registry *m_registry, id_t id, World *world);
+    Entity(id_t id, World *world);
 
-    entt::registry *m_registry;
     World *m_world;
     id_t m_id;
 

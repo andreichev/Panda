@@ -59,7 +59,7 @@ WorldDto WorldMapper::toDto(const World &world) {
         if (!_world.m_registry.valid(entityId)) {
             continue;
         }
-        Entity entity(&_world.m_registry, (id_t)(entityId), &_world);
+        Entity entity((id_t)(entityId), &_world);
         EntityDto entityDto;
         // ID COMPONENT
         { entityDto.idComponent = entity.getComponent<IdComponent>(); }

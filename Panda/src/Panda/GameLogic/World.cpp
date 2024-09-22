@@ -186,7 +186,7 @@ void World::updateBasicComponents(
 
 Entity World::instantiateEntity() {
     id_t entityId = static_cast<id_t>(m_registry.create());
-    Entity entity = {&m_registry, entityId, this};
+    Entity entity = {entityId, this};
     fillEntity(entity);
     m_isChanged = true;
     return entity;
@@ -194,7 +194,7 @@ Entity World::instantiateEntity() {
 
 Entity World::instantiateEntity(id_t id) {
     m_registry.create(static_cast<entt::entity>(id));
-    Entity entity = {&m_registry, id, this};
+    Entity entity = {id, this};
     fillEntity(entity);
     m_isChanged = true;
     return entity;
@@ -215,7 +215,7 @@ void World::rebindScriptsAndFields() {
                 container.rebindId(scriptId);
             } else {
                 component.remove(container);
-                Entity entity = Entity(&m_registry, entityId, this);
+                Entity entity = Entity(entityId, this);
                 LOG_EDITOR(
                     "SCRIPT {} NOT FOUND. REMOVED FROM ENTITY {}.",
                     container.getName(),
@@ -239,7 +239,7 @@ void World::fillEntity(Entity entity) {
 void World::destroy(Entity entity) {
     entity.removeFromParent();
     for (id_t childHandle : entity.getChildEntities()) {
-        Entity child = Entity(&m_registry, childHandle, this);
+        Entity child = Entity(childHandle, this);
         if (!child.isValid()) {
             continue;
         }
@@ -255,6 +255,10 @@ void World::clear() {
     m_registry.clear();
 }
 
+bool World::isEmpty() {
+    return !m_registry.storage<entt::entity>().size();
+}
+
 Entity World::findMainCameraEntity() {
     auto view = m_registry.view<CameraComponent>();
     for (auto entity : view) {
@@ -264,7 +268,7 @@ Entity World::findMainCameraEntity() {
         auto &comp = view.get<CameraComponent>(entity);
         if (comp.isPrimary) {
             id_t id = static_cast<id_t>(entity);
-            return {&m_registry, id, this};
+            return {id, this};
         }
     }
     return {};
@@ -316,7 +320,7 @@ Entity World::findByTag(const char *tag) {
         auto &tagComponent = view.get<TagComponent>(entityHandle);
         id_t entityId = static_cast<id_t>(entityHandle);
         if (tagComponent.tag == tag) {
-            return Entity(&m_registry, entityId, this);
+            return Entity(entityId, this);
         }
     }
     return Entity();
@@ -324,13 +328,55 @@ Entity World::findByTag(const char *tag) {
 
 Entity World::getById(id_t id) {
     PND_ASSERT(m_registry.valid(static_cast<entt::entity>(id)), "ENTITY DOES NOT EXISTS");
-    return Entity(&m_registry, id, this);
+    return Entity(id, this);
 }
 
 void World::setViewId(Miren::ViewId id) {
     m_renderer2d.setViewId(id);
     m_renderer3d.setViewId(id);
     m_renderingViewId = id;
+}
+
+template<typename T>
+void copyAllComponents(entt::registry &src, entt::registry &dst, entt::entity entity) {
+    if (src.any_of<T>(entity)) {
+        dst.emplace<T>(entity, src.get<T>(entity));
+    }
+}
+
+World &World::operator=(World &other) {
+    clear();
+    entt::registry &src = other.m_registry;
+    entt::registry &dst = m_registry;
+    for (auto entity : src.storage<entt::entity>()) {
+        auto _ = dst.create(entity);
+        copyAllComponents<IdComponent>(src, dst, entity);
+        copyAllComponents<TagComponent>(src, dst, entity);
+        copyAllComponents<TransformComponent>(src, dst, entity);
+        copyAllComponents<RelationshipComponent>(src, dst, entity);
+        copyAllComponents<SpriteRendererComponent>(src, dst, entity);
+        copyAllComponents<StaticMeshComponent>(src, dst, entity);
+        copyAllComponents<DynamicMeshComponent>(src, dst, entity);
+        copyAllComponents<CameraComponent>(src, dst, entity);
+        copyAllComponents<ScriptListComponent>(src, dst, entity);
+        copyAllComponents<SkyComponent>(src, dst, entity);
+    }
+    return *this;
+}
+
+void World::debugPrint() {
+    LOG_INFO("WORLD DEBUG PRINT");
+    {
+        auto view = m_registry.view<TagComponent>();
+        for (auto entityHandle : view) {
+            if (!m_registry.valid(entityHandle)) {
+                continue;
+            }
+            auto &tagComponent = view.get<TagComponent>(entityHandle);
+            LOG_INFO("ENTITY: {}", tagComponent.tag);
+        }
+    }
+    LOG_INFO("TOTAL: {} entities", m_registry.storage<entt::entity>().size());
 }
 
 } // namespace Panda

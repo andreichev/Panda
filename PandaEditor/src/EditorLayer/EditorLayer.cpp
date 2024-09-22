@@ -9,14 +9,16 @@
 namespace Panda {
 
 EditorLayer::EditorLayer()
-    : m_world()
+    : m_editingWorld()
+    , m_playingWorld()
+    , m_currentWorld(&m_editingWorld)
     , m_toolbar(this)
     , m_dockspace()
     , m_viewport()
     , m_hierarchyPanel(nullptr, this)
     , m_statisticsPanel(nullptr)
     , m_consolePanel()
-    , m_loader(&m_world, this)
+    , m_loader(&m_editingWorld, this)
     , m_startPanel(&m_loader)
     , m_menuBar(this)
     , m_contentBrowser(this)
@@ -24,17 +26,19 @@ EditorLayer::EditorLayer()
     , m_popups()
     , m_cameraController()
     , m_sceneState(SceneState::EDIT) {
-    m_viewport.init(&m_world);
+    m_viewport.init();
+    m_editingWorld.setViewId(m_viewport.getViewId());
+    m_playingWorld.setViewId(m_viewport.getViewId());
     m_viewport.setCamera(&m_editorCamera);
-    m_hierarchyPanel.setWorld(&m_world);
-    m_statisticsPanel.setWorld(&m_world);
+    m_hierarchyPanel.setWorld(m_currentWorld);
+    m_statisticsPanel.setWorld(m_currentWorld);
     m_cameraController.setPosition({0.f, 0.f, 4.f});
 }
 
 void EditorLayer::onAttach() {
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
     m_loader.loadInitialData();
-    GameContext::s_currentWorld = &m_world;
+    GameContext::s_currentWorld = m_currentWorld;
     LOG_EDITOR("EDITOR INITIALIZED");
 }
 
@@ -53,12 +57,12 @@ void EditorLayer::onUpdate(double deltaTime) {
             glm::mat4 proj = m_editorCamera.getProjection();
             glm::mat4 cameraViewProj = proj * m_cameraController.getSkyViewMatrix();
             glm::mat4 viewProj = proj * view;
-            m_world.updateEditor(deltaTime, viewProj, cameraViewProj);
+            m_editingWorld.updateEditor(deltaTime, viewProj, cameraViewProj);
             break;
         }
         case SceneState::PLAY: {
-            m_viewport.setCamera(m_world.findMainCamera());
-            m_world.updateRuntime(deltaTime);
+            m_viewport.setCamera(m_playingWorld.findMainCamera());
+            m_playingWorld.updateRuntime(deltaTime);
             break;
         }
         case SceneState::SIMULATE: {
@@ -67,7 +71,7 @@ void EditorLayer::onUpdate(double deltaTime) {
             glm::mat4 proj = m_editorCamera.getProjection();
             glm::mat4 cameraViewProj = proj * m_cameraController.getSkyViewMatrix();
             glm::mat4 viewProj = proj * view;
-            m_world.updateSimulation(deltaTime, viewProj, cameraViewProj);
+            m_playingWorld.updateSimulation(deltaTime, viewProj, cameraViewProj);
             break;
         }
     }
@@ -100,20 +104,33 @@ void EditorLayer::onEvent(Event *event) {
 
 void EditorLayer::play() {
     m_sceneState = SceneState::PLAY;
-    m_world.startRunning();
+    m_playingWorld = m_editingWorld;
+    m_currentWorld = &m_playingWorld;
+    GameContext::s_currentWorld = m_currentWorld;
+    m_hierarchyPanel.setWorld(m_currentWorld);
+    m_statisticsPanel.setWorld(m_currentWorld);
+    m_playingWorld.startRunning();
     m_viewport.focus();
 }
 
 void EditorLayer::simulate() {
     m_sceneState = SceneState::SIMULATE;
-    m_world.startRunning();
+    m_currentWorld = &m_playingWorld;
+    GameContext::s_currentWorld = m_currentWorld;
+    m_hierarchyPanel.setWorld(m_currentWorld);
+    m_statisticsPanel.setWorld(m_currentWorld);
+    m_playingWorld.startRunning();
     m_viewport.focus();
 }
 
 void EditorLayer::stop() {
     m_sceneState = SceneState::EDIT;
     m_viewport.setCamera(&m_editorCamera);
-    m_world.finishRunning();
+    m_currentWorld = &m_editingWorld;
+    GameContext::s_currentWorld = m_currentWorld;
+    m_hierarchyPanel.setWorld(m_currentWorld);
+    m_statisticsPanel.setWorld(m_currentWorld);
+    m_playingWorld.finishRunning();
     m_viewport.focus();
 }
 
@@ -129,14 +146,16 @@ void EditorLayer::loaderDidLoadWorld() {
 }
 
 void EditorLayer::loaderDidLoadCloseProject() {
-    m_world.clear();
+    m_editingWorld.clear();
+    m_playingWorld.clear();
     updateWindowState();
 }
 
 void EditorLayer::loaderCreateSampleWorld() {
     Application::get()->getWindow()->setTitle("Untitled World");
-    m_world.clear();
-    m_world.fillStartupData();
+    m_editingWorld.clear();
+    m_playingWorld.clear();
+    m_editingWorld.fillStartupData();
 }
 
 EditorCameraSettings EditorLayer::getEditorCameraSettings() {
@@ -177,7 +196,7 @@ const path_t &EditorLayer::menuBarGetOpenedProjectPath() {
 }
 
 void EditorLayer::menuBarCloseApp() {
-    if (m_world.isChanged()) {
+    if (m_editingWorld.isChanged()) {
         EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
         popup->yesAction = [](void *data) {
             auto self = static_cast<EditorLayer *>(data);
@@ -217,7 +236,7 @@ void EditorLayer::menuBarSaveWorld() {
 }
 
 void EditorLayer::menuBarCloseProject() {
-    if (m_world.isChanged()) {
+    if (m_editingWorld.isChanged()) {
         EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
         popup->yesAction = [](void *data) {
             auto self = static_cast<EditorLayer *>(data);
@@ -366,7 +385,16 @@ void EditorLayer::updateWindowState() {
 }
 
 void EditorLayer::saveWorld() {
-    m_loader.saveWorld();
+    switch (m_sceneState) {
+        case SceneState::EDIT:
+        case SceneState::SIMULATE:
+            m_loader.saveWorld();
+            break;
+        case SceneState::PLAY:
+            m_editingWorld = m_playingWorld;
+            m_loader.saveWorld();
+            break;
+    }
 }
 
 } // namespace Panda

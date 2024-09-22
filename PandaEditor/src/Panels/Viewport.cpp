@@ -11,15 +11,13 @@ Viewport::Viewport()
     , m_camera(nullptr)
     , m_focused(false)
     , m_focusNextFrame(true)
-    , m_world(nullptr)
     , m_sceneFB()
     , m_sceneFbSpecification()
     , m_sceneViewId(1)
     , m_colorAttachment() {}
 
-void Viewport::init(World *world) {
+void Viewport::init() {
     PandaUI::initialize();
-    m_world = world;
     Vec2 dpi = Application::get()->getWindow()->getDpi();
     Vec2 windowSize = Application::get()->getWindow()->getSize();
     Miren::TextureCreate create;
@@ -44,7 +42,6 @@ void Viewport::init(World *world) {
     );
     Miren::setViewClear(m_sceneViewId, 0x12212bff);
     Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
-    m_world->setViewId(m_sceneViewId);
     PandaUI::Context::shared().updateViewId(m_sceneViewId);
 }
 
@@ -104,7 +101,9 @@ void Viewport::onImGuiRender() {
 
 void Viewport::setCamera(Camera *camera) {
     m_camera = camera;
-    m_camera->setViewportSize(m_viewportPanelSize);
+    if (m_camera) {
+        m_camera->setViewportSize(m_viewportPanelSize);
+    }
 }
 
 bool Viewport::isFocused() {
@@ -113,6 +112,10 @@ bool Viewport::isFocused() {
 
 void Viewport::focus() {
     m_focusNextFrame = true;
+}
+
+Miren::ViewId Viewport::getViewId() {
+    return m_sceneViewId;
 }
 
 } // namespace Panda
