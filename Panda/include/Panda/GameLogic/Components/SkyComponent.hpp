@@ -28,14 +28,18 @@ public:
     }
 
     ~SkyComponent() {
-        Miren::deleteVertexBuffer(m_vertexBuffer);
-        Miren::deleteIndexBuffer(m_indexBuffer);
-        Miren::deleteProgram(m_shader);
-        Miren::deleteTexture(m_skyTexture);
+        freeResources();
     }
 
     Miren::TextureHandle getSkyTexture() {
         return m_skyTexture;
+    }
+
+    void freeResources() {
+        Miren::deleteVertexBuffer(m_vertexBuffer);
+        Miren::deleteIndexBuffer(m_indexBuffer);
+        Miren::deleteProgram(m_shader);
+        Miren::deleteTexture(m_skyTexture);
     }
 
     void initResources() {

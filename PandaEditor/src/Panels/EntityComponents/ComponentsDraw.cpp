@@ -66,7 +66,7 @@ static void drawTag(Entity entity) {
         if (buffer[0] == 0) {
             memcpy(buffer, "Unnamed Entity", 16);
         }
-        entity.getComponent<TagComponent>().tag = buffer;
+        entity.setName(buffer);
     }
 }
 

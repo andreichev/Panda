@@ -86,6 +86,7 @@ public:
 #pragma endregion
 
 private:
+    void closeApp();
     void saveWorld();
     void updateWindowState();
 

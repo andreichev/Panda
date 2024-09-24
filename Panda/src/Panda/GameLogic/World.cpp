@@ -246,6 +246,7 @@ void World::destroy(Entity entity) {
         destroy(child);
     }
     m_registry.destroy(static_cast<entt::entity>(entity.getId()));
+    m_isChanged = true;
 }
 
 void World::clear() {

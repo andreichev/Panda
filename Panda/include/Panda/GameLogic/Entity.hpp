@@ -16,18 +16,21 @@ class World;
 
 class Entity final {
 private:
-    inline entt::registry &worldGetRegistry(World *world);
+    inline entt::registry &worldGetRegistry();
+    inline void setWorldChanged();
 
 public:
     Entity();
 
     void addScript(ExternalScript script) {
         ScriptListComponent &component = getComponent<ScriptListComponent>();
+        setWorldChanged();
         return component.add(script);
     }
 
     void removeScript(ExternalScript script) {
         ScriptListComponent &component = getComponent<ScriptListComponent>();
+        setWorldChanged();
         return component.remove(script);
     }
 
@@ -35,30 +38,32 @@ public:
     T &addComponent(Args &&...args) {
         PND_ASSERT(!hasComponent<T>(), "Entity already has component!");
         entt::entity entity = static_cast<entt::entity>(m_id);
-        entt::registry &registry = worldGetRegistry(m_world);
+        entt::registry &registry = worldGetRegistry();
         T &component = registry.emplace<T>(entity, std::forward<Args>(args)...);
+        setWorldChanged();
         return component;
     }
 
     template<typename T>
     void removeComponent() {
         entt::entity entityHandle = static_cast<entt::entity>(m_id);
-        entt::registry &registry = worldGetRegistry(m_world);
+        entt::registry &registry = worldGetRegistry();
         registry.remove<T>(entityHandle);
+        setWorldChanged();
     }
 
     template<typename T>
     T &getComponent() {
         PND_ASSERT(hasComponent<T>(), "Entity doesn't have component!");
         entt::entity entityHandle = static_cast<entt::entity>(m_id);
-        entt::registry &registry = worldGetRegistry(m_world);
+        entt::registry &registry = worldGetRegistry();
         return registry.get<T>(entityHandle);
     }
 
     template<typename T>
     bool hasComponent() {
         entt::entity entityHandle = static_cast<entt::entity>(m_id);
-        entt::registry &registry = worldGetRegistry(m_world);
+        entt::registry &registry = worldGetRegistry();
         return registry.any_of<T>(entityHandle);
     }
 
@@ -81,7 +86,7 @@ public:
     }
 
     bool isValid() {
-        entt::registry &registry = worldGetRegistry(m_world);
+        entt::registry &registry = worldGetRegistry();
         return m_id != -1 && registry.valid(static_cast<entt::entity>(m_id));
     }
 
@@ -90,7 +95,12 @@ public:
     }
 
     void setName(const std::string &name) {
-        getComponent<TagComponent>().tag = name;
+        auto& tagComponent = getComponent<TagComponent>();
+        if(tagComponent.tag == name) {
+            return;
+        }
+        tagComponent.tag = name;
+        setWorldChanged();
     }
 
     World *getWorld() {

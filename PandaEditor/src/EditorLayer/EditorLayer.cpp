@@ -99,7 +99,9 @@ void EditorLayer::onImGuiRender() {
 }
 
 void EditorLayer::onEvent(Event *event) {
-    Input::onEvent(event);
+    if (event->type == EventType::WindowClose) {
+        closeApp();
+    }
 }
 
 void EditorLayer::play() {
@@ -196,35 +198,7 @@ const path_t &EditorLayer::menuBarGetOpenedProjectPath() {
 }
 
 void EditorLayer::menuBarCloseApp() {
-    if (m_editingWorld.isChanged()) {
-        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
-        popup->yesAction = [](void *data) {
-            auto self = static_cast<EditorLayer *>(data);
-            self->saveWorld();
-            Application::get()->close();
-            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-            self->m_popups.pop_back();
-        };
-        popup->noAction = [](void *data) {
-            Application::get()->close();
-            auto self = static_cast<EditorLayer *>(data);
-            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-            self->m_popups.pop_back();
-        };
-        popup->closeAction = [](void *data) {
-            auto self = static_cast<EditorLayer *>(data);
-            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-            self->m_popups.pop_back();
-        };
-        popup->userData = this;
-        popup->title = "Save current world?";
-        popup->subtitle = "Do you want to save your changes?";
-        popup->yesText = "Save";
-        popup->noText = "Not save";
-        m_popups.emplace_back(popup);
-    } else {
-        Application::get()->close();
-    }
+    closeApp();
 }
 
 void EditorLayer::menuBarOpenCppProject() {
@@ -394,6 +368,38 @@ void EditorLayer::saveWorld() {
             m_editingWorld = m_playingWorld;
             m_loader.saveWorld();
             break;
+    }
+}
+
+void EditorLayer::closeApp() {
+    if (m_editingWorld.isChanged()) {
+        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
+        popup->yesAction = [](void *data) {
+            auto self = static_cast<EditorLayer *>(data);
+            self->saveWorld();
+            Application::get()->close();
+            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+            self->m_popups.pop_back();
+        };
+        popup->noAction = [](void *data) {
+            Application::get()->close();
+            auto self = static_cast<EditorLayer *>(data);
+            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+            self->m_popups.pop_back();
+        };
+        popup->closeAction = [](void *data) {
+            auto self = static_cast<EditorLayer *>(data);
+            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+            self->m_popups.pop_back();
+        };
+        popup->userData = this;
+        popup->title = "Save current world?";
+        popup->subtitle = "Do you want to save your changes?";
+        popup->yesText = "Save";
+        popup->noText = "Not save";
+        m_popups.emplace_back(popup);
+    } else {
+        Application::get()->close();
     }
 }
 

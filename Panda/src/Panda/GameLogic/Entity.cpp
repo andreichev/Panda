@@ -15,8 +15,12 @@ Entity::Entity()
     : m_id(-1)
     , m_world(nullptr) {}
 
-entt::registry &Entity::worldGetRegistry(Panda::World *world) {
-    return world->m_registry;
+entt::registry &Entity::worldGetRegistry() {
+    return m_world->m_registry;
+}
+
+void Entity::setWorldChanged() {
+    m_world->setChanged();
 }
 
 TransformComponent &Entity::getTransform() {
@@ -29,6 +33,7 @@ void Entity::addChildEntity(Entity entity) {
 
     otherRelationship.parentHandle = m_id;
     thisRelationship.children.push_back(entity.m_id);
+    setWorldChanged();
 }
 
 void Entity::removeChildEntity(Entity entity) {
@@ -37,6 +42,7 @@ void Entity::removeChildEntity(Entity entity) {
 
     std::remove(thisRelationship.children.begin(), thisRelationship.children.end(), entity.m_id);
     otherRelationship.parentHandle = -1;
+    setWorldChanged();
 }
 
 void Entity::removeFromParent() {

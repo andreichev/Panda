@@ -15,7 +15,11 @@ WorldHierarchyPanel::WorldHierarchyPanel(World *world, ComponentsDrawOutput *com
     , m_selected() {}
 
 void WorldHierarchyPanel::onImGuiRender() {
-    ImGui::Begin("World Hierarchy");
+    ImGuiWindowFlags flags = 0;
+    if (m_world->isChanged()) {
+        flags |= ImGuiWindowFlags_UnsavedDocument;
+    }
+    ImGui::Begin("World Hierarchy", nullptr, flags);
     if (m_world && !m_world->isEmpty()) {
         for (auto entityId : m_world->m_registry.storage<entt::entity>()) {
             Entity entity((id_t)entityId, m_world);
@@ -50,12 +54,9 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
         m_selected = entity;
     }
     if (ImGui::BeginPopupContextItem()) {
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-        if (ImGui::Button("Rename", ImVec2(75, ImGui::GetTextLineHeight() + 5))) {
-
-        } else if (ImGui::Button("Delete", ImVec2(75, ImGui::GetTextLineHeight() + 5))) {
+        if (ImGui::MenuItem("Delete", NULL)) {
+            m_world->destroy(entity);
         }
-        ImGui::PopStyleVar();
         ImGui::EndPopup();
     }
     if (opened) {

@@ -132,8 +132,6 @@ void Application::processEvents() {
         if (event->type == EventType::WindowResize) {
             const WindowResizeEvent *ev = static_cast<const WindowResizeEvent *>(event);
             windowSizeChanged(Size(ev->getWidth(), ev->getHeight()));
-        } else if (event->type == EventType::WindowClose) {
-            close();
         }
         for (auto it = m_layerStack->rbegin(); it != m_layerStack->rend(); ++it) {
             if (event->isHandled)
