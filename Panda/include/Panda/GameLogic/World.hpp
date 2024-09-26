@@ -8,6 +8,7 @@
 #include "Panda/Window/Window.hpp"
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Renderer/Renderer3D.hpp"
+#include "Panda/GameLogic/WorldCommandManager.hpp"
 
 #include <Miren/Miren.hpp>
 #include <entt/entt.hpp>
@@ -48,6 +49,9 @@ public:
     Camera *findMainCamera();
     World &operator=(World &other);
     void debugPrint();
+    inline WorldCommandManager &getCommandManger() {
+        return m_commandManager;
+    }
 
 private:
     void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
@@ -61,6 +65,7 @@ private:
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;
     Miren::ViewId m_renderingViewId;
+    WorldCommandManager m_commandManager;
 
     friend class Entity;
     friend class WorldHierarchyPanel;

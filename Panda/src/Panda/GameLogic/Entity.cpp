@@ -27,6 +27,11 @@ TransformComponent &Entity::getTransform() {
     return getComponent<TransformComponent>();
 }
 
+void Entity::setTransform(TransformComponent &transform) {
+    TransformComponent &_transform = getTransform();
+    _transform.setTransform(transform);
+}
+
 void Entity::addChildEntity(Entity entity) {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
     RelationshipComponent &otherRelationship = entity.getComponent<RelationshipComponent>();

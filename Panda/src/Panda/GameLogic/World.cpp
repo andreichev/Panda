@@ -13,7 +13,8 @@ namespace Panda {
 World::World()
     : m_isRunning(false)
     , m_isChanged(false)
-    , m_registry() {}
+    , m_registry()
+    , m_commandManager() {}
 
 World::~World() {}
 

@@ -72,4 +72,11 @@ void TransformComponent::setScale(glm::vec3 _scale) {
     scale = _scale;
 }
 
+void TransformComponent::setTransform(TransformComponent &other) {
+    position = other.position;
+    rotation = other.rotation;
+    rotationEuler = other.rotationEuler;
+    scale = other.scale;
+}
+
 } // namespace Panda

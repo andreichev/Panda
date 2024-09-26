@@ -22,7 +22,7 @@ void shiftCursorX(float distance);
 void shiftCursorY(float distance);
 void shiftCursor(float x, float y);
 void separator(ImVec2 size, ImVec4 color);
-void drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.f);
+bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.f);
 void separator();
 void beginDisabled(bool disabled = true);
 bool isItemDisabled();

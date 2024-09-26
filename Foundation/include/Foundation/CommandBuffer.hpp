@@ -44,7 +44,7 @@ public:
 
     template<typename CMD>
     void write(CMD &cmd) {
-        static_assert(std::is_base_of<Command, CMD>::value, "Not inherited from Command");
+        static_assert(std::is_base_of_v<Command, CMD>, "Not inherited from Command");
         Header header(sizeof(CMD), __alignof(CMD));
         writeHeader(header);
         align(__alignof(CMD));

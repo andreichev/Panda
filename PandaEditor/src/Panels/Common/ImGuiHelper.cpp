@@ -58,9 +58,10 @@ void separator(ImVec2 size, ImVec4 color) {
     ImGui::PopStyleColor();
 }
 
-void drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue) {
+bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue) {
     ImGuiIO &io = ImGui::GetIO();
     auto boldFont = io.Fonts->Fonts[0];
+    bool edited = false;
 
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
@@ -89,7 +90,7 @@ void drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
 
     ImGui::SameLine();
     ImGui::SetNextItemWidth(inputItemWidth);
-    ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+    edited = ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f") || edited;
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.0f));
@@ -104,7 +105,7 @@ void drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
 
     ImGui::SameLine();
     ImGui::SetNextItemWidth(inputItemWidth);
-    ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+    edited = ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f") || edited;
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
@@ -119,11 +120,12 @@ void drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
 
     ImGui::SameLine();
     ImGui::SetNextItemWidth(inputItemWidth);
-    ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+    edited = ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f") || edited;
 
     ImGui::PopStyleVar();
     ImGui::Columns(1);
     ImGui::PopID();
+    return edited;
 }
 
 void separator() {

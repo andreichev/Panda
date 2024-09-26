@@ -5,17 +5,23 @@
 #include "Panels/Common/ImGuiHelper.hpp"
 #include "ComponentsDraw.hpp"
 
+#include <Panda/GameLogic/WorldCommands/EntityTransformCommand.hpp>
 #include <Panda/GameLogic/Components/SkyComponent.hpp>
 #include <Panda/ImGui/FontAwesome.h>
 
 namespace Panda {
 
 template<typename T>
-using UIFunction = void (*)(Entity entity, T &);
+using UIFunction = void (*)(Entity entity, WorldCommandManager &cmd, T &);
 
 template<typename T>
 static void
 drawComponent(const std::string &name, Entity entity, bool canRemove, UIFunction<T> uiFunction) {
+    World *world = entity.getWorld();
+    if (!world) {
+        return;
+    }
+    WorldCommandManager &cmd = world->getCommandManger();
     const ImGuiTreeNodeFlags treeNodeFlags =
         ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen |
         ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap |
@@ -46,7 +52,7 @@ drawComponent(const std::string &name, Entity entity, bool canRemove, UIFunction
             ImGui::EndPopup();
         }
         if (open) {
-            uiFunction(entity, component);
+            uiFunction(entity, cmd, component);
             ImGui::TreePop();
         }
         if (removeComponent) {
@@ -106,20 +112,27 @@ void ComponentsDraw::drawComponents(Entity entity) {
         "Transform",
         entity,
         false,
-        [](Entity entity, auto &component) {
-            glm::vec3 position = component.getPosition();
-            drawVec3Control("Translation", position);
-            component.setPosition(position);
-            glm::vec3 rotation = component.getRotationEuler();
-            drawVec3Control("Rotation", rotation);
-            component.setRotationEuler(rotation);
+        [](Entity entity, WorldCommandManager &cmd, auto &component) {
+            TransformComponent transform = component;
+            glm::vec3 position = transform.getPosition();
+            if (drawVec3Control("Translation", position)) {
+                transform.setPosition(position);
+                EntityTransformCommand move(entity, transform);
+                cmd.DO(move);
+            }
+            glm::vec3 rotation = transform.getRotationEuler();
+            if (drawVec3Control("Rotation", rotation)) {
+                transform.setRotationEuler(rotation);
+                EntityTransformCommand rotate(entity, transform);
+                cmd.DO(rotate);
+            }
         }
     );
     drawComponent<SpriteRendererComponent>(
         "Sprite Renderer",
         entity,
         true,
-        [](Entity entity, auto &component) {
+        [](Entity entity, WorldCommandManager &cmd, auto &component) {
             beginPropertiesGrid();
             propertyColor("Color", component.color);
             endPropertiesGrid();
@@ -129,7 +142,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
         "Dynamic Mesh",
         entity,
         false,
-        [](Entity entity, auto &component) {
+        [](Entity entity, WorldCommandManager &cmd, auto &component) {
             ImGui::Text("Meshes count: %d", (int)component.meshes.size());
         }
     );
@@ -137,56 +150,61 @@ void ComponentsDraw::drawComponents(Entity entity) {
         "Static Mesh",
         entity,
         false,
-        [](Entity entity, auto &component) {
+        [](Entity entity, WorldCommandManager &cmd, auto &component) {
             ImGui::Text("Meshes count: %d", (int)component.meshes.size());
         }
     );
-    drawComponent<CameraComponent>("Camera", entity, true, [](Entity entity, auto &component) {
-        auto &camera = component.camera;
-        ImGui::Checkbox("Primary", &component.isPrimary);
+    drawComponent<CameraComponent>(
+        "Camera",
+        entity,
+        true,
+        [](Entity entity, WorldCommandManager &cmd, auto &component) {
+            auto &camera = component.camera;
+            ImGui::Checkbox("Primary", &component.isPrimary);
 
-        const char *projectionTypeStrings[] = {"Perspective", "Orthographic"};
-        const char *currentProjectionTypeString =
-            projectionTypeStrings[(int)camera.getProjectionType()];
-        if (ImGui::BeginCombo("Projection", currentProjectionTypeString)) {
-            for (int i = 0; i < 2; i++) {
-                bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
-                if (ImGui::Selectable(projectionTypeStrings[i], isSelected)) {
-                    currentProjectionTypeString = projectionTypeStrings[i];
-                    camera.setProjectionType((WorldCamera::ProjectionType)i);
+            const char *projectionTypeStrings[] = {"Perspective", "Orthographic"};
+            const char *currentProjectionTypeString =
+                projectionTypeStrings[(int)camera.getProjectionType()];
+            if (ImGui::BeginCombo("Projection", currentProjectionTypeString)) {
+                for (int i = 0; i < 2; i++) {
+                    bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
+                    if (ImGui::Selectable(projectionTypeStrings[i], isSelected)) {
+                        currentProjectionTypeString = projectionTypeStrings[i];
+                        camera.setProjectionType((WorldCamera::ProjectionType)i);
+                    }
+                    if (isSelected) {
+                        ImGui::SetItemDefaultFocus();
+                    }
                 }
-                if (isSelected) {
-                    ImGui::SetItemDefaultFocus();
+                ImGui::EndCombo();
+            }
+            if (camera.getProjectionType() == WorldCamera::ProjectionType::PERSPECTIVE) {
+                float perspectiveVerticalFov = camera.getFieldOfView();
+                if (ImGui::DragFloat("Vertical FOV", &perspectiveVerticalFov)) {
+                    camera.setFieldOfView(perspectiveVerticalFov);
                 }
             }
-            ImGui::EndCombo();
-        }
-        if (camera.getProjectionType() == WorldCamera::ProjectionType::PERSPECTIVE) {
-            float perspectiveVerticalFov = camera.getFieldOfView();
-            if (ImGui::DragFloat("Vertical FOV", &perspectiveVerticalFov)) {
-                camera.setFieldOfView(perspectiveVerticalFov);
+            if (camera.getProjectionType() == WorldCamera::ProjectionType::ORTHOGRAPHIC) {
+                float orthoSize = camera.getOrthoSize();
+                if (ImGui::DragFloat("Size", &orthoSize)) {
+                    camera.setOrthoSize(orthoSize);
+                }
+            }
+            float near = camera.getNear();
+            if (ImGui::DragFloat("Near", &near)) {
+                camera.setNear(near);
+            }
+            float far = camera.getFar();
+            if (ImGui::DragFloat("Far", &far)) {
+                camera.setFar(far);
             }
         }
-        if (camera.getProjectionType() == WorldCamera::ProjectionType::ORTHOGRAPHIC) {
-            float orthoSize = camera.getOrthoSize();
-            if (ImGui::DragFloat("Size", &orthoSize)) {
-                camera.setOrthoSize(orthoSize);
-            }
-        }
-        float near = camera.getNear();
-        if (ImGui::DragFloat("Near", &near)) {
-            camera.setNear(near);
-        }
-        float far = camera.getFar();
-        if (ImGui::DragFloat("Far", &far)) {
-            camera.setFar(far);
-        }
-    });
+    );
     drawComponent<ScriptListComponent>(
         "Scripts",
         entity,
         false,
-        [](Entity entity, auto &component) {
+        [](Entity entity, WorldCommandManager &cmd, auto &component) {
             for (auto &script : component.scripts) {
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
                 ImGui::Text("%s", script.getName().c_str());
@@ -204,7 +222,10 @@ void ComponentsDraw::drawComponents(Entity entity) {
         }
     );
     drawComponent<SkyComponent>(
-        "Cube Map Rendering", entity, true, [](Entity entity, auto &component) {}
+        "Cube Map Rendering",
+        entity,
+        true,
+        [](Entity entity, WorldCommandManager &cmd, auto &component) {}
     );
 }
 

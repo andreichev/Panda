@@ -18,6 +18,14 @@ void Toolbar::onImGuiRender(float offsetY) {
     ImGui::Begin(
         "##viewport_central_toolbar", 0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking
     );
+    ImGui::SetCursorPos({200.f, 4.f});
+    if (ImGui::Button(getString(ICON_UNDO).c_str())) {
+        m_output->toolbarUndo();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(getString(ICON_REPEAT).c_str())) {
+        m_output->toolbarRedo();
+    }
     ImGui::SetCursorPos({width / 2.f - 70.f, 4.f});
     switch (m_output->toolbarGetCurrentSceneState()) {
         case SceneState::EDIT: {
@@ -29,7 +37,7 @@ void Toolbar::onImGuiRender(float offsetY) {
                 m_output->toolbarDidPickSceneState(SceneState::SIMULATE);
             }
             ImGui::SameLine();
-            if (ImGui::Button(getString(ICON_CODE).c_str())) {
+            if (ImGui::Button(getString(ICON_REFRESH).c_str())) {
                 m_output->toolbarDidTapReloadScripts();
             }
             break;

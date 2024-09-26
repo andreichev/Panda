@@ -176,6 +176,14 @@ void EditorLayer::setEditorCameraSettings(EditorCameraSettings settings) {
 
 #pragma region Menu bar output
 
+void EditorLayer::menuBarUndo() {
+    undo();
+}
+
+void EditorLayer::menuBarRedo() {
+    redo();
+}
+
 void EditorLayer::menuBarOpenProject() {
     std::optional<path_t> optionalPath = SystemTools::openFolderDialog();
     if (!optionalPath.has_value()) {
@@ -321,6 +329,14 @@ void EditorLayer::deleteFileShowPopup(path_t path) {
 
 #pragma region Toolbar output
 
+void EditorLayer::toolbarUndo() {
+    undo();
+}
+
+void EditorLayer::toolbarRedo() {
+    redo();
+}
+
 void EditorLayer::toolbarDidPickSceneState(SceneState state) {
     switch (state) {
         case SceneState::EDIT: {
@@ -356,6 +372,20 @@ void EditorLayer::updateWindowState() {
         window->setTitle("Welcome");
         window->setSize({600, 400});
     }
+}
+
+void EditorLayer::undo() {
+    if (!m_currentWorld) {
+        return;
+    }
+    m_currentWorld->getCommandManger().UNDO();
+}
+
+void EditorLayer::redo() {
+    if (!m_currentWorld) {
+        return;
+    }
+    m_currentWorld->getCommandManger().REDO();
 }
 
 void EditorLayer::saveWorld() {

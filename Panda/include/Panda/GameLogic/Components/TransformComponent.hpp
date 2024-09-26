@@ -29,6 +29,8 @@ public:
     // ------- Matrices -------
     glm::mat4 getTransform() const;
     glm::mat4 getSkyTransform() const;
+    // ------- Copy values --------
+    void setTransform(TransformComponent &other);
 
 private:
     glm::quat rotation;

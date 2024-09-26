@@ -67,6 +67,15 @@ void MenuBar::onImGuiRender() {
             }
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Edit")) {
+            if (ImGui::MenuItem("Undo", NULL)) {
+                m_output->menuBarUndo();
+            }
+            if (ImGui::MenuItem("Redo", NULL)) {
+                m_output->menuBarRedo();
+            }
+            ImGui::EndMenu();
+        }
         ImGui::EndMenuBar();
     }
     ImGui::PopStyleVar(2);

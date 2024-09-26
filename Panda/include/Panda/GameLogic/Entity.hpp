@@ -16,8 +16,8 @@ class World;
 
 class Entity final {
 private:
-    inline entt::registry &worldGetRegistry();
-    inline void setWorldChanged();
+    entt::registry &worldGetRegistry();
+    void setWorldChanged();
 
 public:
     Entity();
@@ -75,6 +75,8 @@ public:
 
     TransformComponent &getTransform();
 
+    void setTransform(TransformComponent &transform);
+
     Entity getParent();
 
     const std::vector<id_t> &getChildEntities() {
@@ -95,8 +97,8 @@ public:
     }
 
     void setName(const std::string &name) {
-        auto& tagComponent = getComponent<TagComponent>();
-        if(tagComponent.tag == name) {
+        auto &tagComponent = getComponent<TagComponent>();
+        if (tagComponent.tag == name) {
             return;
         }
         tagComponent.tag = name;
