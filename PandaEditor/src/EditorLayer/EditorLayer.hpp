@@ -55,7 +55,9 @@ public:
 
     void menuBarOpenProject() override;
     void menuBarOpenProject(const RecentProject &project) override;
+    bool menuBarCanUndo() override;
     void menuBarUndo() override;
+    bool menuBarCanRedo() override;
     void menuBarRedo() override;
     const std::vector<RecentProject> &menuBarGetRecentProjectsList() override;
     const path_t &menuBarGetOpenedProjectPath() override;
@@ -81,7 +83,9 @@ public:
 
 #pragma region Toolbar output
 
+    bool toolbarCanUndo() override;
     void toolbarUndo() override;
+    bool toolbarCanRedo() override;
     void toolbarRedo() override;
     void toolbarDidPickSceneState(SceneState state) override;
     void toolbarDidTapReloadScripts() override;
@@ -92,7 +96,9 @@ public:
 private:
     void closeApp();
     void saveWorld();
+    bool canUndo();
     void undo();
+    bool canRedo();
     void redo();
     void updateWindowState();
 

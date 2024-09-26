@@ -176,8 +176,16 @@ void EditorLayer::setEditorCameraSettings(EditorCameraSettings settings) {
 
 #pragma region Menu bar output
 
+bool EditorLayer::menuBarCanUndo() {
+    return canUndo();
+}
+
 void EditorLayer::menuBarUndo() {
     undo();
+}
+
+bool EditorLayer::menuBarCanRedo() {
+    return canRedo();
 }
 
 void EditorLayer::menuBarRedo() {
@@ -329,8 +337,16 @@ void EditorLayer::deleteFileShowPopup(path_t path) {
 
 #pragma region Toolbar output
 
+bool EditorLayer::toolbarCanUndo() {
+    return canUndo();
+}
+
 void EditorLayer::toolbarUndo() {
     undo();
+}
+
+bool EditorLayer::toolbarCanRedo() {
+    return canRedo();
 }
 
 void EditorLayer::toolbarRedo() {
@@ -374,11 +390,25 @@ void EditorLayer::updateWindowState() {
     }
 }
 
+bool EditorLayer::canUndo() {
+    if (!m_currentWorld) {
+        return false;
+    }
+    return m_currentWorld->getCommandManger().CAN_UNDO();
+}
+
 void EditorLayer::undo() {
     if (!m_currentWorld) {
         return;
     }
     m_currentWorld->getCommandManger().UNDO();
+}
+
+bool EditorLayer::canRedo() {
+    if (!m_currentWorld) {
+        return false;
+    }
+    return m_currentWorld->getCommandManger().CAN_REDO();
 }
 
 void EditorLayer::redo() {

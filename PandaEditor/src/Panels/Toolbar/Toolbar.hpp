@@ -12,7 +12,9 @@ public:
     virtual ~ToolbarOutput() = default;
     virtual void toolbarDidPickSceneState(SceneState state) = 0;
     virtual void toolbarDidTapReloadScripts() = 0;
+    virtual bool toolbarCanUndo() = 0;
     virtual void toolbarUndo() = 0;
+    virtual bool toolbarCanRedo() = 0;
     virtual void toolbarRedo() = 0;
     virtual SceneState toolbarGetCurrentSceneState() = 0;
 };

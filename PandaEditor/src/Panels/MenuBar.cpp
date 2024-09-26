@@ -68,10 +68,10 @@ void MenuBar::onImGuiRender() {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Edit")) {
-            if (ImGui::MenuItem("Undo", NULL)) {
+            if (ImGui::MenuItem("Undo", NULL, false, m_output->menuBarCanUndo())) {
                 m_output->menuBarUndo();
             }
-            if (ImGui::MenuItem("Redo", NULL)) {
+            if (ImGui::MenuItem("Redo", NULL, false, m_output->menuBarCanRedo())) {
                 m_output->menuBarRedo();
             }
             ImGui::EndMenu();

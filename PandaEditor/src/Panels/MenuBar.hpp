@@ -20,7 +20,9 @@ public:
     virtual void menuBarOpenCppProject() = 0;
     virtual void menuBarCloseProject() = 0;
     virtual void menuBarCloseApp() = 0;
+    virtual bool menuBarCanUndo() = 0;
     virtual void menuBarUndo() = 0;
+    virtual bool menuBarCanRedo() = 0;
     virtual void menuBarRedo() = 0;
     virtual const path_t &menuBarGetOpenedProjectPath() = 0;
     virtual const std::vector<RecentProject> &menuBarGetRecentProjectsList() = 0;
