@@ -24,7 +24,6 @@ private:
 
     ComponentsDraw m_componentsDraw;
     World *m_world;
-    Entity m_selected;
 };
 
 } // namespace Panda

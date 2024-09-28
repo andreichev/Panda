@@ -11,10 +11,12 @@ namespace Panda {
 
 WorldHierarchyPanel::WorldHierarchyPanel(World *world, ComponentsDrawOutput *componentsDrawOutput)
     : m_world(world)
-    , m_componentsDraw(componentsDrawOutput)
-    , m_selected() {}
+    , m_componentsDraw(componentsDrawOutput) {}
 
 void WorldHierarchyPanel::onImGuiRender() {
+    if(!m_world) {
+        return;
+    }
     ImGuiWindowFlags flags = 0;
     if (m_world->isChanged()) {
         flags |= ImGuiWindowFlags_UnsavedDocument;
@@ -37,21 +39,23 @@ void WorldHierarchyPanel::onImGuiRender() {
     }
     ImGui::End();
 
+    Entity selected = m_world->getSelectedEntity();
     ImGui::Begin("Properties");
-    if (m_selected.isValid()) {
-        m_componentsDraw.drawComponents(m_selected);
+    if (selected.isValid()) {
+        m_componentsDraw.drawComponents(selected);
     }
     ImGui::End();
 }
 
 void WorldHierarchyPanel::drawEntityNode(Entity entity) {
+    Entity selected = m_world->getSelectedEntity();
     auto &tag = entity.getComponent<TagComponent>().tag;
     ImGuiTreeNodeFlags flags =
-        ((m_selected == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+        ((selected == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
     flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
     bool opened = ImGui::TreeNodeEx((void *)entity.m_id, flags, "%s", tag.c_str());
     if (ImGui::IsItemClicked()) {
-        m_selected = entity;
+        m_world->setSelectedEntity(entity);
     }
     if (ImGui::BeginPopupContextItem()) {
         if (ImGui::MenuItem("Delete", NULL)) {

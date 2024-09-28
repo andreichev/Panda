@@ -148,10 +148,15 @@ void World::updateBasicComponents(
             auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
             auto &transform = view.get<TransformComponent>(entityHandle);
             Panda::Renderer2D::RectData rect;
+            id_t entityId = static_cast<id_t>(entityHandle);
+            rect.transform = transform.getTransform();
+            if(m_selectedEntity.getId() == entityId) {
+                rect.color = Color(1.f, 1.f, 0.f, 1.f);
+                rect.size = {1.05f, 1.05f};
+                m_renderer2d.drawRect(rect);
+            }
             rect.color = spriteComponent.color;
             rect.size = {1.f, 1.f};
-            rect.center = transform.getPosition();
-            rect.rotation = transform.getRotationEuler().z;
             m_renderer2d.drawRect(rect);
         }
     }
@@ -251,10 +256,12 @@ void World::destroy(Entity entity) {
 }
 
 void World::clear() {
+    m_selectedEntity = Entity();
     for (auto id : m_registry.storage<entt::entity>()) {
         m_registry.destroy(id);
     }
     m_registry.clear();
+    m_commandManager.CLEAR();
 }
 
 bool World::isEmpty() {
@@ -344,7 +351,6 @@ void copyAllComponents(entt::registry &src, entt::registry &dst, entt::entity en
 
 World &World::operator=(World &other) {
     clear();
-    m_commandManager.CLEAR();
     entt::registry &src = other.m_registry;
     entt::registry &dst = m_registry;
     for (auto entity : src.storage<entt::entity>()) {

@@ -31,8 +31,6 @@ public:
     void destroy(Entity entity);
     void clear();
     bool isEmpty();
-    bool isChanged();
-    void setChanged(bool changed = true);
     Entity findByTag(const char *tag);
     Entity getById(id_t id);
     inline bool isRunning() {
@@ -48,8 +46,22 @@ public:
     Camera *findMainCamera();
     World &operator=(World &other);
     void debugPrint();
+
+    /// --------- Editor stuff -----------------
+
     inline WorldCommandManager &getCommandManger() {
         return m_commandManager;
+    }
+
+    bool isChanged();
+    void setChanged(bool changed = true);
+
+    Entity getSelectedEntity() {
+        return m_selectedEntity;
+    }
+
+    void setSelectedEntity(Entity entity) {
+        m_selectedEntity = entity;
     }
 
 private:
@@ -59,12 +71,15 @@ private:
     void fillEntity(Entity entity);
 
     bool m_isRunning;
-    bool m_isChanged;
     entt::registry m_registry;
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;
     Miren::ViewId m_renderingViewId;
+
+    /// -------- Editor stuff -----------
+    bool m_isChanged;
     WorldCommandManager m_commandManager;
+    Entity m_selectedEntity;
 
     friend class Entity;
     friend class WorldHierarchyPanel;
