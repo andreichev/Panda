@@ -28,6 +28,8 @@ public:
     virtual void flip() = 0;
     virtual void
     createFrameBuffer(FrameBufferHandle handle, FrameBufferSpecification specification) = 0;
+    virtual void
+    readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data) = 0;
     virtual void deleteFrameBuffer(FrameBufferHandle handle) = 0;
     virtual void createProgram(ProgramHandle handle, ProgramCreate) = 0;
     virtual void deleteShader(ProgramHandle handle) = 0;
@@ -68,6 +70,7 @@ public:
     virtual void deleteVertexBuffer(VertexBufferHandle handle) = 0;
     virtual void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) = 0;
     virtual void deleteVertexLayout(VertexLayoutHandle handle) = 0;
+    virtual void readTexture(TextureHandle handle, void *data) = 0;
     virtual void setUniform(const Uniform &uniform) = 0;
     virtual void setTexture(TextureHandle handle, uint32_t slot) = 0;
     virtual void submit(Frame *frame, View *views) = 0;

@@ -2,6 +2,7 @@
 #include "RendererOpenGL.hpp"
 
 #include "OpenGLBase.hpp"
+#include "Extensions/OpenGLExtensions.hpp"
 
 namespace Miren {
 
@@ -59,6 +60,14 @@ void OpenGLFrameBuffer::terminate() {
     PND_ASSERT(m_id != -1, "FRAMEBUFFER ALREADY DELETED");
     GL_CALL(glDeleteFramebuffers(1, &m_id));
     m_id = -1;
+}
+
+void OpenGLFrameBuffer::readPixels(int x, int y, int width, int height, void *data) {
+    bind();
+    GLenum readPixelsFmt =
+        OpenGLExtensions::isSupported(OpenGLExtensions::Extension::EXT_bgra) ? GL_BGRA : GL_RGBA;
+    GL_CALL(glReadBuffer(GL_COLOR_ATTACHMENT0));
+    GL_CALL(glReadPixels(0, 0, width, height, readPixelsFmt, GL_UNSIGNED_BYTE, data));
 }
 
 } // namespace Miren

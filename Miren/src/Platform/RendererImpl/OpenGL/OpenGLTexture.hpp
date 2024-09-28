@@ -30,10 +30,14 @@ public:
         return m_create.m_format;
     }
 
+    void readPixels(void *data);
+
 private:
     TextureCreate m_create;
     uint32_t m_id;
     uint32_t m_target;
+    uint32_t m_format;
+    uint32_t m_type;
 };
 
 } // namespace Miren

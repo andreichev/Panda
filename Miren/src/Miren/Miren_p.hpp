@@ -209,6 +209,20 @@ struct Context {
                     m_renderer->deleteVertexLayout(cmd->handle);
                     break;
                 }
+                case RendererCommandType::ReadTexture: {
+                    CMDBUF_LOG("READ TEXTURE COMMAND");
+                    const ReadTextureCommand *cmd =
+                        static_cast<const ReadTextureCommand *>(command);
+                    m_renderer->readTexture(cmd->handle, cmd->data);
+                    break;
+                }
+                case RendererCommandType::ReadFrameBuffer: {
+                    CMDBUF_LOG("READ FRAME BUFFER COMMAND");
+                    const ReadFrameBufferCommand *cmd =
+                        static_cast<const ReadFrameBufferCommand *>(command);
+                    m_renderer->readFrameBuffer(cmd->handle, cmd->x, cmd->y, cmd->width, cmd->height, cmd->data);
+                    break;
+                }
                 default: {
                     LOG_CRITICAL("UNKNOWN COMMAND");
                 }
@@ -270,6 +284,12 @@ struct Context {
         CreateFrameBufferCommand cmd(handle, specification);
         m_preCommandQueue.write(cmd);
         return handle;
+    }
+
+    uint32_t readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data) {
+        ReadFrameBufferCommand cmd(handle, x, y, width, height, data);
+        m_postCommandQueue.write(cmd);
+        return m_frameNumber + 1;
     }
 
     void deleteFrameBuffer(FrameBufferHandle handle) {
@@ -438,6 +458,12 @@ struct Context {
         buffer->startIndex = transientIBOffset;
         buffer->elementType = elementType;
         buffer->handle = m_submit->m_transientIb.handle;
+    }
+
+    uint32_t readTexture(TextureHandle handle, void *data) {
+        ReadTextureCommand cmd(handle, data);
+        m_postCommandQueue.write(cmd);
+        return m_frameNumber + 1;
     }
 
     void setState(uint32_t state) {

@@ -150,7 +150,7 @@ void World::updateBasicComponents(
             Panda::Renderer2D::RectData rect;
             id_t entityId = static_cast<id_t>(entityHandle);
             rect.transform = transform.getTransform();
-            if(m_selectedEntity.getId() == entityId) {
+            if (m_selectedEntity.getId() == entityId) {
                 rect.color = Color(1.f, 1.f, 0.f, 1.f);
                 rect.size = {1.05f, 1.05f};
                 m_renderer2d.drawRect(rect);

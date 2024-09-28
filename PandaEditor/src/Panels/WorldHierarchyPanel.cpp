@@ -14,7 +14,7 @@ WorldHierarchyPanel::WorldHierarchyPanel(World *world, ComponentsDrawOutput *com
     , m_componentsDraw(componentsDrawOutput) {}
 
 void WorldHierarchyPanel::onImGuiRender() {
-    if(!m_world) {
+    if (!m_world) {
         return;
     }
     ImGuiWindowFlags flags = 0;

@@ -14,6 +14,7 @@ void initialize();
 void terminate();
 // MARK: - Command buffer
 FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification);
+uint32_t readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data);
 void deleteFrameBuffer(FrameBufferHandle handle);
 ProgramHandle createProgram(ProgramCreate create);
 void deleteProgram(ProgramHandle handle);
@@ -41,6 +42,7 @@ VertexBufferHandle createDynamicVertexBuffer(
 void updateDynamicVertexBuffer(VertexBufferHandle handle, Foundation::Memory data, uint32_t size);
 void deleteVertexBuffer(VertexBufferHandle handle);
 void deleteVertexLayout(VertexLayoutHandle handle);
+uint32_t readTexture(TextureHandle handle, void *data);
 // MARK: - Encoder setup
 void setViewClear(ViewId id, uint32_t color);
 void setViewport(ViewId id, Rect rect);

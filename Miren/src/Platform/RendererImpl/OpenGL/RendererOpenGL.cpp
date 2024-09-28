@@ -73,6 +73,8 @@ RendererOpenGL::RendererOpenGL() {
 #endif
     GL_CALL(glGenVertexArrays(1, &m_uselessVao));
     GL_CALL(glBindVertexArray(m_uselessVao));
+
+    OpenGLExtensions::initialize();
 }
 
 RendererOpenGL::~RendererOpenGL() {
@@ -97,6 +99,12 @@ void RendererOpenGL::createFrameBuffer(
     FrameBufferHandle handle, FrameBufferSpecification specification
 ) {
     frameBuffers[handle.id].create(specification);
+}
+
+void RendererOpenGL::readFrameBuffer(
+    FrameBufferHandle handle, int x, int y, int width, int height, void *data
+) {
+    frameBuffers[handle.id].readPixels(x, y, width, height, data);
 }
 
 void RendererOpenGL::deleteFrameBuffer(FrameBufferHandle handle) {
@@ -192,6 +200,10 @@ void RendererOpenGL::createVertexLayout(VertexLayoutHandle handle, VertexBufferL
 }
 
 void RendererOpenGL::deleteVertexLayout(VertexLayoutHandle handle) {}
+
+void RendererOpenGL::readTexture(Miren::TextureHandle handle, void *data) {
+    textures[handle.id].readPixels(data);
+}
 
 void RendererOpenGL::setUniform(const Uniform &uniform) {
     shaders[uniform.handle.id].bind();

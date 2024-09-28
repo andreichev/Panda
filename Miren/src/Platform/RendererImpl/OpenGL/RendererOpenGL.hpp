@@ -6,6 +6,7 @@
 
 #include "Miren/RendererI.hpp"
 #include "Miren/GraphicsContext.hpp"
+#include "Platform/RendererImpl/OpenGL/Extensions/OpenGLExtensions.hpp"
 #include "OpenGLFrameBuffer.hpp"
 #include "OpenGLShader.hpp"
 #include "OpenGLTexture.hpp"
@@ -22,6 +23,9 @@ public:
     void flip() override;
     void
     createFrameBuffer(FrameBufferHandle handle, FrameBufferSpecification specification) override;
+    void readFrameBuffer(
+        Miren::FrameBufferHandle handle, int x, int y, int width, int height, void *data
+    ) override;
     void deleteFrameBuffer(FrameBufferHandle handle) override;
     void createProgram(ProgramHandle handle, ProgramCreate create) override;
     void deleteShader(ProgramHandle handle) override;
@@ -62,6 +66,7 @@ public:
     void deleteVertexBuffer(VertexBufferHandle handle) override;
     void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) override;
     void deleteVertexLayout(VertexLayoutHandle handle) override;
+    void readTexture(Miren::TextureHandle handle, void *data) override;
     void setUniform(const Uniform &uniform) override;
     void setTexture(TextureHandle handle, uint32_t slot) override;
     void submit(Frame *frame, View *views) override;

@@ -36,6 +36,11 @@ FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification) {
     return s_context->createFrameBuffer(specification);
 }
 
+uint32_t readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data) {
+    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    return s_context->readFrameBuffer(handle, x, y, width, height, data);
+}
+
 void deleteFrameBuffer(FrameBufferHandle handle) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     s_context->deleteFrameBuffer(handle);
@@ -125,6 +130,11 @@ VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data) {
 void deleteVertexLayout(VertexLayoutHandle handle) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     s_context->deleteVertexLayout(handle);
+}
+
+uint32_t readTexture(TextureHandle handle, void *data) {
+    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    return s_context->readTexture(handle, data);
 }
 
 void allocTransientVertexBuffer(TransientVertexBuffer *buffer, uint32_t size) {

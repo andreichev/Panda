@@ -30,7 +30,9 @@ enum RendererCommandType {
     UpdateDynamicVertexBuffer,
     DestroyVertexBuffer,
     CreateVertexLayout,
-    DestroyVertexLayout
+    DestroyVertexLayout,
+    ReadTexture,
+    ReadFrameBuffer
 };
 
 struct CreateFrameBufferCommand : Foundation::CommandBuffer::Command {
@@ -235,6 +237,28 @@ struct DeleteVertexLayoutCommand : Foundation::CommandBuffer::Command {
     DeleteVertexLayoutCommand(VertexLayoutHandle handle)
         : Command(RendererCommandType::DestroyVertexLayout)
         , handle(handle) {}
+};
+
+struct ReadTextureCommand : Foundation::CommandBuffer::Command {
+    TextureHandle handle;
+    void *data;
+
+    ReadTextureCommand(TextureHandle handle, void *data)
+        : Command(RendererCommandType::ResizeTexture)
+        , handle(handle)
+        , data(data) {}
+};
+
+struct ReadFrameBufferCommand : Foundation::CommandBuffer::Command {
+    FrameBufferHandle handle;
+    int x, y, width, height;
+    void *data;
+
+    ReadFrameBufferCommand(FrameBufferHandle handle, int x, int y, int width, int height, void *data)
+        : Command(RendererCommandType::ResizeTexture)
+        , handle(handle)
+        , x(x) ,y(y), width(width), height(height)
+        , data(data) {}
 };
 
 } // namespace Miren
