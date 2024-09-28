@@ -19,17 +19,12 @@ entt::registry &Entity::worldGetRegistry() {
     return m_world->m_registry;
 }
 
-void Entity::setWorldChanged() {
-    m_world->setChanged();
+void Entity::setWorldChanged(bool changed) {
+    m_world->setChanged(changed);
 }
 
 TransformComponent &Entity::getTransform() {
     return getComponent<TransformComponent>();
-}
-
-void Entity::setTransform(TransformComponent &transform) {
-    TransformComponent &_transform = getTransform();
-    _transform.setTransform(transform);
 }
 
 void Entity::addChildEntity(Entity entity) {

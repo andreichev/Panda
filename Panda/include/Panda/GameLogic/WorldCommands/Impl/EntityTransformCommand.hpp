@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panda/GameLogic/WorldCommand.hpp"
+#include "Panda/GameLogic/WorldCommands/WorldCommand.hpp"
 #include "Panda/GameLogic/Entity.hpp"
 #include "Panda/GameLogic/Components/TransformComponent.hpp"
 
@@ -17,7 +17,8 @@ public:
         if (!m_entity.isValid()) {
             return false;
         }
-        m_entity.setTransform(m_prevTransform);
+        m_entity.setComponent(m_prevTransform);
+        m_entity.setWorldChanged();
         return true;
     }
 
@@ -25,7 +26,8 @@ public:
         if (!m_entity.isValid()) {
             return false;
         }
-        m_entity.setTransform(m_newTransform);
+        m_entity.setComponent(m_newTransform);
+        m_entity.setWorldChanged();
         return true;
     }
 

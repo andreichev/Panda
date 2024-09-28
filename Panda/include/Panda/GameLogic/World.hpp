@@ -8,7 +8,7 @@
 #include "Panda/Window/Window.hpp"
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Renderer/Renderer3D.hpp"
-#include "Panda/GameLogic/WorldCommandManager.hpp"
+#include "Panda/GameLogic/WorldCommands/WorldCommandManager.hpp"
 
 #include <Miren/Miren.hpp>
 #include <entt/entt.hpp>
@@ -32,8 +32,7 @@ public:
     void clear();
     bool isEmpty();
     bool isChanged();
-    void resetChanged();
-    void setChanged();
+    void setChanged(bool changed = true);
     Entity findByTag(const char *tag);
     Entity getById(id_t id);
     inline bool isRunning() {

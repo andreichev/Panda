@@ -4,6 +4,7 @@
 
 #include "CameraController.hpp"
 
+#include <Foundation/PlatformDetection.hpp>
 #include <imgui.h>
 
 namespace Panda {
@@ -25,6 +26,18 @@ CameraController::CameraController()
 
 void CameraController::update(float deltaTime) {
     if (!m_isActive) {
+        m_cursorStarted = false;
+        return;
+    }
+    bool ctrl;
+    bool shift;
+#ifdef PLATFORM_MACOS
+    ctrl = Input::isKeyPressed(Key::LEFT_SUPER) || Input::isKeyPressed(Key::RIGHT_SUPER);
+#else
+    ctrl = Input::isKeyPressed(Key::LEFT_CONTROL) || Input::isKeyPressed(Key::RIGHT_CONTROL);
+#endif
+    shift = Input::isKeyPressed(Key::LEFT_SHIFT) || Input::isKeyPressed(Key::RIGHT_SHIFT);
+    if (ctrl || shift) {
         m_cursorStarted = false;
         return;
     }

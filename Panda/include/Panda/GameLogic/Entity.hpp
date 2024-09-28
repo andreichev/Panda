@@ -17,7 +17,6 @@ class World;
 class Entity final {
 private:
     entt::registry &worldGetRegistry();
-    void setWorldChanged();
 
 public:
     Entity();
@@ -75,7 +74,10 @@ public:
 
     TransformComponent &getTransform();
 
-    void setTransform(TransformComponent &transform);
+    template<typename T>
+    void setComponent(T &value) {
+        getComponent<T>() = value;
+    }
 
     Entity getParent();
 
@@ -112,6 +114,8 @@ public:
     friend bool operator==(const Entity &lhs, const Entity &rhs) {
         return lhs.m_id == rhs.m_id;
     }
+
+    void setWorldChanged(bool changed = true);
 
 private:
     Entity(id_t id, World *world);

@@ -160,7 +160,7 @@ void ProjectLoader::saveWorld() {
         Rain::Encoder *encoder = &jsonEncoder;
         encoder->encode(file, worldDto);
         file.close();
-        m_world->resetChanged();
+        m_world->setChanged(false);
     } else {
         LOG_ERROR("ERROR SAVING WORLD AT PATH {}", m_worldPath.string());
     }

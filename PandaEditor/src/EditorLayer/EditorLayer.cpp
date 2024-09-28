@@ -6,6 +6,8 @@
 #include "Panels/Popups/PickScriptPopup.hpp"
 #include "Panels/Popups/EnterNamePopup.hpp"
 
+#include <Foundation/PlatformDetection.hpp>
+
 namespace Panda {
 
 EditorLayer::EditorLayer()
@@ -47,6 +49,7 @@ void EditorLayer::onDetach() {
 }
 
 void EditorLayer::onUpdate(double deltaTime) {
+    processShortcuts();
     if (!m_loader.hasOpenedProject()) {
         return;
     }
@@ -429,6 +432,7 @@ void EditorLayer::saveWorld() {
             m_loader.saveWorld();
             break;
     }
+    LOG_EDITOR("World saved.");
 }
 
 void EditorLayer::closeApp() {
@@ -460,6 +464,29 @@ void EditorLayer::closeApp() {
         m_popups.emplace_back(popup);
     } else {
         Application::get()->close();
+    }
+}
+
+void EditorLayer::processShortcuts() {
+    bool ctrl;
+    bool shift;
+#ifdef PLATFORM_MACOS
+    ctrl = Input::isKeyPressed(Key::LEFT_SUPER) || Input::isKeyPressed(Key::RIGHT_SUPER);
+#else
+    ctrl = Input::isKeyPressed(Key::LEFT_CONTROL) || Input::isKeyPressed(Key::RIGHT_CONTROL);
+#endif
+    shift = Input::isKeyPressed(Key::LEFT_SHIFT) || Input::isKeyPressed(Key::RIGHT_SHIFT);
+    if (ctrl) {
+        if (Input::isKeyJustPressed(Key::S)) {
+            saveWorld();
+        }
+        if (Input::isKeyJustPressed(Key::Z)) {
+            if (shift) {
+                redo();
+            } else {
+                undo();
+            }
+        }
     }
 }
 

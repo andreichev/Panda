@@ -109,6 +109,12 @@ public:
         return nullptr;
     }
 
+    void CLEAR() {
+        m_index = 0;
+        m_undoCount = 0;
+        m_redoCount = 0;
+    }
+
 private:
     void write(const void *_data, uint32_t _size, int index) {
         uint32_t pos = index * WORLD_COMMAND_SIZE;

@@ -305,12 +305,8 @@ bool World::isChanged() {
     return m_isChanged;
 }
 
-void World::resetChanged() {
-    m_isChanged = false;
-}
-
-void World::setChanged() {
-    m_isChanged = true;
+void World::setChanged(bool changed) {
+    m_isChanged = changed;
 }
 
 Entity World::findByTag(const char *tag) {
@@ -348,6 +344,7 @@ void copyAllComponents(entt::registry &src, entt::registry &dst, entt::entity en
 
 World &World::operator=(World &other) {
     clear();
+    m_commandManager.CLEAR();
     entt::registry &src = other.m_registry;
     entt::registry &dst = m_registry;
     for (auto entity : src.storage<entt::entity>()) {

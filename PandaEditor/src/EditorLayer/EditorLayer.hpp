@@ -101,6 +101,7 @@ private:
     bool canRedo();
     void redo();
     void updateWindowState();
+    void processShortcuts();
 
     ProjectLoader m_loader;
     MenuBar m_menuBar;

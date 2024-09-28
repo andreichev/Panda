@@ -5,7 +5,9 @@
 #include "Panels/Common/ImGuiHelper.hpp"
 #include "ComponentsDraw.hpp"
 
-#include <Panda/GameLogic/WorldCommands/EntityTransformCommand.hpp>
+#include <Panda/GameLogic/WorldCommands/Impl/EntityTransformCommand.hpp>
+#include <Panda/GameLogic/WorldCommands/Impl/UpdateSpriteRendererCommand.hpp>
+#include <Panda/GameLogic/WorldCommands/Impl/AddRemoveComponentCommand.hpp>
 #include <Panda/GameLogic/Components/SkyComponent.hpp>
 #include <Panda/ImGui/FontAwesome.h>
 
@@ -56,7 +58,8 @@ drawComponent(const std::string &name, Entity entity, bool canRemove, UIFunction
             ImGui::TreePop();
         }
         if (removeComponent) {
-            entity.removeComponent<T>();
+            AddRemoveComponentCommand<T> update(entity);
+            cmd.DO(update);
         }
         style.IndentSpacing = indentSpacing;
     }
@@ -77,10 +80,12 @@ static void drawTag(Entity entity) {
 }
 
 template<typename T>
-static void displayAddComponentEntry(Entity entity, const std::string &entryName) {
+static void
+displayAddComponentEntry(Entity entity, WorldCommandManager &cmd, const std::string &entryName) {
     if (!entity.hasComponent<T>()) {
         if (ImGui::MenuItem(entryName.c_str())) {
-            entity.addComponent<T>();
+            AddRemoveComponentCommand<T> update(entity);
+            cmd.DO(update);
             ImGui::CloseCurrentPopup();
         }
     }
@@ -97,14 +102,19 @@ ComponentsDraw::ComponentsDraw(Panda::ComponentsDrawOutput *output)
     : m_output(output) {}
 
 void ComponentsDraw::drawComponents(Entity entity) {
+    World *world = entity.getWorld();
+    if (!world) {
+        return;
+    }
+    WorldCommandManager &cmd = world->getCommandManger();
     drawTag(entity);
     if (ImGui::Button("Add Component")) {
         ImGui::OpenPopup("AddComponent");
     }
     if (ImGui::BeginPopup("AddComponent")) {
-        displayAddComponentEntry<CameraComponent>(entity, "Camera");
-        displayAddComponentEntry<SpriteRendererComponent>(entity, "Sprite Renderer");
-        displayAddComponentEntry<SkyComponent>(entity, "Cube Map Rendering");
+        displayAddComponentEntry<CameraComponent>(entity, cmd, "Camera");
+        displayAddComponentEntry<SpriteRendererComponent>(entity, cmd, "Sprite Renderer");
+        displayAddComponentEntry<SkyComponent>(entity, cmd, "Cube Map Rendering");
         displayAddScriptMenuItem(entity);
         ImGui::EndPopup();
     }
@@ -134,7 +144,11 @@ void ComponentsDraw::drawComponents(Entity entity) {
         true,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
             beginPropertiesGrid();
-            propertyColor("Color", component.color);
+            SpriteRendererComponent spriteRenderer = component;
+            if (propertyColor("Color", spriteRenderer.color)) {
+                UpdateSpriteRendererCommand update(entity, spriteRenderer);
+                cmd.DO(update);
+            }
             endPropertiesGrid();
         }
     );

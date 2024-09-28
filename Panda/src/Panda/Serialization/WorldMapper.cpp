@@ -49,7 +49,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
             }
         }
     }
-    world.resetChanged();
+    world.setChanged(false);
 }
 
 WorldDto WorldMapper::toDto(const World &world) {
