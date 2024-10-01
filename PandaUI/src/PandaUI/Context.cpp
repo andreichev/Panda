@@ -39,7 +39,7 @@ void Context::update(double deltaTime) {
     if (m_rootView) {
         m_renderer2d.begin();
         m_rootView->render(0, 0);
-        m_renderer2d.end();
+        m_renderer2d.end(Panda::Renderer2D::COLOR);
     }
 }
 

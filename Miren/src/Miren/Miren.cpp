@@ -36,7 +36,8 @@ FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification) {
     return s_context->createFrameBuffer(specification);
 }
 
-uint32_t readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data) {
+uint32_t
+readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     return s_context->readFrameBuffer(handle, x, y, width, height, data);
 }

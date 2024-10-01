@@ -254,10 +254,15 @@ struct ReadFrameBufferCommand : Foundation::CommandBuffer::Command {
     int x, y, width, height;
     void *data;
 
-    ReadFrameBufferCommand(FrameBufferHandle handle, int x, int y, int width, int height, void *data)
+    ReadFrameBufferCommand(
+        FrameBufferHandle handle, int x, int y, int width, int height, void *data
+    )
         : Command(RendererCommandType::ResizeTexture)
         , handle(handle)
-        , x(x) ,y(y), width(width), height(height)
+        , x(x)
+        , y(y)
+        , width(width)
+        , height(height)
         , data(data) {}
 };
 

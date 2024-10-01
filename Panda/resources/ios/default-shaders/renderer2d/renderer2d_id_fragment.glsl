@@ -5,6 +5,7 @@ precision highp float;
 in float fragTextureIndex;
 in vec4 fragColor;
 in vec2 fragTexCoord;
+in int fragId;
 
 out vec4 outColor;
 uniform sampler2D u_textures[8];

@@ -2,6 +2,6 @@
 
 namespace Panda {
 
-ConsolePanel *ConsolePanel::s_instance;
+ConsolePanel *ConsolePanel::s_instance = nullptr;
 
 }

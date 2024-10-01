@@ -34,10 +34,13 @@ public:
     static Touch getTouch(int index);
     static double getMousePositionX();
     static double getMousePositionY();
+    static double getMouseViewportPositionX();
+    static double getMouseViewportPositionY();
     static double getMouseScrollX();
     static double getMouseScrollY();
     static Size getWindowSize();
     static void onEvent(Event *event);
+    static void setViewportFrame(Vec2 pos, Size size);
     static void nextFrame();
 
 private:
@@ -61,6 +64,8 @@ private:
     // Номера кадров при нажатии мыши
     static uint32_t framesMouseButtons[4];
     static Size windowSize;
+    static Vec2 viewportPos;
+    static Vec2 viewportSize;
     static double mousePositionX;
     static double mousePositionY;
     static double mouseScrollX;

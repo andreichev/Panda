@@ -20,6 +20,8 @@ double Input::mousePositionX = 0;
 double Input::mousePositionY = 0;
 double Input::mouseScrollX = 0;
 double Input::mouseScrollY = 0;
+Vec2 Input::viewportPos;
+Vec2 Input::viewportSize;
 std::vector<Input::Touch> Input::activeTouches;
 
 void Input::onEvent(Event *event) {
@@ -119,6 +121,14 @@ double Input::getMousePositionY() {
     return mousePositionY;
 }
 
+double Input::getMouseViewportPositionX() {
+    return mousePositionX - viewportPos.x;
+}
+
+double Input::getMouseViewportPositionY() {
+    return mousePositionY - viewportPos.y;
+}
+
 double Input::getMouseScrollX() {
     return mouseScrollX;
 }
@@ -186,6 +196,11 @@ void Input::postTouchEndedEvent(int id) {
     if (touch != activeTouches.end()) {
         activeTouches.erase(touch);
     }
+}
+
+void Input::setViewportFrame(Panda::Vec2 pos, Panda::Size size) {
+    viewportPos = pos;
+    viewportSize = size;
 }
 
 } // namespace Panda

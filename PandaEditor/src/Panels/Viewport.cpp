@@ -92,6 +92,8 @@ void Viewport::onImGuiRender() {
     Application::get()->getImGuiLayer()->setBlockEvents(!hovered);
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 1);
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
+    ImVec2 viewportScreenPos = ImGui::GetCursorScreenPos();
+    Input::setViewportFrame(viewportScreenPos, viewportSpace);
     ImGui::Image(
         (void *)(uintptr_t)m_colorAttachment.id, m_viewportPanelSize, ImVec2(0, 1), ImVec2(1, 0)
     );

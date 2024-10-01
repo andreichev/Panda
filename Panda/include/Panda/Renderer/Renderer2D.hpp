@@ -11,13 +11,15 @@ namespace Panda {
 #define MAX_INDICES_COUNT 160000
 #define MAX_TEXTURE_SLOTS 8
 
-/// Renderer2D отвечает за то, чтобы рисовать примитивные двумерные 2D фигуры.
+/// Renderer2D отвечает за то, чтобы рисовать примитивные двумерные фигуры.
 /// Для этого Renderer2D создает шейдер и буферы с вершинами, текстурами, индексами.
 /// Renderer2D вызывает отрисовку после вызова end();
 /// Если требуется не стандартный framebuffer, его требуется создать вне Renderer2D
 /// и передать viewId.
 class Renderer2D {
 public:
+    enum RenderType { COLOR, OBJECT_ID, SELECTED_MASK };
+
     struct RectData {
         RectData()
             : center()
@@ -25,11 +27,13 @@ public:
             , color()
             , texture(nullptr)
             , rotation(0)
+            , id(-1)
             , transform(1.f) {}
 
         Vec3 center;
         Size size;
         Color color;
+        int32_t id;
         float rotation;
         glm::mat4 transform;
         Foundation::Shared<Texture> texture;
@@ -48,28 +52,34 @@ public:
     };
 
     struct Vertex2D {
-        Vertex2D(glm::vec3 pos, glm::vec2 textureCoords, float textureIndex, Color color)
+        Vertex2D(
+            glm::vec3 pos, glm::vec2 textureCoords, float textureIndex, int32_t id, Color color
+        )
             : pos(pos)
             , textureCoords(textureCoords)
             , textureIndex(textureIndex)
+            , id(id)
             , color(color) {}
 
         Vertex2D()
             : pos()
             , textureCoords()
             , textureIndex(0)
+            , id(-1)
             , color() {}
 
         glm::vec3 pos;
         glm::vec2 textureCoords;
         float textureIndex;
+        int32_t id;
         glm::vec4 color;
     };
 
     struct DrawCallData {
         Renderer2D::Statistics stats;
         glm::mat4 projMat;
-        Miren::ProgramHandle shader;
+        Miren::ProgramHandle shaderColor;
+        Miren::ProgramHandle shaderIds;
         Foundation::Shared<Texture> whiteTexture;
         Miren::VertexLayoutHandle layout;
         Foundation::Shared<Texture> textures[MAX_TEXTURE_SLOTS];
@@ -88,7 +98,7 @@ public:
     ~Renderer2D();
     void begin();
     void drawRect(RectData rect);
-    void end();
+    void end(RenderType type);
     Statistics getStats();
     void setViewId(Miren::ViewId id);
     void setViewProj(glm::mat4 viewProj);

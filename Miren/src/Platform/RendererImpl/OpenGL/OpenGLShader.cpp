@@ -94,6 +94,9 @@ void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseV
             case BufferElementType::UnsignedInt:
                 type = GL_UNSIGNED_INT;
                 break;
+            case BufferElementType::Int:
+                type = GL_INT;
+                break;
             case BufferElementType::UnsignedByte:
                 type = GL_UNSIGNED_BYTE;
                 break;

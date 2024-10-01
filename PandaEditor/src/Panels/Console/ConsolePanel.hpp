@@ -3,24 +3,35 @@
 #include <Foundation/Foundation.hpp>
 #include <imgui.h>
 #include <cctype>
+#include <cstdlib>
 
 namespace Panda {
 
 struct ConsolePanel {
-    ImVector<char *> Items;
+    static constexpr int32_t MAX_LINES = 50;
+    static constexpr int32_t MAX_LINE_SYMBOLS = 1000;
+    static ConsolePanel *s_instance;
+
+    char *data;
     ImGuiTextFilter Filter;
     bool AutoScroll;
     bool ScrollToBottom;
-    static ConsolePanel *s_instance;
+    int32_t index;
+    int32_t count;
 
     ConsolePanel() {
         ClearLog();
+        data = (char *)F_ALLOC(Foundation::getAllocator(), MAX_LINES * MAX_LINE_SYMBOLS);
+        index = 0;
         AutoScroll = true;
         ScrollToBottom = false;
+        PND_ASSERT(s_instance == nullptr, "ONLY SINGE CONSOLE SUPPORTED");
         s_instance = this;
     }
+
     ~ConsolePanel() {
         ClearLog();
+        F_FREE(Foundation::getAllocator(), data);
         s_instance = nullptr;
     }
 
@@ -31,61 +42,20 @@ struct ConsolePanel {
         s_instance->AddLog(message);
     }
 
-    // Portable helpers
-    static int Stricmp(const char *s1, const char *s2) {
-        int d;
-        while ((d = toupper(*s2) - toupper(*s1)) == 0 && *s1) {
-            s1++;
-            s2++;
-        }
-        return d;
-    }
-    static int Strnicmp(const char *s1, const char *s2, int n) {
-        int d = 0;
-        while (n > 0 && (d = toupper(*s2) - toupper(*s1)) == 0 && *s1) {
-            s1++;
-            s2++;
-            n--;
-        }
-        return d;
-    }
-    static char *Strdup(const char *s) {
-        IM_ASSERT(s);
-        size_t len = strlen(s) + 1;
-        void *buf = ImGui::MemAlloc(len);
-        IM_ASSERT(buf);
-        return (char *)memcpy(buf, (const void *)s, len);
-    }
-    static void Strtrim(char *s) {
-        char *str_end = s + strlen(s);
-        while (str_end > s && str_end[-1] == ' ')
-            str_end--;
-        *str_end = 0;
-    }
-
     void ClearLog() {
-        for (int i = 0; i < Items.Size; i++)
-            ImGui::MemFree(Items[i]);
-        Items.clear();
-    }
-
-    void AddLog(const char *fmt, ...) IM_FMTARGS(2) {
-        // FIXME-OPT
-        char buf[1024];
-        va_list args;
-        va_start(args, fmt);
-        vsnprintf(buf, IM_ARRAYSIZE(buf), fmt, args);
-        buf[IM_ARRAYSIZE(buf) - 1] = 0;
-        va_end(args);
-        Items.push_back(Strdup(buf));
+        count = 0;
+        index = 0;
     }
 
     void AddLog(std::string_view message) {
-        size_t len = message.size() + 1;
-        void *buf = ImGui::MemAlloc(len);
-        char *str = (char *)memcpy(buf, (const void *)message.data(), len - 1);
+        size_t len = message.size();
+        char *buf = data + index * MAX_LINE_SYMBOLS;
+        char *str = (char *)memcpy(buf, (const void *)message.data(), len);
         str[len] = 0;
-        Items.push_back(str);
+        index++;
+        index %= MAX_LINES;
+        count++;
+        count = Foundation::min(count, MAX_LINES);
     }
 
     void onImGuiRender() {
@@ -130,26 +100,22 @@ struct ConsolePanel {
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
             if (copy_to_clipboard)
                 ImGui::LogToClipboard();
-            for (const char *item : Items) {
-                if (!Filter.PassFilter(item))
+            int i;
+            if (index < count) {
+                i = MAX_LINES - (count - index);
+            } else {
+                i = index - count;
+            }
+            for (int c = 0; c < count; c++) {
+                char *item = data + i * MAX_LINE_SYMBOLS;
+                if (!Filter.PassFilter(item)) {
+                    i++;
+                    i %= MAX_LINES;
                     continue;
-
-                // Normally you would store more information in your item than just a string.
-                // (e.g. make Items[] an array of structure, store color/type etc.)
-                ImVec4 color;
-                bool has_color = false;
-                if (strstr(item, "[error]")) {
-                    color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
-                    has_color = true;
-                } else if (strncmp(item, "# ", 2) == 0) {
-                    color = ImVec4(1.0f, 0.8f, 0.6f, 1.0f);
-                    has_color = true;
                 }
-                if (has_color)
-                    ImGui::PushStyleColor(ImGuiCol_Text, color);
                 ImGui::TextUnformatted(item);
-                if (has_color)
-                    ImGui::PopStyleColor();
+                i++;
+                i %= MAX_LINES;
             }
             if (copy_to_clipboard)
                 ImGui::LogFinish();

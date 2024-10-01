@@ -12,11 +12,16 @@ Renderer2D::Renderer2D()
         (Vertex2D *)F_ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
     m_drawData.indices =
         (uint16_t *)F_ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
-    Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
+    Panda::ProgramAsset programColorAsset = Panda::AssetLoader::loadProgram(
         "default-shaders/renderer2d/renderer2d_vertex.glsl",
-        "default-shaders/renderer2d/renderer2d_fragment.glsl"
+        "default-shaders/renderer2d/renderer2d_color_fragment.glsl"
     );
-    m_drawData.shader = Miren::createProgram(programAsset.getMirenProgramCreate());
+    m_drawData.shaderColor = Miren::createProgram(programColorAsset.getMirenProgramCreate());
+    Panda::ProgramAsset programIdAsset = Panda::AssetLoader::loadProgram(
+        "default-shaders/renderer2d/renderer2d_vertex.glsl",
+        "default-shaders/renderer2d/renderer2d_id_fragment.glsl"
+    );
+    m_drawData.shaderIds = Miren::createProgram(programIdAsset.getMirenProgramCreate());
     Miren::VertexBufferLayoutData layoutData;
     // Position
     layoutData.pushVec3();
@@ -24,6 +29,8 @@ Renderer2D::Renderer2D()
     layoutData.pushVec2();
     // Texture Index
     layoutData.pushFloat(1);
+    // Object id
+    layoutData.pushInt(1);
     // Color
     layoutData.pushVec4();
     m_drawData.layout = Miren::createVertexLayout(layoutData);
@@ -36,7 +43,7 @@ Renderer2D::Renderer2D()
         m_drawData.samplers[i] = i;
     }
     Miren::setUniform(
-        m_drawData.shader,
+        m_drawData.shaderColor,
         "u_textures",
         m_drawData.samplers,
         Miren::UniformType::Sampler,
@@ -45,8 +52,11 @@ Renderer2D::Renderer2D()
 }
 
 Renderer2D::~Renderer2D() {
-    if (m_drawData.shader.isValid()) {
-        Miren::deleteProgram(m_drawData.shader);
+    if (m_drawData.shaderColor.isValid()) {
+        Miren::deleteProgram(m_drawData.shaderColor);
+    }
+    if (m_drawData.shaderIds.isValid()) {
+        Miren::deleteProgram(m_drawData.shaderIds);
     }
     if (m_drawData.layout.isValid()) {
         Miren::deleteVertexLayout(m_drawData.layout);
@@ -118,6 +128,7 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
         m_drawData.vertices[verticesCount].pos = rect.transform * transform * positions[i];
         m_drawData.vertices[verticesCount].textureIndex = textureIndex;
         m_drawData.vertices[verticesCount].color = rect.color;
+        m_drawData.vertices[verticesCount].id = rect.id;
         m_drawData.vertices[verticesCount].textureCoords = textureCoords[i];
         verticesCount++;
     }
@@ -140,14 +151,24 @@ Renderer2D::Statistics Renderer2D::getStats() {
     return m_drawData.stats;
 }
 
-void Renderer2D::end() {
+void Renderer2D::end(RenderType type) {
     if (m_drawData.verticesCount == 0) {
         return;
     }
-    Miren::setShader(m_drawData.shader);
-    Miren::setUniform(
-        m_drawData.shader, "projViewMtx", (void *)&m_viewProj, Miren::UniformType::Mat4
-    );
+    Miren::ProgramHandle shader;
+    switch (type) {
+        case COLOR:
+            shader = m_drawData.shaderColor;
+            break;
+        case OBJECT_ID:
+            shader = m_drawData.shaderIds;
+            break;
+        case SELECTED_MASK:
+            shader = m_drawData.shaderColor;
+            break;
+    }
+    Miren::setShader(shader);
+    Miren::setUniform(shader, "projViewMtx", (void *)&m_viewProj, Miren::UniformType::Mat4);
 
     Miren::TransientVertexBuffer tvb;
     Miren::allocTransientVertexBuffer(&tvb, m_drawData.vbSize);

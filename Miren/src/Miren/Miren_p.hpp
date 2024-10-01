@@ -220,7 +220,9 @@ struct Context {
                     CMDBUF_LOG("READ FRAME BUFFER COMMAND");
                     const ReadFrameBufferCommand *cmd =
                         static_cast<const ReadFrameBufferCommand *>(command);
-                    m_renderer->readFrameBuffer(cmd->handle, cmd->x, cmd->y, cmd->width, cmd->height, cmd->data);
+                    m_renderer->readFrameBuffer(
+                        cmd->handle, cmd->x, cmd->y, cmd->width, cmd->height, cmd->data
+                    );
                     break;
                 }
                 default: {
@@ -286,7 +288,8 @@ struct Context {
         return handle;
     }
 
-    uint32_t readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data) {
+    uint32_t
+    readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data) {
         ReadFrameBufferCommand cmd(handle, x, y, width, height, data);
         m_postCommandQueue.write(cmd);
         return m_frameNumber + 1;

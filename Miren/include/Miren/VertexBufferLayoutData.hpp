@@ -11,7 +11,7 @@ namespace Miren {
 
 #define MAX_VERTEX_LAYOUT_ELEMENTS 20
 
-enum class BufferElementType { Float, UnsignedInt, UnsignedShort, UnsignedByte };
+enum class BufferElementType { Float, UnsignedInt, Int, UnsignedShort, UnsignedByte };
 
 struct VertexBufferElement {
     BufferElementType type;
@@ -24,6 +24,8 @@ struct VertexBufferElement {
                 return sizeof(float);
             case BufferElementType::UnsignedInt:
                 return sizeof(unsigned int);
+            case BufferElementType::Int:
+                return sizeof(int);
             case BufferElementType::UnsignedShort:
                 return sizeof(unsigned short);
             case BufferElementType::UnsignedByte:
@@ -53,6 +55,12 @@ public:
         VertexBufferElement element = {BufferElementType::UnsignedInt, count, false};
         m_elements[m_elementsCount++] = element;
         m_stride += count * VertexBufferElement::getSizeOfType(BufferElementType::UnsignedInt);
+    }
+
+    void pushInt(uint32_t count) {
+        VertexBufferElement element = {BufferElementType::Int, count, false};
+        m_elements[m_elementsCount++] = element;
+        m_stride += count * VertexBufferElement::getSizeOfType(BufferElementType::Int);
     }
 
     void pushChar(uint32_t count, bool normalized) {
