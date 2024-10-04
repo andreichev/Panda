@@ -244,21 +244,23 @@ struct ReadTextureCommand : Foundation::CommandBuffer::Command {
     void *data;
 
     ReadTextureCommand(TextureHandle handle, void *data)
-        : Command(RendererCommandType::ResizeTexture)
+        : Command(RendererCommandType::ReadTexture)
         , handle(handle)
         , data(data) {}
 };
 
 struct ReadFrameBufferCommand : Foundation::CommandBuffer::Command {
     FrameBufferHandle handle;
+    int attachIndex;
     int x, y, width, height;
     void *data;
 
     ReadFrameBufferCommand(
-        FrameBufferHandle handle, int x, int y, int width, int height, void *data
+        FrameBufferHandle handle, int attachIndex, int x, int y, int width, int height, void *data
     )
-        : Command(RendererCommandType::ResizeTexture)
+        : Command(RendererCommandType::ReadFrameBuffer)
         , handle(handle)
+        , attachIndex(attachIndex)
         , x(x)
         , y(y)
         , width(width)

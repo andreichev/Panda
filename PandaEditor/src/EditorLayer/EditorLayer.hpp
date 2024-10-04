@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panels/Viewport.hpp"
+#include "Panels/Viewport/Viewport.hpp"
 #include "Panels/MenuBar.hpp"
 #include "Panels/Dockspace.hpp"
 #include "Panels/WorldHierarchyPanel.hpp"
@@ -15,7 +15,7 @@
 #include "Panels/Popups/EditorPopup.hpp"
 #include "ProjectLoader/ProjectLoader.hpp"
 
-#include <Panda.hpp>
+#include <Panda/Application/Layer.hpp>
 
 namespace Panda {
 

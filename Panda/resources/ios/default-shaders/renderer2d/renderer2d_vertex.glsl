@@ -19,5 +19,6 @@ void main(){
     fragTextureIndex = textureIndex;
     fragColor = color;
     fragTexCoord = texCoord;
+    fragId = id;
     gl_Position = projViewMtx * vec4(position, 1);
 }

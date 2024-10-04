@@ -79,7 +79,7 @@ void World::updateRuntime(double deltaTime) {
         }
     }
 
-    m_renderer2d.end(Renderer2D::COLOR);
+    m_renderer2d.end();
     m_renderer3d.end();
 }
 
@@ -106,7 +106,7 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
 
-    m_renderer2d.end(Renderer2D::COLOR);
+    m_renderer2d.end();
     m_renderer3d.end();
 }
 
@@ -119,7 +119,7 @@ void World::updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &sk
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
 
-    m_renderer2d.end(Renderer2D::COLOR);
+    m_renderer2d.end();
     m_renderer3d.end();
 }
 
@@ -150,13 +150,9 @@ void World::updateBasicComponents(
             Panda::Renderer2D::RectData rect;
             id_t entityId = static_cast<id_t>(entityHandle);
             rect.transform = transform.getTransform();
-            if (m_selectedEntity.getId() == entityId) {
-                rect.color = Color(1.f, 1.f, 0.f, 1.f);
-                rect.size = {1.05f, 1.05f};
-                m_renderer2d.drawRect(rect);
-            }
             rect.color = spriteComponent.color;
             rect.size = {1.f, 1.f};
+            rect.id = entityId;
             m_renderer2d.drawRect(rect);
         }
     }

@@ -24,7 +24,13 @@ public:
     void
     createFrameBuffer(FrameBufferHandle handle, FrameBufferSpecification specification) override;
     void readFrameBuffer(
-        Miren::FrameBufferHandle handle, int x, int y, int width, int height, void *data
+        Miren::FrameBufferHandle handle,
+        int attachIndex,
+        int x,
+        int y,
+        int width,
+        int height,
+        void *data
     ) override;
     void deleteFrameBuffer(FrameBufferHandle handle) override;
     void createProgram(ProgramHandle handle, ProgramCreate create) override;

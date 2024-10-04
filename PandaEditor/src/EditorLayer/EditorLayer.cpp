@@ -28,9 +28,9 @@ EditorLayer::EditorLayer()
     , m_popups()
     , m_cameraController()
     , m_sceneState(SceneState::EDIT) {
-    m_viewport.init();
-    m_editingWorld.setViewId(m_viewport.getViewId());
-    m_playingWorld.setViewId(m_viewport.getViewId());
+    m_viewport.initWithSize(Size(100.f, 100.f));
+    m_editingWorld.setViewId(m_viewport.getMirenView());
+    m_playingWorld.setViewId(m_viewport.getMirenView());
     m_viewport.setCamera(&m_editorCamera);
     m_hierarchyPanel.setWorld(m_currentWorld);
     m_statisticsPanel.setWorld(m_currentWorld);

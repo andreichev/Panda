@@ -28,8 +28,9 @@ public:
     virtual void flip() = 0;
     virtual void
     createFrameBuffer(FrameBufferHandle handle, FrameBufferSpecification specification) = 0;
-    virtual void
-    readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data) = 0;
+    virtual void readFrameBuffer(
+        FrameBufferHandle handle, int attachIndex, int x, int y, int width, int height, void *data
+    ) = 0;
     virtual void deleteFrameBuffer(FrameBufferHandle handle) = 0;
     virtual void createProgram(ProgramHandle handle, ProgramCreate) = 0;
     virtual void deleteShader(ProgramHandle handle) = 0;

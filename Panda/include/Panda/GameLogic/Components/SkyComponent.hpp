@@ -31,6 +31,11 @@ public:
         freeResources();
     }
 
+    SkyComponent &operator=(SkyComponent &other) {
+        initResources();
+        return *this;
+    }
+
     Miren::TextureHandle getSkyTexture() {
         return m_skyTexture;
     }

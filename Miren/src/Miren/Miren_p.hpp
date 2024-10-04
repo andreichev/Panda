@@ -221,7 +221,13 @@ struct Context {
                     const ReadFrameBufferCommand *cmd =
                         static_cast<const ReadFrameBufferCommand *>(command);
                     m_renderer->readFrameBuffer(
-                        cmd->handle, cmd->x, cmd->y, cmd->width, cmd->height, cmd->data
+                        cmd->handle,
+                        cmd->attachIndex,
+                        cmd->x,
+                        cmd->y,
+                        cmd->width,
+                        cmd->height,
+                        cmd->data
                     );
                     break;
                 }
@@ -288,9 +294,10 @@ struct Context {
         return handle;
     }
 
-    uint32_t
-    readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data) {
-        ReadFrameBufferCommand cmd(handle, x, y, width, height, data);
+    uint32_t readFrameBuffer(
+        FrameBufferHandle handle, int attachIndex, int x, int y, int width, int height, void *data
+    ) {
+        ReadFrameBufferCommand cmd(handle, attachIndex, x, y, width, height, data);
         m_postCommandQueue.write(cmd);
         return m_frameNumber + 1;
     }

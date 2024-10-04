@@ -13,7 +13,7 @@ public:
     void terminate();
     void bind();
     void unbind();
-    void readPixels(int x, int y, int width, int height, void *data);
+    void readPixels(int index, int x, int y, int width, int height, void *data);
 
 private:
     void checkStatus();

@@ -18,8 +18,6 @@ namespace Panda {
 /// и передать viewId.
 class Renderer2D {
 public:
-    enum RenderType { COLOR, OBJECT_ID, SELECTED_MASK };
-
     struct RectData {
         RectData()
             : center()
@@ -78,8 +76,7 @@ public:
     struct DrawCallData {
         Renderer2D::Statistics stats;
         glm::mat4 projMat;
-        Miren::ProgramHandle shaderColor;
-        Miren::ProgramHandle shaderIds;
+        Miren::ProgramHandle shader;
         Foundation::Shared<Texture> whiteTexture;
         Miren::VertexLayoutHandle layout;
         Foundation::Shared<Texture> textures[MAX_TEXTURE_SLOTS];
@@ -98,7 +95,7 @@ public:
     ~Renderer2D();
     void begin();
     void drawRect(RectData rect);
-    void end(RenderType type);
+    void end();
     Statistics getStats();
     void setViewId(Miren::ViewId id);
     void setViewProj(glm::mat4 viewProj);

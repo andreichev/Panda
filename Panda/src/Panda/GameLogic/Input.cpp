@@ -8,6 +8,8 @@
 #include "Panda/Events/KeyEvents.hpp"
 #include "Panda/Events/MouseEvents.hpp"
 
+#include <Foundation/Foundation.hpp>
+
 namespace Panda {
 
 uint32_t Input::frame;
@@ -122,11 +124,11 @@ double Input::getMousePositionY() {
 }
 
 double Input::getMouseViewportPositionX() {
-    return mousePositionX - viewportPos.x;
+    return Foundation::max(mousePositionX - viewportPos.x, 0.0);
 }
 
 double Input::getMouseViewportPositionY() {
-    return mousePositionY - viewportPos.y;
+    return Foundation::max(mousePositionY - viewportPos.y, 0.0);
 }
 
 double Input::getMouseScrollX() {

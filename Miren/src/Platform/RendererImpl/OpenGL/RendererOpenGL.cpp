@@ -66,7 +66,7 @@ RendererOpenGL::RendererOpenGL() {
     // glBlendEquation(GL_FUNC_ADD);
     // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    MIREN_LOG("OPENGL VERSION {}", glGetString(GL_VERSION));
+    MIREN_LOG("OPENGL VERSION {}", (const char *)glGetString(GL_VERSION));
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(gpuErrorCallback, nullptr);
@@ -102,9 +102,9 @@ void RendererOpenGL::createFrameBuffer(
 }
 
 void RendererOpenGL::readFrameBuffer(
-    FrameBufferHandle handle, int x, int y, int width, int height, void *data
+    FrameBufferHandle handle, int attachIndex, int x, int y, int width, int height, void *data
 ) {
-    frameBuffers[handle.id].readPixels(x, y, width, height, data);
+    frameBuffers[handle.id].readPixels(attachIndex, x, y, width, height, data);
 }
 
 void RendererOpenGL::deleteFrameBuffer(FrameBufferHandle handle) {

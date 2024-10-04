@@ -21,12 +21,12 @@ struct TextureFormatInfo {
 const static TextureFormatInfo s_textureFormat[] = {
     {GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE},   // RGB8
     {GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE}, // RGBA8
-    {GL_R8I, GL_RED, GL_BYTE},             // RED_INTEGER
+    {GL_R32I, GL_RED_INTEGER, GL_INT},     // RED_INTEGER
     // Depth/stencil
     {GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8} // DEPTH24STENCIL8
 };
 
-GLint openGLFiltering(TextureFiltering filtering) {
+static GLint openGLFiltering(TextureFiltering filtering) {
     switch (filtering) {
         case NEAREST:
             return GL_NEAREST;

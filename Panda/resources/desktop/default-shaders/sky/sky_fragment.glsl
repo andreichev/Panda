@@ -2,11 +2,13 @@
 
 in vec3 TexCoord;
 
-out vec4 FragColor;
+layout(location = 0) out vec4 outColor;
+layout(location = 1) out int outId;
 
 uniform samplerCube skyTexture;
 
 void main()
 {
-	FragColor = texture(skyTexture, TexCoord);
+	outColor = texture(skyTexture, TexCoord);
+	outId = -1;
 }

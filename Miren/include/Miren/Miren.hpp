@@ -14,7 +14,9 @@ void initialize();
 void terminate();
 // MARK: - Command buffer
 FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification);
-uint32_t readFrameBuffer(FrameBufferHandle handle, int x, int y, int width, int height, void *data);
+uint32_t readFrameBuffer(
+    FrameBufferHandle handle, int attachIndex, int x, int y, int width, int height, void *data
+);
 void deleteFrameBuffer(FrameBufferHandle handle);
 ProgramHandle createProgram(ProgramCreate create);
 void deleteProgram(ProgramHandle handle);

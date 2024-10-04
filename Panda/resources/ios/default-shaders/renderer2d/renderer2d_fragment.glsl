@@ -7,7 +7,9 @@ in vec4 fragColor;
 in vec2 fragTexCoord;
 in int fragId;
 
-out vec4 outColor;
+layout(location = 0) out vec4 outColor;
+layout(location = 1) out int outId;
+
 uniform sampler2D u_textures[8];
 
 void main() {
@@ -23,4 +25,5 @@ void main() {
         case  6: outColor *= texture(u_textures[ 6], fragTexCoord.st); break;
         case  7: outColor *= texture(u_textures[ 7], fragTexCoord.st); break;
     }
+    outId = int(fragId);
 }

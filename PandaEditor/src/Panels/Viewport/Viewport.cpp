@@ -7,16 +7,17 @@
 namespace Panda {
 
 Viewport::Viewport()
-    : m_viewportPanelSize(300, 200)
+    : m_viewportPanelSize()
     , m_camera(nullptr)
     , m_focused(false)
     , m_focusNextFrame(true)
     , m_sceneFB()
     , m_sceneFbSpecification()
-    , m_sceneViewId(1)
+    , m_sceneView(1)
     , m_colorAttachment() {}
 
-void Viewport::init() {
+void Viewport::initWithSize(Vec2 size) {
+    m_viewportPanelSize = size;
     PandaUI::initialize();
     Vec2 dpi = Application::get()->getWindow()->getDpi();
     Vec2 windowSize = Application::get()->getWindow()->getSize();
@@ -26,13 +27,15 @@ void Viewport::init() {
     create.m_width = m_viewportPanelSize.width * dpi.width;
     create.m_height = m_viewportPanelSize.height * dpi.height;
     m_colorAttachment = Miren::createTexture(create);
+    create.m_format = Miren::TextureFormat::RED_INTEGER;
+    Miren::TextureHandle idAttachment = Miren::createTexture(create);
     create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
     Miren::TextureHandle depthAttachment = Miren::createTexture(create);
-    Miren::FrameBufferAttachment attachments[] = {m_colorAttachment, depthAttachment};
-    m_sceneFbSpecification = Miren::FrameBufferSpecification(attachments, 2);
+    Miren::FrameBufferAttachment attachments[] = {m_colorAttachment, idAttachment, depthAttachment};
+    m_sceneFbSpecification = Miren::FrameBufferSpecification(attachments, 3);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewport(
-        m_sceneViewId,
+        m_sceneView,
         Miren::Rect(
             0, 0, m_viewportPanelSize.width * dpi.width, m_viewportPanelSize.height * dpi.height
         )
@@ -40,9 +43,9 @@ void Viewport::init() {
     Miren::setViewport(
         0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
     );
-    Miren::setViewClear(m_sceneViewId, 0x12212bff);
-    Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
-    PandaUI::Context::shared().updateViewId(m_sceneViewId);
+    Miren::setViewClear(m_sceneView, 0x12212bff);
+    Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
+    PandaUI::Context::shared().updateViewId(m_sceneView);
 }
 
 void Viewport::updateViewportSize(Vec2 size) {
@@ -56,7 +59,7 @@ void Viewport::updateViewportSize(Vec2 size) {
     }
     Size dpi = Application::get()->getWindow()->getDpi();
     Miren::setViewport(
-        m_sceneViewId, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
+        m_sceneView, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
     );
     // COLOR ATTACHMENT
     Miren::resizeTexture(
@@ -64,15 +67,21 @@ void Viewport::updateViewportSize(Vec2 size) {
         size.width * dpi.width,
         size.height * dpi.height
     );
-    // DEPTH ATTACHMENT
+    // ID ATTACHMENT
     Miren::resizeTexture(
         m_sceneFbSpecification.attachments[1].handle,
         size.width * dpi.width,
         size.height * dpi.height
     );
+    // DEPTH ATTACHMENT
+    Miren::resizeTexture(
+        m_sceneFbSpecification.attachments[2].handle,
+        size.width * dpi.width,
+        size.height * dpi.height
+    );
     Miren::deleteFrameBuffer(m_sceneFB);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
-    Miren::setViewFrameBuffer(m_sceneViewId, m_sceneFB);
+    Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
 }
 
 void Viewport::onImGuiRender() {
@@ -99,6 +108,19 @@ void Viewport::onImGuiRender() {
     );
     ImGui::End();
     ImGui::PopStyleVar();
+
+    static int32_t hoveredId = -1;
+    Size dpi = Application::get()->getWindow()->getDpi();
+    Miren::readFrameBuffer(
+        m_sceneFB,
+        1,
+        Input::getMouseViewportPositionX() * dpi.x,
+        m_viewportPanelSize.height * dpi.y - Input::getMouseViewportPositionY() * dpi.y,
+        1,
+        1,
+        &hoveredId
+    );
+    // LOG_EDITOR("id: {}", hoveredId);
 }
 
 void Viewport::setCamera(Camera *camera) {
@@ -116,8 +138,8 @@ void Viewport::focus() {
     m_focusNextFrame = true;
 }
 
-Miren::ViewId Viewport::getViewId() {
-    return m_sceneViewId;
+Miren::ViewId Viewport::getMirenView() {
+    return m_sceneView;
 }
 
 } // namespace Panda

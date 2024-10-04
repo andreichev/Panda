@@ -96,7 +96,7 @@ struct TextureCreate {
             case RGBA8:
                 return 4;
             case RED_INTEGER:
-                return 1;
+                return 4;
             case DEPTH24STENCIL8:
                 return 4;
         }
