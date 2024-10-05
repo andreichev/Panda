@@ -47,6 +47,7 @@ void deleteVertexLayout(VertexLayoutHandle handle);
 uint32_t readTexture(TextureHandle handle, void *data);
 // MARK: - Encoder setup
 void setViewClear(ViewId id, uint32_t color);
+void setViewClearAttachments(ViewId id, std::vector<Clear> clear);
 void setViewport(ViewId id, Rect rect);
 void setViewFrameBuffer(ViewId id, FrameBufferHandle frameBuffer);
 void setState(uint32_t state);

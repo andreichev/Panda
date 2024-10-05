@@ -24,7 +24,8 @@ class EditorLayer : public Layer,
                     public MenuBarOutput,
                     public ComponentsDrawOutput,
                     public ContentBrowserOutput,
-                    public ToolbarOutput {
+                    public ToolbarOutput,
+                    public ViewportOutput {
 public:
     EditorLayer();
     ~EditorLayer() override = default;
@@ -41,18 +42,15 @@ public:
     void stop();
 
 #pragma region Project loader output
-
     void loaderDidLoadProject(const std::string &name, const path_t &path) override;
     void loaderDidLoadWorld() override;
     void loaderDidLoadCloseProject() override;
     void loaderCreateSampleWorld() override;
     EditorCameraSettings getEditorCameraSettings() override;
     void setEditorCameraSettings(EditorCameraSettings settings) override;
-
 #pragma endregion
 
 #pragma region Menu bar output
-
     void menuBarOpenProject() override;
     void menuBarOpenProject(const RecentProject &project) override;
     bool menuBarCanUndo() override;
@@ -65,24 +63,18 @@ public:
     void menuBarOpenCppProject() override;
     void menuBarSaveWorld() override;
     void menuBarCloseProject() override;
-
 #pragma endregion
 
 #pragma region Components draw output
-
     void addScriptToEntity(Entity entity) override;
-
 #pragma endregion
 
 #pragma region Content browser output
-
     void showCreateFolderPopup() override;
     void deleteFileShowPopup(path_t path) override;
-
 #pragma endregion
 
 #pragma region Toolbar output
-
     bool toolbarCanUndo() override;
     void toolbarUndo() override;
     bool toolbarCanRedo() override;
@@ -90,7 +82,11 @@ public:
     void toolbarDidPickSceneState(SceneState state) override;
     void toolbarDidTapReloadScripts() override;
     SceneState toolbarGetCurrentSceneState() override;
+#pragma endregion
 
+#pragma region Viewport output
+    void viewportPickEntityWithId(id_t id) override;
+    void viewportUnselectEntity() override;
 #pragma endregion
 
 private:

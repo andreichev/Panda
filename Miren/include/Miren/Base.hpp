@@ -214,4 +214,9 @@ struct Rect {
     }
 };
 
+struct Clear {
+    int attachmentIndex;
+    int value;
+};
+
 } // namespace Miren

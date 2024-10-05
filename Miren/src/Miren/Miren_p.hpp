@@ -533,6 +533,10 @@ struct Context {
         m_views[id].m_clearColor = color;
     }
 
+    void setViewClearAttachments(ViewId id, std::vector<Clear> clear) {
+        m_views[id].m_clearAttachments = clear;
+    }
+
     void setViewFrameBuffer(ViewId id, FrameBufferHandle frameBuffer) {
         m_views[id].m_frameBuffer = frameBuffer;
     }

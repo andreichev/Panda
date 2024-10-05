@@ -166,6 +166,11 @@ void setViewClear(ViewId id, uint32_t color) {
     s_context->setViewClear(id, color);
 }
 
+void setViewClearAttachments(ViewId id, std::vector<Clear> clear) {
+    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    s_context->setViewClearAttachments(id, clear);
+}
+
 void setViewport(ViewId id, Rect rect) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     s_context->setViewport(id, rect);

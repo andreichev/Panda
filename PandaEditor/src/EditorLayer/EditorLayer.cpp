@@ -16,7 +16,7 @@ EditorLayer::EditorLayer()
     , m_currentWorld(&m_editingWorld)
     , m_toolbar(this)
     , m_dockspace()
-    , m_viewport()
+    , m_viewport(this)
     , m_hierarchyPanel(nullptr, this)
     , m_statisticsPanel(nullptr)
     , m_consolePanel()
@@ -379,6 +379,24 @@ void EditorLayer::toolbarDidTapReloadScripts() {
 
 SceneState EditorLayer::toolbarGetCurrentSceneState() {
     return m_sceneState;
+}
+
+#pragma endregion
+
+#pragma region Viewport output
+
+void EditorLayer::viewportPickEntityWithId(id_t id) {
+    if (!m_currentWorld) {
+        return;
+    }
+    Entity selected = m_currentWorld->getById(id);
+    if (selected.isValid()) {
+        m_currentWorld->setSelectedEntity(selected);
+    }
+}
+
+void EditorLayer::viewportUnselectEntity() {
+    m_currentWorld->setSelectedEntity(Entity());
 }
 
 #pragma endregion

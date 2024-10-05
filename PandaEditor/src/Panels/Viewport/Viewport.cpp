@@ -6,8 +6,10 @@
 
 namespace Panda {
 
-Viewport::Viewport()
-    : m_viewportPanelSize()
+Viewport::Viewport(ViewportOutput *output)
+    : m_output(output)
+    , m_viewportPanelSize()
+    , m_hoveredId(-1)
     , m_camera(nullptr)
     , m_focused(false)
     , m_focusNextFrame(true)
@@ -43,8 +45,9 @@ void Viewport::initWithSize(Vec2 size) {
     Miren::setViewport(
         0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
     );
-    Miren::setViewClear(m_sceneView, 0x12212bff);
     Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
+    Miren::setViewClear(m_sceneView, 0x12212bff);
+    Miren::setViewClearAttachments(m_sceneView, {Miren::Clear(1, -1)});
     PandaUI::Context::shared().updateViewId(m_sceneView);
 }
 
@@ -109,7 +112,6 @@ void Viewport::onImGuiRender() {
     ImGui::End();
     ImGui::PopStyleVar();
 
-    static int32_t hoveredId = -1;
     Size dpi = Application::get()->getWindow()->getDpi();
     Miren::readFrameBuffer(
         m_sceneFB,
@@ -118,9 +120,18 @@ void Viewport::onImGuiRender() {
         m_viewportPanelSize.height * dpi.y - Input::getMouseViewportPositionY() * dpi.y,
         1,
         1,
-        &hoveredId
+        &m_hoveredId
     );
-    // LOG_EDITOR("id: {}", hoveredId);
+
+    if ((hovered || m_focusNextFrame || m_focused) &&
+        Input::isMouseButtonPressed(MouseButton::LEFT)) {
+        if (m_hoveredId == -1) {
+            m_output->viewportUnselectEntity();
+        } else {
+            m_output->viewportPickEntityWithId(m_hoveredId);
+        }
+    }
+    // LOG_EDITOR("id: {}", m_hoveredId);
 }
 
 void Viewport::setCamera(Camera *camera) {
@@ -132,6 +143,10 @@ void Viewport::setCamera(Camera *camera) {
 
 bool Viewport::isFocused() {
     return m_focused;
+}
+
+id_t Viewport::getHoveredId() {
+    return m_hoveredId;
 }
 
 void Viewport::focus() {

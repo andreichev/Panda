@@ -290,6 +290,12 @@ void RendererOpenGL::viewChanged(View &view) {
     uint8_t a = rgba >> 0;
     GL_CALL(glClearColor((r) / 255.f, (g) / 255.f, (b) / 255.f, (a) / 255.f));
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    if (!view.m_frameBuffer.isValid()) {
+        return;
+    }
+    for (auto clear : view.m_clearAttachments) {
+        frameBuffers[view.m_frameBuffer.id].clearIntAttachment(clear.attachmentIndex, clear.value);
+    }
 }
 
 void RendererOpenGL::submit(RenderDraw *draw) {
