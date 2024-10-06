@@ -155,4 +155,14 @@ using Size = Vec2;
 using Color = Vec4;
 using Quat = Vec4;
 
+struct Rect : public Rain::Codable {
+    Vec2 origin;
+    Vec2 size;
+
+    RAIN_FIELDS_BEGIN(Rect)
+    RAIN_FIELD(origin)
+    RAIN_FIELD(size)
+    RAIN_FIELDS_END
+};
+
 } // namespace Panda

@@ -40,7 +40,7 @@ public:
     static double getMouseScrollY();
     static Size getWindowSize();
     static void onEvent(Event *event);
-    static void setViewportFrame(Vec2 pos, Size size);
+    static void setViewportFrame(Rect frame);
     static void nextFrame();
 
 private:
@@ -64,8 +64,7 @@ private:
     // Номера кадров при нажатии мыши
     static uint32_t framesMouseButtons[4];
     static Size windowSize;
-    static Vec2 viewportPos;
-    static Vec2 viewportSize;
+    static Rect viewportFrame;
     static double mousePositionX;
     static double mousePositionY;
     static double mouseScrollX;

@@ -89,5 +89,9 @@ target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/entt/src)
 target_link_libraries(Panda imgui)
 target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/imgui)
 
+# Dependencies - ImGuizmo
+target_link_libraries(Panda ImGuizmo)
+target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/ImGuizmo)
+
 # Dependencies - dylib
 target_link_libraries(Panda dylib)

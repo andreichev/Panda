@@ -1,6 +1,7 @@
 #include "Panda/ImGui/ImGuiLayer.hpp"
 
 #include <imgui.h>
+#include <ImGuizmo.h>
 
 #include "Panda/Application/Application.hpp"
 
@@ -19,6 +20,7 @@ ImGuiLayer::ImGuiLayer()
 
 void ImGuiLayer::onAttach() {
     ImGui::CreateContext();
+    ImGuizmo::SetImGuiContext(ImGui::GetCurrentContext());
     ImGuiIO &io = ImGui::GetIO();
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -77,6 +79,7 @@ void ImGuiLayer::onDetach() {
     ImGui_ImplMiren_Shutdown();
     ImGui_ImplPanda_Shutdown();
     ImGui::DestroyContext();
+    ImGuizmo::SetImGuiContext(nullptr);
 }
 
 void ImGuiLayer::onEvent(Event *event) {
@@ -90,7 +93,7 @@ void ImGuiLayer::begin(double deltaTime) {
     ImGui_ImplPanda_NewFrame(deltaTime);
     ImGui_ImplMiren_NewFrame();
     ImGui::NewFrame();
-    // ImGuizmo::BeginFrame();
+    ImGuizmo::BeginFrame();
 }
 
 void ImGuiLayer::end() {

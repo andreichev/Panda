@@ -6,9 +6,9 @@
 
 namespace Panda {
 
-Viewport::Viewport(ViewportOutput *output)
+Viewport::Viewport(ViewportOutput *output, CameraController *cameraController)
     : m_output(output)
-    , m_viewportPanelSize()
+    , m_frame()
     , m_hoveredId(-1)
     , m_camera(nullptr)
     , m_focused(false)
@@ -16,18 +16,19 @@ Viewport::Viewport(ViewportOutput *output)
     , m_sceneFB()
     , m_sceneFbSpecification()
     , m_sceneView(1)
-    , m_colorAttachment() {}
+    , m_colorAttachment()
+    , m_gizmos(nullptr, cameraController) {}
 
 void Viewport::initWithSize(Vec2 size) {
-    m_viewportPanelSize = size;
+    m_frame.size = size;
     PandaUI::initialize();
     Vec2 dpi = Application::get()->getWindow()->getDpi();
     Vec2 windowSize = Application::get()->getWindow()->getSize();
     Miren::TextureCreate create;
     create.m_data = Foundation::Memory(nullptr);
     create.m_format = Miren::TextureFormat::RGBA8;
-    create.m_width = m_viewportPanelSize.width * dpi.width;
-    create.m_height = m_viewportPanelSize.height * dpi.height;
+    create.m_width = m_frame.size.width * dpi.width;
+    create.m_height = m_frame.size.height * dpi.height;
     m_colorAttachment = Miren::createTexture(create);
     create.m_format = Miren::TextureFormat::RED_INTEGER;
     Miren::TextureHandle idAttachment = Miren::createTexture(create);
@@ -38,9 +39,7 @@ void Viewport::initWithSize(Vec2 size) {
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewport(
         m_sceneView,
-        Miren::Rect(
-            0, 0, m_viewportPanelSize.width * dpi.width, m_viewportPanelSize.height * dpi.height
-        )
+        Miren::Rect(0, 0, m_frame.size.width * dpi.width, m_frame.size.height * dpi.height)
     );
     Miren::setViewport(
         0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
@@ -51,11 +50,11 @@ void Viewport::initWithSize(Vec2 size) {
     PandaUI::Context::shared().updateViewId(m_sceneView);
 }
 
-void Viewport::updateViewportSize(Vec2 size) {
+void Viewport::updateViewportSize(Size size) {
     if (size.width < 1 || size.height < 1) {
         return;
     }
-    m_viewportPanelSize = size;
+    m_frame.size = size;
     PandaUI::Context::shared().updateViewportSize({size.width, size.height});
     if (m_camera) {
         m_camera->setViewportSize(size);
@@ -87,12 +86,12 @@ void Viewport::updateViewportSize(Vec2 size) {
     Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
 }
 
-void Viewport::onImGuiRender() {
+void Viewport::onImGuiRender(SceneState sceneState) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
     ImGui::Begin("Viewport");
     ImVec2 viewportSpace = ImGui::GetContentRegionAvail();
     viewportSpace = ImVec2(viewportSpace.x - 4, viewportSpace.y - 4);
-    if (m_viewportPanelSize != viewportSpace) {
+    if (m_frame.size != viewportSpace) {
         updateViewportSize(viewportSpace);
     }
     bool hovered = ImGui::IsWindowHovered();
@@ -104,11 +103,10 @@ void Viewport::onImGuiRender() {
     Application::get()->getImGuiLayer()->setBlockEvents(!hovered);
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 1);
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
-    ImVec2 viewportScreenPos = ImGui::GetCursorScreenPos();
-    Input::setViewportFrame(viewportScreenPos, viewportSpace);
-    ImGui::Image(
-        (void *)(uintptr_t)m_colorAttachment.id, m_viewportPanelSize, ImVec2(0, 1), ImVec2(1, 0)
-    );
+    m_frame.origin = ImGui::GetCursorScreenPos();
+    Input::setViewportFrame(m_frame);
+    ImGui::Image((void *)(uintptr_t)m_colorAttachment.id, m_frame.size, ImVec2(0, 1), ImVec2(1, 0));
+    m_gizmos.onImGuiRender(sceneState, m_frame);
     ImGui::End();
     ImGui::PopStyleVar();
 
@@ -117,14 +115,14 @@ void Viewport::onImGuiRender() {
         m_sceneFB,
         1,
         Input::getMouseViewportPositionX() * dpi.x,
-        m_viewportPanelSize.height * dpi.y - Input::getMouseViewportPositionY() * dpi.y,
+        m_frame.size.height * dpi.y - Input::getMouseViewportPositionY() * dpi.y,
         1,
         1,
         &m_hoveredId
     );
 
     if ((hovered || m_focusNextFrame || m_focused) &&
-        Input::isMouseButtonPressed(MouseButton::LEFT)) {
+        Input::isMouseButtonPressed(MouseButton::LEFT) && !m_gizmos.isOver()) {
         if (m_hoveredId == -1) {
             m_output->viewportUnselectEntity();
         } else {
@@ -136,9 +134,14 @@ void Viewport::onImGuiRender() {
 
 void Viewport::setCamera(Camera *camera) {
     m_camera = camera;
+    m_gizmos.setCamera(camera);
     if (m_camera) {
-        m_camera->setViewportSize(m_viewportPanelSize);
+        m_camera->setViewportSize(m_frame.size);
     }
+}
+
+void Viewport::setWorld(World *world) {
+    m_gizmos.setWorld(world);
 }
 
 bool Viewport::isFocused() {

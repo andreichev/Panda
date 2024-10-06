@@ -16,7 +16,7 @@ EditorLayer::EditorLayer()
     , m_currentWorld(&m_editingWorld)
     , m_toolbar(this)
     , m_dockspace()
-    , m_viewport(this)
+    , m_viewport(this, &m_cameraController)
     , m_hierarchyPanel(nullptr, this)
     , m_statisticsPanel(nullptr)
     , m_consolePanel()
@@ -32,6 +32,7 @@ EditorLayer::EditorLayer()
     m_editingWorld.setViewId(m_viewport.getMirenView());
     m_playingWorld.setViewId(m_viewport.getMirenView());
     m_viewport.setCamera(&m_editorCamera);
+    m_viewport.setWorld(m_currentWorld);
     m_hierarchyPanel.setWorld(m_currentWorld);
     m_statisticsPanel.setWorld(m_currentWorld);
     m_cameraController.setPosition({0.f, 0.f, 4.f});
@@ -90,7 +91,7 @@ void EditorLayer::onImGuiRender() {
         m_toolbar.onImGuiRender(m_menuBar.m_height);
         m_dockspace.beginImGuiDockspace(m_toolbar.getHeight() + m_menuBar.m_height + 2);
         m_statisticsPanel.onImGuiRender();
-        m_viewport.onImGuiRender();
+        m_viewport.onImGuiRender(m_sceneState);
         m_hierarchyPanel.onImGuiRender();
         m_contentBrowser.onImGuiRender();
         m_consolePanel.onImGuiRender();
@@ -114,6 +115,7 @@ void EditorLayer::play() {
     GameContext::s_currentWorld = m_currentWorld;
     m_hierarchyPanel.setWorld(m_currentWorld);
     m_statisticsPanel.setWorld(m_currentWorld);
+    m_viewport.setWorld(m_currentWorld);
     m_playingWorld.startRunning();
     m_viewport.focus();
 }
@@ -124,6 +126,7 @@ void EditorLayer::simulate() {
     GameContext::s_currentWorld = m_currentWorld;
     m_hierarchyPanel.setWorld(m_currentWorld);
     m_statisticsPanel.setWorld(m_currentWorld);
+    m_viewport.setWorld(m_currentWorld);
     m_playingWorld.startRunning();
     m_viewport.focus();
 }
@@ -135,6 +138,7 @@ void EditorLayer::stop() {
     GameContext::s_currentWorld = m_currentWorld;
     m_hierarchyPanel.setWorld(m_currentWorld);
     m_statisticsPanel.setWorld(m_currentWorld);
+    m_viewport.setWorld(m_currentWorld);
     m_playingWorld.finishRunning();
     m_viewport.focus();
 }

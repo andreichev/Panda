@@ -43,6 +43,7 @@ public:
         return m_renderer3d;
     }
     void setViewId(Miren::ViewId id);
+    Entity findMainCameraEntity();
     Camera *findMainCamera();
     World &operator=(World &other);
     void debugPrint();
@@ -66,7 +67,6 @@ public:
 
 private:
     void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
-    Entity findMainCameraEntity();
     Entity instantiateEntity(id_t id);
     void fillEntity(Entity entity);
 
