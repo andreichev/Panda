@@ -84,8 +84,15 @@ void SystemTools::show(const Panda::path_t &path) {
 
 void SystemTools::openCppProject(const Panda::path_t &path) {
 #ifdef PLATFORM_MACOS
-    std::string command = "/Applications/CLion.app/Contents/MacOS/clion \"" + path.string() + "\"";
-    system(command.c_str());
+    if (std::filesystem::exists("/Applications/CLion.app")) {
+        std::string command =
+            "/Applications/CLion.app/Contents/MacOS/clion \"" + path.string() + "\"";
+        system(command.c_str());
+    } else if (std::filesystem::exists("/Applications/Visual Studio Code.app")) {
+        std::string command =
+            "/Applications/Visual Studio Code.app/Contents/MacOS/clion \"" + path.string() + "\"";
+        system(command.c_str());
+    }
 #endif
 }
 

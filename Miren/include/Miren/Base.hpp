@@ -217,6 +217,10 @@ struct Rect {
 struct Clear {
     int attachmentIndex;
     int value;
+    Clear() = default;
+    Clear(int value, int attachmentIndex)
+        : value(value)
+        , attachmentIndex(attachmentIndex) {}
 };
 
 } // namespace Miren
