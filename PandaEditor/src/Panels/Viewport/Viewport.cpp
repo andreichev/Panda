@@ -11,6 +11,7 @@ Viewport::Viewport(ViewportOutput *output, CameraController *cameraController)
     , m_frame()
     , m_hoveredId(-1)
     , m_camera(nullptr)
+    , m_cameraController(cameraController)
     , m_focused(false)
     , m_focusNextFrame(true)
     , m_sceneFB()
@@ -107,6 +108,10 @@ void Viewport::onImGuiRender(SceneState sceneState) {
     Input::setViewportFrame(m_frame);
     ImGui::Image((void *)(uintptr_t)m_colorAttachment.id, m_frame.size, ImVec2(0, 1), ImVec2(1, 0));
     m_gizmos.onImGuiRender(sceneState, m_frame);
+    ImGui::SetCursorPos({20, 40});
+    if (ImGui::Button("RESET")) {
+        m_cameraController->reset();
+    }
     ImGui::End();
     ImGui::PopStyleVar();
 
@@ -121,8 +126,7 @@ void Viewport::onImGuiRender(SceneState sceneState) {
         &m_hoveredId
     );
 
-    if ((hovered || m_focusNextFrame || m_focused) &&
-        Input::isMouseButtonPressed(MouseButton::LEFT) && !m_gizmos.isOver()) {
+    if (m_focused && Input::isMouseButtonJustPressed(MouseButton::LEFT) && !m_gizmos.isUsing()) {
         if (m_hoveredId == -1) {
             m_output->viewportUnselectEntity();
         } else {

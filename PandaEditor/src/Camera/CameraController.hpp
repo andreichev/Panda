@@ -9,6 +9,14 @@
 namespace Panda {
 
 class CameraController {
+    struct Animation {
+        bool isActive = false;
+        TransformComponent startTransform;
+        TransformComponent endTransform;
+        float distance;
+        float duration;
+    };
+
 public:
     CameraController();
     void update(float deltaTime);
@@ -19,6 +27,8 @@ public:
     glm::quat getRotation();
     void setRotation(glm::quat quat);
     void setActive(bool flag);
+    void reset();
+    void animateTo(TransformComponent transform);
 
 private:
     void updateVectors();
@@ -28,6 +38,7 @@ private:
     double m_lastMouseX;
     double m_lastMouseY;
     TransformComponent m_transform;
+    Animation m_animation;
     glm::vec4 m_front;
     glm::vec4 m_up;
     glm::vec4 m_right;

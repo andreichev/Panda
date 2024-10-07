@@ -49,18 +49,17 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
         glm::value_ptr(transform)
     );
 
-    if (ImGuizmo::IsUsing()) {
+    if (isUsing()) {
         glm::vec3 pos = glm::vec3(transform[3]);
         transformComponent.setPosition(pos);
         EntityTransformCommand move(selected, transformComponent);
         WorldCommandManager &cmd = m_world->getCommandManger();
         cmd.DO(move);
-        // LOG_EDITOR("POS: {}, {}, {}", pos.x, pos.y, pos.z);
     }
 }
 
-bool Gizmos::isOver() {
-    return ImGuizmo::IsOver();
+bool Gizmos::isUsing() {
+    return ImGuizmo::IsUsing();
 }
 
 } // namespace Panda

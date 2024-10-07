@@ -5,6 +5,8 @@
 #include "CameraController.hpp"
 
 #include <Foundation/PlatformDetection.hpp>
+#include <Panda/Math/Math.hpp>
+
 #include <imgui.h>
 
 namespace Panda {
@@ -20,7 +22,8 @@ CameraController::CameraController()
     , m_cursorStarted(false)
     , m_isActive(false)
     , m_lastMouseX(0)
-    , m_lastMouseY(0) {
+    , m_lastMouseY(0)
+    , m_animation() {
     updateVectors();
 }
 
@@ -29,6 +32,30 @@ void CameraController::update(float deltaTime) {
         m_cursorStarted = false;
         return;
     }
+    if (m_animation.isActive) {
+        float distanceToEnd = m_animation.endTransform.distanceTo(m_transform);
+        if (distanceToEnd < 0.1) {
+            m_transform.setTransform(m_animation.endTransform);
+            m_animation.isActive = false;
+        } else {
+            static glm::vec3 velocity = glm::vec3(0.0);
+            m_transform.setPosition(Math::smoothDamp(
+                m_transform.getPosition(),
+                m_animation.endTransform.getPosition(),
+                velocity,
+                0.15,
+                deltaTime
+            ));
+            float distanceFromStart = m_animation.startTransform.distanceTo(m_transform);
+            float progress = distanceFromStart / m_animation.distance;
+            m_transform.setRotation(glm::mix(
+                m_animation.startTransform.getRotation(),
+                m_animation.endTransform.getRotation(),
+                progress
+            ));
+        }
+    }
+
     bool ctrl;
     bool shift;
 #ifdef PLATFORM_MACOS
@@ -125,6 +152,20 @@ void CameraController::setRotation(glm::quat quat) {
 
 void CameraController::setActive(bool flag) {
     m_isActive = flag;
+}
+
+void CameraController::reset() {
+    TransformComponent newTransform;
+    animateTo(newTransform);
+}
+
+void CameraController::animateTo(TransformComponent transform) {
+    Animation animation;
+    animation.startTransform = m_transform;
+    animation.endTransform = transform;
+    animation.isActive = true;
+    animation.distance = m_transform.distanceTo(transform);
+    m_animation = animation;
 }
 
 } // namespace Panda

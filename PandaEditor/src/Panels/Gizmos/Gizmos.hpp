@@ -25,7 +25,7 @@ public:
         m_camera = camera;
     }
 
-    bool isOver();
+    bool isUsing();
 
 private:
     Camera *m_camera;

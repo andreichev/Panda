@@ -18,6 +18,7 @@ public:
     void setRotation(glm::quat quat);
     glm::quat getRotation();
     glm::mat4 getRotationMatrix();
+    float distanceTo(TransformComponent tc);
     // ------- Position -------
     glm::vec3 getPosition();
     glm::vec4 getPositionHomogeneous();

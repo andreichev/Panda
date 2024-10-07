@@ -39,6 +39,10 @@ glm::mat4 TransformComponent::getRotationMatrix() {
     return glm::toMat4(rotation);
 }
 
+float TransformComponent::distanceTo(TransformComponent tc) {
+    return glm::distance(position, tc.position);
+}
+
 void TransformComponent::translate(glm::vec3 offset) {
     position += offset;
 }

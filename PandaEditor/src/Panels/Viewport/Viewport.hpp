@@ -43,6 +43,7 @@ private:
     Miren::ViewId m_sceneView;
     Miren::TextureHandle m_colorAttachment;
     Camera *m_camera;
+    CameraController *m_cameraController;
     bool m_focusNextFrame;
     bool m_focused;
     id_t m_hoveredId;
