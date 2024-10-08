@@ -14,6 +14,7 @@
 #include "EditorLayer/SceneState.hpp"
 #include "Panels/Popups/EditorPopup.hpp"
 #include "ProjectLoader/ProjectLoader.hpp"
+#include "SceneGrid.hpp"
 
 #include <Panda/Application/Layer.hpp>
 
@@ -112,6 +113,7 @@ private:
     EditorCamera m_editorCamera;
     CameraController m_cameraController;
     std::vector<EditorPopup *> m_popups;
+    SceneGrid m_grid;
 
     // World that is visible by default in editor but never played.
     World m_editingWorld;

@@ -3,6 +3,7 @@
 #include <Panda.hpp>
 #include <PandaUI/PandaUI.hpp>
 #include <imgui.h>
+#include <Panda/ImGui/FontAwesome.h>
 
 namespace Panda {
 
@@ -109,7 +110,7 @@ void Viewport::onImGuiRender(SceneState sceneState) {
     ImGui::Image((void *)(uintptr_t)m_colorAttachment.id, m_frame.size, ImVec2(0, 1), ImVec2(1, 0));
     m_gizmos.onImGuiRender(sceneState, m_frame);
     ImGui::SetCursorPos({20, 40});
-    if (ImGui::Button("RESET")) {
+    if (ImGui::Button(getString(ICON_HOME).c_str())) {
         m_cameraController->reset();
     }
     ImGui::End();

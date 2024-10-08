@@ -27,10 +27,12 @@ EditorLayer::EditorLayer()
     , m_editorCamera()
     , m_popups()
     , m_cameraController()
-    , m_sceneState(SceneState::EDIT) {
+    , m_sceneState(SceneState::EDIT)
+    , m_grid(&m_cameraController) {
     m_viewport.initWithSize(Size(100.f, 100.f));
     m_editingWorld.setViewId(m_viewport.getMirenView());
     m_playingWorld.setViewId(m_viewport.getMirenView());
+    m_grid.setViewId(m_viewport.getMirenView());
     m_viewport.setCamera(&m_editorCamera);
     m_viewport.setWorld(m_currentWorld);
     m_hierarchyPanel.setWorld(m_currentWorld);
@@ -62,6 +64,7 @@ void EditorLayer::onUpdate(double deltaTime) {
             glm::mat4 cameraViewProj = proj * m_cameraController.getSkyViewMatrix();
             glm::mat4 viewProj = proj * view;
             m_editingWorld.updateEditor(deltaTime, viewProj, cameraViewProj);
+            m_grid.update(viewProj);
             break;
         }
         case SceneState::PLAY: {
@@ -76,6 +79,7 @@ void EditorLayer::onUpdate(double deltaTime) {
             glm::mat4 cameraViewProj = proj * m_cameraController.getSkyViewMatrix();
             glm::mat4 viewProj = proj * view;
             m_playingWorld.updateSimulation(deltaTime, viewProj, cameraViewProj);
+            m_grid.update(viewProj);
             break;
         }
     }

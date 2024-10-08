@@ -252,6 +252,7 @@ void World::destroy(Entity entity) {
 }
 
 void World::clear() {
+    m_isChanged = false;
     m_selectedEntity = Entity();
     for (auto id : m_registry.storage<entt::entity>()) {
         m_registry.destroy(id);

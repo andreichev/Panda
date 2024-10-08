@@ -156,6 +156,13 @@ void CameraController::setActive(bool flag) {
 
 void CameraController::reset() {
     TransformComponent newTransform;
+    newTransform.setPosition({1.5, 1.5, 1.5});
+    glm::quat r;
+    r.x = -0.27716076374053955;
+    r.y = 0.3426811695098877;
+    r.z = 0.08326273411512375;
+    r.w = 0.8937666416168213;
+    newTransform.setRotation(r);
     animateTo(newTransform);
 }
 

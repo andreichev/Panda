@@ -32,6 +32,7 @@ public:
     }
 
     SkyComponent &operator=(SkyComponent &other) {
+        m_sceneViewId = other.m_sceneViewId;
         initResources();
         return *this;
     }
