@@ -27,7 +27,7 @@ public:
     glm::quat getRotation();
     void setRotation(glm::quat quat);
     void setActive(bool flag);
-    void reset();
+    void reset(glm::vec3 pos);
     void animateTo(TransformComponent transform);
 
 private:

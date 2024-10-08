@@ -27,7 +27,7 @@ public:
     void initWithSize(Vec2 size);
     void setCamera(Camera *camera);
     void setWorld(World *world);
-    void onImGuiRender(SceneState sceneState);
+    void onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen);
     void focus();
     bool isFocused();
     id_t getHoveredId();

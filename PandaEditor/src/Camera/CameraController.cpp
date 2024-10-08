@@ -4,7 +4,6 @@
 
 #include "CameraController.hpp"
 
-#include <Foundation/PlatformDetection.hpp>
 #include <Panda/Math/Math.hpp>
 
 #include <imgui.h>
@@ -28,10 +27,6 @@ CameraController::CameraController()
 }
 
 void CameraController::update(float deltaTime) {
-    if (!m_isActive) {
-        m_cursorStarted = false;
-        return;
-    }
     if (m_animation.isActive) {
         float distanceToEnd = m_animation.endTransform.distanceTo(m_transform);
         if (distanceToEnd < 0.1) {
@@ -55,43 +50,35 @@ void CameraController::update(float deltaTime) {
             ));
         }
     }
-
-    bool ctrl;
-    bool shift;
-#ifdef PLATFORM_MACOS
-    ctrl = Input::isKeyPressed(Key::LEFT_SUPER) || Input::isKeyPressed(Key::RIGHT_SUPER);
-#else
-    ctrl = Input::isKeyPressed(Key::LEFT_CONTROL) || Input::isKeyPressed(Key::RIGHT_CONTROL);
-#endif
-    shift = Input::isKeyPressed(Key::LEFT_SHIFT) || Input::isKeyPressed(Key::RIGHT_SHIFT);
+    bool ctrl = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+    bool shift = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
     if (ctrl || shift) {
+        m_cursorStarted = false;
+        return;
+    }
+    if (!m_isActive) {
         m_cursorStarted = false;
         return;
     }
     glm::vec3 cameraRotation = m_transform.getRotationEuler();
     glm::vec3 cameraPosition = m_transform.getPosition();
     float speed = m_moveSpeed * deltaTime;
-    if (Panda::Input::isKeyPressed(Panda::Key::W)) {
+    if (ImGui::IsKeyDown(ImGuiKey_W)) {
         m_transform.translate(m_front * speed);
     }
-    if (Panda::Input::isKeyPressed(Panda::Key::S)) {
+    if (ImGui::IsKeyDown(ImGuiKey_S)) {
         m_transform.translate(-m_front * speed);
     }
-    if (Panda::Input::isKeyPressed(Panda::Key::A)) {
+    if (ImGui::IsKeyDown(ImGuiKey_A)) {
         m_transform.translate(-m_right * speed);
     }
-    if (Panda::Input::isKeyPressed(Panda::Key::D)) {
+    if (ImGui::IsKeyDown(ImGuiKey_D)) {
         m_transform.translate(m_right * speed);
     }
-    if (Panda::Input::isKeyPressed(Panda::Key::SPACE)) {
-        m_transform.translate(m_up * speed);
-    }
-    if (Panda::Input::isKeyPressed(Panda::Key::LEFT_SHIFT)) {
-        m_transform.translate(-m_up * speed);
-    }
-    if (Input::isMouseButtonPressed(MouseButton::RIGHT)) {
-        double mouseX = Panda::Input::getMousePositionX();
-        double mouseY = Panda::Input::getMousePositionY();
+    if (ImGui::IsKeyDown(ImGuiKey_MouseRight)) {
+        ImVec2 mousePos = ImGui::GetMousePos();
+        double mouseX = mousePos.x;
+        double mouseY = mousePos.y;
         double deltaX = mouseX - m_lastMouseX;
         double deltaY = mouseY - m_lastMouseY;
         if (!m_cursorStarted) {
@@ -154,9 +141,9 @@ void CameraController::setActive(bool flag) {
     m_isActive = flag;
 }
 
-void CameraController::reset() {
+void CameraController::reset(glm::vec3 pos) {
     TransformComponent newTransform;
-    newTransform.setPosition({1.5, 1.5, 1.5});
+    newTransform.setPosition({pos.x + 1.5, pos.y + 1.5, pos.z + 1.5});
     glm::quat r;
     r.x = -0.27716076374053955;
     r.y = 0.3426811695098877;

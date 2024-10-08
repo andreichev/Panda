@@ -6,14 +6,13 @@
 #include "Panels/Popups/PickScriptPopup.hpp"
 #include "Panels/Popups/EnterNamePopup.hpp"
 
-#include <Foundation/PlatformDetection.hpp>
-
 namespace Panda {
 
 EditorLayer::EditorLayer()
     : m_editingWorld()
     , m_playingWorld()
     , m_currentWorld(&m_editingWorld)
+    , m_viewportFullscreen(false)
     , m_toolbar(this)
     , m_dockspace()
     , m_viewport(this, &m_cameraController)
@@ -93,13 +92,18 @@ void EditorLayer::onImGuiRender() {
     if (m_loader.hasOpenedProject()) {
         m_menuBar.onImGuiRender();
         m_toolbar.onImGuiRender(m_menuBar.m_height);
-        m_dockspace.beginImGuiDockspace(m_toolbar.getHeight() + m_menuBar.m_height + 2);
-        m_statisticsPanel.onImGuiRender();
-        m_viewport.onImGuiRender(m_sceneState);
-        m_hierarchyPanel.onImGuiRender();
-        m_contentBrowser.onImGuiRender();
-        m_consolePanel.onImGuiRender();
-        m_dockspace.endImGuiDockspace();
+        float offsetY = m_toolbar.getHeight() + m_menuBar.m_height + 2;
+        if (m_viewportFullscreen) {
+            m_viewport.onImGuiRender(m_sceneState, offsetY, true);
+        } else {
+            m_dockspace.beginImGuiDockspace(offsetY);
+            m_statisticsPanel.onImGuiRender();
+            m_viewport.onImGuiRender(m_sceneState, 0, false);
+            m_hierarchyPanel.onImGuiRender();
+            m_contentBrowser.onImGuiRender();
+            m_consolePanel.onImGuiRender();
+            m_dockspace.endImGuiDockspace();
+        }
         m_cameraController.setActive(m_viewport.isFocused());
     } else {
         m_startPanel.onImGuiRender();
@@ -494,25 +498,32 @@ void EditorLayer::closeApp() {
 }
 
 void EditorLayer::processShortcuts() {
-    bool ctrl;
-    bool shift;
-#ifdef PLATFORM_MACOS
-    ctrl = Input::isKeyPressed(Key::LEFT_SUPER) || Input::isKeyPressed(Key::RIGHT_SUPER);
-#else
-    ctrl = Input::isKeyPressed(Key::LEFT_CONTROL) || Input::isKeyPressed(Key::RIGHT_CONTROL);
-#endif
-    shift = Input::isKeyPressed(Key::LEFT_SHIFT) || Input::isKeyPressed(Key::RIGHT_SHIFT);
-    if (ctrl) {
-        if (Input::isKeyJustPressed(Key::S)) {
+    bool ctrl = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+    bool shift = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
+    if (ImGui::IsKeyPressed(ImGuiKey_S, false)) {
+        if (ctrl) {
             saveWorld();
         }
-        if (Input::isKeyJustPressed(Key::Z)) {
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_Z, false)) {
+        if (ctrl) {
             if (shift) {
                 redo();
             } else {
                 undo();
             }
+        } else {
+            // Move to selected entity
+            if (m_currentWorld) {
+                Entity selected = m_currentWorld->getSelectedEntity();
+                if (selected.isValid()) {
+                    m_cameraController.reset(selected.getTransform().getPosition());
+                }
+            }
         }
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_W, false) && ctrl) {
+        m_viewportFullscreen = !m_viewportFullscreen;
     }
 }
 

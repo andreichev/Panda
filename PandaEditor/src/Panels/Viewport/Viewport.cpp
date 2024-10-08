@@ -88,9 +88,23 @@ void Viewport::updateViewportSize(Size size) {
     Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
 }
 
-void Viewport::onImGuiRender(SceneState sceneState) {
+void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen) {
+    ImGuiWindowFlags window_flags = 0;
+    if (fullScreen) {
+        const ImGuiViewport *viewport = ImGui::GetMainViewport();
+        ImVec2 pos = viewport->WorkPos;
+        pos.y += offsetY;
+        ImGui::SetNextWindowPos(pos);
+        ImVec2 size = viewport->WorkSize;
+        size.y -= offsetY;
+        ImGui::SetNextWindowSize(size);
+        ImGui::SetNextWindowViewport(viewport->ID);
+        window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse |
+                       ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                       ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+    }
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
-    ImGui::Begin("Viewport");
+    ImGui::Begin(fullScreen ? "Viewport (fullscreen mode)" : "Viewport", NULL, window_flags);
     ImVec2 viewportSpace = ImGui::GetContentRegionAvail();
     viewportSpace = ImVec2(viewportSpace.x - 4, viewportSpace.y - 4);
     if (m_frame.size != viewportSpace) {
@@ -111,7 +125,7 @@ void Viewport::onImGuiRender(SceneState sceneState) {
     m_gizmos.onImGuiRender(sceneState, m_frame);
     ImGui::SetCursorPos({20, 40});
     if (ImGui::Button(getString(ICON_HOME).c_str())) {
-        m_cameraController->reset();
+        m_cameraController->reset({0, 0, 0});
     }
     ImGui::End();
     ImGui::PopStyleVar();

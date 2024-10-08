@@ -100,6 +100,7 @@ private:
     void updateWindowState();
     void processShortcuts();
 
+    bool m_viewportFullscreen;
     ProjectLoader m_loader;
     MenuBar m_menuBar;
     Toolbar m_toolbar;
