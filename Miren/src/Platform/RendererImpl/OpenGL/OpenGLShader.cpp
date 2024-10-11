@@ -104,14 +104,24 @@ void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseV
                 PND_ASSERT(false, "Buffer element type is undefined");
                 break;
         }
-        GL_CALL(glVertexAttribPointer(
-            i,
-            layout.m_elements[i].count,
-            type,
-            layout.m_elements[i].normalized ? GL_TRUE : GL_FALSE,
-            layout.m_stride,
-            (const void *)pointer
-        ));
+        if(type == GL_UNSIGNED_INT || type == GL_INT) {
+            GL_CALL(glVertexAttribIPointer(
+                i,
+                layout.m_elements[i].count,
+                type,
+                layout.m_stride,
+                reinterpret_cast<const void *>(pointer)
+            ));
+        } else {
+            GL_CALL(glVertexAttribPointer(
+                i,
+                layout.m_elements[i].count,
+                type,
+                layout.m_elements[i].normalized ? GL_TRUE : GL_FALSE,
+                layout.m_stride,
+                reinterpret_cast<const void *>(pointer)
+            ));
+        }
         pointer += layout.m_elements[i].count *
                    VertexBufferElement::getSizeOfType(layout.m_elements[i].type);
     }

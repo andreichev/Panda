@@ -68,7 +68,7 @@ void ProjectLoader::openProject(const path_t &path) {
         return;
     }
     m_projectPath = path;
-    std::string projectName = path.filename();
+    path_t projectName = path.filename();
     m_worldPath.clear();
     path_t pandaDirectoryPath = path;
     pandaDirectoryPath.append(".Panda");
@@ -91,7 +91,7 @@ void ProjectLoader::openProject(const path_t &path) {
     }
     // Load editor camera location
     { m_output->setEditorCameraSettings(m_projectSettings.editorCameraSettings); }
-    m_output->loaderDidLoadProject(projectName, m_projectPath);
+    m_output->loaderDidLoadProject(projectName.string(), m_projectPath);
     LOG_INFO("LOADED PROJECT AT PATH {}", m_projectPath.string());
     if (m_projectSettings.worldPath.empty()) {
         m_output->loaderCreateSampleWorld();
@@ -105,7 +105,7 @@ void ProjectLoader::openProject(const path_t &path) {
 }
 
 void ProjectLoader::reloadScriptsDll() {
-    std::string projectName = m_projectPath.filename();
+    std::string projectName = m_projectPath.filename().string();
     m_scriptEngine.reload({m_projectPath / "Scripts" / projectName / "bin", projectName});
     m_world->rebindScriptsAndFields();
 }
@@ -124,7 +124,7 @@ void ProjectLoader::createProject(const std::string &name, const path_t &path) {
 }
 
 void ProjectLoader::openCppProject() {
-    std::string name = m_projectPath.filename();
+    std::string name = m_projectPath.filename().string();
     SystemTools::openCppProject(m_projectPath / "Scripts" / name);
 }
 

@@ -1,10 +1,8 @@
 #include "MenuBar.hpp"
 
-#include <Foundation/PlatformDetection.hpp>
-
 namespace Panda {
 
-MenuBar::MenuBar(Panda::MenuBarOutput *output)
+MenuBar::MenuBar(MenuBarOutput *output)
     : m_output(output)
     , m_height(24) {}
 
@@ -40,7 +38,7 @@ void MenuBar::onImGuiRender() {
                             continue;
                         }
                         path_t projectPath = project.path;
-                        std::string projectName = projectPath.filename();
+                        std::string projectName = projectPath.filename().string();
                         path_t openedProjectPath = m_output->menuBarGetOpenedProjectPath();
                         if (ImGui::MenuItem(
                                 projectName.c_str(), nullptr, projectPath == openedProjectPath

@@ -11,7 +11,7 @@ uniform mat4 projViewMtx;
 out float fragTextureIndex;
 out vec4 fragColor;
 out vec2 fragTexCoord;
-out float fragId;
+flat out int fragId;
 
 void main(){
     fragTextureIndex = textureIndex;

@@ -3,7 +3,7 @@
 in float fragTextureIndex;
 in vec4 fragColor;
 in vec2 fragTexCoord;
-in float fragId;
+flat in int fragId;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out int outId;

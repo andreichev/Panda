@@ -68,8 +68,8 @@ RendererOpenGL::RendererOpenGL() {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     MIREN_LOG("OPENGL VERSION {}", (const char *)glGetString(GL_VERSION));
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(gpuErrorCallback, nullptr);
+    // glEnable(GL_DEBUG_OUTPUT);
+    // glDebugMessageCallback(gpuErrorCallback, nullptr);
 #endif
     GL_CALL(glGenVertexArrays(1, &m_uselessVao));
     GL_CALL(glBindVertexArray(m_uselessVao));

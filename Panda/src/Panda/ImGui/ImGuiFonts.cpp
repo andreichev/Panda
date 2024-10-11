@@ -16,9 +16,9 @@ void Fonts::add(const FontConfiguration &config, bool isDefault) {
     imguiFontConfig.OversampleH = 4;
     imguiFontConfig.OversampleV = 4;
     auto &io = ImGui::GetIO();
-    std::string fontPath = AssetLoader::getResourcesPath() / "default-fonts" / config.fileName;
+    path_t fontPath = AssetLoader::getResourcesPath() / "default-fonts" / config.fileName;
     ImFont *font = io.Fonts->AddFontFromFileTTF(
-        fontPath.c_str(),
+        fontPath.string().c_str(),
         config.size,
         &imguiFontConfig,
         config.glyphRanges == nullptr ? io.Fonts->GetGlyphRangesDefault() : config.glyphRanges

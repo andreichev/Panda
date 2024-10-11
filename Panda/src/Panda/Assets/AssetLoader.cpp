@@ -14,8 +14,8 @@ void releaseImage(void *data, void *userInfo) {
 TextureAsset AssetLoader::loadTexture(const path_t &path) {
     // stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
-    std::string texturePath = AssetLoader::getResourcesPath() / path;
-    void *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 0);
+    path_t texturePath = AssetLoader::getResourcesPath() / path;
+    void *image = stbi_load(texturePath.string().c_str(), &width, &height, &channels, 0);
 
     if (image == nullptr) {
         LOG_ERROR("Failed to load a texture file! {}", stbi_failure_reason());
@@ -43,10 +43,10 @@ TextureAsset AssetLoader::loadCubeMapTexture(std::array<path_t, 6> paths) {
     std::array<void *, 6> images;
     int bytesPerColor;
     for (uint16_t side = 0; side < 6; ++side) {
-        const std::string &path = paths[side];
+        const std::string &path = paths[side].string();
         int width, height, channels;
         path_t texturePath = AssetLoader::getResourcesPath() / path;
-        void *image = stbi_load(texturePath.c_str(), &width, &height, &channels, 0);
+        void *image = stbi_load(texturePath.string().c_str(), &width, &height, &channels, 0);
         if (image == nullptr) {
             LOG_ERROR("Failed to load a texture file at path {}", path);
             continue;
@@ -102,8 +102,8 @@ ProgramAsset AssetLoader::loadProgram(const path_t &vertexPath, const path_t &fr
         PND_ASSERT_F(
             false,
             "SHADER::FILE {} or {} NOT SUCCESSFULLY READ",
-            vertexPath.c_str(),
-            fragmentPath.c_str()
+            vertexPath.string().c_str(),
+            fragmentPath.string().c_str()
         );
     }
     Foundation::Memory vertexData =
