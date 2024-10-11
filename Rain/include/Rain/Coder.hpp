@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TypeInfo.hpp"
+#include "UUID.hpp"
 
 #include <istream>
 #include <ostream>
@@ -30,6 +31,8 @@ public:
     virtual void encode(const char *key, const std::string &data) = 0;
     /// Encode const char*
     virtual void encode(const char *key, const char *&data) = 0;
+    /// Encode uuid
+    virtual void encode(const char *key, UUID &data) = 0;
     /// End encoding object
     virtual void endObject() = 0;
     /// Begin encoding array
@@ -59,6 +62,8 @@ public:
     virtual bool decode(const char *key, std::string &data) = 0;
     /// Decode const char*
     virtual bool decode(const char *key, const char *&data) = 0;
+    /// Decode uuid
+    virtual bool decode(const char *key, UUID &data) = 0;
     /// End decoding object
     virtual void endObject() = 0;
     /// Begin decoding array

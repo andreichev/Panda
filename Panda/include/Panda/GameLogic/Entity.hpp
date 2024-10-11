@@ -36,34 +36,30 @@ public:
     template<typename T, typename... Args>
     T &addComponent(Args &&...args) {
         PND_ASSERT(!hasComponent<T>(), "Entity already has component!");
-        entt::entity entity = static_cast<entt::entity>(m_id);
         entt::registry &registry = worldGetRegistry();
-        T &component = registry.emplace<T>(entity, std::forward<Args>(args)...);
+        T &component = registry.emplace<T>(m_handle, std::forward<Args>(args)...);
         setWorldChanged();
         return component;
     }
 
     template<typename T>
     void removeComponent() {
-        entt::entity entityHandle = static_cast<entt::entity>(m_id);
         entt::registry &registry = worldGetRegistry();
-        registry.remove<T>(entityHandle);
+        registry.remove<T>(m_handle);
         setWorldChanged();
     }
 
     template<typename T>
     T &getComponent() {
         PND_ASSERT(hasComponent<T>(), "Entity doesn't have component!");
-        entt::entity entityHandle = static_cast<entt::entity>(m_id);
         entt::registry &registry = worldGetRegistry();
-        return registry.get<T>(entityHandle);
+        return registry.get<T>(m_handle);
     }
 
     template<typename T>
     bool hasComponent() {
-        entt::entity entityHandle = static_cast<entt::entity>(m_id);
         entt::registry &registry = worldGetRegistry();
-        return registry.any_of<T>(entityHandle);
+        return registry.any_of<T>(m_handle);
     }
 
     void addChildEntity(Entity entity);
@@ -81,18 +77,11 @@ public:
 
     Entity getParent();
 
-    const std::vector<id_t> &getChildEntities() {
+    const std::vector<UUID> &getChildEntities() {
         return getComponent<RelationshipComponent>().children;
     }
 
-    id_t getId() {
-        return m_id;
-    }
-
-    bool isValid() {
-        entt::registry &registry = worldGetRegistry();
-        return m_id != -1 && registry.valid(static_cast<entt::entity>(m_id));
-    }
+    bool isValid() const;
 
     std::string &getName() {
         return getComponent<TagComponent>().tag;
@@ -112,16 +101,25 @@ public:
     }
 
     friend bool operator==(const Entity &lhs, const Entity &rhs) {
-        return lhs.m_id == rhs.m_id;
+        return lhs.m_handle == rhs.m_handle;
     }
 
     void setWorldChanged(bool changed = true);
 
+    operator entt::entity() const {
+        return m_handle;
+    }
+    operator bool() const;
+
+    UUID getId() {
+        return getComponent<IdComponent>().id;
+    }
+
 private:
-    Entity(id_t id, World *world);
+    Entity(entt::entity handle, World *world);
 
     World *m_world;
-    id_t m_id;
+    entt::entity m_handle;
 
     friend class World;
     friend class WorldHierarchyPanel;

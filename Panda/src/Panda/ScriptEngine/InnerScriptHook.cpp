@@ -52,17 +52,17 @@ namespace InternalCalls {
         // TODO: Implement using AssetManager
     }
 
-    id_t world_FindByTag(const char *tag) {
+    UUID world_FindByTag(const char *tag) {
         return GameContext::s_currentWorld->findByTag(tag).getId();
     }
 
-    id_t world_CreateEntity(const char *tag) {
+    UUID world_CreateEntity(const char *tag) {
         Entity entity = GameContext::s_currentWorld->instantiateEntity();
         entity.setName(tag);
         return entity.getId();
     }
 
-    void world_DestroyEntity(id_t id) {
+    void world_DestroyEntity(UUID id) {
         Entity entity = GameContext::s_currentWorld->getById(id);
         GameContext::s_currentWorld->destroy(entity);
     }

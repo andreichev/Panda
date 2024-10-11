@@ -18,11 +18,11 @@
 namespace Panda {
 
 struct IdComponent final : public Rain::Codable {
-    id_t id = 0;
+    UUID id;
 
     IdComponent() = default;
     IdComponent(const IdComponent &other) = default;
-    IdComponent(const id_t &id)
+    IdComponent(const UUID &id)
         : id(id) {}
 
     RAIN_FIELDS_BEGIN(IdComponent)
@@ -51,16 +51,16 @@ struct TagComponent final : public Rain::Codable {
 };
 
 struct RelationshipComponent final : public Rain::Codable {
-    id_t parentHandle = -1;
-    std::vector<id_t> children;
+    UUID parent = -1;
+    std::vector<UUID> children;
 
     RelationshipComponent() = default;
     RelationshipComponent(const RelationshipComponent &other) = default;
-    RelationshipComponent(id_t parent)
-        : parentHandle(parent) {}
+    RelationshipComponent(UUID parent)
+        : parent(parent) {}
 
     RAIN_FIELDS_BEGIN(RelationshipComponent)
-    RAIN_FIELD(parentHandle)
+    RAIN_FIELD(parent)
     RAIN_FIELD(children)
     RAIN_FIELDS_END
 };

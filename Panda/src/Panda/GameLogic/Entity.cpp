@@ -7,12 +7,12 @@
 
 namespace Panda {
 
-Entity::Entity(id_t id, World *world)
-    : m_id(id)
+Entity::Entity(entt::entity handle, World *world)
+    : m_handle(handle)
     , m_world(world) {}
 
 Entity::Entity()
-    : m_id(-1)
+    : m_handle(entt::null)
     , m_world(nullptr) {}
 
 entt::registry &Entity::worldGetRegistry() {
@@ -31,8 +31,8 @@ void Entity::addChildEntity(Entity entity) {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
     RelationshipComponent &otherRelationship = entity.getComponent<RelationshipComponent>();
 
-    otherRelationship.parentHandle = m_id;
-    thisRelationship.children.push_back(entity.m_id);
+    otherRelationship.parent = getId();
+    thisRelationship.children.push_back(entity.getId());
     setWorldChanged();
 }
 
@@ -40,22 +40,32 @@ void Entity::removeChildEntity(Entity entity) {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
     RelationshipComponent &otherRelationship = entity.getComponent<RelationshipComponent>();
 
-    std::remove(thisRelationship.children.begin(), thisRelationship.children.end(), entity.m_id);
-    otherRelationship.parentHandle = -1;
+    auto _ = std::remove(
+        thisRelationship.children.begin(), thisRelationship.children.end(), entity.getId()
+    );
+    otherRelationship.parent = 0;
     setWorldChanged();
 }
 
 void Entity::removeFromParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    if (thisRelationship.parentHandle != -1) {
-        Entity parent = Entity(thisRelationship.parentHandle, m_world);
+    if (thisRelationship.parent != 0) {
+        Entity parent = m_world->getById(thisRelationship.parent);
         parent.removeChildEntity(*this);
     }
 }
 
 Entity Entity::getParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    return Entity(thisRelationship.parentHandle, m_world);
+    return m_world->getById(thisRelationship.parent);
+}
+
+bool Entity::isValid() const {
+    return (m_handle != entt::null) && m_world && m_world->m_registry.valid(m_handle);
+}
+
+Entity::operator bool() const {
+    return isValid();
 }
 
 } // namespace Panda

@@ -3,9 +3,9 @@
 namespace Panda {
 
 Entity::Entity()
-    : m_id(-1) {}
+    : m_id(0) {}
 
-Entity::Entity(Panda::id_t id)
+Entity::Entity(UUID id)
     : m_id(id) {}
 
 } // namespace Panda

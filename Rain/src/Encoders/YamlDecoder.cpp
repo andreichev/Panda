@@ -120,6 +120,23 @@ bool YamlDecoder::decode(const char *key, const char *&data) {
     return true;
 }
 
+bool YamlDecoder::decode(const char *key, UUID &data) {
+    if (m_isArray) {
+        const auto &member = *m_arrayIteratorStack.back();
+        data = member.as<uint32_t>();
+    } else {
+        if (!currentObject()[key]) {
+            return false;
+        }
+        const auto &member = currentObject()[key];
+        if (member.IsNull()) {
+            return false;
+        }
+        data = member.as<uint32_t>();
+    }
+    return true;
+}
+
 void YamlDecoder::endObject() {
     // std::cout << "END OBJECT" << std::endl;
     m_isArray = m_objectStack.back().isPartOfArray;

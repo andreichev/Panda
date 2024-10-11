@@ -6,7 +6,7 @@ namespace Panda {
 void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
     world.clear();
     for (auto entityDto : worldDto.entities) {
-        Entity entity = world.instantiateEntity(entityDto.idComponent.id);
+        Entity entity = world.instantiateEntity(entityDto.id);
         // TAG COMPONENT
         { entity.setName(entityDto.tagComponent.tag); }
         // TRANSFORM COMPONENT
@@ -59,10 +59,10 @@ WorldDto WorldMapper::toDto(const World &world) {
         if (!_world.m_registry.valid(entityId)) {
             continue;
         }
-        Entity entity((id_t)(entityId), &_world);
+        Entity entity(entityId, &_world);
         EntityDto entityDto;
         // ID COMPONENT
-        { entityDto.idComponent = entity.getComponent<IdComponent>(); }
+        { entityDto.id = entity.getId(); }
         // TAG COMPONENT
         { entityDto.tagComponent = entity.getComponent<TagComponent>(); }
         // TRANSFORM COMPONENT

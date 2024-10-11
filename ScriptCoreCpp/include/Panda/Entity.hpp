@@ -7,14 +7,14 @@ namespace Panda {
 class Entity {
 public:
     Entity();
-    Entity(id_t id);
+    Entity(UUID id);
 
     inline bool issValid() {
-        return m_id != -1;
+        return m_id != 0;
     }
 
 private:
-    id_t m_id;
+    UUID m_id;
 
     friend class World;
 };

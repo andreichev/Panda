@@ -11,7 +11,8 @@
 namespace Panda {
 
 World::World()
-    : m_isRunning(false)
+    : m_entityIdMap(100)
+    , m_isRunning(false)
     , m_isChanged(false)
     , m_registry()
     , m_commandManager() {}
@@ -148,11 +149,10 @@ void World::updateBasicComponents(
             auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
             auto &transform = view.get<TransformComponent>(entityHandle);
             Panda::Renderer2D::RectData rect;
-            id_t entityId = static_cast<id_t>(entityHandle);
             rect.transform = transform.getTransform();
             rect.color = spriteComponent.color;
             rect.size = {1.f, 1.f};
-            rect.id = entityId;
+            rect.id = static_cast<int32_t>(entityHandle);
             m_renderer2d.drawRect(rect);
         }
     }
@@ -187,17 +187,19 @@ void World::updateBasicComponents(
 }
 
 Entity World::instantiateEntity() {
-    id_t entityId = static_cast<id_t>(m_registry.create());
-    Entity entity = {entityId, this};
-    fillEntity(entity);
+    entt::entity entityHandle = m_registry.create();
+    Entity entity = {entityHandle, this};
+    fillEntity(entity, {});
+    m_entityIdMap[entity.getId()] = entity;
     m_isChanged = true;
     return entity;
 }
 
-Entity World::instantiateEntity(id_t id) {
-    m_registry.create(static_cast<entt::entity>(id));
-    Entity entity = {id, this};
-    fillEntity(entity);
+Entity World::instantiateEntity(UUID id) {
+    entt::entity entityHandle = m_registry.create();
+    Entity entity = {entityHandle, this};
+    fillEntity(entity, id);
+    m_entityIdMap[entity.getId()] = entity;
     m_isChanged = true;
     return entity;
 }
@@ -209,7 +211,7 @@ void World::rebindScriptsAndFields() {
             continue;
         }
         auto &component = view.get<ScriptListComponent>(entityHandle);
-        id_t entityId = static_cast<id_t>(entityHandle);
+        UUID entityId = Entity(entityHandle, this).getId();
         for (auto &container : component.scripts) {
             ScriptHandle scriptId =
                 ExternalCalls::addScriptFunc(entityId, container.getName().c_str());
@@ -217,7 +219,7 @@ void World::rebindScriptsAndFields() {
                 container.rebindId(scriptId);
             } else {
                 component.remove(container);
-                Entity entity = Entity(entityId, this);
+                Entity entity = Entity(entityHandle, this);
                 LOG_EDITOR(
                     "SCRIPT {} NOT FOUND. REMOVED FROM ENTITY {}.",
                     container.getName(),
@@ -228,8 +230,8 @@ void World::rebindScriptsAndFields() {
     }
 }
 
-void World::fillEntity(Entity entity) {
-    entity.addComponent<IdComponent>(entity.m_id);
+void World::fillEntity(Entity entity, UUID id) {
+    entity.addComponent<IdComponent>(id);
     entity.addComponent<TagComponent>("Entity");
     entity.addComponent<RelationshipComponent>();
     entity.addComponent<TransformComponent>();
@@ -240,14 +242,14 @@ void World::fillEntity(Entity entity) {
 
 void World::destroy(Entity entity) {
     entity.removeFromParent();
-    for (id_t childHandle : entity.getChildEntities()) {
-        Entity child = Entity(childHandle, this);
+    for (UUID childHandle : entity.getChildEntities()) {
+        Entity child = getById(childHandle);
         if (!child.isValid()) {
             continue;
         }
         destroy(child);
     }
-    m_registry.destroy(static_cast<entt::entity>(entity.getId()));
+    m_registry.destroy(entity.m_handle);
     m_isChanged = true;
 }
 
@@ -273,8 +275,7 @@ Entity World::findMainCameraEntity() {
         }
         auto &comp = view.get<CameraComponent>(entity);
         if (comp.isPrimary) {
-            id_t id = static_cast<id_t>(entity);
-            return {id, this};
+            return {entity, this};
         }
     }
     return {};
@@ -320,15 +321,19 @@ Entity World::findByTag(const char *tag) {
             continue;
         }
         auto &tagComponent = view.get<TagComponent>(entityHandle);
-        id_t entityId = static_cast<id_t>(entityHandle);
         if (tagComponent.tag == tag) {
-            return Entity(entityId, this);
+            return Entity(entityHandle, this);
         }
     }
     return Entity();
 }
 
-Entity World::getById(id_t id) {
+Entity World::getById(UUID id) {
+    PND_ASSERT(m_entityIdMap.find(id) != m_entityIdMap.end(), "ENTITY DOES NOT EXISTS");
+    return m_entityIdMap.at(id);
+}
+
+Entity World::getByEnttId(entt::entity id) {
     PND_ASSERT(m_registry.valid(static_cast<entt::entity>(id)), "ENTITY DOES NOT EXISTS");
     return Entity(id, this);
 }
@@ -347,21 +352,24 @@ void copyAllComponents(entt::registry &src, entt::registry &dst, entt::entity en
 }
 
 World &World::operator=(World &other) {
+    m_entityIdMap.clear();
     clear();
     entt::registry &src = other.m_registry;
     entt::registry &dst = m_registry;
-    for (auto entity : src.storage<entt::entity>()) {
-        auto _ = dst.create(entity);
-        copyAllComponents<IdComponent>(src, dst, entity);
-        copyAllComponents<TagComponent>(src, dst, entity);
-        copyAllComponents<TransformComponent>(src, dst, entity);
-        copyAllComponents<RelationshipComponent>(src, dst, entity);
-        copyAllComponents<SpriteRendererComponent>(src, dst, entity);
-        copyAllComponents<StaticMeshComponent>(src, dst, entity);
-        copyAllComponents<DynamicMeshComponent>(src, dst, entity);
-        copyAllComponents<CameraComponent>(src, dst, entity);
-        copyAllComponents<ScriptListComponent>(src, dst, entity);
-        copyAllComponents<SkyComponent>(src, dst, entity);
+    for (auto entityHandle : src.storage<entt::entity>()) {
+        auto _ = dst.create(entityHandle);
+        UUID id = src.get<IdComponent>(entityHandle).id;
+        m_entityIdMap[id] = Entity(entityHandle, this);
+        copyAllComponents<IdComponent>(src, dst, entityHandle);
+        copyAllComponents<TagComponent>(src, dst, entityHandle);
+        copyAllComponents<TransformComponent>(src, dst, entityHandle);
+        copyAllComponents<RelationshipComponent>(src, dst, entityHandle);
+        copyAllComponents<SpriteRendererComponent>(src, dst, entityHandle);
+        copyAllComponents<StaticMeshComponent>(src, dst, entityHandle);
+        copyAllComponents<DynamicMeshComponent>(src, dst, entityHandle);
+        copyAllComponents<CameraComponent>(src, dst, entityHandle);
+        copyAllComponents<ScriptListComponent>(src, dst, entityHandle);
+        copyAllComponents<SkyComponent>(src, dst, entityHandle);
     }
     return *this;
 }

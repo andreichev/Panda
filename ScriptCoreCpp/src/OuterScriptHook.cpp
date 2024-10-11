@@ -27,7 +27,7 @@ namespace ExternalCalls {
 } // namespace ExternalCalls
 
 namespace InternalCalls {
-    Panda::ScriptHandle addScriptFunc(id_t entityId, const char *name) {
+    Panda::ScriptHandle addScriptFunc(UUID entityId, const char *name) {
         return Panda::getScriptRegistry()->instantiate(Entity(entityId), name);
     }
 

@@ -142,6 +142,26 @@ bool JsonDecoder::decode(const char *key, const char *&data) {
     return true;
 }
 
+bool JsonDecoder::decode(const char *key, UUID &data) {
+    if (m_isArray) {
+        const auto &member = *m_arrayIteratorStack.back();
+        if (!member.IsUint()) {
+            return false;
+        }
+        data = member.GetUint();
+    } else {
+        if (!currentObject().HasMember(key)) {
+            return false;
+        }
+        const auto &member = currentObject()[key];
+        if (!member.IsUint()) {
+            return false;
+        }
+        data = member.GetUint();
+    }
+    return true;
+}
+
 void JsonDecoder::endObject() {
     // std::cout << "END OBJECT" << std::endl;
     // assert(!m_objectStack.empty());

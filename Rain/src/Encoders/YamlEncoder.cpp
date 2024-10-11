@@ -69,6 +69,13 @@ void YamlEncoder::encode(const char *key, const char *&data) {
     *out << YAML::Value << data;
 }
 
+void YamlEncoder::encode(const char *key, UUID &data) {
+    if (key) {
+        *out << YAML::Key << key;
+    }
+    *out << YAML::Value << data;
+}
+
 void YamlEncoder::endObject() {
     *out << YAML::EndMap;
 }

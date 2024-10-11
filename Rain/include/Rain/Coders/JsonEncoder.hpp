@@ -26,6 +26,7 @@ public:
     void encode(const char *key, const float &data) override;
     void encode(const char *key, const std::string &data) override;
     void encode(const char *key, const char *&data) override;
+    void encode(const char *key, UUID &data) override;
     void endObject() override;
     void beginArray(const char *key) override;
     void endArray() override;

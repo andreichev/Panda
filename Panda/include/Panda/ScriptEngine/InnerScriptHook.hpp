@@ -1,19 +1,20 @@
 #pragma once
 
 #include <stdint.h>
+#include <Rain/UUID.hpp>
 
 namespace Panda {
 
 using ScriptHandle = uint32_t;
 
 namespace ExternalCalls {
-    using AddScriptFunc = ScriptHandle (*)(id_t entityId, const char *name);
+    using AddScriptFunc = ScriptHandle (*)(UUID entityId, const char *name);
     extern AddScriptFunc addScriptFunc;
 
-    using InvokeUpdateAtScriptFunc = void (*)(Panda::ScriptHandle handle, float deltaTime);
+    using InvokeUpdateAtScriptFunc = void (*)(ScriptHandle handle, float deltaTime);
     extern InvokeUpdateAtScriptFunc invokeUpdateAtScriptFunc;
 
-    using InvokeStartAtScriptFunc = void (*)(Panda::ScriptHandle handle);
+    using InvokeStartAtScriptFunc = void (*)(ScriptHandle handle);
     extern InvokeStartAtScriptFunc invokeStartAtScriptFunc;
 
     using GetAvailableScripts = std::vector<const char *> (*)();

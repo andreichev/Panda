@@ -215,6 +215,14 @@ struct TypeDecoder<int> {
     }
 };
 
+/** UUID */
+template<>
+struct TypeDecoder<UUID> {
+    static void decode(const char *key, Decoder *decoder, const TypeInfo &info, UUID &data) {
+        decoder->decode(key, data);
+    }
+};
+
 /** BOOL */
 template<>
 struct TypeDecoder<bool> {
@@ -312,6 +320,14 @@ struct TypeEncoder<std::basic_string<Elem, Traits, Alloc>> {
 template<>
 struct TypeEncoder<int> {
     static void encode(const char *key, Encoder *encoder, const TypeInfo &info, int &data) {
+        encoder->encode(key, data);
+    }
+};
+
+/** UUID */
+template<>
+struct TypeEncoder<UUID> {
+    static void encode(const char *key, Encoder *encoder, const TypeInfo &info, UUID &data) {
         encoder->encode(key, data);
     }
 };

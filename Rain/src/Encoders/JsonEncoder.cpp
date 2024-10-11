@@ -137,6 +137,12 @@ void JsonEncoder::encode(const char *key, const char *&data) {
     addValue(key, value);
 }
 
+void JsonEncoder::encode(const char *key, UUID &data) {
+    rapidjson::Value value;
+    value = data;
+    addValue(key, value);
+}
+
 void JsonEncoder::addValue(const char *key, rapidjson::Value &value) {
     if (m_isArray) {
         m_arrayStack.back().ref->PushBack(value, *m_allocator);

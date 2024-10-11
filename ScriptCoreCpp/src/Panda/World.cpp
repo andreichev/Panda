@@ -5,15 +5,15 @@
 namespace Panda {
 
 std::optional<Entity> World::findByTag(const char *tag) {
-    id_t entityId = ExternalCalls::world_FindByTag(tag);
-    if (entityId == -1) {
+    UUID entityId = ExternalCalls::world_FindByTag(tag);
+    if (entityId == 0) {
         return {};
     }
     return Entity(entityId);
 }
 
 Entity World::createEntity(const char *tag) {
-    id_t entityId = ExternalCalls::world_CreateEntity(tag);
+    UUID entityId = ExternalCalls::world_CreateEntity(tag);
     return Entity(entityId);
 }
 

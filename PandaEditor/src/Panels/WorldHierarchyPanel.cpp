@@ -24,7 +24,7 @@ void WorldHierarchyPanel::onImGuiRender() {
     ImGui::Begin("World Hierarchy", nullptr, flags);
     if (m_world && !m_world->isEmpty()) {
         for (auto entityId : m_world->m_registry.storage<entt::entity>()) {
-            Entity entity((id_t)entityId, m_world);
+            Entity entity(entityId, m_world);
             if (!entity.isValid()) {
                 continue;
             }
@@ -53,7 +53,8 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     ImGuiTreeNodeFlags flags =
         ((selected == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
     flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-    bool opened = ImGui::TreeNodeEx((void *)entity.m_id, flags, "%s", tag.c_str());
+    void* id = reinterpret_cast<void*>(entity.m_handle);
+    bool opened = ImGui::TreeNodeEx(id, flags, "%s", tag.c_str());
     if (ImGui::IsItemClicked()) {
         m_world->setSelectedEntity(entity);
     }

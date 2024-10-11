@@ -145,7 +145,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
         if (m_hoveredId == -1) {
             m_output->viewportUnselectEntity();
         } else {
-            m_output->viewportPickEntityWithId(m_hoveredId);
+            m_output->viewportPickEntityWithEnttId(m_hoveredId);
         }
     }
     // LOG_EDITOR("id: {}", m_hoveredId);
@@ -167,7 +167,7 @@ bool Viewport::isFocused() {
     return m_focused;
 }
 
-id_t Viewport::getHoveredId() {
+int32_t Viewport::getHoveredId() {
     return m_hoveredId;
 }
 

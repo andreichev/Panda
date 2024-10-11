@@ -150,7 +150,6 @@ struct Vec4 : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-using id_t = int32_t;
 using Size = Vec2;
 using Color = Vec4;
 using Quat = Vec4;

@@ -16,7 +16,7 @@ namespace Panda {
 class ViewportOutput {
 public:
     virtual ~ViewportOutput() = default;
-    virtual void viewportPickEntityWithId(id_t id) = 0;
+    virtual void viewportPickEntityWithEnttId(uint32_t id) = 0;
     virtual void viewportUnselectEntity() = 0;
 };
 
@@ -30,7 +30,7 @@ public:
     void onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen);
     void focus();
     bool isFocused();
-    id_t getHoveredId();
+    int32_t getHoveredId();
     Miren::ViewId getMirenView();
 
 private:
@@ -46,7 +46,7 @@ private:
     CameraController *m_cameraController;
     bool m_focusNextFrame;
     bool m_focused;
-    id_t m_hoveredId;
+    int32_t m_hoveredId;
     Rect m_frame;
 };
 

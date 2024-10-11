@@ -32,7 +32,8 @@ public:
     void clear();
     bool isEmpty();
     Entity findByTag(const char *tag);
-    Entity getById(id_t id);
+    Entity getById(UUID id);
+    Entity getByEnttId(entt::entity id);
     inline bool isRunning() {
         return m_isRunning;
     }
@@ -45,6 +46,12 @@ public:
     void setViewId(Miren::ViewId id);
     Entity findMainCameraEntity();
     Camera *findMainCamera();
+
+    template<typename... Components>
+    auto getAllEntitiesWith() {
+        return m_registry.view<Components...>();
+    }
+
     World &operator=(World &other);
     void debugPrint();
 
@@ -67,9 +74,10 @@ public:
 
 private:
     void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
-    Entity instantiateEntity(id_t id);
-    void fillEntity(Entity entity);
+    Entity instantiateEntity(UUID id);
+    void fillEntity(Entity entity, UUID id);
 
+    std::unordered_map<UUID, Entity> m_entityIdMap;
     bool m_isRunning;
     entt::registry m_registry;
     Renderer2D m_renderer2d;

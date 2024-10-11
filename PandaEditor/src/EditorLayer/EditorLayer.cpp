@@ -397,11 +397,11 @@ SceneState EditorLayer::toolbarGetCurrentSceneState() {
 
 #pragma region Viewport output
 
-void EditorLayer::viewportPickEntityWithId(id_t id) {
+void EditorLayer::viewportPickEntityWithEnttId(uint32_t id) {
     if (!m_currentWorld) {
         return;
     }
-    Entity selected = m_currentWorld->getById(id);
+    Entity selected = m_currentWorld->getByEnttId(static_cast<entt::entity>(id));
     if (selected.isValid()) {
         m_currentWorld->setSelectedEntity(selected);
     }

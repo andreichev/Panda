@@ -4,6 +4,6 @@
 
 namespace Panda {
 
-using id_t = int32_t;
+using UUID = uint32_t;
 
 }
