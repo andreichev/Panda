@@ -1,5 +1,5 @@
 #include "imgui_impl_miren.hpp"
-#include "Panda/Assets/AssetLoader.hpp"
+#include "Panda/Assets/AssetHandler.hpp"
 
 #include <Miren/Miren.hpp>
 

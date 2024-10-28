@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Panda/Assets/AssetLoader.hpp"
+#include "Panda/Assets/AssetHandler.hpp"
 
 #include <Miren/Miren.hpp>
 #include <cstdlib>
 
 namespace Panda {
-class Texture {
+
+class Texture: public Asset {
 public:
     Texture()
         : m_handle(MIREN_INVALID_HANDLE) {}
@@ -52,4 +53,5 @@ public:
 private:
     Miren::TextureHandle m_handle;
 };
+
 } // namespace Panda

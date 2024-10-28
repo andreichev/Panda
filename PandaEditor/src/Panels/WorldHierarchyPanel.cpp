@@ -53,7 +53,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     ImGuiTreeNodeFlags flags =
         ((selected == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
     flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-    void* id = reinterpret_cast<void*>(entity.m_handle);
+    void *id = reinterpret_cast<void *>(entity.m_handle);
     bool opened = ImGui::TreeNodeEx(id, flags, "%s", tag.c_str());
     if (ImGui::IsItemClicked()) {
         m_world->setSelectedEntity(entity);

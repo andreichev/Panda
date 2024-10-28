@@ -1,13 +1,19 @@
 #pragma once
 
-#include <unordered_map>
+#include "Asset.hpp"
+
+#include <unordered_set>
 
 namespace Panda {
 
 class AssetManager {
 public:
-private:
-    std::unordered_map<AssetHandle, Ref<Asset>> m_LoadedAssets;
+    virtual ~AssetManager() = default;
+
+    virtual Asset getAsset(AssetHandle assetHandle) = 0;
+    virtual bool reloadData(AssetHandle assetHandle) = 0;
+    virtual bool isValid(AssetHandle assetHandle) = 0;
+    virtual bool isAssetLoaded(AssetHandle handle) = 0;
 };
 
 } // namespace Panda

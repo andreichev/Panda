@@ -1,5 +1,5 @@
 #include "Panda/ImGui/ImGuiFonts.hpp"
-#include "Panda/Assets/AssetLoader.hpp"
+#include "Panda/Assets/AssetHandler.hpp"
 
 namespace Panda {
 

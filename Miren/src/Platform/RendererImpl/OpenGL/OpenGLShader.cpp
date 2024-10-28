@@ -104,7 +104,7 @@ void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseV
                 PND_ASSERT(false, "Buffer element type is undefined");
                 break;
         }
-        if(type == GL_UNSIGNED_INT || type == GL_INT) {
+        if (type == GL_UNSIGNED_INT || type == GL_INT) {
             GL_CALL(glVertexAttribIPointer(
                 i,
                 layout.m_elements[i].count,

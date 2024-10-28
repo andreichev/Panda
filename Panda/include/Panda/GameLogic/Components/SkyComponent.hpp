@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panda/Assets/AssetLoader.hpp"
+#include "Panda/Assets/AssetHandler.hpp"
 #include "Panda/Application/Application.hpp"
 
 #include <glm/glm.hpp>

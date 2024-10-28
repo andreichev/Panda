@@ -10,7 +10,7 @@
 #include "Panda/Application/Layer.hpp"
 
 // Assets
-#include "Panda/Assets/AssetLoader.hpp"
+#include "Panda/Assets/AssetHandler.hpp"
 
 // Game logic
 #include "Panda/GameLogic/Entity.hpp"

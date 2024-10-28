@@ -2,7 +2,7 @@
 
 #include "Camera/CameraController.hpp"
 
-#include <Panda/Assets/AssetLoader.hpp>
+#include <Panda/Assets/AssetHandler.hpp>
 #include <glm/glm.hpp>
 #include <Miren/Miren.hpp>
 

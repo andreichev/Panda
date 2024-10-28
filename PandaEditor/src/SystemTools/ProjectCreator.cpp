@@ -4,7 +4,7 @@
 
 #include "ProjectCreator.hpp"
 
-#include <Panda/Assets/AssetLoader.hpp>
+#include <Panda/Assets/AssetHandler.hpp>
 #include <fstream>
 
 namespace Panda {
