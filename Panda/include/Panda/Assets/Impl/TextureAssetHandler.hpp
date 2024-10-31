@@ -13,4 +13,4 @@ public:
     Foundation::Shared<Asset> loadEditor(const Panda::path_t &filePath) override;
 };
 
-}
+} // namespace Panda

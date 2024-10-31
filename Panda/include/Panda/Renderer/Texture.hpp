@@ -1,20 +1,21 @@
 #pragma once
 
 #include "Panda/Assets/AssetHandler.hpp"
+#include "Panda/Assets/AssetLoaderEditor.hpp"
 
 #include <Miren/Miren.hpp>
 #include <cstdlib>
 
 namespace Panda {
 
-class Texture: public Asset {
+class Texture : public Asset {
 public:
     Texture()
         : m_handle(MIREN_INVALID_HANDLE) {}
 
     Texture(const char *path) {
-        TextureAsset asset = AssetLoader::loadTexture(path);
-        m_handle = Miren::createTexture(asset.getMirenTextureCreate());
+        TextureData data = AssetLoaderEditor::loadTexture(path);
+        m_handle = Miren::createTexture(data.getMirenTextureCreate());
         LOG_INFO("CREATED TEXTURE, path: {}", path);
     }
 
