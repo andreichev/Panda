@@ -14,12 +14,13 @@ bool isSubpath(const path_t &path, const path_t &base) {
 ProjectLoader::ProjectLoader(World *world, ProjectLoaderOutput *output)
     : m_output(output)
     , m_world(world)
-    , jsonEncoder(true)
-    , jsonDecoder()
+    , m_jsonEncoder(true)
+    , m_jsonDecoder()
     , m_editorSettings()
     , m_projectSettings()
     , m_projectPath()
-    , m_worldPath() {}
+    , m_worldPath()
+    , m_assetHandler() {}
 
 ProjectLoader::~ProjectLoader() {
     saveAppSettings();
@@ -31,7 +32,7 @@ void ProjectLoader::loadInitialData() {
     {
         std::ifstream file("config.json");
         if (file.is_open()) {
-            Rain::Decoder *decoder = &jsonDecoder;
+            Rain::Decoder *decoder = &m_jsonDecoder;
             decoder->decode(file, m_editorSettings);
             file.close();
         } else {
@@ -48,7 +49,7 @@ void ProjectLoader::saveAppSettings() {
     m_editorSettings.hasOpenedProject = !m_projectPath.empty();
     std::ofstream file("config.json");
     if (file.is_open()) {
-        Rain::Encoder *encoder = &jsonEncoder;
+        Rain::Encoder *encoder = &m_jsonEncoder;
         encoder->encode(file, m_editorSettings);
         file.close();
     }
@@ -81,7 +82,7 @@ void ProjectLoader::openProject(const path_t &path) {
     {
         std::ifstream file(projectConfigPath);
         if (file.is_open()) {
-            Rain::Decoder *decoder = &jsonDecoder;
+            Rain::Decoder *decoder = &m_jsonDecoder;
             decoder->decode(file, m_projectSettings);
             file.close();
         } else {
@@ -157,7 +158,7 @@ void ProjectLoader::saveWorld() {
     WorldDto worldDto = WorldMapper::toDto(*m_world);
     std::ofstream file(m_worldPath);
     if (file.is_open()) {
-        Rain::Encoder *encoder = &jsonEncoder;
+        Rain::Encoder *encoder = &m_jsonEncoder;
         encoder->encode(file, worldDto);
         file.close();
         m_world->setChanged(false);
@@ -174,7 +175,7 @@ void ProjectLoader::loadWorld() {
     WorldDto worldDto;
     std::ifstream file(m_worldPath);
     if (file.is_open()) {
-        Rain::Decoder *decoder = &jsonDecoder;
+        Rain::Decoder *decoder = &m_jsonDecoder;
         decoder->decode(file, worldDto);
         file.close();
     } else {
@@ -242,7 +243,7 @@ void ProjectLoader::saveProjectSettings() {
     {
         std::ofstream file(projectConfigPath);
         if (file.is_open()) {
-            Rain::Encoder *encoder = &jsonEncoder;
+            Rain::Encoder *encoder = &m_jsonEncoder;
             encoder->encode(file, m_projectSettings);
             file.close();
         } else {

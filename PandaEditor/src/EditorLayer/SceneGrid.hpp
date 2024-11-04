@@ -60,7 +60,7 @@ public:
         m_indexBuffer =
             Miren::createIndexBuffer(indicesMemory, Miren::BufferElementType::UnsignedInt, 6);
 
-        Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
+        Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
             "editor-shaders/grid_vertex.glsl", "editor-shaders/grid_fragment.glsl"
         );
         m_shader = Miren::createProgram(programAsset.getMirenProgramCreate());

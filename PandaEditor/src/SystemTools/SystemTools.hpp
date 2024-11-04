@@ -1,11 +1,9 @@
 #pragma once
 
-#include <filesystem>
+#include <Panda/Base/FileBase.hpp>
 #include <optional>
 
 namespace Panda {
-
-using path_t = std::filesystem::path;
 
 class SystemTools {
 public:

@@ -1,5 +1,6 @@
 #include "Panda/ImGui/ImGuiFonts.hpp"
 #include "Panda/Assets/AssetHandler.hpp"
+#include "Panda/Assets/AssetLoaderEditor.hpp"
 
 namespace Panda {
 
@@ -16,7 +17,7 @@ void Fonts::add(const FontConfiguration &config, bool isDefault) {
     imguiFontConfig.OversampleH = 4;
     imguiFontConfig.OversampleV = 4;
     auto &io = ImGui::GetIO();
-    path_t fontPath = AssetLoader::getResourcesPath() / "default-fonts" / config.fileName;
+    path_t fontPath = AssetHandler::s_defaultResourcesPath / "default-fonts" / config.fileName;
     ImFont *font = io.Fonts->AddFontFromFileTTF(
         fontPath.string().c_str(),
         config.size,

@@ -4,7 +4,6 @@
 #include <glm/gtx/quaternion.hpp>
 #include <imgui.h>
 #include <Rain/Rain.hpp>
-#include <Rain/Codable.hpp>
 
 namespace Panda {
 

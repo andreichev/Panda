@@ -12,8 +12,7 @@ void releaseImage(void *data, void *userInfo) {
 TextureData AssetLoaderEditor::loadTexture(const path_t &path) {
     // stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
-    path_t texturePath = s_resourcesPath / path;
-    void *image = stbi_load(texturePath.string().c_str(), &width, &height, &channels, 0);
+    void *image = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
 
     if (image == nullptr) {
         LOG_ERROR("Failed to load a texture file! {}", stbi_failure_reason());
@@ -41,12 +40,11 @@ TextureData AssetLoaderEditor::loadCubeMapTexture(std::array<path_t, 6> paths) {
     std::array<void *, 6> images;
     int bytesPerColor;
     for (uint16_t side = 0; side < 6; ++side) {
-        const std::string &path = paths[side].string();
+        const path_t &texturePath = paths[side];
         int width, height, channels;
-        path_t texturePath = s_resourcesPath / path;
         void *image = stbi_load(texturePath.string().c_str(), &width, &height, &channels, 0);
         if (image == nullptr) {
-            LOG_ERROR("Failed to load a texture file at path {}", path);
+            LOG_ERROR("Failed to load a texture file at path {}", texturePath.string().c_str());
             continue;
         }
         if (channels == 1) {
@@ -84,8 +82,8 @@ ProgramData AssetLoaderEditor::loadProgram(const path_t &vertexPath, const path_
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         // open files
-        vShaderFile.open(s_resourcesPath / vertexPath);
-        fShaderFile.open(s_resourcesPath / fragmentPath);
+        vShaderFile.open(vertexPath);
+        fShaderFile.open(fragmentPath);
         std::stringstream vShaderStream, fShaderStream;
         // read file's buffer contents into streams
         vShaderStream << vShaderFile.rdbuf();

@@ -3,7 +3,6 @@
 #include "Panda/GameLogic/Components/BaseComponents.hpp"
 
 #include <Rain/Rain.hpp>
-#include <Rain/Codable.hpp>
 
 namespace Panda {
 

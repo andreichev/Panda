@@ -13,10 +13,10 @@ public:
     Texture()
         : m_handle(MIREN_INVALID_HANDLE) {}
 
-    Texture(const char *path) {
+    Texture(const path_t &path) {
         TextureData data = AssetLoaderEditor::loadTexture(path);
         m_handle = Miren::createTexture(data.getMirenTextureCreate());
-        LOG_INFO("CREATED TEXTURE, path: {}", path);
+        LOG_INFO("CREATED TEXTURE, path: {}", path.c_str());
     }
 
     Texture(Foundation::Memory mem, uint32_t width, uint32_t height) {

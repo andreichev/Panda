@@ -19,3 +19,5 @@
 #define RAIN_FIELDS_END                                                                            \
     return fields;                                                                                 \
     }
+
+#include "Codable.hpp"

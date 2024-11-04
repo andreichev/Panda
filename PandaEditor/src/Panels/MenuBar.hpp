@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Model/RecentProject.hpp"
+#include "Serialization/RecentProject.hpp"
 #include "SystemTools/SystemTools.hpp"
 
 #include <imgui.h>

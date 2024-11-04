@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Rain/Rain.hpp>
-#include <Rain/Codable.hpp>
 
 namespace Panda {
 

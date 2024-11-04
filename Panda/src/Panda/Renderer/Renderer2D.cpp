@@ -12,7 +12,7 @@ Renderer2D::Renderer2D()
         (Vertex2D *)F_ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
     m_drawData.indices =
         (uint16_t *)F_ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
-    Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
+    Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
         "default-shaders/renderer2d/renderer2d_vertex.glsl",
         "default-shaders/renderer2d/renderer2d_fragment.glsl"
     );

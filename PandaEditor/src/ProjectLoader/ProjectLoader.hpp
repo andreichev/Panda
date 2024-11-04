@@ -1,10 +1,11 @@
 #pragma once
 
+#include "AssetHandlerEditor.hpp"
 #include "Panda/GameLogic/World.hpp"
 #include "Panda/ScriptEngine/ScriptEngine.hpp"
-#include "Model/EditorSettings.hpp"
+#include "Serialization/EditorSettings.hpp"
 #include "SystemTools/ProjectCreator.hpp"
-#include "Model/ProjectSettings.hpp"
+#include "Serialization/ProjectSettings.hpp"
 
 #include <Rain/Coders/JsonEncoder.hpp>
 #include <Rain/Coders/JsonDecoder.hpp>
@@ -47,8 +48,8 @@ private:
     void loadRecentProject();
     void appendRecentProject();
 
-    Rain::JsonEncoder jsonEncoder;
-    Rain::JsonDecoder jsonDecoder;
+    Rain::JsonEncoder m_jsonEncoder;
+    Rain::JsonDecoder m_jsonDecoder;
     EditorSettings m_editorSettings;
     ProjectSettings m_projectSettings;
     ProjectCreator m_projectCreator;
@@ -57,6 +58,7 @@ private:
     World *m_world;
     ProjectLoaderOutput *m_output;
     ScriptEngine m_scriptEngine;
+    AssetHandlerEditor m_assetHandler;
 };
 
 } // namespace Panda

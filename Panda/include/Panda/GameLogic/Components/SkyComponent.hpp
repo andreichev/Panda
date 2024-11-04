@@ -106,7 +106,7 @@ public:
         m_indexBuffer =
             Miren::createIndexBuffer(indicesMemory, Miren::BufferElementType::UnsignedInt, 36);
 
-        Panda::TextureAsset m_skyTextureAsset = AssetLoader::loadCubeMapTexture({
+        Panda::TextureData m_skyTextureAsset = AssetLoaderEditor::loadCubeMapTexture({
             "default-textures/skybox/2/px.png",
             "default-textures/skybox/2/nx.png",
             "default-textures/skybox/2/py.png",
@@ -120,7 +120,7 @@ public:
         m_skyTextureConfig.m_wrap = CLAMP;
         m_skyTexture = Miren::createTexture(m_skyTextureConfig);
 
-        Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
+        Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
             "default-shaders/sky/sky_vertex.glsl", "default-shaders/sky/sky_fragment.glsl"
         );
         m_shader = Miren::createProgram(programAsset.getMirenProgramCreate());

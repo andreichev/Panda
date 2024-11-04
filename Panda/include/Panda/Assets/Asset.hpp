@@ -3,6 +3,7 @@
 #include <Foundation/Foundation.hpp>
 #include <Rain/UUID.hpp>
 #include <cstdint>
+#include <filesystem>
 
 namespace Panda {
 

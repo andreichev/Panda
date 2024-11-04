@@ -1,5 +1,6 @@
 #include "imgui_impl_miren.hpp"
 #include "Panda/Assets/AssetHandler.hpp"
+#include "Panda/Assets/AssetLoaderEditor.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -146,7 +147,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_DestroyFontsTexture() {
 
 IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
     using namespace Miren;
-    Panda::ProgramAsset programAsset = Panda::AssetLoader::loadProgram(
+    Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
         "default-shaders/imgui/imgui_vertex.glsl", "default-shaders/imgui/imgui_fragment.glsl"
     );
     shader = Miren::createProgram(programAsset.getMirenProgramCreate());

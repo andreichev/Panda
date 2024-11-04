@@ -1,10 +1,9 @@
 #include <fstream>
 
 #include "Panda/Base/Base.hpp"
+#include "Panda/Base/FileBase.hpp"
 
 namespace Panda {
-
-using path_t = std::filesystem::path;
 
 class FileStreamWriter {
 public:

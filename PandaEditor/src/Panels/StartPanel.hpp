@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Model/RecentProject.hpp"
+#include "Serialization/RecentProject.hpp"
 #include "Panda/ImGui/FontAwesome.h"
 #include "Panda/ImGui/ImGuiFonts.hpp"
 #include "Panda/Application/Application.hpp"

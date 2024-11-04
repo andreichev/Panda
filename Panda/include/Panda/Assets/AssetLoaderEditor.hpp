@@ -1,10 +1,9 @@
 #pragma once
 
-#include <filesystem>
+#include <Panda/Base/FileBase.hpp>
+#include <Miren/Miren.hpp>
 
 namespace Panda {
-
-using path_t = std::filesystem::path;
 
 struct TextureData {
     Miren::TextureFormat m_format;
@@ -40,8 +39,6 @@ public:
     static TextureData loadTexture(const path_t &path);
     static TextureData loadCubeMapTexture(std::array<path_t, 6> paths);
     static ProgramData loadProgram(const path_t &vertexPath, const path_t &fragmentPath);
-
-    static path_t s_resourcesPath;
 };
 
 } // namespace Panda

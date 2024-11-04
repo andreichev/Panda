@@ -13,7 +13,6 @@
 
 #include <Foundation/Foundation.hpp>
 #include <Rain/Rain.hpp>
-#include <Rain/Codable.hpp>
 
 namespace Panda {
 

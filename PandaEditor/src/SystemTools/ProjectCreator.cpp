@@ -4,6 +4,7 @@
 
 #include "ProjectCreator.hpp"
 
+#include <Panda/Assets/AssetLoaderEditor.hpp>
 #include <Panda/Assets/AssetHandler.hpp>
 #include <fstream>
 
@@ -58,7 +59,7 @@ void ProjectCreator::createProject(const std::string &name, const Panda::path_t 
     std::filesystem::create_directory(scriptingProjectPath);
 
     copyAndReplace(
-        AssetLoader::getResourcesPath() / "Templates" / "NewCppProject",
+        AssetHandler::s_defaultResourcesPath / "Templates" / "NewCppProject",
         scriptingProjectPath,
         "___PROJECTNAME___",
         name

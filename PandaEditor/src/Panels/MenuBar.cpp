@@ -1,5 +1,7 @@
 #include "MenuBar.hpp"
 
+#include <Foundation/PlatformDetection.hpp>
+
 namespace Panda {
 
 MenuBar::MenuBar(MenuBarOutput *output)
