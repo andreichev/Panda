@@ -1,5 +1,9 @@
 #include "AssetHandlerEditor.hpp"
 
+#include <Panda/Assets/AssetLoaderEditor.hpp>
+#include <Panda/Renderer/Texture.hpp>
+#include <Panda/Renderer/GpuProgram.hpp>
+
 #include <fstream>
 
 namespace Panda {
@@ -12,7 +16,26 @@ AssetHandlerEditor::AssetHandlerEditor()
     , m_jsonEncoder(true)
     , m_jsonDecoder() {}
 
-Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {}
+Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
+    PND_ASSERT(m_registry.find(id) != m_registry.end(), "UNKNOWN ASSET ID");
+    if (m_cache.find(id) != m_cache.end()) {
+        return m_cache.at(id);
+    }
+    auto assetInfo = m_registry.at(id);
+    Foundation::Shared<Asset> asset;
+    switch (assetInfo.type) {
+        case AssetType::TEXTURE:
+            asset = Foundation::makeShared<Texture>(assetInfo.path);
+        case AssetType::PROGRAM:
+            asset = nullptr; // Foundation::makeShared<GpuProgram>(assetInfo.path);
+        case AssetType::CUBE_MAP:
+            asset = nullptr;
+        case AssetType::NONE:
+            asset = nullptr;
+    }
+    m_cache[id] = asset;
+    return asset;
+}
 
 void AssetHandlerEditor::openProject(const path_t path) {
     m_projectPath = path;
