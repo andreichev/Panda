@@ -25,6 +25,7 @@ ProjectLoader::ProjectLoader(World *world, ProjectLoaderOutput *output)
 ProjectLoader::~ProjectLoader() {
     saveAppSettings();
     saveProjectSettings();
+    m_assetHandler.closeProject();
 }
 
 void ProjectLoader::loadInitialData() {
@@ -98,6 +99,8 @@ void ProjectLoader::openProject(const path_t &path) {
         m_output->loaderCreateSampleWorld();
         return;
     }
+    // Load asset registry
+    { m_assetHandler.openProject(m_projectPath); }
     m_worldPath = m_projectPath;
     m_worldPath.append(m_projectSettings.worldPath);
     reloadScriptsDll();
@@ -204,6 +207,7 @@ void ProjectLoader::saveWorldAs() {
 void ProjectLoader::closeProject() {
     saveAppSettings();
     saveProjectSettings();
+    m_assetHandler.closeProject();
     m_projectSettings.clear();
     m_worldPath.clear();
     m_projectPath.clear();
