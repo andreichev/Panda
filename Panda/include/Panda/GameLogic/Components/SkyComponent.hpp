@@ -107,12 +107,12 @@ public:
             Miren::createIndexBuffer(indicesMemory, Miren::BufferElementType::UnsignedInt, 36);
 
         Panda::TextureData m_skyTextureAsset = AssetLoaderEditor::loadCubeMapTexture({
-            "default-textures/skybox/2/px.png",
-            "default-textures/skybox/2/nx.png",
-            "default-textures/skybox/2/py.png",
-            "default-textures/skybox/2/ny.png",
-            "default-textures/skybox/2/pz.png",
-            "default-textures/skybox/2/nz.png",
+            "default-textures/skybox/3/px.png",
+            "default-textures/skybox/3/nx.png",
+            "default-textures/skybox/3/py.png",
+            "default-textures/skybox/3/ny.png",
+            "default-textures/skybox/3/pz.png",
+            "default-textures/skybox/3/nz.png",
         });
         Miren::TextureCreate m_skyTextureConfig = m_skyTextureAsset.getMirenTextureCreate();
         m_skyTextureConfig.m_minFiltering = NEAREST;
