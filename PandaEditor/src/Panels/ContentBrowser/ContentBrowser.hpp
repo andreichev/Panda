@@ -24,8 +24,10 @@ public:
     void setBaseDirectory(const path_t &path);
     void createFolder(std::string name);
     void confirmDeletion();
+    bool isFocused();
 
 private:
+    bool m_focused;
     path_t m_baseDirectory;
     path_t m_currentDirectory;
     path_t m_deletingDirectory;

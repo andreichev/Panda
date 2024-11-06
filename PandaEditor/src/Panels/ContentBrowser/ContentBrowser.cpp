@@ -186,4 +186,8 @@ void ContentBrowser::confirmDeletion() {
     std::filesystem::remove_all(m_deletingDirectory);
 }
 
+bool ContentBrowser::isFocused() {
+    return m_focused;
+}
+
 } // namespace Panda
