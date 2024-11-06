@@ -166,6 +166,7 @@ void ContentBrowser::onImGuiRender() {
         ImGui::PopID();
     }
     ImGui::Columns(1);
+    m_focused = ImGui::IsWindowFocused();
     // ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
     // ImGui::SliderFloat("Padding", &padding, 0, 32);
     ImGui::End();
@@ -182,6 +183,10 @@ void ContentBrowser::createFolder(std::string name) {
 
 void ContentBrowser::confirmDeletion() {
     std::filesystem::remove_all(m_deletingDirectory);
+}
+
+bool ContentBrowser::isFocused() {
+    return m_focused;
 }
 
 } // namespace Panda

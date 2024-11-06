@@ -536,6 +536,19 @@ void EditorLayer::processShortcuts() {
             saveWorld();
         }
     }
+
+    auto clipboardText = Application::get()->getWindow()->getClipboardText();
+
+    if (clipboardText != nullptr) {
+        LOG_INFO("Text: {}", clipboardText);
+    }
+
+    if (clipboardText != nullptr && ctrl && ImGui::IsKeyPressed(ImGuiKey_V, false)) {
+        if (m_contentBrowser.isFocused() && std::filesystem::exists(clipboardText)) {
+
+        }
+    }
+
     if (ImGui::IsKeyPressed(ImGuiKey_Z, false)) {
         if (ctrl) {
             if (shift) {
