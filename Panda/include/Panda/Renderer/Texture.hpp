@@ -13,16 +13,24 @@ public:
     Texture()
         : m_handle(MIREN_INVALID_HANDLE) {}
 
+    /// Editor constructor
     Texture(const path_t &path) {
         TextureData data = AssetLoaderEditor::loadTexture(path);
         m_handle = Miren::createTexture(data.getMirenTextureCreate());
         LOG_INFO("CREATED TEXTURE, path: {}", path.c_str());
     }
 
-    Texture(Foundation::Memory mem, uint32_t width, uint32_t height) {
+    /// Runtime constructor
+    Texture(
+        Foundation::Memory mem,
+        uint32_t width = 1,
+        uint32_t height = 1,
+        Miren::TextureFormat format = Miren::RGBA8,
+        int numMips = 0
+    ) {
         Miren::TextureCreate create;
         create.m_data = mem;
-        create.m_format = Miren::TextureFormat::RGBA8;
+        create.m_format = format;
         create.m_numMips = 0;
         create.m_width = width;
         create.m_height = height;

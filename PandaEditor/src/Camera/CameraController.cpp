@@ -145,10 +145,10 @@ void CameraController::reset(glm::vec3 pos) {
     TransformComponent newTransform;
     newTransform.setPosition({pos.x + 1.5, pos.y + 1.5, pos.z + 1.5});
     glm::quat r;
-    r.x = -0.27716076374053955;
-    r.y = 0.3426811695098877;
-    r.z = 0.08326273411512375;
-    r.w = 0.8937666416168213;
+    r.x = -0.2911117374897003;
+    r.y = 0.31903332471847534;
+    r.z = 0.10366018861532211;
+    r.w = 0.8959499597549438;
     newTransform.setRotation(r);
     animateTo(newTransform);
 }
