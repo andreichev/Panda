@@ -14,7 +14,8 @@ AssetHandlerEditor::AssetHandlerEditor()
     , m_registry()
     , m_cache()
     , m_jsonEncoder(true)
-    , m_jsonDecoder() {}
+    , m_jsonDecoder()
+    , m_importedAssets() {}
 
 Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
     PND_ASSERT(m_registry.find(id) != m_registry.end(), "UNKNOWN ASSET ID");
@@ -37,7 +38,24 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
     return asset;
 }
 
-void AssetHandlerEditor::openProject(const path_t path) {
+void AssetHandlerEditor::importAsset(const path_t &path) {
+    PND_ASSERT(!isAssetImported(path), "ASSET ALREADY IMPORTED");
+    path_t assetPath = std::filesystem::relative(path, m_projectPath);
+    AssetInfoEditor info;
+    info.id = UUID();
+    info.path = assetPath;
+    info.type = AssetType::TEXTURE;
+    m_registry[info.id] = info;
+    m_importedAssets.insert(assetPath);
+    saveAssetRegistry();
+}
+
+bool AssetHandlerEditor::isAssetImported(path_t path) {
+    path_t assetPath = std::filesystem::relative(path, m_projectPath);
+    return m_importedAssets.contains(assetPath);
+}
+
+void AssetHandlerEditor::openProject(const path_t &path) {
     m_projectPath = path;
     path_t projectName = m_projectPath.filename();
     path_t pandaDirectoryPath = path;
@@ -60,6 +78,7 @@ void AssetHandlerEditor::loadAssetRegistry() {
         for (auto &assetInfoDto : registryDto.assets) {
             AssetInfoEditor assetInfo = AssetRegistryMapper::toEntity(assetInfoDto);
             m_registry[assetInfo.id] = assetInfo;
+            m_importedAssets.insert(assetInfo.path);
         }
     } else {
         LOG_INFO("ASSET REGISTRY NOT FOUND");
@@ -85,6 +104,7 @@ void AssetHandlerEditor::saveAssetRegistry() {
         Rain::Encoder *encoder = &m_jsonEncoder;
         encoder->encode(file, registryDto);
         file.close();
+        LOG_EDITOR("Asset registry saved.");
     } else {
         LOG_INFO("ASSET REGISTRY SAVING ERROR");
     }

@@ -12,6 +12,7 @@ ContentBrowser::ContentBrowser(ContentBrowserOutput *output)
     , m_currentDirectory()
     , m_defaultFileIcon("ui/icons/_plain.png")
     , m_directoryIcon("ui/icons/DirectoryIcon.png")
+    , m_importedIcon("ui/icons/ImportedAssetIcon.png")
     , m_fileIcons() {
     m_fileIcons.emplace(".avi", Texture("ui/icons/avi.png"));
     m_fileIcons.emplace(".bmp", Texture("ui/icons/bmp.png"));
@@ -93,7 +94,8 @@ void ContentBrowser::onImGuiRender() {
 
     ImGui::Columns(columnCount, 0, false);
     for (auto &directoryEntry : std::filesystem::directory_iterator(m_currentDirectory)) {
-        const auto &path = directoryEntry.path();
+        const path_t &path = directoryEntry.path();
+        bool isImported = m_output->isAssetImported(path);
         std::string filenameString = path.filename().string();
 
         if (!showHiddenFiles && filenameString[0] == '.') {
@@ -112,11 +114,18 @@ void ContentBrowser::onImGuiRender() {
             }
         }
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        ImVec2 thumbnailPos = ImGui::GetCursorPos();
         ImGui::ImageButton(
             filenameString.c_str(),
             (ImTextureID)(intptr_t)icon->getHandle().id,
             {thumbnailSize, thumbnailSize}
         );
+        if (isImported) {
+            ImVec2 nextThumbnailPos = ImGui::GetCursorPos();
+            ImGui::SetCursorPos({thumbnailPos.x + 10, thumbnailPos.y + 5});
+            ImGui::Image((ImTextureID)(intptr_t)m_importedIcon.getHandle().id, {24, 24});
+            ImGui::SetCursorPos(nextThumbnailPos);
+        }
         ImGui::PopStyleColor();
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
             if (directoryEntry.is_directory()) {
@@ -130,6 +139,11 @@ void ContentBrowser::onImGuiRender() {
             if (ImGui::MenuItem("Delete")) {
                 m_deletingDirectory = path;
                 m_output->deleteFileShowPopup(path);
+            }
+            if (!isImported) {
+                if (ImGui::MenuItem("Import Asset")) {
+                    m_output->importAsset(path);
+                }
             }
             ImGui::EndPopup();
         }

@@ -73,6 +73,8 @@ public:
 #pragma region Content browser output
     void showCreateFolderPopup() override;
     void deleteFileShowPopup(path_t path) override;
+    void importAsset(const path_t &path) override;
+    bool isAssetImported(const path_t &path) override;
 #pragma endregion
 
 #pragma region Toolbar output
