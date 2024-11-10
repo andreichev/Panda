@@ -95,15 +95,16 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     positions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
     positions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
     glm::vec2 textureCoords[4];
-    textureCoords[0] = {0.0f, 0.0f};
-    textureCoords[1] = {1.0f, 0.0f};
-    textureCoords[2] = {1.0f, 1.0f};
-    textureCoords[3] = {0.0f, 1.0f};
+    textureCoords[0] = {0.0f, 1.0f};
+    textureCoords[1] = {1.0f, 1.0f};
+    textureCoords[2] = {1.0f, 0.0f};
+    textureCoords[3] = {0.0f, 0.0f};
 
     float textureIndex = 0.0f;
     if (rect.texture != nullptr) {
         for (uint32_t i = 1; i < m_drawData.textureSlotIndex; i++) {
-            if ((*rect.texture).getHandle().id == (*m_drawData.textures[i]).getHandle().id) {
+            auto texture = Foundation::SharedCast<Texture>(rect.texture);
+            if (texture->getHandle().id == (*m_drawData.textures[i]).getHandle().id) {
                 textureIndex = (float)i;
                 break;
             }
@@ -111,7 +112,8 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
         if (textureIndex == 0.0f) {
             // TODO: Check if next batch is needed
             textureIndex = (float)m_drawData.textureSlotIndex;
-            m_drawData.textures[m_drawData.textureSlotIndex] = rect.texture;
+            m_drawData.textures[m_drawData.textureSlotIndex] =
+                Foundation::SharedCast<Texture>(rect.texture);
             m_drawData.textureSlotIndex++;
         }
     }

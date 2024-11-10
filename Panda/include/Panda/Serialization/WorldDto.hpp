@@ -10,7 +10,7 @@ struct EntityDto : public Rain::Codable {
     TagComponent tagComponent;
     TransformComponentDto transformComponent;
     std::optional<CameraComponentDto> cameraComponent;
-    std::optional<SpriteRendererComponent> spriteRendererComponent;
+    std::optional<SpriteRendererComponentDto> spriteRendererComponent;
     std::optional<CubeMapDto> cubeMapComponent;
     ScriptListComponentDto scriptListComponent;
 

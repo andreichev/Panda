@@ -1,5 +1,6 @@
 
 #include "ContentBrowser.hpp"
+#include "Model/DragDropItem.hpp"
 #include "Panda/ImGui/FontAwesome.h"
 
 #include <imgui.h>
@@ -95,7 +96,7 @@ void ContentBrowser::onImGuiRender() {
     ImGui::Columns(columnCount, 0, false);
     for (auto &directoryEntry : std::filesystem::directory_iterator(m_currentDirectory)) {
         const path_t &path = directoryEntry.path();
-        bool isImported = m_output->isAssetImported(path);
+        UUID assetId = m_output->getAssetId(path);
         std::string filenameString = path.filename().string();
 
         if (!showHiddenFiles && filenameString[0] == '.') {
@@ -120,7 +121,16 @@ void ContentBrowser::onImGuiRender() {
             (ImTextureID)(intptr_t)icon->getHandle().id,
             {thumbnailSize, thumbnailSize}
         );
-        if (isImported) {
+        if (assetId) {
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                DragDropItem item;
+                item.type = DragDropItemType::TEXTURE;
+                item.assetId = assetId;
+                ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+                ImGui::Text("Texture");
+                ImGui::EndDragDropSource();
+            }
+
             ImVec2 nextThumbnailPos = ImGui::GetCursorPos();
             ImGui::SetCursorPos({thumbnailPos.x + 10, thumbnailPos.y + 5});
             ImGui::Image((ImTextureID)(intptr_t)m_importedIcon.getHandle().id, {24, 24});
@@ -132,7 +142,7 @@ void ContentBrowser::onImGuiRender() {
                 m_currentDirectory /= path.filename();
             }
         }
-        if (ImGui::BeginPopupContextItem()) {
+        if (ImGui::BeginPopupContextItem(filenameString.c_str())) {
             if (ImGui::MenuItem("Show in Finder")) {
                 SystemTools::show(path.c_str());
             }
@@ -140,7 +150,7 @@ void ContentBrowser::onImGuiRender() {
                 m_deletingDirectory = path;
                 m_output->deleteFileShowPopup(path);
             }
-            if (!isImported) {
+            if (!assetId) {
                 if (ImGui::MenuItem("Import Asset")) {
                     m_output->importAsset(path);
                 }

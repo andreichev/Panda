@@ -51,6 +51,19 @@ struct WorldCameraDto : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
+struct SpriteRendererComponentDto : public Rain::Codable {
+    Color color;
+    UUID texture = 0;
+
+    SpriteRendererComponentDto() = default;
+    SpriteRendererComponentDto(const SpriteRendererComponentDto &other) = default;
+
+    RAIN_FIELDS_BEGIN(SpriteRendererComponentDto)
+    RAIN_FIELD(color)
+    RAIN_FIELD(texture)
+    RAIN_FIELDS_END
+};
+
 struct CameraComponentDto : public Rain::Codable {
     bool isPrimary;
     WorldCameraDto camera;

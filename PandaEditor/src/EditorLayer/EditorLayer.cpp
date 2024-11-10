@@ -43,11 +43,13 @@ void EditorLayer::onAttach() {
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
     m_loader.loadInitialData();
     GameContext::s_currentWorld = m_currentWorld;
+    GameContext::s_assetHandler = &m_loader.getAssetHandler();
     LOG_EDITOR("EDITOR INITIALIZED");
 }
 
 void EditorLayer::onDetach() {
     GameContext::s_currentWorld = nullptr;
+    GameContext::s_assetHandler = nullptr;
 }
 
 void EditorLayer::onUpdate(double deltaTime) {
@@ -85,6 +87,7 @@ void EditorLayer::onUpdate(double deltaTime) {
 }
 
 void EditorLayer::onImGuiRender() {
+    // ImGui::ShowDemoWindow();
     if (!m_popups.empty()) {
         auto &popup = m_popups.back();
         popup->onImGuiRender();
@@ -352,8 +355,8 @@ void EditorLayer::importAsset(const path_t &path) {
     m_loader.getAssetHandler().importAsset(path);
 }
 
-bool EditorLayer::isAssetImported(const path_t &path) {
-    return m_loader.getAssetHandler().isAssetImported(path);
+UUID EditorLayer::getAssetId(const path_t &path) {
+    return m_loader.getAssetHandler().getAssetId(path);
 }
 
 #pragma endregion

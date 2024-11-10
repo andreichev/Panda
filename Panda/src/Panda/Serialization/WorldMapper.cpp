@@ -31,7 +31,11 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         }
         // SPRITE RENDERER COMPONENT
         if (entityDto.spriteRendererComponent.has_value()) {
-            entity.addComponent<SpriteRendererComponent>(entityDto.spriteRendererComponent.value());
+            SpriteRendererComponentDto &spriteRendererDto =
+                entityDto.spriteRendererComponent.value();
+            auto &spriteRenderer = entity.addComponent<SpriteRendererComponent>();
+            spriteRenderer.color = spriteRendererDto.color;
+            spriteRenderer.textureId = spriteRendererDto.texture;
         }
         // CUBE MAP COMPONENT
         if (entityDto.cubeMapComponent.has_value()) {
@@ -89,7 +93,12 @@ WorldDto WorldMapper::toDto(const World &world) {
         }
         // SPRITE RENDERER COMPONENT
         if (entity.hasComponent<SpriteRendererComponent>()) {
-            entityDto.spriteRendererComponent = entity.getComponent<SpriteRendererComponent>();
+            SpriteRendererComponent &spriteRenderer =
+                entity.getComponent<SpriteRendererComponent>();
+            SpriteRendererComponentDto spriteRendererDto;
+            spriteRendererDto.color = spriteRenderer.color;
+            spriteRendererDto.texture = spriteRenderer.textureId;
+            entityDto.spriteRendererComponent = spriteRendererDto;
         }
         // CUBE MAP COMPONENT
         if (entity.hasComponent<SkyComponent>()) {

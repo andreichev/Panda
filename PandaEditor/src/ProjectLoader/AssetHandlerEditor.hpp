@@ -6,18 +6,21 @@
 #include <Rain/Coders/JsonDecoder.hpp>
 #include <Rain/Coders/JsonEncoder.hpp>
 #include <Panda/Assets/AssetHandler.hpp>
-#include <unordered_set>
 
 namespace Panda {
 
 class AssetHandlerEditor : public AssetHandler {
 public:
     AssetHandlerEditor();
+    ~AssetHandlerEditor();
     Foundation::Shared<Asset> load(AssetId id) override;
     void importAsset(const path_t &path);
-    bool isAssetImported(path_t path);
+    UUID getAssetId(path_t path);
     void openProject(const path_t &path);
     void closeProject();
+    static inline AssetHandlerEditor *getInstance() {
+        return s_instance;
+    }
 
 private:
     void loadAssetRegistry();
@@ -30,7 +33,8 @@ private:
     Rain::JsonDecoder m_jsonDecoder;
     std::unordered_map<AssetId, Foundation::Shared<Asset>> m_cache;
     std::unordered_map<AssetId, AssetInfoEditor> m_registry;
-    std::unordered_set<path_t> m_importedAssets;
+    std::unordered_map<path_t, AssetId> m_importedAssets;
+    static AssetHandlerEditor *s_instance;
 };
 
 } // namespace Panda
