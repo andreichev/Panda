@@ -348,6 +348,14 @@ void EditorLayer::deleteFileShowPopup(path_t path) {
     m_popups.emplace_back(popup);
 }
 
+void EditorLayer::importAsset(const path_t &path) {
+    m_loader.getAssetHandler().importAsset(path);
+}
+
+bool EditorLayer::isAssetImported(const path_t &path) {
+    return m_loader.getAssetHandler().isAssetImported(path);
+}
+
 #pragma endregion
 
 #pragma region Toolbar output

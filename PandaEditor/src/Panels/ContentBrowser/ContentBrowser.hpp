@@ -13,6 +13,8 @@ public:
     virtual ~ContentBrowserOutput() = default;
     virtual void showCreateFolderPopup() = 0;
     virtual void deleteFileShowPopup(path_t path) = 0;
+    virtual void importAsset(const path_t &path) = 0;
+    virtual bool isAssetImported(const path_t &path) = 0;
 };
 
 class ContentBrowser {
@@ -29,6 +31,7 @@ private:
     path_t m_deletingDirectory;
     Texture m_directoryIcon;
     Texture m_defaultFileIcon;
+    Texture m_importedIcon;
     ContentBrowserOutput *m_output;
     std::map<std::string, Texture> m_fileIcons;
 };
