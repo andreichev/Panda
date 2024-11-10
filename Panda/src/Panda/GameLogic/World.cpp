@@ -3,6 +3,7 @@
 //
 
 #include "Panda/GameLogic/World.hpp"
+#include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 #include <Rain/Rain.hpp>
@@ -151,6 +152,12 @@ void World::updateBasicComponents(
             Panda::Renderer2D::RectData rect;
             rect.transform = transform.getTransform();
             rect.color = spriteComponent.color;
+            // Load texture if it needs.
+            AssetHandler *assetHandler = GameContext::s_assetHandler;
+            if (spriteComponent.textureId && !spriteComponent.texture && assetHandler) {
+                spriteComponent.texture = assetHandler->load(spriteComponent.textureId);
+            }
+            rect.texture = spriteComponent.texture;
             rect.size = {1.f, 1.f};
             rect.id = static_cast<int32_t>(entityHandle);
             m_renderer2d.drawRect(rect);

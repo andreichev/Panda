@@ -8,6 +8,8 @@
 
 namespace Panda {
 
+AssetHandlerEditor *AssetHandlerEditor::s_instance = nullptr;
+
 AssetHandlerEditor::AssetHandlerEditor()
     : m_projectPath()
     , m_assetRegistryPath()
@@ -15,7 +17,13 @@ AssetHandlerEditor::AssetHandlerEditor()
     , m_cache()
     , m_jsonEncoder(true)
     , m_jsonDecoder()
-    , m_importedAssets() {}
+    , m_importedAssets() {
+    s_instance = this;
+}
+
+AssetHandlerEditor::~AssetHandlerEditor() {
+    s_instance = nullptr;
+}
 
 Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
     PND_ASSERT(m_registry.find(id) != m_registry.end(), "UNKNOWN ASSET ID");
@@ -25,34 +33,45 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
     auto assetInfo = m_registry.at(id);
     Foundation::Shared<Asset> asset;
     switch (assetInfo.type) {
-        case AssetType::TEXTURE:
-            asset = Foundation::makeShared<Texture>(assetInfo.path);
-        case AssetType::PROGRAM:
+        case AssetType::TEXTURE: {
+            asset = Foundation::makeShared<Texture>(m_projectPath / assetInfo.path);
+            break;
+        }
+        case AssetType::PROGRAM: {
             asset = nullptr; // Foundation::makeShared<GpuProgram>(assetInfo.path);
-        case AssetType::CUBE_MAP:
+            break;
+        }
+        case AssetType::CUBE_MAP: {
             asset = nullptr;
-        case AssetType::NONE:
+            break;
+        }
+        case AssetType::NONE: {
             asset = nullptr;
+            break;
+        }
     }
     m_cache[id] = asset;
     return asset;
 }
 
 void AssetHandlerEditor::importAsset(const path_t &path) {
-    PND_ASSERT(!isAssetImported(path), "ASSET ALREADY IMPORTED");
+    PND_ASSERT(!getAssetId(path), "ASSET ALREADY IMPORTED");
     path_t assetPath = std::filesystem::relative(path, m_projectPath);
     AssetInfoEditor info;
     info.id = UUID();
     info.path = assetPath;
     info.type = AssetType::TEXTURE;
     m_registry[info.id] = info;
-    m_importedAssets.insert(assetPath);
+    m_importedAssets[assetPath] = info.id;
     saveAssetRegistry();
 }
 
-bool AssetHandlerEditor::isAssetImported(path_t path) {
+UUID AssetHandlerEditor::getAssetId(path_t path) {
     path_t assetPath = std::filesystem::relative(path, m_projectPath);
-    return m_importedAssets.contains(assetPath);
+    if (m_importedAssets.find(assetPath) == m_importedAssets.end()) {
+        return 0;
+    }
+    return m_importedAssets[assetPath];
 }
 
 void AssetHandlerEditor::openProject(const path_t &path) {
@@ -78,7 +97,7 @@ void AssetHandlerEditor::loadAssetRegistry() {
         for (auto &assetInfoDto : registryDto.assets) {
             AssetInfoEditor assetInfo = AssetRegistryMapper::toEntity(assetInfoDto);
             m_registry[assetInfo.id] = assetInfo;
-            m_importedAssets.insert(assetInfo.path);
+            m_importedAssets[assetInfo.path] = assetInfo.id;
         }
     } else {
         LOG_INFO("ASSET REGISTRY NOT FOUND");

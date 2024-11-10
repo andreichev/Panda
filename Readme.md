@@ -1,6 +1,7 @@
 # Panda environment 
 ## Environment for creating applications in c++
-![Alt text](Logo.png "Logo")
+<img src="Logo.png" alt="Logo" style="width:200px;"/>
+
 ## Features to come:
 1. Rendering api abstraction
 2. Input, app layers system

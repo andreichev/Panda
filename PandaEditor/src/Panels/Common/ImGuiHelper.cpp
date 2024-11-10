@@ -1,5 +1,8 @@
 #include "ImGuiHelper.hpp"
+#include "Model/DragDropItem.hpp"
+#include "ProjectLoader/AssetHandlerEditor.hpp"
 
+#include <Panda/ImGui/FontAwesome.h>
 #include <string>
 
 namespace Panda {
@@ -219,6 +222,52 @@ bool propertyColor(const char *label, Color &value) {
     ImGui::PopItemWidth();
     ImGui::NextColumn();
     return modified;
+}
+
+bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asset> asset) {
+    bool changed = false;
+    shiftCursorY(6.0f);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
+    ImGui::Text("%s", label);
+    ImGui::NextColumn();
+    if (textureId) {
+        if (asset) {
+            auto texture = Foundation::SharedCast<Texture>(asset);
+            float height = 55;
+            float aspect = texture->getSize().width / texture->getSize().height;
+            aspect = Foundation::min(aspect, 4.f);
+            float width = height * aspect;
+            ImGui::Image((ImTextureID)(intptr_t)texture->getHandle().id, {width, height});
+        } else {
+            ImGui::Button("Texture Asset", {100, 55});
+        }
+    } else {
+        ImGui::Button("No image", {100, 55});
+    }
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        DragDropItem item;
+        item.type = DragDropItemType::TEXTURE;
+        item.assetId = textureId;
+        ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        ImGui::Text("Texture");
+        ImGui::EndDragDropSource();
+    }
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
+            PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
+            DragDropItem &item = *(DragDropItem *)payload->Data;
+            textureId = item.assetId;
+            changed = true;
+        }
+        ImGui::EndDragDropTarget();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+        changed = true;
+        textureId = 0;
+    }
+    ImGui::NextColumn();
+    return changed;
 }
 
 } // namespace Panda

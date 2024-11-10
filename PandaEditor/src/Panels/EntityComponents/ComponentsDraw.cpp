@@ -149,6 +149,11 @@ void ComponentsDraw::drawComponents(Entity entity) {
                 UpdateSpriteRendererCommand update(entity, spriteRenderer);
                 cmd.DO(update);
             }
+            if (propertyTexture("Texture", spriteRenderer.textureId, spriteRenderer.texture)) {
+                spriteRenderer.texture = nullptr;
+                UpdateSpriteRendererCommand update(entity, spriteRenderer);
+                cmd.DO(update);
+            }
             endPropertiesGrid();
         }
     );

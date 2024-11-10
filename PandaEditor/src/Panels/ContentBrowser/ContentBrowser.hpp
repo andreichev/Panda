@@ -14,7 +14,7 @@ public:
     virtual void showCreateFolderPopup() = 0;
     virtual void deleteFileShowPopup(path_t path) = 0;
     virtual void importAsset(const path_t &path) = 0;
-    virtual bool isAssetImported(const path_t &path) = 0;
+    virtual UUID getAssetId(const path_t &path) = 0;
 };
 
 class ContentBrowser {
