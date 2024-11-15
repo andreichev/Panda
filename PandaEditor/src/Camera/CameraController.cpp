@@ -32,6 +32,7 @@ void CameraController::update(float deltaTime) {
         if (distanceToEnd < 0.1) {
             m_transform.setTransform(m_animation.endTransform);
             m_animation.isActive = false;
+            updateVectors();
         } else {
             static glm::vec3 velocity = glm::vec3(0.0);
             m_transform.setPosition(Math::smoothDamp(
@@ -135,6 +136,7 @@ glm::quat CameraController::getRotation() {
 
 void CameraController::setRotation(glm::quat quat) {
     m_transform.setRotation(quat);
+    updateVectors();
 }
 
 void CameraController::setActive(bool flag) {

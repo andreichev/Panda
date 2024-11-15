@@ -261,10 +261,12 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
         }
         ImGui::EndDragDropTarget();
     }
-    ImGui::SameLine();
-    if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
-        changed = true;
-        textureId = 0;
+    if (textureId) {
+        ImGui::SameLine();
+        if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+            changed = true;
+            textureId = 0;
+        }
     }
     ImGui::NextColumn();
     return changed;
