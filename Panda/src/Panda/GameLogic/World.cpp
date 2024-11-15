@@ -8,6 +8,7 @@
 
 #include <Rain/Rain.hpp>
 #include <entt/entt.hpp>
+#include <box2d/box2d.h>
 
 namespace Panda {
 

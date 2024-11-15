@@ -11,9 +11,10 @@
 #include "Panda/GameLogic/WorldCommands/WorldCommandManager.hpp"
 
 #include <Miren/Miren.hpp>
-#include <entt/entt.hpp>
 
 namespace Panda {
+
+class b2World;
 
 class World final {
 public:
@@ -80,6 +81,7 @@ private:
     std::unordered_map<UUID, Entity> m_entityIdMap;
     bool m_isRunning;
     entt::registry m_registry;
+    b2World* m_physicsWorld = nullptr;
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;
     Miren::ViewId m_renderingViewId;
