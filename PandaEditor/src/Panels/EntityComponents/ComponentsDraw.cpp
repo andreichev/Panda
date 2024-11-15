@@ -136,6 +136,12 @@ void ComponentsDraw::drawComponents(Entity entity) {
                 EntityTransformCommand rotate(entity, transform);
                 cmd.DO(rotate);
             }
+            glm::vec3 scale = transform.getScale();
+            if (drawVec3Control("Scale", scale)) {
+                transform.setScale(scale);
+                EntityTransformCommand scale(entity, transform);
+                cmd.DO(scale);
+            }
         }
     );
     drawComponent<SpriteRendererComponent>(
