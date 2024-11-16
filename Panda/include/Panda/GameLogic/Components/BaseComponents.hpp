@@ -111,26 +111,19 @@ struct Rigidbody2DComponent {
     bool fixedRotation = false;
 
     // Storage for runtime
-    void* runtimeBody = nullptr;
-
-    Rigidbody2DComponent() = default;
-    Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
+    uint8_t runtimeBody[8];
 };
 
 struct BoxCollider2DComponent {
-    glm::vec2 offset = { 0.0f, 0.0f };
-    glm::vec2 size = { 0.5f, 0.5f };
+    glm::vec2 offset = {0.0f, 0.0f};
+    glm::vec2 size = {0.5f, 0.5f};
 
     float density = 1.0f;
     float friction = 0.5f;
     float restitution = 0.0f;
-    float restitutionThreshold = 0.5f;
 
     // Storage for runtime
-    void* runtimeFixture = nullptr;
-
-    BoxCollider2DComponent() = default;
-    BoxCollider2DComponent(const BoxCollider2DComponent&) = default;
+    uint8_t runtimeFixture[8];
 };
 
 } // namespace Panda

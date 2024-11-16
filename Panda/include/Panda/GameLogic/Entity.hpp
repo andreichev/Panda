@@ -122,6 +122,7 @@ private:
     entt::entity m_handle;
 
     friend class World;
+    friend class Physics2D;
     friend class WorldHierarchyPanel;
     friend class WorldMapper;
 };

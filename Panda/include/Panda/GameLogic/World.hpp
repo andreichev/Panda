@@ -14,8 +14,6 @@
 
 namespace Panda {
 
-class b2World;
-
 class World final {
 public:
     World();
@@ -81,7 +79,7 @@ private:
     std::unordered_map<UUID, Entity> m_entityIdMap;
     bool m_isRunning;
     entt::registry m_registry;
-    b2World* m_physicsWorld = nullptr;
+    uint8_t m_physics2DInternal[64];
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;
     Miren::ViewId m_renderingViewId;
@@ -94,6 +92,7 @@ private:
     friend class Entity;
     friend class WorldHierarchyPanel;
     friend class WorldMapper;
+    friend class Physics2D;
 };
 
 } // namespace Panda
