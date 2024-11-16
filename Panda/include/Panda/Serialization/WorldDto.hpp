@@ -13,6 +13,8 @@ struct EntityDto : public Rain::Codable {
     std::optional<SpriteRendererComponentDto> spriteRendererComponent;
     std::optional<CubeMapDto> cubeMapComponent;
     ScriptListComponentDto scriptListComponent;
+    std::optional<Rigidbody2DComponentDto> rigidbody2dComponent;
+    std::optional<BoxCollider2DComponentDto> boxCollider2dComponent;
 
     RAIN_FIELDS_BEGIN(EntityDto)
     RAIN_FIELD(id)
@@ -21,7 +23,8 @@ struct EntityDto : public Rain::Codable {
     RAIN_FIELD(cameraComponent)
     RAIN_FIELD(spriteRendererComponent)
     RAIN_FIELD(cubeMapComponent)
-    RAIN_FIELD(scriptListComponent)
+    RAIN_FIELD(rigidbody2dComponent)
+    RAIN_FIELD(boxCollider2dComponent)
     RAIN_FIELDS_END
 };
 

@@ -394,6 +394,8 @@ World &World::operator=(World &other) {
         copyAllComponents<CameraComponent>(src, dst, entityHandle);
         copyAllComponents<ScriptListComponent>(src, dst, entityHandle);
         copyAllComponents<SkyComponent>(src, dst, entityHandle);
+        copyAllComponents<Rigidbody2DComponent>(src, dst, entityHandle);
+        copyAllComponents<BoxCollider2DComponent>(src, dst, entityHandle);
     }
     return *this;
 }

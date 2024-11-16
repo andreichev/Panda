@@ -41,6 +41,22 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         if (entityDto.cubeMapComponent.has_value()) {
             entity.addComponent<SkyComponent>();
         }
+        // PHYSICS 2D
+        if (entityDto.rigidbody2dComponent.has_value()) {
+            Rigidbody2DComponentDto &rigidbody2dDto = entityDto.rigidbody2dComponent.value();
+            auto &rigidbody2d = entity.addComponent<Rigidbody2DComponent>();
+            rigidbody2d.type = rigidbody2dDto.getType();
+            rigidbody2d.fixedRotation = rigidbody2dDto.fixedRotation;
+        }
+        if (entityDto.boxCollider2dComponent.has_value()) {
+            BoxCollider2DComponentDto &boxCollider2dDto = entityDto.boxCollider2dComponent.value();
+            auto &boxCollider2d = entity.addComponent<BoxCollider2DComponent>();
+            boxCollider2d.offset = boxCollider2dDto.offset;
+            boxCollider2d.size = boxCollider2dDto.size;
+            boxCollider2d.density = boxCollider2dDto.density;
+            boxCollider2d.friction = boxCollider2dDto.friction;
+            boxCollider2d.restitution = boxCollider2dDto.restitution;
+        }
         // SCRIPT LIST COMPONENT
         {
             ScriptListComponentDto scriptsComponentDto = entityDto.scriptListComponent;
@@ -99,6 +115,24 @@ WorldDto WorldMapper::toDto(const World &world) {
             spriteRendererDto.color = spriteRenderer.color;
             spriteRendererDto.texture = spriteRenderer.textureId;
             entityDto.spriteRendererComponent = spriteRendererDto;
+        }
+        // PHYSICS
+        if (entity.hasComponent<Rigidbody2DComponent>()) {
+            Rigidbody2DComponent &rigidbody2d = entity.getComponent<Rigidbody2DComponent>();
+            Rigidbody2DComponentDto rigidbody2dDto;
+            rigidbody2dDto.setType(rigidbody2d.type);
+            rigidbody2dDto.fixedRotation = rigidbody2d.fixedRotation;
+            entityDto.rigidbody2dComponent = rigidbody2dDto;
+        }
+        if (entity.hasComponent<BoxCollider2DComponent>()) {
+            BoxCollider2DComponent &boxCollider2d = entity.getComponent<BoxCollider2DComponent>();
+            BoxCollider2DComponentDto boxCollider2dDto;
+            boxCollider2dDto.offset = boxCollider2d.offset;
+            boxCollider2dDto.size = boxCollider2d.size;
+            boxCollider2dDto.density = boxCollider2d.density;
+            boxCollider2dDto.friction = boxCollider2d.friction;
+            boxCollider2dDto.restitution = boxCollider2d.restitution;
+            entityDto.boxCollider2dComponent = boxCollider2dDto;
         }
         // CUBE MAP COMPONENT
         if (entity.hasComponent<SkyComponent>()) {

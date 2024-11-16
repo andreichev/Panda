@@ -103,18 +103,16 @@ struct ScriptListComponent final {
     }
 };
 
-// Physics
-
-struct Rigidbody2DComponent {
-    enum class BodyType { Static = 0, Dynamic, Kinematic };
-    BodyType type = BodyType::Static;
+struct Rigidbody2DComponent final {
+    enum class BodyType { STATIC = 0, DYNAMIC, KINEMATIC };
+    BodyType type = BodyType::STATIC;
     bool fixedRotation = false;
 
     // Storage for runtime
     uint8_t runtimeBody[8];
 };
 
-struct BoxCollider2DComponent {
+struct BoxCollider2DComponent final {
     glm::vec2 offset = {0.0f, 0.0f};
     glm::vec2 size = {0.5f, 0.5f};
 

@@ -5,36 +5,34 @@
 
 namespace Panda {
 
-inline b2BodyType Rigidbody2DTypeToBox2DBody(Rigidbody2DComponent::BodyType bodyType) {
+inline b2BodyType rigidbody2DTypeToBox2DBody(Rigidbody2DComponent::BodyType bodyType) {
     switch (bodyType) {
-        case Rigidbody2DComponent::BodyType::Static:
+        case Rigidbody2DComponent::BodyType::STATIC:
             return b2_staticBody;
-        case Rigidbody2DComponent::BodyType::Dynamic:
+        case Rigidbody2DComponent::BodyType::DYNAMIC:
             return b2_dynamicBody;
-        case Rigidbody2DComponent::BodyType::Kinematic:
+        case Rigidbody2DComponent::BodyType::KINEMATIC:
             return b2_kinematicBody;
     }
-
     PND_ASSERT(false, "Unknown body type");
     return b2_staticBody;
 }
 
-inline Rigidbody2DComponent::BodyType Rigidbody2DTypeFromBox2DBody(b2BodyType bodyType) {
+inline Rigidbody2DComponent::BodyType rigidbody2DTypeFromBox2DBody(b2BodyType bodyType) {
     switch (bodyType) {
         case b2_staticBody:
-            return Rigidbody2DComponent::BodyType::Static;
+            return Rigidbody2DComponent::BodyType::STATIC;
         case b2_dynamicBody:
-            return Rigidbody2DComponent::BodyType::Dynamic;
+            return Rigidbody2DComponent::BodyType::DYNAMIC;
         case b2_kinematicBody:
-            return Rigidbody2DComponent::BodyType::Kinematic;
+            return Rigidbody2DComponent::BodyType::KINEMATIC;
         case b2_bodyTypeCount: {
             PND_ASSERT(false, "Unknown body type");
             break;
         }
     }
-
     PND_ASSERT(false, "Unknown body type");
-    return Rigidbody2DComponent::BodyType::Static;
+    return Rigidbody2DComponent::BodyType::STATIC;
 }
 
 uint32_t b2WorldIdToInt(b2WorldId id) {
@@ -63,11 +61,12 @@ void Physics2D::init(World *world) {
         auto &transform = entity.getTransform();
         auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
 
-        float rotation = transform.getRotationEuler().z;
-        b2BodyDef bodyDef;
-        bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.type);
+        float rotationDeg = transform.getRotationEuler().z;
+        float rotationRad = glm::radians(rotationDeg);
+        b2BodyDef bodyDef = b2DefaultBodyDef();
+        bodyDef.type = rigidbody2DTypeToBox2DBody(rb2d.type);
         bodyDef.position = {transform.getPosition().x, transform.getPosition().y};
-        bodyDef.rotation = {cos(rotation), sin(rotation)};
+        bodyDef.rotation = {cos(rotationRad), sin(rotationRad)};
         bodyDef.fixedRotation = rb2d.fixedRotation;
 
         b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
@@ -114,7 +113,8 @@ void Physics2D::update(World *world, double deltaTime) {
         b2Vec2 position = b2Body_GetPosition(bodyId);
         b2Rot rotation = b2Body_GetRotation(bodyId);
         transform.setPosition({position.x, position.y, 0.f});
-        transform.setRotationEuler({0.f, 0.f, acos(rotation.c)});
+        float rotationRad = b2Rot_GetAngle(rotation);
+        transform.setRotationEuler({0.f, 0.f, glm::degrees(rotationRad)});
     }
 }
 
@@ -122,6 +122,7 @@ void Physics2D::destroy() {
     if (m_physicsWorldId) {
         b2WorldId id = IntToB2WorldId(m_physicsWorldId);
         b2DestroyWorld(id);
+        m_physicsWorldId = 0;
     }
 }
 
