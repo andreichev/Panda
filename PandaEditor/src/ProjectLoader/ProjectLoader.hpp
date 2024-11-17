@@ -42,6 +42,7 @@ public:
     const path_t &getOpenedProjectPath();
     void removeRecentProject(int index);
     const ProjectSettings &getProjectSettings();
+    AssetHandlerEditor &getAssetHandler();
 
 private:
     void saveWorldAs();

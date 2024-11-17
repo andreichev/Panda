@@ -10,6 +10,7 @@
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
 #include "Panda/GameLogic/ExternalScript.hpp"
+#include "Panda/Assets/Asset.hpp"
 
 #include <Foundation/Foundation.hpp>
 #include <Rain/Rain.hpp>
@@ -64,15 +65,13 @@ struct RelationshipComponent final : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-struct SpriteRendererComponent final : public Rain::Codable {
+struct SpriteRendererComponent final {
     Color color;
+    Foundation::Shared<Asset> texture;
+    UUID textureId = 0;
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const SpriteRendererComponent &other) = default;
-
-    RAIN_FIELDS_BEGIN(SpriteRendererComponent)
-    RAIN_FIELD(color)
-    RAIN_FIELDS_END
 };
 
 struct StaticMeshComponent final {
@@ -102,6 +101,27 @@ struct ScriptListComponent final {
     void remove(ExternalScript script) {
         scripts.erase(std::remove(scripts.begin(), scripts.end(), script), scripts.end());
     }
+};
+
+struct Rigidbody2DComponent final {
+    enum class BodyType { STATIC = 0, DYNAMIC, KINEMATIC };
+    BodyType type = BodyType::STATIC;
+    bool fixedRotation = false;
+
+    // Storage for runtime
+    uint8_t runtimeBody[8];
+};
+
+struct BoxCollider2DComponent final {
+    glm::vec2 offset = {0.0f, 0.0f};
+    glm::vec2 size = {0.5f, 0.5f};
+
+    float density = 1.0f;
+    float friction = 0.5f;
+    float restitution = 0.0f;
+
+    // Storage for runtime
+    uint8_t runtimeFixture[8];
 };
 
 } // namespace Panda

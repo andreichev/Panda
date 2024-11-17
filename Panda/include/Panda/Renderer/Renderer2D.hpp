@@ -34,7 +34,7 @@ public:
         int32_t id;
         float rotation;
         glm::mat4 transform;
-        Foundation::Shared<Texture> texture;
+        Foundation::Shared<Asset> texture;
     };
 
     struct Statistics {

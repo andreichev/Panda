@@ -224,6 +224,10 @@ const ProjectSettings &ProjectLoader::getProjectSettings() {
     return m_projectSettings;
 }
 
+AssetHandlerEditor &ProjectLoader::getAssetHandler() {
+    return m_assetHandler;
+}
+
 void ProjectLoader::saveProjectSettings() {
     if (m_projectPath.empty()) {
         return;

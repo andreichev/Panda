@@ -6,6 +6,7 @@
 
 #include <Panda/ImGui/Colors.hpp>
 #include <Panda/Base/Base.hpp>
+#include <Panda/Renderer/Texture.hpp>
 #include <imgui_internal.h>
 #include <imgui.h>
 #include <glm/glm.hpp>
@@ -38,5 +39,6 @@ void drawItemActivityOutline(
 void beginPropertiesGrid(int columns = 2);
 void endPropertiesGrid();
 bool propertyColor(const char *label, Color &value);
+bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asset> asset);
 
 } // namespace Panda

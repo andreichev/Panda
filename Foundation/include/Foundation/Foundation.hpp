@@ -40,6 +40,11 @@ constexpr Shared<T> createShared(T *ptr) {
     return std::shared_ptr<T>(ptr, deleter);
 }
 
+template<typename T1, typename T2>
+inline Shared<T1> SharedCast(const Shared<T2> &r) {
+    return std::dynamic_pointer_cast<T1>(r);
+}
+
 template<typename T, typename... Args>
 constexpr Shared<T> makeShared(Args &&...args) {
     AllocatorI *alloc = getAllocator();

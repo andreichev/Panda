@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Panda/Base/Base.hpp"
 #include "Panda/Assets/AssetHandler.hpp"
 #include "Panda/Assets/AssetLoaderEditor.hpp"
 
@@ -14,8 +15,9 @@ public:
         : m_handle(MIREN_INVALID_HANDLE) {}
 
     /// Editor constructor
-    Texture(const path_t &path) {
+    explicit Texture(const path_t &path) {
         TextureData data = AssetLoaderEditor::loadTexture(path);
+        m_size = {(float)data.m_width, (float)data.m_height};
         m_handle = Miren::createTexture(data.getMirenTextureCreate());
         LOG_INFO("CREATED TEXTURE, path: {}", path.c_str());
     }
@@ -23,8 +25,8 @@ public:
     /// Runtime constructor
     Texture(
         Foundation::Memory mem,
-        uint32_t width = 1,
-        uint32_t height = 1,
+        uint32_t width,
+        uint32_t height,
         Miren::TextureFormat format = Miren::RGBA8,
         int numMips = 0
     ) {
@@ -34,6 +36,7 @@ public:
         create.m_numMips = 0;
         create.m_width = width;
         create.m_height = height;
+        m_size = {(float)width, (float)height};
         m_handle = Miren::createTexture(create);
         LOG_INFO("CREATED TEXTURE, w: {}, h: {}", width, height);
     }
@@ -51,6 +54,10 @@ public:
         }
     }
 
+    Size getSize() const {
+        return m_size;
+    }
+
     inline Miren::TextureHandle getHandle() {
         return m_handle;
     }
@@ -61,6 +68,7 @@ public:
 
 private:
     Miren::TextureHandle m_handle;
+    Size m_size;
 };
 
 } // namespace Panda

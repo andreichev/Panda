@@ -23,14 +23,22 @@ struct AssetInfoEditorDto : public Rain::Codable {
 
     void setAssetType(AssetType assetType) {
         switch (assetType) {
-            case AssetType::TEXTURE:
+            case AssetType::TEXTURE: {
                 type = "TEXTURE";
-            case AssetType::CUBE_MAP:
+                break;
+            }
+            case AssetType::CUBE_MAP: {
                 type = "CUBE_MAP";
-            case AssetType::PROGRAM:
+                break;
+            }
+            case AssetType::PROGRAM: {
                 type = "PROGRAM";
-            case AssetType::NONE:
+                break;
+            }
+            case AssetType::NONE: {
                 type = "NONE";
+                break;
+            }
         }
     }
 

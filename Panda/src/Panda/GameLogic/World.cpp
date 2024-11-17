@@ -3,7 +3,9 @@
 //
 
 #include "Panda/GameLogic/World.hpp"
+#include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
+#include "Panda/Physics/Physics2D.hpp"
 
 #include <Rain/Rain.hpp>
 #include <entt/entt.hpp>
@@ -15,12 +17,21 @@ World::World()
     , m_isRunning(false)
     , m_isChanged(false)
     , m_registry()
-    , m_commandManager() {}
+    , m_commandManager()
+    , m_physics2DInternal(0) {
+    PND_STATIC_ASSERT(sizeof(Physics2D) <= sizeof(m_physics2DInternal));
+}
 
-World::~World() {}
+World::~World() {
+    Physics2D *physics2D = (Physics2D *)m_physics2DInternal;
+    physics2D->destroy();
+}
 
 void World::startRunning() {
-    // Update native scripts
+    // Init physics
+    Physics2D *physics2D = (Physics2D *)m_physics2DInternal;
+    physics2D->init(this);
+    // Call start at native scripts
     {
         auto view = m_registry.view<ScriptListComponent>();
         for (auto entityHandle : view) {
@@ -37,6 +48,8 @@ void World::startRunning() {
 }
 
 void World::finishRunning() {
+    Physics2D *physics2D = (Physics2D *)m_physics2DInternal;
+    physics2D->destroy();
     m_isRunning = false;
 }
 
@@ -47,22 +60,8 @@ void World::updateRuntime(double deltaTime) {
     m_renderer2d.begin();
     m_renderer3d.begin();
 
-    glm::mat4 viewProjMtx;
-    glm::mat4 skyViewProjMtx;
-    Entity cameraEntity = findMainCameraEntity();
-    if (cameraEntity.isValid()) {
-        WorldCamera &camera = cameraEntity.getComponent<CameraComponent>().camera;
-
-        glm::mat4 viewMtx = glm::inverse(cameraEntity.getTransform().getTransform());
-        glm::mat4 skyViewMtx = glm::inverse(cameraEntity.getTransform().getSkyTransform());
-        glm::mat4 projMtx = camera.getProjection();
-
-        viewProjMtx = projMtx * viewMtx;
-        skyViewProjMtx = projMtx * skyViewMtx;
-        m_renderer2d.setViewProj(viewProjMtx);
-        m_renderer3d.setViewProj(viewProjMtx);
-    }
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
+    Physics2D *physics2D = (Physics2D *)m_physics2DInternal;
+    physics2D->update(this, deltaTime);
     // Update native scripts
     {
         auto view = m_registry.view<ScriptListComponent>();
@@ -79,6 +78,22 @@ void World::updateRuntime(double deltaTime) {
             }
         }
     }
+    glm::mat4 viewProjMtx;
+    glm::mat4 skyViewProjMtx;
+    Entity cameraEntity = findMainCameraEntity();
+    if (cameraEntity.isValid()) {
+        WorldCamera &camera = cameraEntity.getComponent<CameraComponent>().camera;
+
+        glm::mat4 viewMtx = glm::inverse(cameraEntity.getTransform().getTransform());
+        glm::mat4 skyViewMtx = glm::inverse(cameraEntity.getTransform().getSkyTransform());
+        glm::mat4 projMtx = camera.getProjection();
+
+        viewProjMtx = projMtx * viewMtx;
+        skyViewProjMtx = projMtx * skyViewMtx;
+        m_renderer2d.setViewProj(viewProjMtx);
+        m_renderer3d.setViewProj(viewProjMtx);
+    }
+    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
 
     m_renderer2d.end();
     m_renderer3d.end();
@@ -88,7 +103,8 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
     m_renderer2d.begin();
     m_renderer3d.begin();
 
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
+    Physics2D *physics2D = (Physics2D *)m_physics2DInternal;
+    physics2D->update(this, deltaTime);
 
     // Update native scripts
     {
@@ -103,6 +119,8 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
             }
         }
     }
+
+    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
 
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
@@ -151,6 +169,12 @@ void World::updateBasicComponents(
             Panda::Renderer2D::RectData rect;
             rect.transform = transform.getTransform();
             rect.color = spriteComponent.color;
+            // Load texture if it needs.
+            AssetHandler *assetHandler = GameContext::s_assetHandler;
+            if (spriteComponent.textureId && !spriteComponent.texture && assetHandler) {
+                spriteComponent.texture = assetHandler->load(spriteComponent.textureId);
+            }
+            rect.texture = spriteComponent.texture;
             rect.size = {1.f, 1.f};
             rect.id = static_cast<int32_t>(entityHandle);
             m_renderer2d.drawRect(rect);
@@ -370,6 +394,8 @@ World &World::operator=(World &other) {
         copyAllComponents<CameraComponent>(src, dst, entityHandle);
         copyAllComponents<ScriptListComponent>(src, dst, entityHandle);
         copyAllComponents<SkyComponent>(src, dst, entityHandle);
+        copyAllComponents<Rigidbody2DComponent>(src, dst, entityHandle);
+        copyAllComponents<BoxCollider2DComponent>(src, dst, entityHandle);
     }
     return *this;
 }

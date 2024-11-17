@@ -95,3 +95,6 @@ target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/ImGuizmo)
 
 # Dependencies - dylib
 target_link_libraries(Panda dylib)
+
+# Dependencies - box2d
+target_link_libraries(Panda box2d)

@@ -9,7 +9,6 @@ class UUID final {
 public:
     UUID();
     UUID(uint32_t uuid);
-    UUID(const UUID &other);
 
     operator uint32_t() {
         return m_UUID;

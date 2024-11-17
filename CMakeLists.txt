@@ -23,6 +23,7 @@ add_subdirectory(Vendor/entt)
 add_subdirectory(Vendor/yoga)
 add_subdirectory(Vendor/dylib)
 add_subdirectory(Vendor/ImGuizmo)
+add_subdirectory(Vendor/box2d)
 
 include(cmake/add_app.cmake)
 
