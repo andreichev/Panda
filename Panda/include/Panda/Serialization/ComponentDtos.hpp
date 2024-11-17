@@ -27,11 +27,16 @@ struct WorldCameraDto : public Rain::Codable {
 
     void setProjectionType(WorldCamera::ProjectionType _projectionType) {
         switch (_projectionType) {
-            case WorldCamera::ProjectionType::PERSPECTIVE:
+            case WorldCamera::ProjectionType::PERSPECTIVE: {
                 projectionType = "PERSPECTIVE";
-            case WorldCamera::ProjectionType::ORTHOGRAPHIC:
+                return;
+            }
+            case WorldCamera::ProjectionType::ORTHOGRAPHIC: {
                 projectionType = "ORTHOGRAPHIC";
+                return;
+            }
         }
+        PND_ASSERT(false, "Unknown projection type");
         projectionType = "PERSPECTIVE";
     }
 
@@ -76,6 +81,65 @@ struct CameraComponentDto : public Rain::Codable {
 
 struct CubeMapDto : public Rain::Codable {
     RAIN_FIELDS_BEGIN(CubeMapDto)
+    RAIN_FIELDS_END
+};
+
+struct Rigidbody2DComponentDto : public Rain::Codable {
+    std::string type;
+    bool fixedRotation;
+
+    void setType(Rigidbody2DComponent::BodyType _type) {
+        switch (_type) {
+            case Rigidbody2DComponent::BodyType::STATIC: {
+                type = "STATIC";
+                return;
+            }
+            case Rigidbody2DComponent::BodyType::DYNAMIC: {
+                type = "DYNAMIC";
+                return;
+            }
+            case Rigidbody2DComponent::BodyType::KINEMATIC: {
+                type = "KINEMATIC";
+                return;
+            }
+        }
+        PND_ASSERT(false, "Unknown rigidbody body type");
+        type = "STATIC";
+    }
+
+    Rigidbody2DComponent::BodyType getType() {
+        if (type == "STATIC") {
+            return Rigidbody2DComponent::BodyType::STATIC;
+        }
+        if (type == "DYNAMIC") {
+            return Rigidbody2DComponent::BodyType::DYNAMIC;
+        }
+        if (type == "KINEMATIC") {
+            return Rigidbody2DComponent::BodyType::KINEMATIC;
+        }
+        PND_ASSERT(false, "Unknown rigidbody body type");
+        return Rigidbody2DComponent::BodyType::STATIC;
+    }
+
+    RAIN_FIELDS_BEGIN(Rigidbody2DComponentDto)
+    RAIN_FIELD(type)
+    RAIN_FIELD(fixedRotation)
+    RAIN_FIELDS_END
+};
+
+struct BoxCollider2DComponentDto : public Rain::Codable {
+    Vec2 offset;
+    Vec2 size;
+    float density;
+    float friction;
+    float restitution;
+
+    RAIN_FIELDS_BEGIN(BoxCollider2DComponentDto)
+    RAIN_FIELD(offset)
+    RAIN_FIELD(size)
+    RAIN_FIELD(density)
+    RAIN_FIELD(friction)
+    RAIN_FIELD(restitution)
     RAIN_FIELDS_END
 };
 

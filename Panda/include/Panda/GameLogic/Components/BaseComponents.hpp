@@ -103,4 +103,25 @@ struct ScriptListComponent final {
     }
 };
 
+struct Rigidbody2DComponent final {
+    enum class BodyType { STATIC = 0, DYNAMIC, KINEMATIC };
+    BodyType type = BodyType::STATIC;
+    bool fixedRotation = false;
+
+    // Storage for runtime
+    uint8_t runtimeBody[8];
+};
+
+struct BoxCollider2DComponent final {
+    glm::vec2 offset = {0.0f, 0.0f};
+    glm::vec2 size = {0.5f, 0.5f};
+
+    float density = 1.0f;
+    float friction = 0.5f;
+    float restitution = 0.0f;
+
+    // Storage for runtime
+    uint8_t runtimeFixture[8];
+};
+
 } // namespace Panda
