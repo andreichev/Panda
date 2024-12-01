@@ -4,6 +4,7 @@
 
 #include "ScriptRegistry.hpp"
 #include "OuterScriptHook.hpp"
+#include "ScriptClassMaper.hpp"
 
 #include <iostream>
 
@@ -27,12 +28,16 @@ namespace ExternalCalls {
 } // namespace ExternalCalls
 
 namespace InternalCalls {
-    Panda::ScriptHandle addScriptFunc(UUID entityId, const char *name) {
-        return Panda::getScriptRegistry()->instantiate(Entity(entityId), name);
+    void removeAllScripts() {
+        getScriptRegistry()->removeAllScripts();
     }
 
-    void invokeUpdateAtScript(Panda::ScriptHandle handle, float deltaTime) {
-        Panda::Script *script = Panda::getScriptRegistry()->getScriptWithId(handle);
+    ScriptHandle addScript(UUID entityId, const char *name) {
+        return getScriptRegistry()->instantiate(Entity(entityId), name);
+    }
+
+    void invokeUpdateAtScript(ScriptHandle handle, float deltaTime) {
+        Script *script = getScriptRegistry()->getScriptWithId(handle);
         if (!script) {
             // assert(false);
             return;
@@ -40,8 +45,8 @@ namespace InternalCalls {
         script->update(deltaTime);
     }
 
-    void invokeStartAtScript(Panda::ScriptHandle handle) {
-        Panda::Script *script = Panda::getScriptRegistry()->getScriptWithId(handle);
+    void invokeStartAtScript(ScriptHandle handle) {
+        Script *script = getScriptRegistry()->getScriptWithId(handle);
         if (!script) {
             // assert(false);
             return;
@@ -49,12 +54,8 @@ namespace InternalCalls {
         script->start();
     }
 
-    std::vector<const char *> getAvailableScripts() {
-        std::vector<const char *> result;
-        for (auto &clazz : getScriptRegistry()->m_scriptClasses) {
-            result.push_back(clazz.name);
-        }
-        return result;
+    std::vector<ScriptClassManifest> getAvailableScripts() {
+        return ScriptClassMapper::getClassesManifest(getScriptRegistry()->m_scriptClasses);
     }
 } // namespace InternalCalls
 
@@ -62,7 +63,8 @@ std::unordered_map<std::string, void *> g_scriptSymbols;
 
 void initScriptHook() {
     using namespace InternalCalls;
-    g_scriptSymbols["addScriptFunc"] = (void *)addScriptFunc;
+    g_scriptSymbols["removeAllScripts"] = (void *)removeAllScripts;
+    g_scriptSymbols["addScript"] = (void *)addScript;
     g_scriptSymbols["invokeUpdateAtScript"] = (void *)invokeUpdateAtScript;
     g_scriptSymbols["invokeStartAtScript"] = (void *)invokeStartAtScript;
     g_scriptSymbols["getAvailableScripts"] = (void *)getAvailableScripts;

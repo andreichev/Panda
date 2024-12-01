@@ -286,12 +286,19 @@ void EditorLayer::addScriptToEntity(Entity entity) {
         F_DELETE(Foundation::getAllocator(), self->m_popups.back());
         self->m_popups.pop_back();
     };
-    popup->selectAction = [](void *data, Entity entity, const char *scriptName) {
+    popup->selectAction = [](void *data, Entity entity, ScriptClassManifest clazz) {
         auto self = static_cast<EditorLayer *>(data);
-        if (scriptName) {
-            ScriptHandle id = ExternalCalls::addScriptFunc(entity.getId(), scriptName);
+        if (clazz.name) {
+            ScriptHandle id = ExternalCalls::addScript(entity.getId(), clazz.name);
             if (id) {
-                entity.addScript(Panda::ExternalScript(id, scriptName));
+                // Map manifest fields to internal ScriptField type
+                std::vector<ScriptField> fields;
+                for (auto manifestField : clazz.fields) {
+                    ScriptField field(manifestField.name, manifestField.type);
+                    fields.emplace_back(field);
+                }
+                // TODO: Bind previously picked values
+                entity.addScript(Panda::ExternalScript(id, clazz.name, fields));
             }
         }
         F_DELETE(Foundation::getAllocator(), self->m_popups.back());

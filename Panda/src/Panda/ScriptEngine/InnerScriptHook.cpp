@@ -93,7 +93,11 @@ void initScriptHook() {
 }
 
 namespace ExternalCalls {
-    AddScriptFunc addScriptFunc = nullptr;
+    // TODO: Rename to remove all script instances
+    RemoveAllScripts removeAllScripts = nullptr;
+    // TODO: Rename to create script instance. It is not actually adding a script, it is creating an
+    // instance.
+    AddScript addScript = nullptr;
     InvokeUpdateAtScriptFunc invokeUpdateAtScriptFunc = nullptr;
     InvokeStartAtScriptFunc invokeStartAtScriptFunc = nullptr;
     GetAvailableScripts getAvailableScripts = nullptr;
@@ -117,7 +121,8 @@ using SymbolsLoadFunc = void *(*)(const char *name);
 
 int loadExternalCalls(SymbolsLoadFunc load) {
     using namespace ExternalCalls;
-    addScriptFunc = (AddScriptFunc)load("addScriptFunc");
+    removeAllScripts = (RemoveAllScripts)load("removeAllScripts");
+    addScript = (AddScript)load("addScript");
     invokeUpdateAtScriptFunc = (InvokeUpdateAtScriptFunc)load("invokeUpdateAtScript");
     invokeStartAtScriptFunc = (InvokeStartAtScriptFunc)load("invokeStartAtScript");
     getAvailableScripts = (GetAvailableScripts)load("getAvailableScripts");

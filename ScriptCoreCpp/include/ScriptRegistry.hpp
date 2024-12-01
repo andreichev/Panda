@@ -1,37 +1,64 @@
 #pragma once
 
-#include "Panda/Script.hpp"
+#include "ScriptClass.hpp"
 
-#include <vector>
 #include <unordered_map>
 
 namespace Panda {
 
 using ScriptHandle = uint32_t;
 
-using InstantiateFunction = void *(*)(Entity entity);
-
-struct ScriptClassContainer {
-    const char *name;
-    InstantiateFunction instantiateFunc;
-
-    ScriptClassContainer(const char *name, InstantiateFunction instantiateFunc)
-        : name(name)
-        , instantiateFunc(instantiateFunc) {}
-};
-
 class ScriptRegistry {
+private:
+    template<typename T>
+    static auto addFieldsIfHas(ScriptClass &) -> std::enable_if_t<!hasFields<T>> {}
+
+    template<typename T>
+    static auto addFieldsIfHas(ScriptClass &info) -> std::enable_if_t<hasFields<T>> {
+        info.fields = StripType<T>::getFields();
+    }
+
 public:
-    std::vector<ScriptClassContainer> m_scriptClasses;
+    std::vector<ScriptClass> m_scriptClasses;
     std::unordered_map<ScriptHandle, Script *> m_instances;
 
     template<typename T>
+    ScriptFieldType getType() {
+        return ScriptFieldType::UNKNOWN;
+    }
+
+    template<>
+    ScriptFieldType getType<int>() {
+        return ScriptFieldType::INTEGER;
+    }
+
+    template<typename FieldType>
+    ScriptFieldInfo makeFieldInfo(const char *fieldName, uint32_t offset) {
+        ScriptFieldType type = getType<FieldType>();
+
+        using TypeRemovedExtents = std::remove_all_extents_t<FieldType>;
+        using TypeRemovedRefs = std::remove_reference_t<TypeRemovedExtents>;
+        using TypeRemovedPtrs = RemoveAllPointers<TypeRemovedRefs>;
+        constexpr bool isRef = std::is_reference_v<FieldType>;
+        constexpr bool isConst = std::is_const_v<TypeRemovedPtrs>;
+
+        static_assert(!isConst, "Const types in script fields not supported");
+        static_assert(!isRef, "Reference types in script fields not supported");
+
+        return ScriptFieldInfo(type, fieldName, offset, alignof(FieldType));
+    }
+
+    template<typename T>
     void registerScriptClass(const char *name) {
-        m_scriptClasses.emplace_back(name, [](Entity entity) {
+        ScriptClass clazz;
+        clazz.name = name;
+        addFieldsIfHas<T>(clazz);
+        clazz.instantiateFunc = [](Entity entity) {
             T *script = new T();
             script->m_entity = entity;
             return (void *)script;
-        });
+        };
+        m_scriptClasses.emplace_back(clazz);
     }
 
     Script *getScriptWithId(ScriptHandle id) {
@@ -49,6 +76,13 @@ public:
         m_instances.erase(id);
     }
 
+    void removeAllScripts() {
+        for (auto instance : m_instances) {
+            delete instance.second;
+        }
+        m_instances.clear();
+    }
+
     ScriptHandle instantiate(Entity entity, const char *name) {
         for (auto clazz : m_scriptClasses) {
             if (strcmp(name, clazz.name) == 0) {
@@ -61,9 +95,7 @@ public:
     }
 
     ~ScriptRegistry() {
-        for (auto instance : m_instances) {
-            delete instance.second;
-        }
+        removeAllScripts();
     }
 
 private:
@@ -72,16 +104,4 @@ private:
 
 ScriptRegistry *getScriptRegistry();
 
-template<typename T>
-struct AutoRegisterScriptClass {
-    AutoRegisterScriptClass(const char *name) {
-        Panda::getScriptRegistry()->registerScriptClass<T>(name);
-    }
-};
-
-#define _PANDA_CONCAT_(a, b) a##b
-#define _REGISTER_SCRIPT_INTERNAL(name, ID)                                                        \
-    inline static Panda::AutoRegisterScriptClass<name> _PANDA_CONCAT_(registerScript_, ID)(#name);
-#define REGISTER_SCRIPT(name) _REGISTER_SCRIPT_INTERNAL(name, __COUNTER__)
-
-}; // namespace Panda
+} // namespace Panda

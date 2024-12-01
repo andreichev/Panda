@@ -229,6 +229,7 @@ Entity World::instantiateEntity(UUID id) {
 }
 
 void World::rebindScriptsAndFields() {
+    ExternalCalls::removeAllScripts();
     auto view = m_registry.view<ScriptListComponent>();
     for (auto entityHandle : view) {
         if (!m_registry.valid(entityHandle)) {
@@ -237,18 +238,18 @@ void World::rebindScriptsAndFields() {
         auto &component = view.get<ScriptListComponent>(entityHandle);
         UUID entityId = Entity(entityHandle, this).getId();
         for (auto &container : component.scripts) {
-            ScriptHandle scriptId =
-                ExternalCalls::addScriptFunc(entityId, container.getName().c_str());
-            if (scriptId) {
-                container.rebindId(scriptId);
+            ScriptHandle scriptInstanceId =
+                ExternalCalls::addScript(entityId, container.getName().c_str());
+            if (scriptInstanceId) {
+                container.rebindId(scriptInstanceId);
+                // TODO: Rebind script fields
             } else {
-                component.remove(container);
                 Entity entity = Entity(entityHandle, this);
-                LOG_EDITOR(
-                    "SCRIPT {} NOT FOUND. REMOVED FROM ENTITY {}.",
-                    container.getName(),
-                    entity.getName()
-                );
+                LOG_EDITOR("SCRIPT {} NOT FOUND.", container.getName(), entity.getName());
+                // TODO: Remove unbound script after N times unfixed.
+                // if(container.unusedCount() > N) {
+                //     component.remove(container);
+                // }
             }
         }
     }

@@ -61,10 +61,14 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         {
             ScriptListComponentDto scriptsComponentDto = entityDto.scriptListComponent;
             for (auto &scriptDto : scriptsComponentDto.scripts) {
-                ScriptHandle id =
-                    ExternalCalls::addScriptFunc(entity.getId(), scriptDto.name.c_str());
+                ScriptHandle id = ExternalCalls::addScript(entity.getId(), scriptDto.name.c_str());
                 if (id) {
-                    entity.addScript(Panda::ExternalScript(id, scriptDto.name));
+                    std::vector<ScriptField> fields;
+                    for (ScriptFieldDto &fieldDto : scriptDto.scriptFields) {
+                        ScriptField field(fieldDto.name, fieldDto.getType());
+                        fields.emplace_back(field);
+                    }
+                    entity.addScript(Panda::ExternalScript(id, scriptDto.name, fields));
                 }
             }
         }
@@ -143,7 +147,14 @@ WorldDto WorldMapper::toDto(const World &world) {
             ScriptListComponentDto &scriptsComponentDto = entityDto.scriptListComponent;
             ScriptListComponent &scriptsComponent = entity.getComponent<ScriptListComponent>();
             for (auto &script : scriptsComponent.scripts) {
-                scriptsComponentDto.scripts.emplace_back(script.getName());
+                std::vector<ScriptFieldDto> fields;
+                for (ScriptField &field : script.getFields()) {
+                    ScriptFieldDto fieldDto;
+                    fieldDto.name = field.name;
+                    fieldDto.setType(field.type);
+                    fields.emplace_back(fieldDto);
+                }
+                scriptsComponentDto.scripts.emplace_back(script.getName(), fields);
             }
         }
         worldDto.entities.push_back(entityDto);

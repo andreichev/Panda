@@ -4,11 +4,21 @@
 
 namespace Panda {
 
+struct ScriptField {
+    std::string name;
+    ScriptFieldType type;
+
+    ScriptField(const std::string &name, ScriptFieldType type)
+        : name(name)
+        , type(type) {}
+};
+
 class ExternalScript {
 public:
-    ExternalScript(uint32_t id, const std::string &name)
+    ExternalScript(uint32_t id, const std::string &name, std::vector<ScriptField> fields)
         : id(id)
-        , name(name) {}
+        , name(name)
+        , fields(fields) {}
 
     void invokeStart() {
         ExternalCalls::invokeStartAtScriptFunc(id);
@@ -22,6 +32,10 @@ public:
         return name;
     }
 
+    [[nodiscard]] std::vector<ScriptField> getFields() const {
+        return fields;
+    }
+
     bool operator==(const ExternalScript &rhs) const {
         return id == rhs.id;
     }
@@ -33,6 +47,7 @@ public:
 private:
     uint32_t id;
     std::string name;
+    std::vector<ScriptField> fields;
 };
 
 } // namespace Panda

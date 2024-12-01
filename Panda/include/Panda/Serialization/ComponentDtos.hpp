@@ -143,17 +143,39 @@ struct BoxCollider2DComponentDto : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
+struct ScriptFieldDto : public Rain::Codable {
+    std::string name;
+    int type;
+
+    void setType(ScriptFieldType _type) {
+        type = (int)_type;
+    }
+
+    ScriptFieldType getType() {
+        return (ScriptFieldType)type;
+    }
+
+    RAIN_FIELDS_BEGIN(ScriptFieldDto)
+    RAIN_FIELD(name)
+    RAIN_FIELD(type)
+    RAIN_FIELDS_END
+};
+
 struct ExternalScriptDto : public Rain::Codable {
     std::string name;
+    std::vector<ScriptFieldDto> scriptFields;
 
     ExternalScriptDto()
-        : name() {}
+        : name()
+        , scriptFields() {}
 
-    ExternalScriptDto(const std::string &name)
-        : name(name) {}
+    ExternalScriptDto(const std::string &name, const std::vector<ScriptFieldDto> &fields)
+        : name(name)
+        , scriptFields(fields) {}
 
     RAIN_FIELDS_BEGIN(ExternalScriptDto)
     RAIN_FIELD(name)
+    RAIN_FIELD(scriptFields)
     RAIN_FIELDS_END
 };
 

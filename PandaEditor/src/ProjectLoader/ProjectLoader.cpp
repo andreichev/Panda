@@ -105,6 +105,7 @@ void ProjectLoader::openProject(const path_t &path) {
     m_worldPath.append(m_projectSettings.worldPath);
     reloadScriptsDll();
     loadWorld();
+    m_world->rebindScriptsAndFields();
     appendRecentProject();
 }
 
