@@ -20,7 +20,11 @@ public:
     bool beginObject(const char *key) override;
     bool decode(const char *key, bool &data) override;
     bool decode(const char *key, int &data) override;
+    bool decode(const char *key, uint32_t &data) override;
+    bool decode(const char *key, int64_t &data) override;
+    bool decode(const char *key, uint64_t &data) override;
     bool decode(const char *key, float &data) override;
+    bool decode(const char *key, double &data) override;
     bool decode(const char *key, std::string &data) override;
     bool decode(const char *key, const char *&data) override;
     bool decode(const char *key, UUID &data) override;

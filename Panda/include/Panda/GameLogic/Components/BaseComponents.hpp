@@ -9,7 +9,7 @@
 #include "Panda/GameLogic/Components/StaticMesh.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
-#include "Panda/GameLogic/ExternalScript.hpp"
+#include "Panda/ScriptEngine/ExternalScript.hpp"
 #include "Panda/Assets/Asset.hpp"
 
 #include <Foundation/Foundation.hpp>

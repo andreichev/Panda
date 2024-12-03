@@ -105,6 +105,7 @@ void ProjectLoader::openProject(const path_t &path) {
     m_worldPath.append(m_projectSettings.worldPath);
     reloadScriptsDll();
     loadWorld();
+    // TODO: Fix and remove. No need to rebind always at start.
     m_world->rebindScriptsAndFields();
     appendRecentProject();
 }

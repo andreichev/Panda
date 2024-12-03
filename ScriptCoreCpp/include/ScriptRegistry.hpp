@@ -6,8 +6,6 @@
 
 namespace Panda {
 
-using ScriptHandle = uint32_t;
-
 class ScriptRegistry {
 private:
     template<typename T>
@@ -20,10 +18,11 @@ private:
 
 public:
     std::vector<ScriptClass> m_scriptClasses;
-    std::unordered_map<ScriptHandle, Script *> m_instances;
+    std::unordered_map<ScriptInstanceHandle, Script *> m_instances;
 
     template<typename T>
     ScriptFieldType getType() {
+        static_assert(false, "Unknown field type");
         return ScriptFieldType::UNKNOWN;
     }
 
@@ -45,7 +44,7 @@ public:
         static_assert(!isConst, "Const types in script fields not supported");
         static_assert(!isRef, "Reference types in script fields not supported");
 
-        return ScriptFieldInfo(type, fieldName, offset, alignof(FieldType));
+        return ScriptFieldInfo(type, fieldName, offset, sizeof(FieldType), alignof(FieldType));
     }
 
     template<typename T>
@@ -54,6 +53,7 @@ public:
         clazz.name = name;
         addFieldsIfHas<T>(clazz);
         clazz.instantiateFunc = [](Entity entity) {
+            // TODO: Use custom allocator for script instances
             T *script = new T();
             script->m_entity = entity;
             return (void *)script;
@@ -61,14 +61,27 @@ public:
         m_scriptClasses.emplace_back(clazz);
     }
 
-    Script *getScriptWithId(ScriptHandle id) {
+    Script *getInstanceWithId(ScriptInstanceHandle id) {
         if (m_instances.find(id) == m_instances.end()) {
             return nullptr;
         }
         return m_instances.at(id);
     }
 
-    void removeScriptId(ScriptHandle id) {
+    void setFieldValue(ScriptInstanceHandle scriptId, FieldHandle fieldId, void *value) {
+        Script *script = getInstanceWithId(scriptId);
+        // PND_ASSERT(script, "Invalid script instance id");
+        ScriptClassHandle classHandle = script->m_classHandle;
+        // PND_ASSERT(classHandle >= 0 && classHandle < m_scriptClasses.size(), "Invalid class
+        // handle");
+        ScriptClass &clazz = m_scriptClasses[classHandle];
+        // PND_ASSERT(clazz.fields.find(fieldId) != clazz.fields.end(), "Invalid field id");
+        ScriptFieldInfo &info = clazz.fields.at(fieldId);
+        void *ptr = addOffset(script, info.offset);
+        memcpy(ptr, value, info.size);
+    }
+
+    void removeScriptId(ScriptInstanceHandle id) {
         if (m_instances.find(id) == m_instances.end()) {
             return;
         }
@@ -76,18 +89,20 @@ public:
         m_instances.erase(id);
     }
 
-    void removeAllScripts() {
+    void deleteAllScriptInstances() {
         for (auto instance : m_instances) {
             delete instance.second;
         }
         m_instances.clear();
     }
 
-    ScriptHandle instantiate(Entity entity, const char *name) {
-        for (auto clazz : m_scriptClasses) {
+    ScriptInstanceHandle instantiate(Entity entity, const char *name) {
+        for (ScriptClassHandle classId = 0; classId < m_scriptClasses.size(); classId++) {
+            ScriptClass &clazz = m_scriptClasses[classId];
             if (strcmp(name, clazz.name) == 0) {
                 m_lastHandle++;
                 m_instances[m_lastHandle] = (Script *)clazz.instantiateFunc(entity);
+                m_instances[m_lastHandle]->m_classHandle = classId;
                 return m_lastHandle;
             }
         }
@@ -95,11 +110,11 @@ public:
     }
 
     ~ScriptRegistry() {
-        removeAllScripts();
+        deleteAllScriptInstances();
     }
 
 private:
-    ScriptHandle m_lastHandle = 0;
+    ScriptClassHandle m_lastHandle = 0;
 };
 
 ScriptRegistry *getScriptRegistry();

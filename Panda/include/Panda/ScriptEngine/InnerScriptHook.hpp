@@ -7,23 +7,26 @@
 
 namespace Panda {
 
-using ScriptHandle = uint32_t;
+using ScriptInstanceHandle = uint32_t;
 
 namespace ExternalCalls {
-    using RemoveAllScripts = void (*)();
-    extern RemoveAllScripts removeAllScripts;
+    using DeleteAllScriptInstances = void (*)();
+    extern DeleteAllScriptInstances deleteAllScriptInstances;
 
-    using AddScript = ScriptHandle (*)(UUID entityId, const char *name);
-    extern AddScript addScript;
+    using InstantiateScript = ScriptInstanceHandle (*)(UUID entityId, const char *name);
+    extern InstantiateScript instantiateScript;
 
-    using InvokeUpdateAtScriptFunc = void (*)(ScriptHandle handle, float deltaTime);
-    extern InvokeUpdateAtScriptFunc invokeUpdateAtScriptFunc;
+    using SetFieldValue = void (*)(ScriptInstanceHandle scriptId, FieldHandle fieldId, void *value);
+    extern SetFieldValue setFieldValue;
 
-    using InvokeStartAtScriptFunc = void (*)(ScriptHandle handle);
-    extern InvokeStartAtScriptFunc invokeStartAtScriptFunc;
+    using InvokeUpdateAtScript = void (*)(ScriptInstanceHandle handle, float deltaTime);
+    extern InvokeUpdateAtScript invokeUpdateAtScript;
 
-    using GetAvailableScripts = std::vector<ScriptClassManifest> (*)();
-    extern GetAvailableScripts getAvailableScripts;
+    using InvokeStartAtScript = void (*)(ScriptInstanceHandle handle);
+    extern InvokeStartAtScript invokeStartAtScript;
+
+    using GetManifest = std::vector<ScriptClassManifest> (*)();
+    extern GetManifest getManifest;
 } // namespace ExternalCalls
 
 //////////////////////////////////////////////////////////////////

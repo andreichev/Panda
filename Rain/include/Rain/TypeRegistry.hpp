@@ -186,6 +186,14 @@ struct TypeDecoder<float> {
     }
 };
 
+/** DOUBLE */
+template<>
+struct TypeDecoder<double> {
+    static void decode(const char *key, Decoder *decoder, const TypeInfo &info, double &data) {
+        decoder->decode(key, data);
+    }
+};
+
 /** CONST CHAR* */
 template<>
 struct TypeDecoder<const char *> {
@@ -211,6 +219,30 @@ struct TypeDecoder<std::basic_string<Elem, Traits, Alloc>> {
 template<>
 struct TypeDecoder<int> {
     static void decode(const char *key, Decoder *decoder, const TypeInfo &info, int &data) {
+        decoder->decode(key, data);
+    }
+};
+
+/** UINT */
+template<>
+struct TypeDecoder<uint32_t> {
+    static void decode(const char *key, Decoder *decoder, const TypeInfo &info, uint32_t &data) {
+        decoder->decode(key, data);
+    }
+};
+
+/** INT64 */
+template<>
+struct TypeDecoder<int64_t> {
+    static void decode(const char *key, Decoder *decoder, const TypeInfo &info, int64_t &data) {
+        decoder->decode(key, data);
+    }
+};
+
+/** UINT64 */
+template<>
+struct TypeDecoder<uint64_t> {
+    static void decode(const char *key, Decoder *decoder, const TypeInfo &info, uint64_t &data) {
         decoder->decode(key, data);
     }
 };
@@ -295,6 +327,14 @@ struct TypeEncoder<float> {
     }
 };
 
+/** DOUBLE */
+template<>
+struct TypeEncoder<double> {
+    static void encode(const char *key, Encoder *encoder, const TypeInfo &info, double &data) {
+        encoder->encode(key, data);
+    }
+};
+
 /** CONST CHAR* */
 template<>
 struct TypeEncoder<const char *> {
@@ -320,6 +360,30 @@ struct TypeEncoder<std::basic_string<Elem, Traits, Alloc>> {
 template<>
 struct TypeEncoder<int> {
     static void encode(const char *key, Encoder *encoder, const TypeInfo &info, int &data) {
+        encoder->encode(key, data);
+    }
+};
+
+/** UINT */
+template<>
+struct TypeEncoder<uint32_t> {
+    static void encode(const char *key, Encoder *encoder, const TypeInfo &info, uint32_t &data) {
+        encoder->encode(key, data);
+    }
+};
+
+/** INT64 */
+template<>
+struct TypeEncoder<int64_t> {
+    static void encode(const char *key, Encoder *encoder, const TypeInfo &info, int64_t &data) {
+        encoder->encode(key, data);
+    }
+};
+
+/** UINT64 */
+template<>
+struct TypeEncoder<uint64_t> {
+    static void encode(const char *key, Encoder *encoder, const TypeInfo &info, uint64_t &data) {
         encoder->encode(key, data);
     }
 };

@@ -22,7 +22,7 @@ public:
             ImGui::Text("%s", subtitle);
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
 
-            auto classes = ExternalCalls::getAvailableScripts();
+            auto classes = ExternalCalls::getManifest();
             // SCRIPT LIST
             for (int i = 0; i < classes.size(); i++) {
                 if (ImGui::Selectable(classes[i].name, selectedClassIndex == i)) {

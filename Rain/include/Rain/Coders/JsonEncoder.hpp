@@ -23,7 +23,11 @@ public:
     void encodeNull(const char *key) override;
     void encode(const char *key, const bool &data) override;
     void encode(const char *key, const int &data) override;
+    void encode(const char *key, const uint32_t &data) override;
+    void encode(const char *key, const int64_t &data) override;
+    void encode(const char *key, const uint64_t &data) override;
     void encode(const char *key, const float &data) override;
+    void encode(const char *key, const double &data) override;
     void encode(const char *key, const std::string &data) override;
     void encode(const char *key, const char *&data) override;
     void encode(const char *key, UUID &data) override;

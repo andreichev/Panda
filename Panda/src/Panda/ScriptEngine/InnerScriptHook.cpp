@@ -93,14 +93,12 @@ void initScriptHook() {
 }
 
 namespace ExternalCalls {
-    // TODO: Rename to remove all script instances
-    RemoveAllScripts removeAllScripts = nullptr;
-    // TODO: Rename to create script instance. It is not actually adding a script, it is creating an
-    // instance.
-    AddScript addScript = nullptr;
-    InvokeUpdateAtScriptFunc invokeUpdateAtScriptFunc = nullptr;
-    InvokeStartAtScriptFunc invokeStartAtScriptFunc = nullptr;
-    GetAvailableScripts getAvailableScripts = nullptr;
+    DeleteAllScriptInstances deleteAllScriptInstances = nullptr;
+    InstantiateScript instantiateScript = nullptr;
+    SetFieldValue setFieldValue = nullptr;
+    InvokeUpdateAtScript invokeUpdateAtScript = nullptr;
+    InvokeStartAtScript invokeStartAtScript = nullptr;
+    GetManifest getManifest = nullptr;
 } // namespace ExternalCalls
 
 //////////////////////////////////////////////////////////////////
@@ -121,11 +119,12 @@ using SymbolsLoadFunc = void *(*)(const char *name);
 
 int loadExternalCalls(SymbolsLoadFunc load) {
     using namespace ExternalCalls;
-    removeAllScripts = (RemoveAllScripts)load("removeAllScripts");
-    addScript = (AddScript)load("addScript");
-    invokeUpdateAtScriptFunc = (InvokeUpdateAtScriptFunc)load("invokeUpdateAtScript");
-    invokeStartAtScriptFunc = (InvokeStartAtScriptFunc)load("invokeStartAtScript");
-    getAvailableScripts = (GetAvailableScripts)load("getAvailableScripts");
+    deleteAllScriptInstances = (DeleteAllScriptInstances)load("deleteAllScriptInstances");
+    instantiateScript = (InstantiateScript)load("instantiateScript");
+    setFieldValue = (SetFieldValue)load("setFieldValue");
+    invokeUpdateAtScript = (InvokeUpdateAtScript)load("invokeUpdateAtScript");
+    invokeStartAtScript = (InvokeStartAtScript)load("invokeStartAtScript");
+    getManifest = (GetManifest)load("getManifest");
     LOG_INFO("SCRIPT ENGINE: Inner functions binding done.");
     return 0;
 }

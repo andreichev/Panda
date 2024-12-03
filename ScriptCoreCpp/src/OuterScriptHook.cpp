@@ -28,16 +28,16 @@ namespace ExternalCalls {
 } // namespace ExternalCalls
 
 namespace InternalCalls {
-    void removeAllScripts() {
-        getScriptRegistry()->removeAllScripts();
+    void deleteAllScriptInstances() {
+        getScriptRegistry()->deleteAllScriptInstances();
     }
 
-    ScriptHandle addScript(UUID entityId, const char *name) {
+    ScriptInstanceHandle instantiateScript(UUID entityId, const char *name) {
         return getScriptRegistry()->instantiate(Entity(entityId), name);
     }
 
-    void invokeUpdateAtScript(ScriptHandle handle, float deltaTime) {
-        Script *script = getScriptRegistry()->getScriptWithId(handle);
+    void invokeUpdateAtScript(ScriptInstanceHandle handle, float deltaTime) {
+        Script *script = getScriptRegistry()->getInstanceWithId(handle);
         if (!script) {
             // assert(false);
             return;
@@ -45,8 +45,8 @@ namespace InternalCalls {
         script->update(deltaTime);
     }
 
-    void invokeStartAtScript(ScriptHandle handle) {
-        Script *script = getScriptRegistry()->getScriptWithId(handle);
+    void invokeStartAtScript(ScriptInstanceHandle handle) {
+        Script *script = getScriptRegistry()->getInstanceWithId(handle);
         if (!script) {
             // assert(false);
             return;
@@ -54,7 +54,11 @@ namespace InternalCalls {
         script->start();
     }
 
-    std::vector<ScriptClassManifest> getAvailableScripts() {
+    void setFieldValue(ScriptInstanceHandle scriptId, FieldHandle fieldId, void *value) {
+        getScriptRegistry()->setFieldValue(scriptId, fieldId, value);
+    }
+
+    std::vector<ScriptClassManifest> getManifest() {
         return ScriptClassMapper::getClassesManifest(getScriptRegistry()->m_scriptClasses);
     }
 } // namespace InternalCalls
@@ -63,11 +67,12 @@ std::unordered_map<std::string, void *> g_scriptSymbols;
 
 void initScriptHook() {
     using namespace InternalCalls;
-    g_scriptSymbols["removeAllScripts"] = (void *)removeAllScripts;
-    g_scriptSymbols["addScript"] = (void *)addScript;
-    g_scriptSymbols["invokeUpdateAtScript"] = (void *)invokeUpdateAtScript;
+    g_scriptSymbols["deleteAllScriptInstances"] = (void *)deleteAllScriptInstances;
+    g_scriptSymbols["instantiateScript"] = (void *)instantiateScript;
+    g_scriptSymbols["setFieldValue"] = (void *)setFieldValue;
     g_scriptSymbols["invokeStartAtScript"] = (void *)invokeStartAtScript;
-    g_scriptSymbols["getAvailableScripts"] = (void *)getAvailableScripts;
+    g_scriptSymbols["invokeUpdateAtScript"] = (void *)invokeUpdateAtScript;
+    g_scriptSymbols["getManifest"] = (void *)getManifest;
 }
 
 //////////////////////////////////////////////////////////////////

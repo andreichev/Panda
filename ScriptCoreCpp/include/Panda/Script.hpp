@@ -11,9 +11,9 @@ public:
 
     virtual void start() {};
     virtual void update(float deltaTime) {};
-    Entity getEntity();
 
 private:
+    ScriptClassHandle m_classHandle;
     friend class ScriptRegistry;
 };
 

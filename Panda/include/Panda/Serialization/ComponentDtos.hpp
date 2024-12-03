@@ -145,6 +145,7 @@ struct BoxCollider2DComponentDto : public Rain::Codable {
 
 struct ScriptFieldDto : public Rain::Codable {
     std::string name;
+    uint32_t fieldId;
     int type;
 
     void setType(ScriptFieldType _type) {
@@ -157,6 +158,7 @@ struct ScriptFieldDto : public Rain::Codable {
 
     RAIN_FIELDS_BEGIN(ScriptFieldDto)
     RAIN_FIELD(name)
+    RAIN_FIELD(fieldId)
     RAIN_FIELD(type)
     RAIN_FIELDS_END
 };

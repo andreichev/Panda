@@ -61,12 +61,14 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         {
             ScriptListComponentDto scriptsComponentDto = entityDto.scriptListComponent;
             for (auto &scriptDto : scriptsComponentDto.scripts) {
-                ScriptHandle id = ExternalCalls::addScript(entity.getId(), scriptDto.name.c_str());
+                ScriptInstanceHandle id =
+                    ExternalCalls::instantiateScript(entity.getId(), scriptDto.name.c_str());
                 if (id) {
                     std::vector<ScriptField> fields;
                     for (ScriptFieldDto &fieldDto : scriptDto.scriptFields) {
-                        ScriptField field(fieldDto.name, fieldDto.getType());
-                        fields.emplace_back(field);
+                        fields.emplace_back(
+                            id, fieldDto.fieldId, fieldDto.name, fieldDto.getType()
+                        );
                     }
                     entity.addScript(Panda::ExternalScript(id, scriptDto.name, fields));
                 }
@@ -151,6 +153,7 @@ WorldDto WorldMapper::toDto(const World &world) {
                 for (ScriptField &field : script.getFields()) {
                     ScriptFieldDto fieldDto;
                     fieldDto.name = field.name;
+                    fieldDto.fieldId = field.fieldId;
                     fieldDto.setType(field.type);
                     fields.emplace_back(fieldDto);
                 }

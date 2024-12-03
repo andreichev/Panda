@@ -161,8 +161,9 @@ void ComponentsDraw::drawComponents(Entity entity) {
                     break;
                 }
                 for (auto &field : script.getFields()) {
-                    ImGui::Text("Field: %s", field.name.c_str());
+                    drawFieldValue(field);
                 }
+                underline();
             }
             if (component.scripts.empty()) {
                 ImGui::Text("No scripts attached to entity");

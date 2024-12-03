@@ -7,14 +7,15 @@ namespace Panda {
 
 class ScriptClassMapper {
 public:
-    static ScriptFieldManifest getFieldManifest(ScriptFieldInfo field) {
-        return ScriptFieldManifest(field.name, field.type);
+    static ScriptFieldManifest getFieldManifest(FieldHandle handle, ScriptFieldInfo field) {
+        return ScriptFieldManifest(handle, field.name, field.type);
     }
 
-    static std::vector<ScriptFieldManifest> getFieldsManifest(std::vector<ScriptFieldInfo> fields) {
+    static std::vector<ScriptFieldManifest>
+    getFieldsManifest(std::unordered_map<FieldHandle, ScriptFieldInfo> fields) {
         std::vector<ScriptFieldManifest> manifest;
         for (auto &field : fields) {
-            manifest.push_back(getFieldManifest(field));
+            manifest.push_back(getFieldManifest(field.first, field.second));
         }
         return manifest;
     }

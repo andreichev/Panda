@@ -7,10 +7,12 @@
 namespace Panda {
 
 struct ScriptFieldManifest final {
-    constexpr ScriptFieldManifest(const char *name, ScriptFieldType type)
-        : name(name)
+    constexpr ScriptFieldManifest(FieldHandle handle, const char *name, ScriptFieldType type)
+        : handle(handle)
+        , name(name)
         , type(type) {}
 
+    FieldHandle handle;
     const char *name;
     ScriptFieldType type;
 };

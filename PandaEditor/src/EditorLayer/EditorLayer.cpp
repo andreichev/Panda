@@ -289,12 +289,14 @@ void EditorLayer::addScriptToEntity(Entity entity) {
     popup->selectAction = [](void *data, Entity entity, ScriptClassManifest clazz) {
         auto self = static_cast<EditorLayer *>(data);
         if (clazz.name) {
-            ScriptHandle id = ExternalCalls::addScript(entity.getId(), clazz.name);
+            ScriptInstanceHandle id = ExternalCalls::instantiateScript(entity.getId(), clazz.name);
             if (id) {
                 // Map manifest fields to internal ScriptField type
                 std::vector<ScriptField> fields;
                 for (auto manifestField : clazz.fields) {
-                    ScriptField field(manifestField.name, manifestField.type);
+                    ScriptField field(
+                        id, manifestField.handle, manifestField.name, manifestField.type
+                    );
                     fields.emplace_back(field);
                 }
                 // TODO: Bind previously picked values

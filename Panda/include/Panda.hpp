@@ -17,7 +17,6 @@
 #include "Panda/GameLogic/Level.hpp"
 #include "Panda/GameLogic/Components/StaticMesh.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
-#include "Panda/GameLogic/ExternalScript.hpp"
 #include "Panda/GameLogic/Input.hpp"
 
 // Renderer stuff
