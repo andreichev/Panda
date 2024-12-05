@@ -29,10 +29,18 @@ concept PrimitiveEncoder =
     };
 
 template<typename T>
+concept CustomEncoder =
+    requires(const char *key, Encoder *encoder, T &data) { T::encode(key, encoder, data); };
+
+template<typename T>
 concept PrimitiveDecoder =
     requires(const char *key, Decoder *decoder, const TypeInfo &info, T &data) {
         TypeDecoder<T>::decode(key, decoder, info, data);
     };
+
+template<typename T>
+concept CustomDecoder =
+    requires(const char *key, Decoder *decoder, T &data) { T::decode(key, decoder, data); };
 
 class TypeRegistry {
 private:
@@ -47,7 +55,13 @@ private:
 public:
     template<typename T>
     constexpr void fillCodingFunc(TypeInfo &info) {
-        if constexpr (PrimitiveEncoder<T>) {
+        if constexpr (CustomEncoder<T>) {
+            info.encoderFunc =
+                [](const char *key, Encoder *encoder, const TypeInfo &info, void *data) {
+                    T *ptr = static_cast<T *>(data);
+                    T::encode(key, encoder, *ptr);
+                };
+        } else if constexpr (PrimitiveEncoder<T>) {
             info.encoderFunc =
                 [](const char *key, Encoder *encoder, const TypeInfo &info, void *data) {
                     T *ptr = static_cast<T *>(data);
@@ -67,7 +81,13 @@ public:
                     encoder->endObject();
                 };
         }
-        if constexpr (PrimitiveDecoder<T>) {
+        if constexpr (CustomDecoder<T>) {
+            info.decoderFunc =
+                [](const char *key, Decoder *decoder, const TypeInfo &info, void *data) {
+                    T *ptr = static_cast<T *>(data);
+                    T::decode(key, decoder, *ptr);
+                };
+        } else if constexpr (PrimitiveDecoder<T>) {
             info.decoderFunc =
                 [](const char *key, Decoder *decoder, const TypeInfo &info, void *data) {
                     T *ptr = static_cast<T *>(data);
