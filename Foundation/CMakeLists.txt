@@ -15,3 +15,7 @@ target_include_directories(Foundation PUBLIC ${PROJECT_SOURCE_DIR}/include)
 # Dependencies - spdlog
 target_link_libraries(Foundation spdlog)
 target_include_directories(Foundation PRIVATE ${VENDOR_DIRECTORY}/spdlog/include)
+
+# Dependencies - easy_profiler
+target_link_libraries(Foundation easy_profiler)
+target_include_directories(Foundation PUBLIC ${VENDOR_DIRECTORY}/easy_profiler)

@@ -520,7 +520,7 @@ void EditorLayer::processShortcuts() {
     auto clipboardText = Application::get()->getWindow()->getClipboardText();
 
     if (clipboardText != nullptr) {
-        LOG_INFO("Text: {}", clipboardText);
+//        LOG_INFO("Text: {}", clipboardText);
     }
 
     if (clipboardText != nullptr && ctrl && ImGui::IsKeyPressed(ImGuiKey_V, false)) {
