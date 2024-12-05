@@ -16,6 +16,8 @@
 #include <Foundation/Semaphore.hpp>
 #include <Foundation/Thread.hpp>
 
+#include <easy/profiler.h>
+
 namespace Miren {
 
 struct Context {
@@ -254,6 +256,7 @@ struct Context {
     bool renderFrame() {
         m_rendererSemaphore.wait();
         MIREN_LOG("RENDER FRAME BEGIN");
+        EASY_BLOCK("Render Frame")
         m_preCommandQueue.finishWriting();
         m_postCommandQueue.finishWriting();
         if (m_renderer == nullptr) {

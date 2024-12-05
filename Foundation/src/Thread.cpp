@@ -2,6 +2,8 @@
 #include "Foundation/Foundation.hpp"
 
 #include "Foundation/Thread.hpp"
+#include "easy/profiler.h"
+//#include "easy/arbitrary_value.h"
 
 #ifdef PLATFORM_POSIX
 #    include <pthread.h>
@@ -112,7 +114,10 @@ bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char
     m_running = true;
 
     if (_name != nullptr) {
+        EASY_THREAD(_name)
         setThreadName(_name);
+    } else {
+        EASY_THREAD("Unknown")
     }
 
     return true;

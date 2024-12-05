@@ -13,6 +13,8 @@
 
 #include <Miren/Miren.hpp>
 
+#include <easy/profiler.h>
+
 namespace Panda {
 
 Application *Application::s_instance = nullptr;
@@ -38,6 +40,8 @@ Application::~Application() {
 #endif
     F_DELETE(Foundation::getAllocator(), m_window);
     LOG_INFO("APP SHUTDOWN END");
+    auto path = std::filesystem::current_path().parent_path().parent_path().parent_path();
+    profiler::dumpBlocksToFile((path / "threads.prof").c_str());
 }
 
 void Application::pushLayer(Layer *layer) {
@@ -56,6 +60,9 @@ Application::Application(ApplicationStartupSettings &settings)
     , m_oneSecondTimeCount(0)
     , m_deltaTimeMillis(0)
     , m_thisSecondFramesCount(0) {
+    EASY_PROFILER_ENABLE
+//    EASY_MAIN_THREAD
+    EASY_THREAD("Main")
     s_instance = this;
     Foundation::Logger::init();
 
@@ -103,6 +110,7 @@ void Application::loop() {
 
         Miren::renderSemaphoreWait();
         // LOG_INFO("APP UPDATE BEGIN");
+        EASY_BLOCK("Update")
         LayerStack &layerStack = *m_layerStack;
         for (Layer *layer : layerStack) {
             layer->onUpdate(deltaTime);
