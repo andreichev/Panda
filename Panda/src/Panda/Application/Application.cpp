@@ -108,9 +108,9 @@ void Application::loop() {
         }
         m_deltaTimeMillis = 0;
 
-        Miren::renderSemaphoreWait();
         // LOG_INFO("APP UPDATE BEGIN");
-        EASY_BLOCK("Update")
+        Miren::renderSemaphoreWait();
+        EASY_BLOCK("Update Start")
         LayerStack &layerStack = *m_layerStack;
         for (Layer *layer : layerStack) {
             layer->onUpdate(deltaTime);
@@ -125,6 +125,7 @@ void Application::loop() {
         processEvents();
         Miren::frame();
         // LOG_INFO("APP UPDATE END");
+        EASY_BLOCK("Update End")
         Miren::renderSemaphorePost();
     }
 }

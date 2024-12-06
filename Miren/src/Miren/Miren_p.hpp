@@ -257,27 +257,36 @@ struct Context {
         m_rendererSemaphore.wait();
         MIREN_LOG("RENDER FRAME BEGIN");
         EASY_BLOCK("Render Frame")
+        {EASY_BLOCK("Render Start")}
         m_preCommandQueue.finishWriting();
         m_postCommandQueue.finishWriting();
         if (m_renderer == nullptr) {
             checkIfHasInitCommand();
         }
+        static Foundation::CommandBuffer preCommandQueue(0);
+        static Foundation::CommandBuffer postCommandQueue(0);
+        preCommandQueue.copy(m_preCommandQueue);
+        postCommandQueue.copy(m_postCommandQueue);
+        m_preCommandQueue.reset();
+        m_postCommandQueue.reset();
+        {EASY_BLOCK("Render Frame End")}
+        m_rendererSemaphore.post();
         if (m_renderer == nullptr) {
-            m_preCommandQueue.reset();
-            m_postCommandQueue.reset();
-            m_rendererSemaphore.post();
+//            m_preCommandQueue.reset();
+//            m_postCommandQueue.reset();
+//            m_rendererSemaphore.post();
             return true;
         }
-        rendererExecuteCommands(m_preCommandQueue);
+        rendererExecuteCommands(preCommandQueue);
         if (m_render->getDrawCallsCount() != 0) {
             m_renderer->submit(m_render, m_views);
             m_renderer->flip();
         }
-        rendererExecuteCommands(m_postCommandQueue);
-        m_preCommandQueue.reset();
-        m_postCommandQueue.reset();
+        rendererExecuteCommands(postCommandQueue);
+//        m_preCommandQueue.reset();
+//        m_postCommandQueue.reset();
+//        m_rendererSemaphore.post();
         MIREN_LOG("RENDER FRAME END");
-        m_rendererSemaphore.post();
         return m_renderer != nullptr;
     }
 
