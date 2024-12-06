@@ -127,6 +127,7 @@ void Application::loop() {
         processEvents();
         Miren::frame();
         // LOG_INFO("APP UPDATE END");
+        EASY_BLOCK("Update End")
         Miren::renderSemaphorePost();
     }
 }
