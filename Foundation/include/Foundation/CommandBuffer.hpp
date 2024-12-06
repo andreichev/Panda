@@ -2,6 +2,7 @@
 
 #include "Foundation/Allocator.hpp"
 #include "Foundation/Assert.hpp"
+#include "Foundation/Memory.hpp"
 
 #include <string>
 
@@ -36,6 +37,20 @@ public:
         : m_size(size)
         , m_pos(0) {
         m_data = (uint8_t *)F_ALLOC(getAllocator(), size);
+    }
+    void copy(const CommandBuffer &commandBuffer) {
+//        m_data = (uint8_t *)F_ALLOC(getAllocator(), size);
+        if (m_size != commandBuffer.m_size) {
+            if (m_data != nullptr) {
+                F_FREE(Foundation::getAllocator(), m_data);
+            }
+            auto copyingMemory = Foundation::Memory::copying((void*)commandBuffer.m_data, commandBuffer.m_size);
+            m_data = (uint8_t *)copyingMemory.data;
+            m_size = commandBuffer.m_size;
+        } else {
+            memcpy(m_data, commandBuffer.m_data, m_size);
+        }
+        m_pos = commandBuffer.m_pos;
     }
 
     ~CommandBuffer() {
