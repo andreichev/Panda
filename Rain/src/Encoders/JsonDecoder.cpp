@@ -216,12 +216,6 @@ bool JsonDecoder::decode(const char *key, std::string &data) {
     return true;
 }
 
-bool JsonDecoder::decode(const char *key, const char *&data) {
-    // DECODING OF CONST CHAT NOT ALLOWED
-    data = "Decoding of const char not allowed";
-    return true;
-}
-
 bool JsonDecoder::decode(const char *key, UUID &data) {
     if (m_isArray) {
         const auto &member = *m_arrayIteratorStack.back();

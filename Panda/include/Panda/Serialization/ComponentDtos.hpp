@@ -19,41 +19,37 @@ struct TransformComponentDto : public Rain::Codable {
 };
 
 struct WorldCameraDto : public Rain::Codable {
-    std::string projectionType;
+    WorldCamera::ProjectionType projectionType;
     float fieldOfView;
     float orthoSize;
     float zNear;
     float zFar;
 
-    void setProjectionType(WorldCamera::ProjectionType _projectionType) {
-        switch (_projectionType) {
-            case WorldCamera::ProjectionType::PERSPECTIVE: {
-                projectionType = "PERSPECTIVE";
-                return;
-            }
-            case WorldCamera::ProjectionType::ORTHOGRAPHIC: {
-                projectionType = "ORTHOGRAPHIC";
-                return;
-            }
-        }
-        PND_ASSERT(false, "Unknown projection type");
-        projectionType = "PERSPECTIVE";
+    static void encode(const char *key, Rain::Encoder *encoder, WorldCameraDto &data) {
+        encoder->beginObject(key);
+        int projectionType = (int)data.projectionType;
+        encoder->encode("projectionType", projectionType);
+        encoder->encode("fieldOfView", data.fieldOfView);
+        encoder->encode("orthoSize", data.orthoSize);
+        encoder->encode("zNear", data.zNear);
+        encoder->encode("zFar", data.zFar);
+        encoder->endObject();
     }
 
-    WorldCamera::ProjectionType getProjectionType() {
-        if (projectionType == "ORTHOGRAPHIC") {
-            return WorldCamera::ProjectionType::ORTHOGRAPHIC;
+    static bool decode(const char *key, Rain::Decoder *decoder, WorldCameraDto &data) {
+        if (!decoder->beginObject(key)) {
+            return false;
         }
-        return WorldCamera::ProjectionType::PERSPECTIVE;
+        int projectionType;
+        decoder->decode("projectionType", projectionType);
+        data.projectionType = (WorldCamera::ProjectionType)projectionType;
+        decoder->decode("fieldOfView", data.fieldOfView);
+        decoder->decode("orthoSize", data.orthoSize);
+        decoder->decode("zNear", data.zNear);
+        decoder->decode("zFar", data.zFar);
+        decoder->endObject();
+        return true;
     }
-
-    RAIN_FIELDS_BEGIN(WorldCameraDto)
-    RAIN_FIELD(projectionType)
-    RAIN_FIELD(fieldOfView)
-    RAIN_FIELD(orthoSize)
-    RAIN_FIELD(zNear)
-    RAIN_FIELD(zFar)
-    RAIN_FIELDS_END
 };
 
 struct SpriteRendererComponentDto : public Rain::Codable {
@@ -85,46 +81,28 @@ struct CubeMapDto : public Rain::Codable {
 };
 
 struct Rigidbody2DComponentDto : public Rain::Codable {
-    std::string type;
+    Rigidbody2DComponent::BodyType type;
     bool fixedRotation;
 
-    void setType(Rigidbody2DComponent::BodyType _type) {
-        switch (_type) {
-            case Rigidbody2DComponent::BodyType::STATIC: {
-                type = "STATIC";
-                return;
-            }
-            case Rigidbody2DComponent::BodyType::DYNAMIC: {
-                type = "DYNAMIC";
-                return;
-            }
-            case Rigidbody2DComponent::BodyType::KINEMATIC: {
-                type = "KINEMATIC";
-                return;
-            }
-        }
-        PND_ASSERT(false, "Unknown rigidbody body type");
-        type = "STATIC";
+    static void encode(const char *key, Rain::Encoder *encoder, Rigidbody2DComponentDto &data) {
+        encoder->beginObject(key);
+        int type = (int)data.type;
+        encoder->encode("type", type);
+        encoder->encode("fixedRotation", data.fixedRotation);
+        encoder->endObject();
     }
 
-    Rigidbody2DComponent::BodyType getType() {
-        if (type == "STATIC") {
-            return Rigidbody2DComponent::BodyType::STATIC;
+    static bool decode(const char *key, Rain::Decoder *decoder, Rigidbody2DComponentDto &data) {
+        if (!decoder->beginObject(key)) {
+            return false;
         }
-        if (type == "DYNAMIC") {
-            return Rigidbody2DComponent::BodyType::DYNAMIC;
-        }
-        if (type == "KINEMATIC") {
-            return Rigidbody2DComponent::BodyType::KINEMATIC;
-        }
-        PND_ASSERT(false, "Unknown rigidbody body type");
-        return Rigidbody2DComponent::BodyType::STATIC;
+        int type;
+        decoder->decode("type", type);
+        data.type = (Rigidbody2DComponent::BodyType)type;
+        decoder->decode("fixedRotation", data.fixedRotation);
+        decoder->endObject();
+        return true;
     }
-
-    RAIN_FIELDS_BEGIN(Rigidbody2DComponentDto)
-    RAIN_FIELD(type)
-    RAIN_FIELD(fixedRotation)
-    RAIN_FIELDS_END
 };
 
 struct BoxCollider2DComponentDto : public Rain::Codable {
@@ -146,21 +124,29 @@ struct BoxCollider2DComponentDto : public Rain::Codable {
 struct ScriptFieldDto : public Rain::Codable {
     std::string name;
     uint32_t fieldId;
-    int type;
+    ScriptFieldType type;
 
-    void setType(ScriptFieldType _type) {
-        type = (int)_type;
+    static void encode(const char *key, Rain::Encoder *encoder, ScriptFieldDto &data) {
+        encoder->beginObject(key);
+        encoder->encode("name", data.name);
+        encoder->encode("fieldId", data.fieldId);
+        int type = (int)data.type;
+        encoder->encode("type", type);
+        encoder->endObject();
     }
 
-    ScriptFieldType getType() {
-        return (ScriptFieldType)type;
+    static bool decode(const char *key, Rain::Decoder *decoder, ScriptFieldDto &data) {
+        if (!decoder->beginObject(key)) {
+            return false;
+        }
+        decoder->decode("name", data.name);
+        decoder->decode("fieldId", data.fieldId);
+        int type;
+        decoder->decode("type", type);
+        data.type = (ScriptFieldType)type;
+        decoder->endObject();
+        return true;
     }
-
-    RAIN_FIELDS_BEGIN(ScriptFieldDto)
-    RAIN_FIELD(name)
-    RAIN_FIELD(fieldId)
-    RAIN_FIELD(type)
-    RAIN_FIELDS_END
 };
 
 struct ExternalScriptDto : public Rain::Codable {

@@ -29,7 +29,6 @@ public:
     bool decode(const char *key, float &data) override;
     bool decode(const char *key, double &data) override;
     bool decode(const char *key, std::string &data) override;
-    bool decode(const char *key, const char *&data) override;
     bool decode(const char *key, UUID &data) override;
     void endObject() override;
     bool beginArray(const char *key) override;

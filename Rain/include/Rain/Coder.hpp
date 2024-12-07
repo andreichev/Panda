@@ -76,8 +76,6 @@ public:
     virtual bool decode(const char *key, double &data) = 0;
     /// Decode string
     virtual bool decode(const char *key, std::string &data) = 0;
-    /// Decode const char*
-    virtual bool decode(const char *key, const char *&data) = 0;
     /// Decode uuid
     virtual bool decode(const char *key, UUID &data) = 0;
     /// End decoding object

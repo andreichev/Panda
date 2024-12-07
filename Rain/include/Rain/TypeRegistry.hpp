@@ -39,8 +39,9 @@ concept PrimitiveDecoder =
     };
 
 template<typename T>
-concept CustomDecoder =
-    requires(const char *key, Decoder *decoder, T &data) { T::decode(key, decoder, data); };
+concept CustomDecoder = requires(const char *key, Decoder *decoder, T &data) {
+    typeid(T::decode(key, decoder, data)) == typeid(bool);
+};
 
 class TypeRegistry {
 private:
@@ -218,7 +219,7 @@ struct TypeDecoder<double> {
 template<>
 struct TypeDecoder<const char *> {
     static void decode(const char *key, Decoder *decoder, const TypeInfo &info, const char *&data) {
-        decoder->decode(key, data);
+        data = "Decoding of const char not allowed";
     }
 };
 
@@ -288,7 +289,22 @@ template<typename T>
 struct TypeDecoder<std::optional<T>> {
     static void
     decode(const char *key, Decoder *decoder, const TypeInfo &info, std::optional<T> &data) {
-        if constexpr (std::is_base_of<Codable, T>()) {
+        if constexpr (CustomDecoder<T>) {
+            T value;
+            if (T::decode(key, decoder, value)) {
+                data = value;
+            } else {
+                data = {};
+            }
+        } else if constexpr (PrimitiveDecoder<T>) {
+            T value;
+            if (decoder->decode(key, value)) {
+                data = value;
+            } else {
+                data = {};
+            }
+        } else {
+            static_assert(std::is_base_of<Codable, T>());
             if (!decoder->beginObject(key)) {
                 data = {};
                 return;
@@ -304,13 +320,6 @@ struct TypeDecoder<std::optional<T>> {
             }
             data = value;
             decoder->endObject();
-        } else {
-            T value;
-            if (decoder->decode(key, value)) {
-                data = value;
-            } else {
-                data = {};
-            }
         }
     }
 };
@@ -430,7 +439,12 @@ struct TypeEncoder<std::optional<T>> {
     static void
     encode(const char *key, Encoder *encoder, const TypeInfo &info, std::optional<T> &data) {
         if (data.has_value()) {
-            if constexpr (std::is_base_of<Codable, T>()) {
+            if constexpr (CustomEncoder<T>) {
+                T::encode(key, encoder, data.value());
+            } else if constexpr (PrimitiveEncoder<T>) {
+                encoder->encode(key, data.value());
+            } else {
+                static_assert(std::is_base_of<Codable, T>());
                 encoder->beginObject(key);
                 TypeInfo typeInfo = getTypeRegistry()->findOrCreateType<T>();
                 for (auto &field : typeInfo.fields) {
@@ -440,8 +454,6 @@ struct TypeEncoder<std::optional<T>> {
                     );
                 }
                 encoder->endObject();
-            } else {
-                encoder->encode(key, data.value());
             }
         } else {
             encoder->encodeNull(key);

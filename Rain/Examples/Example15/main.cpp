@@ -39,7 +39,7 @@ Time stringToTime(std::string time) {
 }
 
 struct B : public Rain::Codable {
-    const char *message;
+    std::string message;
     Time time;
 
     static void encode(const char *key, Rain::Encoder *encoder, B &data) {
@@ -50,14 +50,17 @@ struct B : public Rain::Codable {
         encoder->endObject();
     }
 
-    static void decode(const char *key, Rain::Decoder *decoder, B &data) {
-        decoder->beginObject(key);
+    static bool decode(const char *key, Rain::Decoder *decoder, B &data) {
+        if (!decoder->beginObject(key)) {
+            return false;
+        }
         decoder->decode("message", data.message);
         std::string strTime;
         // Rain can't decode const char.
         decoder->decode("time", strTime);
         data.time = stringToTime(strTime);
         decoder->endObject();
+        return true;
     }
 
     B(const char *message, Time time)
@@ -69,15 +72,15 @@ struct B : public Rain::Codable {
 };
 
 struct A : public Rain::Codable {
-    const char *a;
-    B b;
+    std::string a;
+    std::optional<B> b;
 
     RAIN_FIELDS_BEGIN(A)
     RAIN_FIELD(a)
     RAIN_FIELD(b)
     RAIN_FIELDS_END
 
-    A(const char *a, B b)
+    A(const char *a, std::optional<B> b)
         : a(a)
         , b(b) {}
 
@@ -87,7 +90,7 @@ struct A : public Rain::Codable {
 };
 
 struct Car : public Rain::Codable {
-    const char *mark;
+    std::string mark;
     int year;
     A a;
 
@@ -113,7 +116,7 @@ struct Person : public Rain::Codable {
     int age;
     std::vector<Car> cars;
     std::vector<int> x;
-    const char *surname;
+    std::string surname;
 
     RAIN_FIELDS_BEGIN(Person)
     RAIN_FIELD(name)
@@ -155,7 +158,7 @@ int main() {
     Rain::Decoder *decoder = new Rain::JsonDecoder;
     decoder->decode(stream, p2);
 
-    std::cout << (p1.cars[0].a.b.time == p2.cars[0].a.b.time) << std::endl;
+    std::cout << (p1.cars[0].a.b.value().time == p2.cars[0].a.b.value().time) << std::endl;
 
     delete encoder;
     return 0;
