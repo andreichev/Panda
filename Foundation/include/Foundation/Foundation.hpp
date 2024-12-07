@@ -12,6 +12,8 @@
 
 namespace Foundation {
 
+#define PND_DISCARD(x) static_cast<void>(x)
+
 template<typename T>
 using Unique = std::unique_ptr<T>;
 

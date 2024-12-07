@@ -11,7 +11,7 @@ namespace Miren {
 class OpenGLTexture {
 public:
     OpenGLTexture();
-    void create(const TextureCreate &create);
+    void create(TextureCreate &create);
     void resize(uint32_t width, uint32_t height);
     uint16_t getWidth() {
         return m_create.m_width;

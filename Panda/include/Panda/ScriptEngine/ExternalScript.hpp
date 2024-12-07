@@ -16,23 +16,14 @@ struct ScriptField {
         ScriptInstanceHandle instanceId,
         FieldHandle fieldId,
         const std::string &name,
-        ScriptFieldType type
+        ScriptFieldType type,
+        Foundation::Memory data
     )
         : instanceId(instanceId)
         , fieldId(fieldId)
         , name(name)
         , type(type)
-        , data() {
-        switch (type) {
-            case ScriptFieldType::INTEGER: {
-                data = Foundation::Memory::alloc(sizeof(int));
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
+        , data(data) {}
 };
 
 class ExternalScript {

@@ -294,8 +294,18 @@ void EditorLayer::addScriptToEntity(Entity entity) {
                 // Map manifest fields to internal ScriptField type
                 std::vector<ScriptField> fields;
                 for (auto manifestField : clazz.fields) {
+                    Foundation::Memory data;
+                    switch (manifestField.type) {
+                        case ScriptFieldType::INTEGER: {
+                            data = Foundation::Memory::alloc(sizeof(int));
+                            break;
+                        }
+                        default: {
+                            PND_ASSERT(false, "Unknown field type");
+                        }
+                    }
                     ScriptField field(
-                        id, manifestField.handle, manifestField.name, manifestField.type
+                        id, manifestField.handle, manifestField.name, manifestField.type, data
                     );
                     fields.emplace_back(field);
                 }

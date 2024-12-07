@@ -125,6 +125,7 @@ struct ScriptFieldDto : public Rain::Codable {
     std::string name;
     uint32_t fieldId;
     ScriptFieldType type;
+    Foundation::Memory data;
 
     static void encode(const char *key, Rain::Encoder *encoder, ScriptFieldDto &data) {
         encoder->beginObject(key);
@@ -132,6 +133,17 @@ struct ScriptFieldDto : public Rain::Codable {
         encoder->encode("fieldId", data.fieldId);
         int type = (int)data.type;
         encoder->encode("type", type);
+        switch (data.type) {
+            case ScriptFieldType::INTEGER: {
+                int* value = (int*) data.data.data;
+                encoder->encode("value", *value);
+                break;
+            }
+            default: {
+                PND_ASSERT(false, "Unknown field type");
+                break;
+            }
+        }
         encoder->endObject();
     }
 
@@ -144,6 +156,20 @@ struct ScriptFieldDto : public Rain::Codable {
         int type;
         decoder->decode("type", type);
         data.type = (ScriptFieldType)type;
+        data.data.release();
+        switch (data.type) {
+            case ScriptFieldType::INTEGER: {
+                data.data = Foundation::Memory::alloc(sizeof(int));
+                int value = 0;
+                decoder->decode("value", value);
+                memcpy(data.data.data, &value, sizeof(int));
+                break;
+            }
+            default: {
+                PND_ASSERT(false, "Unknown field type");
+                break;
+            }
+        }
         decoder->endObject();
         return true;
     }
