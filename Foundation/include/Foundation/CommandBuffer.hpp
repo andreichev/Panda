@@ -39,18 +39,22 @@ public:
         m_data = (uint8_t *)F_ALLOC(getAllocator(), size);
     }
     void copy(const CommandBuffer &commandBuffer) {
-//        m_data = (uint8_t *)F_ALLOC(getAllocator(), size);
+        //        m_data = (uint8_t *)F_ALLOC(getAllocator(), size);
+        m_pos = commandBuffer.m_pos;
         if (m_size != commandBuffer.m_size) {
             if (m_data != nullptr) {
                 F_FREE(Foundation::getAllocator(), m_data);
             }
-            auto copyingMemory = Foundation::Memory::copying((void*)commandBuffer.m_data, commandBuffer.m_size);
+            auto copyingMemory =
+                Foundation::Memory::copying((void *)commandBuffer.m_data, commandBuffer.m_size);
             m_data = (uint8_t *)copyingMemory.data;
             m_size = commandBuffer.m_size;
-        } else {
-            memcpy(m_data, commandBuffer.m_data, m_size);
+            return;
         }
-        m_pos = commandBuffer.m_pos;
+        memcpy(m_data, commandBuffer.m_data, m_size);
+//        for (int i = 0; i < m_pos; i++) {
+//            m_data[i] = commandBuffer.m_data[i];
+//        }
     }
 
     ~CommandBuffer() {
