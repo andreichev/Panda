@@ -110,22 +110,23 @@ void Application::loop() {
 
         // LOG_INFO("APP UPDATE BEGIN");
         Miren::renderSemaphoreWait();
-        EASY_BLOCK("Update Start")
+        EASY_BLOCK("Update")
         LayerStack &layerStack = *m_layerStack;
         for (Layer *layer : layerStack) {
             layer->onUpdate(deltaTime);
         }
+//        Miren::renderSemaphorePost();
         m_ImGuiLayer->begin(deltaTime);
         for (Layer *layer : layerStack) {
             layer->onImGuiRender();
         }
         m_ImGuiLayer->end();
+//        Miren::renderSemaphoreWait();
         m_window->pollEvents();
         Input::nextFrame();
         processEvents();
         Miren::frame();
         // LOG_INFO("APP UPDATE END");
-        EASY_BLOCK("Update End")
         Miren::renderSemaphorePost();
     }
 }
