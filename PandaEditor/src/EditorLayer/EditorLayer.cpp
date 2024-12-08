@@ -286,12 +286,31 @@ void EditorLayer::addScriptToEntity(Entity entity) {
         F_DELETE(Foundation::getAllocator(), self->m_popups.back());
         self->m_popups.pop_back();
     };
-    popup->selectAction = [](void *data, Entity entity, const char *scriptName) {
+    popup->selectAction = [](void *data, Entity entity, ScriptClassManifest clazz) {
         auto self = static_cast<EditorLayer *>(data);
-        if (scriptName) {
-            ScriptHandle id = ExternalCalls::addScriptFunc(entity.getId(), scriptName);
+        if (clazz.name) {
+            ScriptInstanceHandle id = ExternalCalls::instantiateScript(entity.getId(), clazz.name);
             if (id) {
-                entity.addScript(Panda::ExternalScript(id, scriptName));
+                // Map manifest fields to internal ScriptField type
+                std::vector<ScriptField> fields;
+                for (auto manifestField : clazz.fields) {
+                    Foundation::Memory data;
+                    switch (manifestField.type) {
+                        case ScriptFieldType::INTEGER: {
+                            data = Foundation::Memory::alloc(sizeof(int));
+                            break;
+                        }
+                        default: {
+                            PND_ASSERT(false, "Unknown field type");
+                        }
+                    }
+                    ScriptField field(
+                        id, manifestField.handle, manifestField.name, manifestField.type, data
+                    );
+                    fields.emplace_back(field);
+                }
+                // TODO: Bind previously picked values
+                entity.addScript(Panda::ExternalScript(id, clazz.name, fields));
             }
         }
         F_DELETE(Foundation::getAllocator(), self->m_popups.back());
@@ -398,6 +417,7 @@ void EditorLayer::toolbarDidPickSceneState(SceneState state) {
 
 void EditorLayer::toolbarDidTapReloadScripts() {
     m_loader.reloadScriptsDll();
+    m_currentWorld->bindScriptsAndFields();
 }
 
 SceneState EditorLayer::toolbarGetCurrentSceneState() {

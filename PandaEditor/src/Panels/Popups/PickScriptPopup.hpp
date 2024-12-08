@@ -7,13 +7,17 @@
 
 namespace Panda {
 
-using SelectScriptFunction = void (*)(void *userData, Entity entity, const char *scriptName);
+using SelectScriptFunction = void (*)(void *userData, Entity entity, ScriptClassManifest clazz);
 
-class PickScriptPopup : public EditorPopup {
+class PickScriptPopup final : public EditorPopup {
 public:
     void onImGuiRender() override {
         static int selectedClassIndex = -1;
-        static const char *selectedClassName = nullptr;
+        static ScriptClassManifest selectedClass;
+        if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
+            PND_ASSERT(false, "SCRIPT ENGINE IS NOT INITIALIZED");
+            return;
+        }
         ImGui::OpenPopup(title);
         ImVec2 center = ImGui::GetMainViewport()->GetCenter();
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -21,24 +25,24 @@ public:
         if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Text("%s", subtitle);
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-
-            auto classes = ExternalCalls::getAvailableScripts();
+            auto manifest = GameContext::s_scriptEngine->getManifest();
             // SCRIPT LIST
-            for (int i = 0; i < classes.size(); i++) {
-                if (ImGui::Selectable(classes[i], selectedClassIndex == i)) {
+            for (int i = 0; i < manifest.classes.size(); i++) {
+                if (ImGui::Selectable(manifest.classes[i].name, selectedClassIndex == i)) {
                     selectedClassIndex = i;
-                    selectedClassName = classes[i];
+                    selectedClass = manifest.classes[i];
                 }
             }
             if (ImGui::Button("Select", {ImGui::GetContentRegionAvail().x, 24})) {
                 if (selectAction) {
-                    selectAction(userData, entity, selectedClassName);
+                    selectAction(userData, entity, selectedClass);
                 }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();
                 selectedClassIndex = -1;
-                selectedClassName = nullptr;
+                selectedClass.name = nullptr;
+                selectedClass.fields = {};
                 return;
             }
             ImGui::Separator();
@@ -50,7 +54,8 @@ public:
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();
                 selectedClassIndex = -1;
-                selectedClassName = nullptr;
+                selectedClass.name = nullptr;
+                selectedClass.fields = {};
                 return;
             }
 

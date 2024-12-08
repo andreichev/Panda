@@ -16,7 +16,7 @@ OpenGLTexture::OpenGLTexture()
     , m_format(0)
     , m_type(0) {}
 
-void OpenGLTexture::create(const TextureCreate &create) {
+void OpenGLTexture::create(TextureCreate &create) {
     PND_ASSERT(m_id == -1, "TEXTURE ALREADY CREATED");
     m_create = create;
     MIREN_LOG("CREATE TEXTURE, w: {}, h: {}", create.m_width, create.m_height);

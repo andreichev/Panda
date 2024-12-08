@@ -5,6 +5,7 @@
 #pragma once
 
 #include <Panda/ImGui/Colors.hpp>
+#include <Panda/ScriptEngine/ExternalScript.hpp>
 #include <Panda/Base/Base.hpp>
 #include <Panda/Renderer/Texture.hpp>
 #include <imgui_internal.h>
@@ -40,5 +41,6 @@ void beginPropertiesGrid(int columns = 2);
 void endPropertiesGrid();
 bool propertyColor(const char *label, Color &value);
 bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asset> asset);
+bool drawFieldValue(ScriptField &field);
 
 } // namespace Panda

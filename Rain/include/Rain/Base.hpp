@@ -55,4 +55,8 @@ inline void *addOffset(void *data, size_t offset) {
     return static_cast<uint8_t *>(data) + offset;
 }
 
+constexpr bool stringsEqual(char const *a, char const *b) {
+    return *a == *b && (*a == '\0' || stringsEqual(a + 1, b + 1));
+}
+
 } // namespace Rain

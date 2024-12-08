@@ -48,7 +48,35 @@ void YamlEncoder::encode(const char *key, const int &data) {
     *out << YAML::Value << data;
 }
 
+void YamlEncoder::encode(const char *key, const uint32_t &data) {
+    if (key) {
+        *out << YAML::Key << key;
+    }
+    *out << YAML::Value << data;
+}
+
+void YamlEncoder::encode(const char *key, const int64_t &data) {
+    if (key) {
+        *out << YAML::Key << key;
+    }
+    *out << YAML::Value << data;
+}
+
+void YamlEncoder::encode(const char *key, const uint64_t &data) {
+    if (key) {
+        *out << YAML::Key << key;
+    }
+    *out << YAML::Value << data;
+}
+
 void YamlEncoder::encode(const char *key, const float &data) {
+    if (key) {
+        *out << YAML::Key << key;
+    }
+    *out << YAML::Value << data;
+}
+
+void YamlEncoder::encode(const char *key, const double &data) {
     if (key) {
         *out << YAML::Key << key;
     }

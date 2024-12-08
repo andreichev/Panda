@@ -29,10 +29,19 @@ concept PrimitiveEncoder =
     };
 
 template<typename T>
+concept CustomEncoder =
+    requires(const char *key, Encoder *encoder, T &data) { T::encode(key, encoder, data); };
+
+template<typename T>
 concept PrimitiveDecoder =
     requires(const char *key, Decoder *decoder, const TypeInfo &info, T &data) {
         TypeDecoder<T>::decode(key, decoder, info, data);
     };
+
+template<typename T>
+concept CustomDecoder = requires(const char *key, Decoder *decoder, T &data) {
+    typeid(T::decode(key, decoder, data)) == typeid(bool);
+};
 
 class TypeRegistry {
 private:
@@ -47,7 +56,13 @@ private:
 public:
     template<typename T>
     constexpr void fillCodingFunc(TypeInfo &info) {
-        if constexpr (PrimitiveEncoder<T>) {
+        if constexpr (CustomEncoder<T>) {
+            info.encoderFunc =
+                [](const char *key, Encoder *encoder, const TypeInfo &info, void *data) {
+                    T *ptr = static_cast<T *>(data);
+                    T::encode(key, encoder, *ptr);
+                };
+        } else if constexpr (PrimitiveEncoder<T>) {
             info.encoderFunc =
                 [](const char *key, Encoder *encoder, const TypeInfo &info, void *data) {
                     T *ptr = static_cast<T *>(data);
@@ -67,7 +82,13 @@ public:
                     encoder->endObject();
                 };
         }
-        if constexpr (PrimitiveDecoder<T>) {
+        if constexpr (CustomDecoder<T>) {
+            info.decoderFunc =
+                [](const char *key, Decoder *decoder, const TypeInfo &info, void *data) {
+                    T *ptr = static_cast<T *>(data);
+                    T::decode(key, decoder, *ptr);
+                };
+        } else if constexpr (PrimitiveDecoder<T>) {
             info.decoderFunc =
                 [](const char *key, Decoder *decoder, const TypeInfo &info, void *data) {
                     T *ptr = static_cast<T *>(data);
@@ -186,11 +207,19 @@ struct TypeDecoder<float> {
     }
 };
 
+/** DOUBLE */
+template<>
+struct TypeDecoder<double> {
+    static void decode(const char *key, Decoder *decoder, const TypeInfo &info, double &data) {
+        decoder->decode(key, data);
+    }
+};
+
 /** CONST CHAR* */
 template<>
 struct TypeDecoder<const char *> {
     static void decode(const char *key, Decoder *decoder, const TypeInfo &info, const char *&data) {
-        decoder->decode(key, data);
+        data = "Decoding of const char not allowed";
     }
 };
 
@@ -211,6 +240,30 @@ struct TypeDecoder<std::basic_string<Elem, Traits, Alloc>> {
 template<>
 struct TypeDecoder<int> {
     static void decode(const char *key, Decoder *decoder, const TypeInfo &info, int &data) {
+        decoder->decode(key, data);
+    }
+};
+
+/** UINT */
+template<>
+struct TypeDecoder<uint32_t> {
+    static void decode(const char *key, Decoder *decoder, const TypeInfo &info, uint32_t &data) {
+        decoder->decode(key, data);
+    }
+};
+
+/** INT64 */
+template<>
+struct TypeDecoder<int64_t> {
+    static void decode(const char *key, Decoder *decoder, const TypeInfo &info, int64_t &data) {
+        decoder->decode(key, data);
+    }
+};
+
+/** UINT64 */
+template<>
+struct TypeDecoder<uint64_t> {
+    static void decode(const char *key, Decoder *decoder, const TypeInfo &info, uint64_t &data) {
         decoder->decode(key, data);
     }
 };
@@ -236,7 +289,22 @@ template<typename T>
 struct TypeDecoder<std::optional<T>> {
     static void
     decode(const char *key, Decoder *decoder, const TypeInfo &info, std::optional<T> &data) {
-        if constexpr (std::is_base_of<Codable, T>()) {
+        if constexpr (CustomDecoder<T>) {
+            T value;
+            if (T::decode(key, decoder, value)) {
+                data = value;
+            } else {
+                data = {};
+            }
+        } else if constexpr (PrimitiveDecoder<T>) {
+            T value;
+            if (decoder->decode(key, value)) {
+                data = value;
+            } else {
+                data = {};
+            }
+        } else {
+            static_assert(std::is_base_of<Codable, T>());
             if (!decoder->beginObject(key)) {
                 data = {};
                 return;
@@ -252,13 +320,6 @@ struct TypeDecoder<std::optional<T>> {
             }
             data = value;
             decoder->endObject();
-        } else {
-            T value;
-            if (decoder->decode(key, value)) {
-                data = value;
-            } else {
-                data = {};
-            }
         }
     }
 };
@@ -295,6 +356,14 @@ struct TypeEncoder<float> {
     }
 };
 
+/** DOUBLE */
+template<>
+struct TypeEncoder<double> {
+    static void encode(const char *key, Encoder *encoder, const TypeInfo &info, double &data) {
+        encoder->encode(key, data);
+    }
+};
+
 /** CONST CHAR* */
 template<>
 struct TypeEncoder<const char *> {
@@ -324,6 +393,30 @@ struct TypeEncoder<int> {
     }
 };
 
+/** UINT */
+template<>
+struct TypeEncoder<uint32_t> {
+    static void encode(const char *key, Encoder *encoder, const TypeInfo &info, uint32_t &data) {
+        encoder->encode(key, data);
+    }
+};
+
+/** INT64 */
+template<>
+struct TypeEncoder<int64_t> {
+    static void encode(const char *key, Encoder *encoder, const TypeInfo &info, int64_t &data) {
+        encoder->encode(key, data);
+    }
+};
+
+/** UINT64 */
+template<>
+struct TypeEncoder<uint64_t> {
+    static void encode(const char *key, Encoder *encoder, const TypeInfo &info, uint64_t &data) {
+        encoder->encode(key, data);
+    }
+};
+
 /** UUID */
 template<>
 struct TypeEncoder<UUID> {
@@ -346,7 +439,12 @@ struct TypeEncoder<std::optional<T>> {
     static void
     encode(const char *key, Encoder *encoder, const TypeInfo &info, std::optional<T> &data) {
         if (data.has_value()) {
-            if constexpr (std::is_base_of<Codable, T>()) {
+            if constexpr (CustomEncoder<T>) {
+                T::encode(key, encoder, data.value());
+            } else if constexpr (PrimitiveEncoder<T>) {
+                encoder->encode(key, data.value());
+            } else {
+                static_assert(std::is_base_of<Codable, T>());
                 encoder->beginObject(key);
                 TypeInfo typeInfo = getTypeRegistry()->findOrCreateType<T>();
                 for (auto &field : typeInfo.fields) {
@@ -356,8 +454,6 @@ struct TypeEncoder<std::optional<T>> {
                     );
                 }
                 encoder->endObject();
-            } else {
-                encoder->encode(key, data.value());
             }
         } else {
             encoder->encodeNull(key);

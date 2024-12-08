@@ -147,6 +147,33 @@ void ComponentsDraw::drawComponents(Entity entity) {
             }
         }
     );
+    drawComponent<ScriptListComponent>(
+        "Scripts",
+        entity,
+        false,
+        [](Entity entity, WorldCommandManager &cmd, auto &component) {
+            for (auto &script : component.scripts) {
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
+                ImGui::Text("%s", script.getName().c_str());
+                // TODO: Add opening script .cpp file in editor or displaying .cpp file name
+                ImGui::SameLine();
+                if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+                    entity.removeScript(script);
+                    break;
+                }
+                for (auto &field : script.getFields()) {
+                    drawFieldValue(field);
+                }
+                underline();
+            }
+            if (component.scripts.empty()) {
+                ImGui::Text("No scripts attached to entity");
+            } else {
+                ImGui::Separator();
+                ImGui::Text("%lu scripts", component.scripts.size());
+            }
+        }
+    );
     drawComponent<SpriteRendererComponent>(
         "Sprite Renderer",
         entity,
@@ -268,27 +295,6 @@ void ComponentsDraw::drawComponents(Entity entity) {
         entity,
         true,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {}
-    );
-    drawComponent<ScriptListComponent>(
-        "Scripts",
-        entity,
-        false,
-        [](Entity entity, WorldCommandManager &cmd, auto &component) {
-            for (auto &script : component.scripts) {
-                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
-                ImGui::Text("%s", script.getName().c_str());
-                ImGui::SameLine();
-                if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
-                    entity.removeScript(script);
-                }
-            }
-            if (component.scripts.empty()) {
-                ImGui::Text("No scripts attached to entity");
-            } else {
-                ImGui::Separator();
-                ImGui::Text("%lu scripts", component.scripts.size());
-            }
-        }
     );
 }
 

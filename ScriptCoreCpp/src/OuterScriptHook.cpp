@@ -4,6 +4,7 @@
 
 #include "ScriptRegistry.hpp"
 #include "OuterScriptHook.hpp"
+#include "ScriptClassMaper.hpp"
 
 #include <iostream>
 
@@ -27,12 +28,16 @@ namespace ExternalCalls {
 } // namespace ExternalCalls
 
 namespace InternalCalls {
-    Panda::ScriptHandle addScriptFunc(UUID entityId, const char *name) {
-        return Panda::getScriptRegistry()->instantiate(Entity(entityId), name);
+    void clear() {
+        getScriptRegistry()->clear();
     }
 
-    void invokeUpdateAtScript(Panda::ScriptHandle handle, float deltaTime) {
-        Panda::Script *script = Panda::getScriptRegistry()->getScriptWithId(handle);
+    ScriptInstanceHandle instantiateScript(UUID entityId, const char *name) {
+        return getScriptRegistry()->instantiate(Entity(entityId), name);
+    }
+
+    void invokeUpdateAtScript(ScriptInstanceHandle handle, float deltaTime) {
+        Script *script = getScriptRegistry()->getInstanceWithId(handle);
         if (!script) {
             // assert(false);
             return;
@@ -40,8 +45,8 @@ namespace InternalCalls {
         script->update(deltaTime);
     }
 
-    void invokeStartAtScript(Panda::ScriptHandle handle) {
-        Panda::Script *script = Panda::getScriptRegistry()->getScriptWithId(handle);
+    void invokeStartAtScript(ScriptInstanceHandle handle) {
+        Script *script = getScriptRegistry()->getInstanceWithId(handle);
         if (!script) {
             // assert(false);
             return;
@@ -49,12 +54,12 @@ namespace InternalCalls {
         script->start();
     }
 
-    std::vector<const char *> getAvailableScripts() {
-        std::vector<const char *> result;
-        for (auto &clazz : getScriptRegistry()->m_scriptClasses) {
-            result.push_back(clazz.name);
-        }
-        return result;
+    void setFieldValue(ScriptInstanceHandle scriptId, FieldHandle fieldId, void *value) {
+        getScriptRegistry()->setFieldValue(scriptId, fieldId, value);
+    }
+
+    ScriptBundleManifest getManifest() {
+        return ScriptClassMapper::getClassesManifest(getScriptRegistry()->m_scriptClasses);
     }
 } // namespace InternalCalls
 
@@ -62,10 +67,12 @@ std::unordered_map<std::string, void *> g_scriptSymbols;
 
 void initScriptHook() {
     using namespace InternalCalls;
-    g_scriptSymbols["addScriptFunc"] = (void *)addScriptFunc;
-    g_scriptSymbols["invokeUpdateAtScript"] = (void *)invokeUpdateAtScript;
+    g_scriptSymbols["clear"] = (void *)clear;
+    g_scriptSymbols["instantiateScript"] = (void *)instantiateScript;
+    g_scriptSymbols["setFieldValue"] = (void *)setFieldValue;
     g_scriptSymbols["invokeStartAtScript"] = (void *)invokeStartAtScript;
-    g_scriptSymbols["getAvailableScripts"] = (void *)getAvailableScripts;
+    g_scriptSymbols["invokeUpdateAtScript"] = (void *)invokeUpdateAtScript;
+    g_scriptSymbols["getManifest"] = (void *)getManifest;
 }
 
 //////////////////////////////////////////////////////////////////

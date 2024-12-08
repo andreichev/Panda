@@ -76,6 +76,86 @@ bool JsonDecoder::decode(const char *key, int &data) {
     return true;
 }
 
+bool JsonDecoder::decode(const char *key, uint32_t &data) {
+    if (m_isArray) {
+        const auto &member = *m_arrayIteratorStack.back();
+        if (!member.IsUint()) {
+            return false;
+        }
+        data = member.GetUint();
+    } else {
+        if (!currentObject().HasMember(key)) {
+            return false;
+        }
+        const auto &member = currentObject()[key];
+        if (!member.IsUint()) {
+            return false;
+        }
+        data = member.GetUint();
+    }
+    return true;
+}
+
+bool JsonDecoder::decode(const char *key, int64_t &data) {
+    if (m_isArray) {
+        const auto &member = *m_arrayIteratorStack.back();
+        if (!member.IsInt64()) {
+            return false;
+        }
+        data = member.GetInt64();
+    } else {
+        if (!currentObject().HasMember(key)) {
+            return false;
+        }
+        const auto &member = currentObject()[key];
+        if (!member.IsInt64()) {
+            return false;
+        }
+        data = member.GetInt64();
+    }
+    return true;
+}
+
+bool JsonDecoder::decode(const char *key, uint64_t &data) {
+    if (m_isArray) {
+        const auto &member = *m_arrayIteratorStack.back();
+        if (!member.IsUint64()) {
+            return false;
+        }
+        data = member.GetUint64();
+    } else {
+        if (!currentObject().HasMember(key)) {
+            return false;
+        }
+        const auto &member = currentObject()[key];
+        if (!member.IsUint64()) {
+            return false;
+        }
+        data = member.GetUint64();
+    }
+    return true;
+}
+
+bool JsonDecoder::decode(const char *key, double &data) {
+    if (m_isArray) {
+        const auto &member = *m_arrayIteratorStack.back();
+        if (!member.IsDouble()) {
+            return false;
+        }
+        data = member.GetDouble();
+    } else {
+        if (!currentObject().HasMember(key)) {
+            return false;
+        }
+        const auto &member = currentObject()[key];
+        if (!member.IsDouble()) {
+            return false;
+        }
+        data = member.GetDouble();
+    }
+    return true;
+}
+
 bool JsonDecoder::decode(const char *key, bool &data) {
     if (m_isArray) {
         const auto &member = *m_arrayIteratorStack.back();
@@ -133,12 +213,6 @@ bool JsonDecoder::decode(const char *key, std::string &data) {
         }
         data = member.GetString();
     }
-    return true;
-}
-
-bool JsonDecoder::decode(const char *key, const char *&data) {
-    // DECODING OF CONST CHAT NOT ALLOWED
-    data = "Decoding of const char not allowed";
     return true;
 }
 

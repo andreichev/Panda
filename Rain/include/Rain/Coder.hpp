@@ -25,8 +25,16 @@ public:
     virtual void encode(const char *key, const bool &data) = 0;
     /// Encode int
     virtual void encode(const char *key, const int &data) = 0;
+    /// Encode uint
+    virtual void encode(const char *key, const uint32_t &data) = 0;
+    /// Encode int64
+    virtual void encode(const char *key, const int64_t &data) = 0;
+    /// Encode uint64
+    virtual void encode(const char *key, const uint64_t &data) = 0;
     /// Encode float
     virtual void encode(const char *key, const float &data) = 0;
+    /// Encode double
+    virtual void encode(const char *key, const double &data) = 0;
     /// Encode string
     virtual void encode(const char *key, const std::string &data) = 0;
     /// Encode const char*
@@ -56,12 +64,18 @@ public:
     virtual bool decode(const char *key, bool &data) = 0;
     /// Decode int
     virtual bool decode(const char *key, int &data) = 0;
+    /// Decode uint
+    virtual bool decode(const char *key, uint32_t &data) = 0;
+    /// Decode int64
+    virtual bool decode(const char *key, int64_t &data) = 0;
+    /// Decode uint64
+    virtual bool decode(const char *key, uint64_t &data) = 0;
     /// Decode float
     virtual bool decode(const char *key, float &data) = 0;
+    /// Decode double
+    virtual bool decode(const char *key, double &data) = 0;
     /// Decode string
     virtual bool decode(const char *key, std::string &data) = 0;
-    /// Decode const char*
-    virtual bool decode(const char *key, const char *&data) = 0;
     /// Decode uuid
     virtual bool decode(const char *key, UUID &data) = 0;
     /// End decoding object

@@ -1,24 +1,32 @@
 #pragma once
 
+#include "Manifest/ScriptClassManifest.hpp"
+
 #include <stdint.h>
 #include <Rain/UUID.hpp>
 
 namespace Panda {
 
-using ScriptHandle = uint32_t;
+using ScriptInstanceHandle = uint32_t;
 
 namespace ExternalCalls {
-    using AddScriptFunc = ScriptHandle (*)(UUID entityId, const char *name);
-    extern AddScriptFunc addScriptFunc;
+    using Clear = void (*)();
+    extern Clear clear;
 
-    using InvokeUpdateAtScriptFunc = void (*)(ScriptHandle handle, float deltaTime);
-    extern InvokeUpdateAtScriptFunc invokeUpdateAtScriptFunc;
+    using InstantiateScript = ScriptInstanceHandle (*)(UUID entityId, const char *name);
+    extern InstantiateScript instantiateScript;
 
-    using InvokeStartAtScriptFunc = void (*)(ScriptHandle handle);
-    extern InvokeStartAtScriptFunc invokeStartAtScriptFunc;
+    using SetFieldValue = void (*)(ScriptInstanceHandle scriptId, FieldHandle fieldId, void *value);
+    extern SetFieldValue setFieldValue;
 
-    using GetAvailableScripts = std::vector<const char *> (*)();
-    extern GetAvailableScripts getAvailableScripts;
+    using InvokeUpdateAtScript = void (*)(ScriptInstanceHandle handle, float deltaTime);
+    extern InvokeUpdateAtScript invokeUpdateAtScript;
+
+    using InvokeStartAtScript = void (*)(ScriptInstanceHandle handle);
+    extern InvokeStartAtScript invokeStartAtScript;
+
+    using GetManifest = ScriptBundleManifest (*)();
+    extern GetManifest getManifest;
 } // namespace ExternalCalls
 
 //////////////////////////////////////////////////////////////////

@@ -17,12 +17,16 @@ struct Memory {
     void *userData;
     ReleaseFunction releaseFn;
 
-    const void release() const {
+    const void release() {
+        if (!data) {
+            return;
+        }
         if (releaseFn != nullptr) {
             releaseFn(data, userData);
         } else if (data != nullptr) {
             F_FREE(Foundation::getAllocator(), data);
         }
+        data = nullptr;
     }
 
     /// Create memory copying some data

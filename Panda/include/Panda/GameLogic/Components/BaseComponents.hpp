@@ -9,7 +9,7 @@
 #include "Panda/GameLogic/Components/StaticMesh.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
 #include "Panda/GameLogic/Components/DynamicMesh.hpp"
-#include "Panda/GameLogic/ExternalScript.hpp"
+#include "Panda/ScriptEngine/ExternalScript.hpp"
 #include "Panda/Assets/Asset.hpp"
 
 #include <Foundation/Foundation.hpp>
@@ -66,7 +66,7 @@ struct RelationshipComponent final : public Rain::Codable {
 };
 
 struct SpriteRendererComponent final {
-    Color color;
+    Color color = Color(0.f, 0.f, 0.f, 1.f);
     Foundation::Shared<Asset> texture;
     UUID textureId = 0;
 

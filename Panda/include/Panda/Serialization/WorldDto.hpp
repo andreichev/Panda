@@ -23,6 +23,7 @@ struct EntityDto : public Rain::Codable {
     RAIN_FIELD(cameraComponent)
     RAIN_FIELD(spriteRendererComponent)
     RAIN_FIELD(cubeMapComponent)
+    RAIN_FIELD(scriptListComponent)
     RAIN_FIELD(rigidbody2dComponent)
     RAIN_FIELD(boxCollider2dComponent)
     RAIN_FIELDS_END

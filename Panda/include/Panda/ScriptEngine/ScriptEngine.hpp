@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <Panda/ScriptEngine/Manifest/ScriptClassManifest.hpp>
 #include <filesystem>
 
 namespace Panda {
@@ -15,12 +16,16 @@ struct ScriptEngineConfig {
 
 class ScriptEngine {
 public:
+    ScriptEngine();
     ~ScriptEngine();
     bool reload(ScriptEngineConfig config);
+    bool isLoaded();
+    ScriptBundleManifest getManifest();
     void terminate();
 
 private:
-    void *lib = nullptr;
+    ScriptBundleManifest m_manifest;
+    void *m_lib;
 };
 
 } // namespace Panda

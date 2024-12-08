@@ -1,4 +1,6 @@
 #include "Panda/Serialization/WorldMapper.hpp"
+
+#include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 namespace Panda {
@@ -23,7 +25,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
             auto &cameraComponent = entity.addComponent<CameraComponent>();
             cameraComponent.isPrimary = cameraComponentDto.isPrimary;
             WorldCameraDto worldCameraDto = cameraComponentDto.camera;
-            cameraComponent.camera.setProjectionType(worldCameraDto.getProjectionType());
+            cameraComponent.camera.setProjectionType(worldCameraDto.projectionType);
             cameraComponent.camera.setNear(worldCameraDto.zNear);
             cameraComponent.camera.setFar(worldCameraDto.zFar);
             cameraComponent.camera.setFieldOfView(worldCameraDto.fieldOfView);
@@ -45,7 +47,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         if (entityDto.rigidbody2dComponent.has_value()) {
             Rigidbody2DComponentDto &rigidbody2dDto = entityDto.rigidbody2dComponent.value();
             auto &rigidbody2d = entity.addComponent<Rigidbody2DComponent>();
-            rigidbody2d.type = rigidbody2dDto.getType();
+            rigidbody2d.type = rigidbody2dDto.type;
             rigidbody2d.fixedRotation = rigidbody2dDto.fixedRotation;
         }
         if (entityDto.boxCollider2dComponent.has_value()) {
@@ -61,11 +63,19 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         {
             ScriptListComponentDto scriptsComponentDto = entityDto.scriptListComponent;
             for (auto &scriptDto : scriptsComponentDto.scripts) {
-                ScriptHandle id =
-                    ExternalCalls::addScriptFunc(entity.getId(), scriptDto.name.c_str());
-                if (id) {
-                    entity.addScript(Panda::ExternalScript(id, scriptDto.name));
+                ScriptInstanceHandle id;
+                if (GameContext::s_scriptEngine && GameContext::s_scriptEngine->isLoaded()) {
+                    id = ExternalCalls::instantiateScript(entity.getId(), scriptDto.name.c_str());
+                } else {
+                    id = 0;
                 }
+                std::vector<ScriptField> fields;
+                for (ScriptFieldDto &fieldDto : scriptDto.scriptFields) {
+                    fields.emplace_back(
+                        id, fieldDto.fieldId, fieldDto.name, fieldDto.type, fieldDto.value
+                    );
+                }
+                entity.addScript(Panda::ExternalScript(id, scriptDto.name, fields));
             }
         }
     }
@@ -99,7 +109,7 @@ WorldDto WorldMapper::toDto(const World &world) {
             CameraComponentDto cameraComponentDto;
             cameraComponentDto.isPrimary = cameraComponent.isPrimary;
             WorldCameraDto worldCameraDto;
-            worldCameraDto.setProjectionType(cameraComponent.camera.getProjectionType());
+            worldCameraDto.projectionType = cameraComponent.camera.getProjectionType();
             worldCameraDto.zNear = cameraComponent.camera.getNear();
             worldCameraDto.zFar = cameraComponent.camera.getFar();
             worldCameraDto.fieldOfView = cameraComponent.camera.getFieldOfView();
@@ -120,7 +130,7 @@ WorldDto WorldMapper::toDto(const World &world) {
         if (entity.hasComponent<Rigidbody2DComponent>()) {
             Rigidbody2DComponent &rigidbody2d = entity.getComponent<Rigidbody2DComponent>();
             Rigidbody2DComponentDto rigidbody2dDto;
-            rigidbody2dDto.setType(rigidbody2d.type);
+            rigidbody2dDto.type = rigidbody2d.type;
             rigidbody2dDto.fixedRotation = rigidbody2d.fixedRotation;
             entityDto.rigidbody2dComponent = rigidbody2dDto;
         }
@@ -143,7 +153,16 @@ WorldDto WorldMapper::toDto(const World &world) {
             ScriptListComponentDto &scriptsComponentDto = entityDto.scriptListComponent;
             ScriptListComponent &scriptsComponent = entity.getComponent<ScriptListComponent>();
             for (auto &script : scriptsComponent.scripts) {
-                scriptsComponentDto.scripts.emplace_back(script.getName());
+                std::vector<ScriptFieldDto> fields;
+                for (ScriptField &field : script.getFields()) {
+                    ScriptFieldDto fieldDto;
+                    fieldDto.name = field.name;
+                    fieldDto.fieldId = field.fieldId;
+                    fieldDto.type = field.type;
+                    fieldDto.value = field.value;
+                    fields.emplace_back(fieldDto);
+                }
+                scriptsComponentDto.scripts.emplace_back(script.getName(), fields);
             }
         }
         worldDto.entities.push_back(entityDto);

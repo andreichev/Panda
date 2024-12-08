@@ -272,4 +272,29 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
     return changed;
 }
 
+bool property(const char *label, int *value) {
+    bool modified = ImGui::DragInt(label, value);
+    return modified;
+}
+
+bool drawFieldValue(ScriptField &field) {
+    bool changed = false;
+    ImGui::PushID(field.fieldId);
+    switch (field.type) {
+        case ScriptFieldType::INTEGER: {
+            if (property(field.name.c_str(), (int *)field.value.data)) {
+                ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
+                changed = true;
+            }
+            break;
+        }
+        default: {
+            ImGui::Text("Unsupported type field: %s", field.name.c_str());
+            break;
+        }
+    }
+    ImGui::PopID();
+    return changed;
+}
+
 } // namespace Panda

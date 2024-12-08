@@ -12,6 +12,9 @@
         auto fields = std::vector<Rain::FieldInfo>();
 
 #define RAIN_FIELD(name)                                                                           \
+    static_assert(                                                                                 \
+        !Rain::stringsEqual(#name, "fields"), "Incorrect name \"fields\". Plrease, rename"         \
+    );                                                                                             \
     fields.emplace_back(Rain::getTypeRegistry()->makeFieldInfo<decltype(name)>(                    \
         #name, Rain::offsetOf(&ClassType::name)                                                    \
     ));

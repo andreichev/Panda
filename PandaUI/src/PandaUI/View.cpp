@@ -140,7 +140,7 @@ void View::removeSubview(Foundation::Shared<View> node) {
     auto *thatInternal = (ViewInternal *)m_internal;
     YGNodeRef thatYogaView = thatInternal->ref;
     YGNodeRemoveChild(thisYogaView, thatYogaView);
-    std::remove(m_subviews.begin(), m_subviews.end(), node);
+    PND_DISCARD(std::remove(m_subviews.begin(), m_subviews.end(), node));
 }
 
 void View::calculateLayout() {

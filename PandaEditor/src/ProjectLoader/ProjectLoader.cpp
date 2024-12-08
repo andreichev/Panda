@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "Panda/GameLogic/GameContext.hpp"
+
 namespace Panda {
 
 bool isSubpath(const path_t &path, const path_t &base) {
@@ -20,12 +22,15 @@ ProjectLoader::ProjectLoader(World *world, ProjectLoaderOutput *output)
     , m_projectSettings()
     , m_projectPath()
     , m_worldPath()
-    , m_assetHandler() {}
+    , m_assetHandler() {
+    GameContext::s_scriptEngine = &m_scriptEngine;
+}
 
 ProjectLoader::~ProjectLoader() {
     saveAppSettings();
     saveProjectSettings();
     m_assetHandler.closeProject();
+    GameContext::s_scriptEngine = nullptr;
 }
 
 void ProjectLoader::loadInitialData() {
@@ -105,13 +110,13 @@ void ProjectLoader::openProject(const path_t &path) {
     m_worldPath.append(m_projectSettings.worldPath);
     reloadScriptsDll();
     loadWorld();
+    m_world->bindScriptsAndFields();
     appendRecentProject();
 }
 
 void ProjectLoader::reloadScriptsDll() {
     std::string projectName = m_projectPath.filename().string();
     m_scriptEngine.reload({m_projectPath / "Scripts" / projectName / "bin", projectName});
-    m_world->rebindScriptsAndFields();
 }
 
 bool ProjectLoader::hasOpenedProject() {

@@ -93,10 +93,12 @@ void initScriptHook() {
 }
 
 namespace ExternalCalls {
-    AddScriptFunc addScriptFunc = nullptr;
-    InvokeUpdateAtScriptFunc invokeUpdateAtScriptFunc = nullptr;
-    InvokeStartAtScriptFunc invokeStartAtScriptFunc = nullptr;
-    GetAvailableScripts getAvailableScripts = nullptr;
+    Clear clear = nullptr;
+    InstantiateScript instantiateScript = nullptr;
+    SetFieldValue setFieldValue = nullptr;
+    InvokeUpdateAtScript invokeUpdateAtScript = nullptr;
+    InvokeStartAtScript invokeStartAtScript = nullptr;
+    GetManifest getManifest = nullptr;
 } // namespace ExternalCalls
 
 //////////////////////////////////////////////////////////////////
@@ -117,10 +119,12 @@ using SymbolsLoadFunc = void *(*)(const char *name);
 
 int loadExternalCalls(SymbolsLoadFunc load) {
     using namespace ExternalCalls;
-    addScriptFunc = (AddScriptFunc)load("addScriptFunc");
-    invokeUpdateAtScriptFunc = (InvokeUpdateAtScriptFunc)load("invokeUpdateAtScript");
-    invokeStartAtScriptFunc = (InvokeStartAtScriptFunc)load("invokeStartAtScript");
-    getAvailableScripts = (GetAvailableScripts)load("getAvailableScripts");
+    clear = (Clear)load("clear");
+    instantiateScript = (InstantiateScript)load("instantiateScript");
+    setFieldValue = (SetFieldValue)load("setFieldValue");
+    invokeUpdateAtScript = (InvokeUpdateAtScript)load("invokeUpdateAtScript");
+    invokeStartAtScript = (InvokeStartAtScript)load("invokeStartAtScript");
+    getManifest = (GetManifest)load("getManifest");
     LOG_INFO("SCRIPT ENGINE: Inner functions binding done.");
     return 0;
 }
