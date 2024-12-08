@@ -254,23 +254,24 @@ struct Context {
     }
 
     bool renderFrame() {
-        m_rendererSemaphore.wait();
-        MIREN_LOG("RENDER FRAME BEGIN");
         EASY_BLOCK("Render Frame")
-        {EASY_BLOCK("Render Start")}
-        m_preCommandQueue.finishWriting();
-        m_postCommandQueue.finishWriting();
-        if (m_renderer == nullptr) {
-            checkIfHasInitCommand();
-        }
         static Foundation::CommandBuffer preCommandQueue(0);
         static Foundation::CommandBuffer postCommandQueue(0);
-        preCommandQueue.copy(m_preCommandQueue);
-        postCommandQueue.copy(m_postCommandQueue);
-        m_preCommandQueue.reset();
-        m_postCommandQueue.reset();
-        {EASY_BLOCK("Render Frame End")}
-        m_rendererSemaphore.post();
+        {
+            m_rendererSemaphore.wait();
+            EASY_BLOCK("Render Start")
+            MIREN_LOG("RENDER FRAME BEGIN");
+            m_preCommandQueue.finishWriting();
+            m_postCommandQueue.finishWriting();
+            if (m_renderer == nullptr) {
+                checkIfHasInitCommand();
+            }
+            preCommandQueue.copy(m_preCommandQueue);
+            postCommandQueue.copy(m_postCommandQueue);
+            m_preCommandQueue.reset();
+            m_postCommandQueue.reset();
+            m_rendererSemaphore.post();
+        }
         if (m_renderer == nullptr) {
 //            m_preCommandQueue.reset();
 //            m_postCommandQueue.reset();
