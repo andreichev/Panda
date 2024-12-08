@@ -55,6 +55,7 @@ public:
 //        for (int i = 0; i < m_pos; i++) {
 //            m_data[i] = commandBuffer.m_data[i];
 //        }
+    }
 
     ~CommandBuffer() {
         F_FREE(getAllocator(), m_data);
