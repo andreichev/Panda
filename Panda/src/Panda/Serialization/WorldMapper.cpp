@@ -1,4 +1,6 @@
 #include "Panda/Serialization/WorldMapper.hpp"
+
+#include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 namespace Panda {
@@ -61,15 +63,19 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         {
             ScriptListComponentDto scriptsComponentDto = entityDto.scriptListComponent;
             for (auto &scriptDto : scriptsComponentDto.scripts) {
-                ScriptInstanceHandle id =
-                    ExternalCalls::instantiateScript(entity.getId(), scriptDto.name.c_str());
-                if (id) {
-                    std::vector<ScriptField> fields;
-                    for (ScriptFieldDto &fieldDto : scriptDto.scriptFields) {
-                        fields.emplace_back(id, fieldDto.fieldId, fieldDto.name, fieldDto.type, fieldDto.data);
-                    }
-                    entity.addScript(Panda::ExternalScript(id, scriptDto.name, fields));
+                ScriptInstanceHandle id;
+                if (GameContext::s_scriptEngine && GameContext::s_scriptEngine->isLoaded()) {
+                    id = ExternalCalls::instantiateScript(entity.getId(), scriptDto.name.c_str());
+                } else {
+                    id = 0;
                 }
+                std::vector<ScriptField> fields;
+                for (ScriptFieldDto &fieldDto : scriptDto.scriptFields) {
+                    fields.emplace_back(
+                        id, fieldDto.fieldId, fieldDto.name, fieldDto.type, fieldDto.value
+                    );
+                }
+                entity.addScript(Panda::ExternalScript(id, scriptDto.name, fields));
             }
         }
     }
@@ -153,7 +159,7 @@ WorldDto WorldMapper::toDto(const World &world) {
                     fieldDto.name = field.name;
                     fieldDto.fieldId = field.fieldId;
                     fieldDto.type = field.type;
-                    fieldDto.data = field.data;
+                    fieldDto.value = field.value;
                     fields.emplace_back(fieldDto);
                 }
                 scriptsComponentDto.scripts.emplace_back(script.getName(), fields);

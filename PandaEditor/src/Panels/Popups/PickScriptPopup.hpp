@@ -9,11 +9,15 @@ namespace Panda {
 
 using SelectScriptFunction = void (*)(void *userData, Entity entity, ScriptClassManifest clazz);
 
-class PickScriptPopup : public EditorPopup {
+class PickScriptPopup final : public EditorPopup {
 public:
     void onImGuiRender() override {
         static int selectedClassIndex = -1;
         static ScriptClassManifest selectedClass;
+        if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
+            PND_ASSERT(false, "SCRIPT ENGINE IS NOT INITIALIZED");
+            return;
+        }
         ImGui::OpenPopup(title);
         ImVec2 center = ImGui::GetMainViewport()->GetCenter();
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -21,13 +25,12 @@ public:
         if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Text("%s", subtitle);
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-
-            auto classes = ExternalCalls::getManifest();
+            auto manifest = GameContext::s_scriptEngine->getManifest();
             // SCRIPT LIST
-            for (int i = 0; i < classes.size(); i++) {
-                if (ImGui::Selectable(classes[i].name, selectedClassIndex == i)) {
+            for (int i = 0; i < manifest.classes.size(); i++) {
+                if (ImGui::Selectable(manifest.classes[i].name, selectedClassIndex == i)) {
                     selectedClassIndex = i;
-                    selectedClass = classes[i];
+                    selectedClass = manifest.classes[i];
                 }
             }
             if (ImGui::Button("Select", {ImGui::GetContentRegionAvail().x, 24})) {

@@ -93,7 +93,7 @@ void initScriptHook() {
 }
 
 namespace ExternalCalls {
-    DeleteAllScriptInstances deleteAllScriptInstances = nullptr;
+    Clear clear = nullptr;
     InstantiateScript instantiateScript = nullptr;
     SetFieldValue setFieldValue = nullptr;
     InvokeUpdateAtScript invokeUpdateAtScript = nullptr;
@@ -119,7 +119,7 @@ using SymbolsLoadFunc = void *(*)(const char *name);
 
 int loadExternalCalls(SymbolsLoadFunc load) {
     using namespace ExternalCalls;
-    deleteAllScriptInstances = (DeleteAllScriptInstances)load("deleteAllScriptInstances");
+    clear = (Clear)load("clear");
     instantiateScript = (InstantiateScript)load("instantiateScript");
     setFieldValue = (SetFieldValue)load("setFieldValue");
     invokeUpdateAtScript = (InvokeUpdateAtScript)load("invokeUpdateAtScript");

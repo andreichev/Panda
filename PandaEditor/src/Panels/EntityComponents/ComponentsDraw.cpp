@@ -155,6 +155,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
             for (auto &script : component.scripts) {
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
                 ImGui::Text("%s", script.getName().c_str());
+                // TODO: Add opening script .cpp file in editor or displaying .cpp file name
                 ImGui::SameLine();
                 if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
                     entity.removeScript(script);

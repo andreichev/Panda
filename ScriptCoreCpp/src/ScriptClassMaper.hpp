@@ -27,12 +27,12 @@ public:
         return manifest;
     }
 
-    static std::vector<ScriptClassManifest> getClassesManifest(std::vector<ScriptClass> classes) {
+    static ScriptBundleManifest getClassesManifest(std::vector<ScriptClass> classes) {
         std::vector<ScriptClassManifest> manifest;
         for (auto &clazz : classes) {
             manifest.push_back(getClassManifest(clazz));
         }
-        return manifest;
+        return {manifest};
     }
 };
 

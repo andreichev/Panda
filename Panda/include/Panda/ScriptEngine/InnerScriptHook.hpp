@@ -10,8 +10,8 @@ namespace Panda {
 using ScriptInstanceHandle = uint32_t;
 
 namespace ExternalCalls {
-    using DeleteAllScriptInstances = void (*)();
-    extern DeleteAllScriptInstances deleteAllScriptInstances;
+    using Clear = void (*)();
+    extern Clear clear;
 
     using InstantiateScript = ScriptInstanceHandle (*)(UUID entityId, const char *name);
     extern InstantiateScript instantiateScript;
@@ -25,7 +25,7 @@ namespace ExternalCalls {
     using InvokeStartAtScript = void (*)(ScriptInstanceHandle handle);
     extern InvokeStartAtScript invokeStartAtScript;
 
-    using GetManifest = std::vector<ScriptClassManifest> (*)();
+    using GetManifest = ScriptBundleManifest (*)();
     extern GetManifest getManifest;
 } // namespace ExternalCalls
 

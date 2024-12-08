@@ -417,6 +417,7 @@ void EditorLayer::toolbarDidPickSceneState(SceneState state) {
 
 void EditorLayer::toolbarDidTapReloadScripts() {
     m_loader.reloadScriptsDll();
+    m_currentWorld->bindScriptsAndFields();
 }
 
 SceneState EditorLayer::toolbarGetCurrentSceneState() {

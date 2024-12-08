@@ -228,30 +228,81 @@ Entity World::instantiateEntity(UUID id) {
     return entity;
 }
 
-void World::rebindScriptsAndFields() {
-    ExternalCalls::deleteAllScriptInstances();
+void World::bindScriptsAndFields() {
+    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
+        return;
+    }
     auto view = m_registry.view<ScriptListComponent>();
+    auto manifest = GameContext::s_scriptEngine->getManifest();
     for (auto entityHandle : view) {
         if (!m_registry.valid(entityHandle)) {
             continue;
         }
         auto &component = view.get<ScriptListComponent>(entityHandle);
         UUID entityId = Entity(entityHandle, this).getId();
+        //-----------------------------------
+        //              CLASSES
+        //-----------------------------------
         for (auto &container : component.scripts) {
             ScriptInstanceHandle scriptInstanceId =
                 ExternalCalls::instantiateScript(entityId, container.getName().c_str());
-            if (scriptInstanceId) {
-                container.rebindId(scriptInstanceId);
-                for (ScriptField &field : container.getFields()) {
-                    field.instanceId = scriptInstanceId;
-                }
-            } else {
+            if (!scriptInstanceId) {
                 Entity entity = Entity(entityHandle, this);
                 LOG_EDITOR("SCRIPT {} NOT FOUND.", container.getName(), entity.getName());
                 // TODO: Remove unbound script after N times unfixed.
                 // if(container.unusedCount() > N) {
                 //     component.remove(container);
                 // }
+                continue;
+            }
+            const ScriptClassManifest &clazz = manifest.getClass(container.getName().c_str());
+            if (!clazz) {
+                Entity entity = Entity(entityHandle, this);
+                LOG_EDITOR(
+                    "SCRIPT CLASS MANIFEST {} NOT FOUND.", container.getName(), entity.getName()
+                );
+                continue;
+            }
+            container.rebindId(scriptInstanceId);
+            //-----------------------------------
+            //              FIELDS
+            //-----------------------------------
+            for (ScriptField &field : container.getFields()) {
+                const ScriptFieldManifest &fieldManifest = clazz.getField(field.name.c_str());
+                if (!fieldManifest) {
+                    LOG_EDITOR("SCRIPT {} FIELD {} NOT FOUND.", container.getName(), field.name);
+                    container.removeField(field);
+                    continue;
+                }
+            }
+            for (auto &fieldManifest : clazz.fields) {
+                // Check if field is new - allocate memory and save it
+                if (!container.hasField(fieldManifest.name)) {
+                    Foundation::Memory value;
+                    switch (fieldManifest.type) {
+                        case ScriptFieldType::INTEGER: {
+                            value = Foundation::Memory::alloc(sizeof(int));
+                            memset(value.data, 0, sizeof(int));
+                            break;
+                        }
+                        default: {
+                            PND_ASSERT(false, "Unknown field type");
+                            break;
+                        }
+                    }
+                    ScriptField field = ScriptField(
+                        scriptInstanceId,
+                        fieldManifest.handle,
+                        fieldManifest.name,
+                        fieldManifest.type,
+                        value
+                    );
+                    container.addField(field);
+                    continue;
+                }
+                ScriptField &field = container.getField(fieldManifest.name);
+                field.instanceId = scriptInstanceId;
+                ExternalCalls::setFieldValue(scriptInstanceId, field.fieldId, field.value.data);
             }
         }
     }

@@ -89,7 +89,7 @@ public:
         m_instances.erase(id);
     }
 
-    void deleteAllScriptInstances() {
+    void clear() {
         for (auto instance : m_instances) {
             delete instance.second;
         }
@@ -110,7 +110,7 @@ public:
     }
 
     ~ScriptRegistry() {
-        deleteAllScriptInstances();
+        clear();
     }
 
 private:

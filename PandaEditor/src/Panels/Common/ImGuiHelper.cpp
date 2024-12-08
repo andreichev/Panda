@@ -282,8 +282,8 @@ bool drawFieldValue(ScriptField &field) {
     ImGui::PushID(field.fieldId);
     switch (field.type) {
         case ScriptFieldType::INTEGER: {
-            if (property(field.name.c_str(), (int *)field.data.data)) {
-                ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.data.data);
+            if (property(field.name.c_str(), (int *)field.value.data)) {
+                ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
                 changed = true;
             }
             break;

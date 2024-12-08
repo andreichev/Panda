@@ -28,8 +28,8 @@ namespace ExternalCalls {
 } // namespace ExternalCalls
 
 namespace InternalCalls {
-    void deleteAllScriptInstances() {
-        getScriptRegistry()->deleteAllScriptInstances();
+    void clear() {
+        getScriptRegistry()->clear();
     }
 
     ScriptInstanceHandle instantiateScript(UUID entityId, const char *name) {
@@ -58,7 +58,7 @@ namespace InternalCalls {
         getScriptRegistry()->setFieldValue(scriptId, fieldId, value);
     }
 
-    std::vector<ScriptClassManifest> getManifest() {
+    ScriptBundleManifest getManifest() {
         return ScriptClassMapper::getClassesManifest(getScriptRegistry()->m_scriptClasses);
     }
 } // namespace InternalCalls
@@ -67,7 +67,7 @@ std::unordered_map<std::string, void *> g_scriptSymbols;
 
 void initScriptHook() {
     using namespace InternalCalls;
-    g_scriptSymbols["deleteAllScriptInstances"] = (void *)deleteAllScriptInstances;
+    g_scriptSymbols["clear"] = (void *)clear;
     g_scriptSymbols["instantiateScript"] = (void *)instantiateScript;
     g_scriptSymbols["setFieldValue"] = (void *)setFieldValue;
     g_scriptSymbols["invokeStartAtScript"] = (void *)invokeStartAtScript;
