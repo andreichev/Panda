@@ -40,7 +40,7 @@ drawComponent(const std::string &name, Entity entity, bool canRemove, UIFunction
         bool open =
             ImGui::TreeNodeEx((void *)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
         if (canRemove) {
-            ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+            ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f - 3);
             if (ImGui::Button(getString(ICON_COG).c_str(), ImVec2(lineHeight, lineHeight))) {
                 ImGui::OpenPopup("ComponentSettings");
             }
