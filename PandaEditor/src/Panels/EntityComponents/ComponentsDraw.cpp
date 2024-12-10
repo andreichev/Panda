@@ -283,11 +283,11 @@ void ComponentsDraw::drawComponents(Entity entity) {
         entity,
         true,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
-            ImGui::DragFloat2("Offset", glm::value_ptr(component.offset));
-            ImGui::DragFloat2("Size", glm::value_ptr(component.size));
-            ImGui::DragFloat("Density", &component.density, 0.01f, 0.0f, 1.0f);
-            ImGui::DragFloat("Friction", &component.friction, 0.01f, 0.0f, 1.0f);
-            ImGui::DragFloat("Restitution", &component.restitution, 0.01f, 0.0f, 1.0f);
+            dragFloat2("Offset", glm::value_ptr(component.offset));
+            dragFloat(("Size"), glm::value_ptr(component.size));
+            dragFloat("Density", &component.density, 0.01f, 0.0f, 1.0f);
+            dragFloat("Friction", &component.friction, 0.01f, 0.0f, 1.0f);
+            dragFloat("Restitution", &component.restitution, 0.01f, 0.0f, 1.0f);
         }
     );
     drawComponent<SkyComponent>(
