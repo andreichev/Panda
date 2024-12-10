@@ -235,22 +235,22 @@ void ComponentsDraw::drawComponents(Entity entity) {
             }
             if (camera.getProjectionType() == WorldCamera::ProjectionType::PERSPECTIVE) {
                 float perspectiveVerticalFov = camera.getFieldOfView();
-                if (ImGui::DragFloat("Vertical FOV", &perspectiveVerticalFov)) {
+                if (dragFloat("Vertical FOV", &perspectiveVerticalFov)) {
                     camera.setFieldOfView(perspectiveVerticalFov);
                 }
             }
             if (camera.getProjectionType() == WorldCamera::ProjectionType::ORTHOGRAPHIC) {
                 float orthoSize = camera.getOrthoSize();
-                if (ImGui::DragFloat("Size", &orthoSize)) {
+                if (dragFloat("Size", &orthoSize)) {
                     camera.setOrthoSize(orthoSize);
                 }
             }
             float near = camera.getNear();
-            if (ImGui::DragFloat("Near", &near)) {
+            if (dragFloat("Near", &near)) {
                 camera.setNear(near);
             }
             float far = camera.getFar();
-            if (ImGui::DragFloat("Far", &far)) {
+            if (dragFloat("Far", &far)) {
                 camera.setFar(far);
             }
         }
@@ -284,7 +284,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
         true,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
             dragFloat2("Offset", glm::value_ptr(component.offset));
-            dragFloat(("Size"), glm::value_ptr(component.size));
+            dragFloat("Size", glm::value_ptr(component.size));
             dragFloat("Density", &component.density, 0.01f, 0.0f, 1.0f);
             dragFloat("Friction", &component.friction, 0.01f, 0.0f, 1.0f);
             dragFloat("Restitution", &component.restitution, 0.01f, 0.0f, 1.0f);
