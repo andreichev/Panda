@@ -61,6 +61,48 @@ void separator(ImVec2 size, ImVec4 color) {
     ImGui::PopStyleColor();
 }
 
+bool dragFloat(const std::string &label, float* v, float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags) {
+    ImGuiStyle& style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = 5.0f;
+    ImGui::Text("%s", label.c_str());
+    ImGui::SameLine();
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    ImVec2 currentPos = ImGui::GetCursorPos();
+
+    float availableWidth = windowSize.x;
+    float width = 200;
+    float offsetRight = 22;
+
+    ImGui::SetNextItemWidth(width);
+
+    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    bool result = ImGui::DragFloat("", v, v_speed, v_min, v_max, format, flags);
+    style.FrameRounding = lastFrameRounding;
+    return result;
+}
+
+bool dragFloat2(const std::string &label, float v[2], float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags) {
+    ImGuiStyle& style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = 5.0f;
+    ImGui::Text("%s", label.c_str());
+    ImGui::SameLine();
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    ImVec2 currentPos = ImGui::GetCursorPos();
+
+    float availableWidth = windowSize.x;
+    float width = 200;
+    float offsetRight = 22;
+
+    ImGui::SetNextItemWidth(width);
+
+    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    bool result = ImGui::DragFloat2("", v, v_speed, v_min, v_max, format, flags);
+    style.FrameRounding = lastFrameRounding;
+    return result;
+}
+
 bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue) {
     ImGuiIO &io = ImGui::GetIO();
     auto boldFont = io.Fonts->Fonts[0];
