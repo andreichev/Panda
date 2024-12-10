@@ -18,7 +18,7 @@ World::World()
     , m_isChanged(false)
     , m_registry()
     , m_commandManager()
-    , m_physics2DInternal(0) {
+    , m_physics2DInternal() {
     PND_STATIC_ASSERT(sizeof(Physics2D) <= sizeof(m_physics2DInternal));
 }
 

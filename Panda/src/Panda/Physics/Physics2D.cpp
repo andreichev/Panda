@@ -78,7 +78,7 @@ void Physics2D::init(World *world) {
             b2Polygon boxShape = b2MakeOffsetBox(
                 bc2d.size.x * transform.getScale().x,
                 bc2d.size.y * transform.getScale().y,
-                b2Vec2(bc2d.offset.x, bc2d.offset.y),
+                { bc2d.offset.x, bc2d.offset.y },
                 {1.0f, 0.0f}
             );
 
