@@ -61,8 +61,16 @@ void separator(ImVec2 size, ImVec4 color) {
     ImGui::PopStyleColor();
 }
 
-bool dragFloat(const std::string &label, float* v, float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags) {
-    ImGuiStyle& style = ImGui::GetStyle();
+bool dragFloat(
+    const std::string &label,
+    float *v,
+    float v_speed,
+    float v_min,
+    float v_max,
+    const char *format,
+    ImGuiSliderFlags flags
+) {
+    ImGuiStyle &style = ImGui::GetStyle();
     float lastFrameRounding = style.FrameRounding;
     style.FrameRounding = 5.0f;
     ImGui::Text("%s", label.c_str());
@@ -82,8 +90,16 @@ bool dragFloat(const std::string &label, float* v, float v_speed, float v_min, f
     return result;
 }
 
-bool dragFloat2(const std::string &label, float v[2], float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags) {
-    ImGuiStyle& style = ImGui::GetStyle();
+bool dragFloat2(
+    const std::string &label,
+    float v[2],
+    float v_speed,
+    float v_min,
+    float v_max,
+    const char *format,
+    ImGuiSliderFlags flags
+) {
+    ImGuiStyle &style = ImGui::GetStyle();
     float lastFrameRounding = style.FrameRounding;
     style.FrameRounding = 5.0f;
     ImGui::Text("%s", label.c_str());
@@ -99,6 +115,180 @@ bool dragFloat2(const std::string &label, float v[2], float v_speed, float v_min
 
     ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
     bool result = ImGui::DragFloat2("", v, v_speed, v_min, v_max, format, flags);
+    style.FrameRounding = lastFrameRounding;
+    return result;
+}
+
+bool dragFloat3(
+    const std::string &label,
+    float v[3],
+    float v_speed,
+    float v_min,
+    float v_max,
+    const char *format,
+    ImGuiSliderFlags flags
+) {
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = 5.0f;
+    ImGui::Text("%s", label.c_str());
+    ImGui::SameLine();
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    ImVec2 currentPos = ImGui::GetCursorPos();
+
+    float availableWidth = windowSize.x;
+    float width = 200;
+    float offsetRight = 22;
+
+    ImGui::SetNextItemWidth(width);
+
+    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    bool result = ImGui::DragFloat3("", v, v_speed, v_min, v_max, format, flags);
+    style.FrameRounding = lastFrameRounding;
+    return result;
+}
+
+bool dragFloat4(
+    const std::string &label,
+    float v[4],
+    float v_speed,
+    float v_min,
+    float v_max,
+    const char *format,
+    ImGuiSliderFlags flags
+) {
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = 5.0f;
+    ImGui::Text("%s", label.c_str());
+    ImGui::SameLine();
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    ImVec2 currentPos = ImGui::GetCursorPos();
+
+    float availableWidth = windowSize.x;
+    float width = 200;
+    float offsetRight = 22;
+
+    ImGui::SetNextItemWidth(width);
+
+    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    bool result = ImGui::DragFloat4("", v, v_speed, v_min, v_max, format, flags);
+    style.FrameRounding = lastFrameRounding;
+    return result;
+}
+
+bool dragInt(
+    const std::string &label,
+    int *v,
+    float v_speed,
+    int v_min,
+    int v_max,
+    const char *format,
+    ImGuiSliderFlags flags
+) {
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = 5.0f;
+    ImGui::Text("%s", label.c_str());
+    ImGui::SameLine();
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    ImVec2 currentPos = ImGui::GetCursorPos();
+
+    float availableWidth = windowSize.x;
+    float width = 200;
+    float offsetRight = 22;
+
+    ImGui::SetNextItemWidth(width);
+
+    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    bool result = ImGui::DragInt("", v, v_speed, v_min, v_max, format, flags);
+    style.FrameRounding = lastFrameRounding;
+    return result;
+}
+
+bool dragInt2(
+    const std::string &label,
+    int v[2],
+    float v_speed,
+    int v_min,
+    int v_max,
+    const char *format,
+    ImGuiSliderFlags flags
+) {
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = 5.0f;
+    ImGui::Text("%s", label.c_str());
+    ImGui::SameLine();
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    ImVec2 currentPos = ImGui::GetCursorPos();
+
+    float availableWidth = windowSize.x;
+    float width = 200;
+    float offsetRight = 22;
+
+    ImGui::SetNextItemWidth(width);
+
+    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    bool result = ImGui::DragInt2("", v, v_speed, v_min, v_max, format, flags);
+    style.FrameRounding = lastFrameRounding;
+    return result;
+}
+
+bool dragInt3(
+    const std::string &label,
+    int v[3],
+    float v_speed,
+    int v_min,
+    int v_max,
+    const char *format,
+    ImGuiSliderFlags flags
+) {
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = 5.0f;
+    ImGui::Text("%s", label.c_str());
+    ImGui::SameLine();
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    ImVec2 currentPos = ImGui::GetCursorPos();
+
+    float availableWidth = windowSize.x;
+    float width = 200;
+    float offsetRight = 22;
+
+    ImGui::SetNextItemWidth(width);
+
+    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    bool result = ImGui::DragInt3("", v, v_speed, v_min, v_max, format, flags);
+    style.FrameRounding = lastFrameRounding;
+    return result;
+}
+
+bool dragInt4(
+    const std::string &label,
+    int v[4],
+    float v_speed,
+    int v_min,
+    int v_max,
+    const char *format,
+    ImGuiSliderFlags flags
+) {
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = 5.0f;
+    ImGui::Text("%s", label.c_str());
+    ImGui::SameLine();
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    ImVec2 currentPos = ImGui::GetCursorPos();
+
+    float availableWidth = windowSize.x;
+    float width = 200;
+    float offsetRight = 22;
+
+    ImGui::SetNextItemWidth(width);
+
+    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    bool result = ImGui::DragInt4("", v, v_speed, v_min, v_max, format, flags);
     style.FrameRounding = lastFrameRounding;
     return result;
 }
@@ -315,7 +505,7 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
 }
 
 bool property(const char *label, int *value) {
-    bool modified = ImGui::DragInt(label, value);
+    bool modified = dragInt(label, value);
     return modified;
 }
 
