@@ -72,23 +72,22 @@ bool dragFloat(
     const char *format,
     ImGuiSliderFlags flags
 ) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+
+    ImGui::PushID(label.c_str());
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label.c_str());
-    ImGui::SameLine();
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    ImVec2 currentPos = ImGui::GetCursorPos();
+    ImGui::NextColumn();
+    ImGui::Spacing();
 
-    float availableWidth = windowSize.x;
-    float width = 200;
-    float offsetRight = 22;
-
-    ImGui::SetNextItemWidth(width);
-
-    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    ImGui::PushItemWidth(-1);
     bool result = ImGui::DragFloat("", v, v_speed, v_min, v_max, format, flags);
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+    ImGui::PopID();
+    ImGui::PopStyleVar(2);
     return result;
 }
 
@@ -101,23 +100,22 @@ bool dragFloat2(
     const char *format,
     ImGuiSliderFlags flags
 ) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+
+    ImGui::PushID(label.c_str());
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label.c_str());
-    ImGui::SameLine();
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    ImVec2 currentPos = ImGui::GetCursorPos();
-
-    float availableWidth = windowSize.x;
-    float width = 200;
-    float offsetRight = 22;
-
-    ImGui::SetNextItemWidth(width);
-
-    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    ImGui::NextColumn();
+    ImGui::Spacing();
+    
+    ImGui::PushItemWidth(-1);
     bool result = ImGui::DragFloat2("", v, v_speed, v_min, v_max, format, flags);
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+    ImGui::PopID();
+    ImGui::PopStyleVar(2);
     return result;
 }
 
@@ -130,23 +128,22 @@ bool dragFloat3(
     const char *format,
     ImGuiSliderFlags flags
 ) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+
+    ImGui::PushID(label.c_str());
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label.c_str());
-    ImGui::SameLine();
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    ImVec2 currentPos = ImGui::GetCursorPos();
-
-    float availableWidth = windowSize.x;
-    float width = 200;
-    float offsetRight = 22;
-
-    ImGui::SetNextItemWidth(width);
-
-    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    ImGui::NextColumn();
+    ImGui::Spacing();
+    
+    ImGui::PushItemWidth(-1);
     bool result = ImGui::DragFloat3("", v, v_speed, v_min, v_max, format, flags);
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+    ImGui::PopID();
+    ImGui::PopStyleVar(2);
     return result;
 }
 
@@ -159,23 +156,21 @@ bool dragFloat4(
     const char *format,
     ImGuiSliderFlags flags
 ) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+    ImGui::PushID(label.c_str());
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label.c_str());
-    ImGui::SameLine();
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    ImVec2 currentPos = ImGui::GetCursorPos();
-
-    float availableWidth = windowSize.x;
-    float width = 200;
-    float offsetRight = 22;
-
-    ImGui::SetNextItemWidth(width);
-
-    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    ImGui::NextColumn();
+    ImGui::Spacing();
+    
+    ImGui::PushItemWidth(-1);
     bool result = ImGui::DragFloat4("", v, v_speed, v_min, v_max, format, flags);
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+    ImGui::PopID();
+    ImGui::PopStyleVar(2);
     return result;
 }
 
@@ -188,23 +183,22 @@ bool dragInt(
     const char *format,
     ImGuiSliderFlags flags
 ) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+
+    ImGui::PushID(label.c_str());
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label.c_str());
-    ImGui::SameLine();
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    ImVec2 currentPos = ImGui::GetCursorPos();
-
-    float availableWidth = windowSize.x;
-    float width = 200;
-    float offsetRight = 22;
-
-    ImGui::SetNextItemWidth(width);
-
-    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    ImGui::NextColumn();
+    ImGui::Spacing();
+    
+    ImGui::PushItemWidth(-1);
     bool result = ImGui::DragInt("", v, v_speed, v_min, v_max, format, flags);
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+    ImGui::PopID();
+    ImGui::PopStyleVar(2);
     return result;
 }
 
@@ -217,23 +211,21 @@ bool dragInt2(
     const char *format,
     ImGuiSliderFlags flags
 ) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+    ImGui::PushID(label.c_str());
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label.c_str());
-    ImGui::SameLine();
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    ImVec2 currentPos = ImGui::GetCursorPos();
+    ImGui::NextColumn();
+    ImGui::Spacing();
 
-    float availableWidth = windowSize.x;
-    float width = 200;
-    float offsetRight = 22;
-
-    ImGui::SetNextItemWidth(width);
-
-    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    ImGui::PushItemWidth(-1);
     bool result = ImGui::DragInt2("", v, v_speed, v_min, v_max, format, flags);
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+    ImGui::PopID();
+    ImGui::PopStyleVar(2);
     return result;
 }
 
@@ -246,23 +238,22 @@ bool dragInt3(
     const char *format,
     ImGuiSliderFlags flags
 ) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+
+    ImGui::PushID(label.c_str());
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label.c_str());
-    ImGui::SameLine();
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    ImVec2 currentPos = ImGui::GetCursorPos();
+    ImGui::NextColumn();
+    ImGui::Spacing();
 
-    float availableWidth = windowSize.x;
-    float width = 200;
-    float offsetRight = 22;
-
-    ImGui::SetNextItemWidth(width);
-
-    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    ImGui::PushItemWidth(-1);
     bool result = ImGui::DragInt3("", v, v_speed, v_min, v_max, format, flags);
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+    ImGui::PopID();
+    ImGui::PopStyleVar(2);
     return result;
 }
 
@@ -275,24 +266,77 @@ bool dragInt4(
     const char *format,
     ImGuiSliderFlags flags
 ) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+
+    ImGui::PushID(label.c_str());
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label.c_str());
-    ImGui::SameLine();
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    ImVec2 currentPos = ImGui::GetCursorPos();
+    ImGui::NextColumn();
+    ImGui::Spacing();
 
-    float availableWidth = windowSize.x;
-    float width = 200;
-    float offsetRight = 22;
-
-    ImGui::SetNextItemWidth(width);
-
-    ImGui::SetCursorPos(ImVec2(availableWidth - width - offsetRight, currentPos.y));
+    ImGui::PushItemWidth(-1);
     bool result = ImGui::DragInt4("", v, v_speed, v_min, v_max, format, flags);
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+    ImGui::PopID();
+    ImGui::PopStyleVar(2);
     return result;
+}
+
+bool checkbox(const std::string &label, bool* v) {
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+
+    ImGui::PushID(label.c_str());
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
+    ImGui::Text("%s", label.c_str());
+    ImGui::NextColumn();
+    ImGui::Spacing();
+
+    ImGui::PushItemWidth(-1);
+    bool result = ImGui::Checkbox("", v);
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+    ImGui::PopID();
+    ImGui::PopStyleVar(2);
+    return result;
+}
+
+int combo(const std::string &label, const std::vector<std::string> &list, int current) {
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+
+    ImGui::PushID(label.c_str());
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
+    ImGui::Text("%s", label.c_str());
+    ImGui::NextColumn();
+    ImGui::Spacing();
+
+    ImGui::PushItemWidth(-1);
+    auto currentStr = list[current];
+    if (ImGui::BeginCombo("", currentStr.c_str())) {
+        for (int i = 0; i < list.size(); i++) {
+            bool isSelected = currentStr == list[i];
+            if (ImGui::Selectable(list[i].c_str(), isSelected)) {
+                currentStr = list[i];
+                current = i;
+            }
+            if (isSelected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::PopItemWidth();
+    ImGui::Columns(1);
+    ImGui::PopID();
+    ImGui::PopStyleVar(3);
+    return current;
 }
 
 bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue) {
