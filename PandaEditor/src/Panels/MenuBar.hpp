@@ -6,6 +6,7 @@
 
 #include "Serialization/RecentProject.hpp"
 #include "SystemTools/SystemTools.hpp"
+#include "Panda/Renderer/Texture.hpp"
 
 #include <imgui.h>
 
@@ -35,6 +36,8 @@ public:
 
     float m_height;
     MenuBarOutput *m_output;
+private:
+    Texture m_iconPanda;
 };
 
 } // namespace Panda

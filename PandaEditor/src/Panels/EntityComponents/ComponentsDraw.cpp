@@ -74,16 +74,14 @@ static void drawTag(Entity entity) {
     buffer[0] = 0; // Setting the first byte to 0 makes checking if string is empty easier later.
     const std::string &tag = entity.getName();
     memcpy(buffer, tag.c_str(), tag.length());
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, coefficientRounding);
     if (ImGui::InputText("##Tag", buffer, 256)) {
         if (buffer[0] == 0) {
             memcpy(buffer, "Unnamed Entity", 16);
         }
         entity.setName(buffer);
     }
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopStyleVar();
 }
 
 template<typename T>
@@ -114,11 +112,10 @@ void ComponentsDraw::drawComponents(Entity entity) {
         return;
     }
     WorldCommandManager &cmd = world->getCommandManger();
-    drawTag(entity);
 
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    drawTag(entity);
     if (ImGui::Button("Add Component")) {
         ImGui::OpenPopup("AddComponent");
     }
@@ -131,7 +128,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
         displayAddScriptMenuItem(entity);
         ImGui::EndPopup();
     }
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopStyleVar(2);
     drawComponent<TransformComponent>(
         "Transform",
         entity,
@@ -225,25 +222,13 @@ void ComponentsDraw::drawComponents(Entity entity) {
         entity,
         true,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
+            ImGuiStyle &style = ImGui::GetStyle();
             auto &camera = component.camera;
-            ImGui::Checkbox("Primary", &component.isPrimary);
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+            checkbox("Primary", &component.isPrimary);
+            int selectedPos = combo("Projection", { "Perspective", "Orthographic" }, (int)camera.getProjectionType());
 
-            const char *projectionTypeStrings[] = {"Perspective", "Orthographic"};
-            const char *currentProjectionTypeString =
-                projectionTypeStrings[(int)camera.getProjectionType()];
-            if (ImGui::BeginCombo("Projection", currentProjectionTypeString)) {
-                for (int i = 0; i < 2; i++) {
-                    bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
-                    if (ImGui::Selectable(projectionTypeStrings[i], isSelected)) {
-                        currentProjectionTypeString = projectionTypeStrings[i];
-                        camera.setProjectionType((WorldCamera::ProjectionType)i);
-                    }
-                    if (isSelected) {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndCombo();
-            }
+            camera.setProjectionType((WorldCamera::ProjectionType)selectedPos);
             if (camera.getProjectionType() == WorldCamera::ProjectionType::PERSPECTIVE) {
                 float perspectiveVerticalFov = camera.getFieldOfView();
                 if (dragFloat("Vertical FOV", &perspectiveVerticalFov)) {
@@ -264,6 +249,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
             if (dragFloat("Far", &far)) {
                 camera.setFar(far);
             }
+            ImGui::PopStyleVar();
         }
     );
     drawComponent<Rigidbody2DComponent>(
@@ -273,24 +259,12 @@ void ComponentsDraw::drawComponents(Entity entity) {
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
             const char *bodyTypeStrings[] = {"Static", "Dynamic", "Kinematic"};
             const char *currentBodyTypeString = bodyTypeStrings[(int)component.type];
-            ImGuiStyle &style = ImGui::GetStyle();
-            float lastFrameRounding = style.FrameRounding;
-            style.FrameRounding = 5.0;
-            if (ImGui::BeginCombo("Body Type", currentBodyTypeString)) {
-                for (int i = 0; i < 3; i++) {
-                    bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
-                    if (ImGui::Selectable(bodyTypeStrings[i], isSelected)) {
-                        currentBodyTypeString = bodyTypeStrings[i];
-                        component.type = (Rigidbody2DComponent::BodyType)i;
-                    }
-                    if (isSelected) {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndCombo();
-            }
-            ImGui::Checkbox("Fixed Rotation", &component.fixedRotation);
-            style.FrameRounding = lastFrameRounding;
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0);
+
+            int selectedPos = combo("Body Type", {"Static", "Dynamic", "Kinematic"}, (int)component.type);
+            component.type = (Rigidbody2DComponent::BodyType)selectedPos;
+            checkbox("Fixed Rotation", &component.fixedRotation);
+            ImGui::PopStyleVar();
         }
     );
     drawComponent<BoxCollider2DComponent>(
