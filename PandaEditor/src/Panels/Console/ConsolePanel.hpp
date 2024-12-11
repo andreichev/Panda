@@ -63,6 +63,9 @@ struct ConsolePanel {
             ImGui::End();
             return;
         }
+        ImGuiStyle &style = ImGui::GetStyle();
+        float lastFrameRounding = style.FrameRounding;
+        style.FrameRounding = 3.0f;
 
         if (ImGui::SmallButton("Clear")) {
             ClearLog();
@@ -130,7 +133,7 @@ struct ConsolePanel {
             ImGui::PopStyleVar();
         }
         ImGui::EndChild();
-
+        style.FrameRounding = lastFrameRounding;
         ImGui::End();
     }
 };

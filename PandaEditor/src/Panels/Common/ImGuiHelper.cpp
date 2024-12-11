@@ -12,6 +12,8 @@ static uint32_t s_counter = 0;
 static char s_idBuffer[16] = "##";
 static float firstColumnWidth = 120.f;
 
+static float coefficientRounding = 3.0f;
+
 const char *generateID() {
     snprintf(s_idBuffer + 2, sizeof(s_idBuffer) - 2, "%x", s_counter++);
     return s_idBuffer;
@@ -72,7 +74,7 @@ bool dragFloat(
 ) {
     ImGuiStyle &style = ImGui::GetStyle();
     float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = 5.0f;
+    style.FrameRounding = coefficientRounding;
     ImGui::Text("%s", label.c_str());
     ImGui::SameLine();
     ImVec2 windowSize = ImGui::GetWindowSize();
@@ -101,7 +103,7 @@ bool dragFloat2(
 ) {
     ImGuiStyle &style = ImGui::GetStyle();
     float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = 5.0f;
+    style.FrameRounding = coefficientRounding;
     ImGui::Text("%s", label.c_str());
     ImGui::SameLine();
     ImVec2 windowSize = ImGui::GetWindowSize();
@@ -130,7 +132,7 @@ bool dragFloat3(
 ) {
     ImGuiStyle &style = ImGui::GetStyle();
     float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = 5.0f;
+    style.FrameRounding = coefficientRounding;
     ImGui::Text("%s", label.c_str());
     ImGui::SameLine();
     ImVec2 windowSize = ImGui::GetWindowSize();
@@ -159,7 +161,7 @@ bool dragFloat4(
 ) {
     ImGuiStyle &style = ImGui::GetStyle();
     float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = 5.0f;
+    style.FrameRounding = coefficientRounding;
     ImGui::Text("%s", label.c_str());
     ImGui::SameLine();
     ImVec2 windowSize = ImGui::GetWindowSize();
@@ -188,7 +190,7 @@ bool dragInt(
 ) {
     ImGuiStyle &style = ImGui::GetStyle();
     float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = 5.0f;
+    style.FrameRounding = coefficientRounding;
     ImGui::Text("%s", label.c_str());
     ImGui::SameLine();
     ImVec2 windowSize = ImGui::GetWindowSize();
@@ -217,7 +219,7 @@ bool dragInt2(
 ) {
     ImGuiStyle &style = ImGui::GetStyle();
     float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = 5.0f;
+    style.FrameRounding = coefficientRounding;
     ImGui::Text("%s", label.c_str());
     ImGui::SameLine();
     ImVec2 windowSize = ImGui::GetWindowSize();
@@ -246,7 +248,7 @@ bool dragInt3(
 ) {
     ImGuiStyle &style = ImGui::GetStyle();
     float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = 5.0f;
+    style.FrameRounding = coefficientRounding;
     ImGui::Text("%s", label.c_str());
     ImGui::SameLine();
     ImVec2 windowSize = ImGui::GetWindowSize();
@@ -275,7 +277,7 @@ bool dragInt4(
 ) {
     ImGuiStyle &style = ImGui::GetStyle();
     float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = 5.0f;
+    style.FrameRounding = coefficientRounding;
     ImGui::Text("%s", label.c_str());
     ImGui::SameLine();
     ImVec2 windowSize = ImGui::GetWindowSize();
@@ -294,6 +296,10 @@ bool dragInt4(
 }
 
 bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue) {
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = coefficientRounding;
+
     ImGuiIO &io = ImGui::GetIO();
     auto boldFont = io.Fonts->Fonts[0];
     bool edited = false;
@@ -360,6 +366,7 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
     ImGui::PopStyleVar();
     ImGui::Columns(1);
     ImGui::PopID();
+    style.FrameRounding = lastFrameRounding;
     return edited;
 }
 
@@ -445,6 +452,10 @@ void endPropertiesGrid() {
 }
 
 bool propertyColor(const char *label, Color &value) {
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = coefficientRounding;
+
     shiftCursorY(6.0f);
     ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label);
@@ -453,10 +464,14 @@ bool propertyColor(const char *label, Color &value) {
     bool modified = ImGui::ColorEdit4(generateID(), &value.r);
     ImGui::PopItemWidth();
     ImGui::NextColumn();
+    style.FrameRounding = lastFrameRounding;
     return modified;
 }
 
 bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asset> asset) {
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = coefficientRounding;
     bool changed = false;
     shiftCursorY(6.0f);
     ImGui::SetColumnWidth(0, firstColumnWidth);
@@ -501,6 +516,7 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
         }
     }
     ImGui::NextColumn();
+    style.FrameRounding = lastFrameRounding;
     return changed;
 }
 
