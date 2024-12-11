@@ -123,10 +123,17 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     Input::setViewportFrame(m_frame);
     ImGui::Image((void *)(uintptr_t)m_colorAttachment.id, m_frame.size, ImVec2(0, 1), ImVec2(1, 0));
     m_gizmos.onImGuiRender(sceneState, m_frame);
-    ImGui::SetCursorPos({20, 40});
+
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = 3.0f;
+    ImGui::SetCursorPos({10, 40});
     if (ImGui::Button(getString(ICON_HOME).c_str())) {
         m_cameraController->reset({0, 0, 0});
     }
+    style.FrameRounding = lastFrameRounding;
+
+
     ImGui::End();
     ImGui::PopStyleVar();
 

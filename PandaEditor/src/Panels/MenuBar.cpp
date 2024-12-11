@@ -23,6 +23,9 @@ void MenuBar::onImGuiRender() {
         0,
         ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking
     );
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.PopupRounding = 5.0;
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Save World", NULL)) {
@@ -79,6 +82,7 @@ void MenuBar::onImGuiRender() {
         ImGui::EndMenuBar();
     }
     ImGui::PopStyleVar(2);
+    style.PopupRounding = lastFrameRounding;
     ImGui::End();
 }
 

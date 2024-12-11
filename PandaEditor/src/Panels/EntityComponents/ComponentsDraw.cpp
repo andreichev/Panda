@@ -14,6 +14,8 @@
 
 namespace Panda {
 
+static float coefficientRounding = 3.0f;
+
 template<typename T>
 using UIFunction = void (*)(Entity entity, WorldCommandManager &cmd, T &);
 
@@ -72,12 +74,16 @@ static void drawTag(Entity entity) {
     buffer[0] = 0; // Setting the first byte to 0 makes checking if string is empty easier later.
     const std::string &tag = entity.getName();
     memcpy(buffer, tag.c_str(), tag.length());
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = coefficientRounding;
     if (ImGui::InputText("##Tag", buffer, 256)) {
         if (buffer[0] == 0) {
             memcpy(buffer, "Unnamed Entity", 16);
         }
         entity.setName(buffer);
     }
+    style.FrameRounding = lastFrameRounding;
 }
 
 template<typename T>
@@ -109,6 +115,10 @@ void ComponentsDraw::drawComponents(Entity entity) {
     }
     WorldCommandManager &cmd = world->getCommandManger();
     drawTag(entity);
+
+    ImGuiStyle &style = ImGui::GetStyle();
+    float lastFrameRounding = style.FrameRounding;
+    style.FrameRounding = coefficientRounding;
     if (ImGui::Button("Add Component")) {
         ImGui::OpenPopup("AddComponent");
     }
@@ -121,6 +131,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
         displayAddScriptMenuItem(entity);
         ImGui::EndPopup();
     }
+    style.FrameRounding = lastFrameRounding;
     drawComponent<TransformComponent>(
         "Transform",
         entity,
@@ -262,6 +273,9 @@ void ComponentsDraw::drawComponents(Entity entity) {
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
             const char *bodyTypeStrings[] = {"Static", "Dynamic", "Kinematic"};
             const char *currentBodyTypeString = bodyTypeStrings[(int)component.type];
+            ImGuiStyle &style = ImGui::GetStyle();
+            float lastFrameRounding = style.FrameRounding;
+            style.FrameRounding = 5.0;
             if (ImGui::BeginCombo("Body Type", currentBodyTypeString)) {
                 for (int i = 0; i < 3; i++) {
                     bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
@@ -276,6 +290,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
                 ImGui::EndCombo();
             }
             ImGui::Checkbox("Fixed Rotation", &component.fixedRotation);
+            style.FrameRounding = lastFrameRounding;
         }
     );
     drawComponent<BoxCollider2DComponent>(
