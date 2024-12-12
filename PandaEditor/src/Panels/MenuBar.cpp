@@ -6,8 +6,7 @@ namespace Panda {
 
 MenuBar::MenuBar(MenuBarOutput *output)
     : m_output(output)
-    , m_height(24)
-    , m_iconPanda("ui/icons/Panda.png") {}
+    , m_height(24) {}
 
 void MenuBar::onImGuiRender() {
     ImGui::SetNextWindowPos({0, 0});
@@ -26,8 +25,6 @@ void MenuBar::onImGuiRender() {
     );
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0);
     if (ImGui::BeginMenuBar()) {
-        ImGui::SetCursorPosY(2);
-        ImGui::Image((void *)(uintptr_t)m_iconPanda.getHandle().id, {20, 20});
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Save World", NULL)) {
                 m_output->menuBarSaveWorld();
