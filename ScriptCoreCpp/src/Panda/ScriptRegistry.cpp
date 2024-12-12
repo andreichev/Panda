@@ -1,4 +1,4 @@
-#include "ScriptRegistry.hpp"
+#include "Panda/ScriptRegistry.hpp"
 
 namespace Panda {
 

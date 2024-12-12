@@ -1,12 +1,12 @@
 #pragma once
 
-#include "ScriptFieldType.hpp"
-
 #include <vector>
 
 namespace Panda {
 
 using FieldHandle = uint32_t;
+
+enum class ScriptFieldType { INTEGER, TEXTURE, COMPONENT, ENTITY, SCRIPT, UNKNOWN };
 
 struct ScriptFieldManifest final {
     constexpr ScriptFieldManifest(FieldHandle handle, const char *name, ScriptFieldType type)

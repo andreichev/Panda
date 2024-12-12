@@ -133,6 +133,7 @@ void EditorLayer::play() {
 
 void EditorLayer::simulate() {
     m_sceneState = SceneState::SIMULATE;
+    m_playingWorld = m_editingWorld;
     m_currentWorld = &m_playingWorld;
     GameContext::s_currentWorld = m_currentWorld;
     m_hierarchyPanel.setWorld(m_currentWorld);

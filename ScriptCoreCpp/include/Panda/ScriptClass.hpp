@@ -1,15 +1,18 @@
 #pragma once
 
-#include "Panda/Script.hpp"
-#include "Manifest/ScriptFieldType.hpp"
+#include "Panda/Manifest/ScriptBundleManifest.hpp"
 
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+namespace Bamboo {
+class Entity;
+}
+
 namespace Panda {
 
-using InstantiateFunction = void *(*)(Entity entity);
+using InstantiateFunction = void *(*)(Bamboo::Entity entity);
 
 struct ScriptFieldInfo final {
     constexpr ScriptFieldInfo(

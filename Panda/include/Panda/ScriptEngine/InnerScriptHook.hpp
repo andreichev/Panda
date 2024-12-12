@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Manifest/ScriptClassManifest.hpp"
+#include "Manifest/ScriptBundleManifest.hpp"
 
 #include <stdint.h>
 #include <Rain/UUID.hpp>

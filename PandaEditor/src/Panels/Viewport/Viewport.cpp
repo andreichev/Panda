@@ -133,7 +133,6 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     }
     style.FrameRounding = lastFrameRounding;
 
-
     ImGui::End();
     ImGui::PopStyleVar();
 

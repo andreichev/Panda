@@ -1,7 +1,12 @@
 #include "SampleScript.hpp"
 
-#include <Logger.hpp>
+#include <Bamboo/Input.hpp>
+#include <Bamboo/Logger.hpp>
+
+using namespace Bamboo;
 
 void SampleScript::update(float dt) {
-    LOG("Hello from Sample script!");
+    if (Input::isKeyPressed(Key::L)) {
+        LOG("Hello Panda! var: {}", var);
+    }
 }

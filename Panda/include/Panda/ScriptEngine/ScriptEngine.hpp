@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <Panda/ScriptEngine/Manifest/ScriptClassManifest.hpp>
+#include <Panda/ScriptEngine/Manifest/ScriptBundleManifest.hpp>
 #include <filesystem>
 
 namespace Panda {

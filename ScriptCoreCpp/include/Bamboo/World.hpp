@@ -5,7 +5,7 @@
 
 #include <optional>
 
-namespace Panda {
+namespace Bamboo {
 
 class World {
 public:
@@ -14,4 +14,4 @@ public:
     static void destroyEntity(Entity entity);
 };
 
-} // namespace Panda
+} // namespace Bamboo

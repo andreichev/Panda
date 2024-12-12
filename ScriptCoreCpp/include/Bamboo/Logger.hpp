@@ -3,6 +3,8 @@
 #include <string>
 #include <format>
 
+namespace Bamboo {
+
 class Logger {
 public:
     static void log(std::string message);
@@ -14,4 +16,6 @@ public:
     }
 };
 
-#define LOG(...) ::Logger::logF(__VA_ARGS__)
+} // namespace Bamboo
+
+#define LOG(...) Bamboo::Logger::logF(__VA_ARGS__)

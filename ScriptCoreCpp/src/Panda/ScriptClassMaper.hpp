@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Manifest/ScriptClassManifest.hpp"
-#include "ScriptClass.hpp"
+#include "Panda/Manifest/ScriptBundleManifest.hpp"
+#include "Panda/ScriptClass.hpp"
 
 namespace Panda {
 

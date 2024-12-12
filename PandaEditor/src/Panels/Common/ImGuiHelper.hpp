@@ -96,7 +96,7 @@ bool dragInt4(
     const char *format = "%d",
     ImGuiSliderFlags flags = 0
 );
-bool checkbox(const std::string &label, bool* v);
+bool checkbox(const std::string &label, bool *v);
 int combo(const std::string &label, const std::vector<std::string> &list, int current);
 bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.f);
 void separator();

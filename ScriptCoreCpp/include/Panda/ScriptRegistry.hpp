@@ -1,6 +1,8 @@
 #pragma once
 
 #include "ScriptClass.hpp"
+#include "Panda/Base.hpp"
+#include "Bamboo/Script.hpp"
 
 #include <unordered_map>
 
@@ -18,7 +20,7 @@ private:
 
 public:
     std::vector<ScriptClass> m_scriptClasses;
-    std::unordered_map<ScriptInstanceHandle, Script *> m_instances;
+    std::unordered_map<ScriptInstanceHandle, Bamboo::Script *> m_instances;
 
     template<typename T>
     ScriptFieldType getType() {
@@ -52,7 +54,7 @@ public:
         ScriptClass clazz;
         clazz.name = name;
         addFieldsIfHas<T>(clazz);
-        clazz.instantiateFunc = [](Entity entity) {
+        clazz.instantiateFunc = [](Bamboo::Entity entity) {
             // TODO: Use custom allocator for script instances
             T *script = new T();
             script->m_entity = entity;
@@ -61,7 +63,7 @@ public:
         m_scriptClasses.emplace_back(clazz);
     }
 
-    Script *getInstanceWithId(ScriptInstanceHandle id) {
+    Bamboo::Script *getInstanceWithId(ScriptInstanceHandle id) {
         if (m_instances.find(id) == m_instances.end()) {
             return nullptr;
         }
@@ -69,7 +71,7 @@ public:
     }
 
     void setFieldValue(ScriptInstanceHandle scriptId, FieldHandle fieldId, void *value) {
-        Script *script = getInstanceWithId(scriptId);
+        Bamboo::Script *script = getInstanceWithId(scriptId);
         // PND_ASSERT(script, "Invalid script instance id");
         ScriptClassHandle classHandle = script->m_classHandle;
         // PND_ASSERT(classHandle >= 0 && classHandle < m_scriptClasses.size(), "Invalid class
@@ -96,12 +98,12 @@ public:
         m_instances.clear();
     }
 
-    ScriptInstanceHandle instantiate(Entity entity, const char *name) {
+    ScriptInstanceHandle instantiate(Bamboo::Entity entity, const char *name) {
         for (ScriptClassHandle classId = 0; classId < m_scriptClasses.size(); classId++) {
             ScriptClass &clazz = m_scriptClasses[classId];
             if (strcmp(name, clazz.name) == 0) {
                 m_lastHandle++;
-                m_instances[m_lastHandle] = (Script *)clazz.instantiateFunc(entity);
+                m_instances[m_lastHandle] = (Bamboo::Script *)clazz.instantiateFunc(entity);
                 m_instances[m_lastHandle]->m_classHandle = classId;
                 return m_lastHandle;
             }

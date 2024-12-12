@@ -18,7 +18,12 @@ public:
     explicit Texture(const path_t &path) {
         TextureData data = AssetLoaderEditor::loadTexture(path);
         m_size = {(float)data.m_width, (float)data.m_height};
-        m_handle = Miren::createTexture(data.getMirenTextureCreate());
+        auto textureCreate = data.getMirenTextureCreate();
+        textureCreate.m_wrap = Miren::CLAMP;
+        textureCreate.m_magFiltering = Miren::NEAREST;
+        textureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
+        textureCreate.m_numMips = 3;
+        m_handle = Miren::createTexture(textureCreate);
         LOG_INFO("CREATED TEXTURE, path: {}", path.c_str());
     }
 

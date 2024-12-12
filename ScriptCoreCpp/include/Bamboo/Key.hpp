@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Panda {
+namespace Bamboo {
 
 enum class MouseButton { LEFT = 0, RIGHT = 1, MIDDLE = 2 };
 
@@ -132,4 +132,4 @@ enum class Key {
     MOD_SUPER = 8
 };
 
-} // namespace Panda
+} // namespace Bamboo

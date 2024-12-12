@@ -3,7 +3,7 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "ScriptRegistry.hpp"
+#include "Panda/ScriptRegistry.hpp"
 
 namespace Panda {
 

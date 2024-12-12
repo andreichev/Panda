@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Panda {
+namespace Bamboo {
 
 class Application final {
 public:
@@ -12,4 +12,4 @@ public:
     static void quit();
 };
 
-} // namespace Panda
+} // namespace Bamboo

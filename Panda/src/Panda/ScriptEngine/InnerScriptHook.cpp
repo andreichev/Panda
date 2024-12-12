@@ -67,6 +67,59 @@ namespace InternalCalls {
         GameContext::s_currentWorld->destroy(entity);
     }
 
+    /// ENTITY
+
+    void entity_CreateComponent(UUID entityId, const char *type) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        PND_ASSERT(type != nullptr, "TYPE IS NULL");
+        if (s_createComponentFuncs.find(type) == s_createComponentFuncs.end()) {
+            PND_ASSERT_F(false, "UNKNOWN TYPE {}", type);
+            return;
+        }
+        s_createComponentFuncs.at(type)(entity);
+    }
+
+    bool entity_HasComponent(UUID entityId, const char *type) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        PND_ASSERT(type != nullptr, "TYPE IS NULL");
+        if (s_hasComponentFuncs.find(type) == s_hasComponentFuncs.end()) {
+            PND_ASSERT_F(false, "UNKNOWN TYPE {}", type);
+            return false;
+        }
+        return s_hasComponentFuncs.at(type)(entity);
+    }
+
+    void entity_RemoveComponent(UUID entityId, const char *type) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        PND_ASSERT(type != nullptr, "TYPE IS NULL");
+        if (s_removeComponentFuncs.find(type) == s_removeComponentFuncs.end()) {
+            PND_ASSERT_F(false, "UNKNOWN TYPE {}", type);
+            return;
+        }
+        if (!entity_HasComponent(entityId, type)) {
+            PND_ASSERT_F(false, "ENTITY {} DOES NOT HAVE COMPONENT {}", (uint32_t)entityId, type);
+            return;
+        }
+        s_removeComponentFuncs.at(type)(entity);
+    }
+
+    /// TRANSFORM COMPONENT
+
+    void transformComponent_GetPosition(UUID entityId, float *x, float *y, float *z) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        TransformComponent &transformComponent = entity.getTransform();
+        glm::vec3 position = transformComponent.getPosition();
+        *x = position.x;
+        *y = position.y;
+        *z = position.z;
+    }
+
+    void transformComponent_SetPosition(UUID entityId, float x, float y, float z) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        TransformComponent &transformComponent = entity.getTransform();
+        transformComponent.setPosition({x, y, z});
+    }
+
     /// CONSOLE
     void console_Log(const char *message) {
         LOG_EDITOR(message);
@@ -76,19 +129,34 @@ namespace InternalCalls {
 std::unordered_map<std::string, void *> g_scriptSymbols;
 
 void initScriptHook() {
+    /// APPLICATION
     g_scriptSymbols["application_Quit"] = (void *)InternalCalls::application_Quit;
     g_scriptSymbols["application_GetWidth"] = (void *)InternalCalls::application_GetWidth;
     g_scriptSymbols["application_GetHeight"] = (void *)InternalCalls::application_GetHeight;
+    /// INPUT
     g_scriptSymbols["input_IsKeyPressed"] = (void *)InternalCalls::input_IsKeyPressed;
     g_scriptSymbols["input_IsKeyJustPressed"] = (void *)InternalCalls::input_IsKeyJustPressed;
+    /// WORLD
     g_scriptSymbols["world_Load"] = (void *)InternalCalls::world_Load;
     g_scriptSymbols["world_FindByTag"] = (void *)InternalCalls::world_FindByTag;
     g_scriptSymbols["world_CreateEntity"] = (void *)InternalCalls::world_CreateEntity;
     g_scriptSymbols["world_DestroyEntity"] = (void *)InternalCalls::world_DestroyEntity;
+    /// ENTITY
+    g_scriptSymbols["entity_CreateComponent"] = (void *)InternalCalls::entity_CreateComponent;
+    g_scriptSymbols["entity_HasComponent"] = (void *)InternalCalls::entity_HasComponent;
+    g_scriptSymbols["entity_RemoveComponent"] = (void *)InternalCalls::entity_RemoveComponent;
+    /// TRANSFORM COMPONENT
+    g_scriptSymbols["transformComponent_GetPosition"] =
+        (void *)InternalCalls::transformComponent_GetPosition;
+    g_scriptSymbols["transformComponent_SetPosition"] =
+        (void *)InternalCalls::transformComponent_SetPosition;
+    /// CONSOLE
     g_scriptSymbols["console_Log"] = (void *)InternalCalls::console_Log;
 
     registerManagedComponent<SpriteRendererComponent>();
     registerManagedComponent<CameraComponent>();
+    registerManagedComponent<Rigidbody2DComponent>();
+    registerManagedComponent<BoxCollider2DComponent>();
     registerManagedComponent<SkyComponent>();
 }
 

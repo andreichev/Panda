@@ -6,7 +6,7 @@
 
 #include "Key.hpp"
 
-namespace Panda {
+namespace Bamboo {
 
 class Input {
 public:
@@ -33,4 +33,4 @@ public:
     static double getMouseScrollY();
 };
 
-} // namespace Panda
+} // namespace Bamboo

@@ -47,7 +47,7 @@ public:
 
     void invokeUpdate(float deltaTime) {
         ExternalCalls::invokeUpdateAtScript(id, deltaTime);
-    };
+    }
 
     const std::string &getName() {
         return name;
