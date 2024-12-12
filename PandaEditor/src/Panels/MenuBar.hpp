@@ -36,9 +36,6 @@ public:
 
     float m_height;
     MenuBarOutput *m_output;
-
-private:
-    Texture m_iconPanda;
 };
 
 } // namespace Panda
