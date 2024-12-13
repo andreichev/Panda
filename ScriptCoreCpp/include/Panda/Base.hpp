@@ -5,7 +5,7 @@
 
 namespace Panda {
 
-using UUID = uint32_t;
+using EntityHandle = uint32_t;
 using ScriptClassHandle = uint32_t;
 using ScriptInstanceHandle = uint32_t;
 using FieldHandle = uint32_t;

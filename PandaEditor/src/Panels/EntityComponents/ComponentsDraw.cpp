@@ -226,7 +226,9 @@ void ComponentsDraw::drawComponents(Entity entity) {
             auto &camera = component.camera;
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
             checkbox("Primary", &component.isPrimary);
-            int selectedPos = combo("Projection", { "Perspective", "Orthographic" }, (int)camera.getProjectionType());
+            int selectedPos = combo(
+                "Projection", {"Perspective", "Orthographic"}, (int)camera.getProjectionType()
+            );
 
             camera.setProjectionType((WorldCamera::ProjectionType)selectedPos);
             if (camera.getProjectionType() == WorldCamera::ProjectionType::PERSPECTIVE) {
@@ -261,7 +263,8 @@ void ComponentsDraw::drawComponents(Entity entity) {
             const char *currentBodyTypeString = bodyTypeStrings[(int)component.type];
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0);
 
-            int selectedPos = combo("Body Type", {"Static", "Dynamic", "Kinematic"}, (int)component.type);
+            int selectedPos =
+                combo("Body Type", {"Static", "Dynamic", "Kinematic"}, (int)component.type);
             component.type = (Rigidbody2DComponent::BodyType)selectedPos;
             checkbox("Fixed Rotation", &component.fixedRotation);
             ImGui::PopStyleVar();

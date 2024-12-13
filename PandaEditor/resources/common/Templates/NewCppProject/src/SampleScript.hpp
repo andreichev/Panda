@@ -1,10 +1,16 @@
 #pragma once
 
-#include <Script.hpp>
-#include <ScriptRegistry.hpp>
+#include <Bamboo/Script.hpp>
+#include <Bamboo/Bamboo.hpp>
 
-class SampleScript : public Panda::Script {
+class SampleScript : public Bamboo::Script {
 public:
+    int var;
+
+    PANDA_FIELDS_BEGIN(SampleScript)
+    PANDA_FIELD(var)
+    PANDA_FIELDS_END
+
     void update(float dt) override;
 };
 

@@ -109,7 +109,7 @@ bool dragFloat2(
     ImGui::Text("%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
-    
+
     ImGui::PushItemWidth(-1);
     bool result = ImGui::DragFloat2("", v, v_speed, v_min, v_max, format, flags);
     ImGui::PopItemWidth();
@@ -137,7 +137,7 @@ bool dragFloat3(
     ImGui::Text("%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
-    
+
     ImGui::PushItemWidth(-1);
     bool result = ImGui::DragFloat3("", v, v_speed, v_min, v_max, format, flags);
     ImGui::PopItemWidth();
@@ -164,7 +164,7 @@ bool dragFloat4(
     ImGui::Text("%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
-    
+
     ImGui::PushItemWidth(-1);
     bool result = ImGui::DragFloat4("", v, v_speed, v_min, v_max, format, flags);
     ImGui::PopItemWidth();
@@ -192,7 +192,7 @@ bool dragInt(
     ImGui::Text("%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
-    
+
     ImGui::PushItemWidth(-1);
     bool result = ImGui::DragInt("", v, v_speed, v_min, v_max, format, flags);
     ImGui::PopItemWidth();
@@ -285,7 +285,7 @@ bool dragInt4(
     return result;
 }
 
-bool checkbox(const std::string &label, bool* v) {
+bool checkbox(const std::string &label, bool *v) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
 
