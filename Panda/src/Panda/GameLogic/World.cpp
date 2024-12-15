@@ -18,19 +18,15 @@ World::World()
     , m_isChanged(false)
     , m_registry()
     , m_commandManager()
-    , m_physics2DInternal() {
-    PND_STATIC_ASSERT(sizeof(Physics2D) <= sizeof(m_physics2DInternal));
-}
+    , m_physics2D() {}
 
 World::~World() {
-    Physics2D *physics2D = (Physics2D *)m_physics2DInternal;
-    physics2D->destroy();
+    m_physics2D.destroy();
 }
 
 void World::startRunning() {
     // Init physics
-    Physics2D *physics2D = (Physics2D *)m_physics2DInternal;
-    physics2D->init(this);
+    m_physics2D.init(this);
     // Call start at native scripts
     {
         auto view = m_registry.view<ScriptListComponent>();
@@ -48,8 +44,7 @@ void World::startRunning() {
 }
 
 void World::finishRunning() {
-    Physics2D *physics2D = (Physics2D *)m_physics2DInternal;
-    physics2D->destroy();
+    m_physics2D.destroy();
     m_isRunning = false;
 }
 
@@ -60,8 +55,7 @@ void World::updateRuntime(double deltaTime) {
     m_renderer2d.begin();
     m_renderer3d.begin();
 
-    Physics2D *physics2D = (Physics2D *)m_physics2DInternal;
-    physics2D->update(this, deltaTime);
+    m_physics2D.update(this, deltaTime);
     // Update native scripts
     {
         auto view = m_registry.view<ScriptListComponent>();
@@ -103,8 +97,7 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
     m_renderer2d.begin();
     m_renderer3d.begin();
 
-    Physics2D *physics2D = (Physics2D *)m_physics2DInternal;
-    physics2D->update(this, deltaTime);
+    m_physics2D.update(this, deltaTime);
 
     // Update native scripts
     {
@@ -452,6 +445,18 @@ World &World::operator=(World &other) {
         copyAllComponents<BoxCollider2DComponent>(src, dst, entityHandle);
     }
     return *this;
+}
+
+void World::physics2DRegisterEntity(Entity entity) {
+    m_physics2D.registerEntity(entity);
+}
+
+void World::physics2DUpdateEntity(Entity entity) {
+    m_physics2D.updateEntity(entity);
+}
+
+void World::physics2DRemoveEntity(Entity entity) {
+    m_physics2D.removeEntity(entity);
 }
 
 void World::debugPrint() {

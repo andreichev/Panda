@@ -68,4 +68,16 @@ Entity::operator bool() const {
     return isValid();
 }
 
+void Entity::physics2DRegister() {
+    m_world->physics2DRegisterEntity(*this);
+}
+
+void Entity::physics2DUpdate() {
+    m_world->physics2DUpdateEntity(*this);
+}
+
+void Entity::physics2DRemove() {
+    m_world->physics2DRemoveEntity(*this);
+}
+
 } // namespace Panda

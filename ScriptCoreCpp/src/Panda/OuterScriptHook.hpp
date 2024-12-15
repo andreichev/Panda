@@ -5,6 +5,7 @@
 namespace Panda {
 
 namespace ExternalCalls {
+
     /// APPLICATION
     using Application_Quit = void (*)();
     extern Application_Quit application_Quit;
@@ -40,9 +41,22 @@ namespace ExternalCalls {
     using TransformComponent_SetPosition =
         void (*)(EntityHandle entityId, float x, float y, float z);
     extern TransformComponent_SetPosition transformComponent_SetPosition;
+    /// RIGIDBODY2D COMPONENT
+    using Rigidbody2DComponent_applyForce = void (*)(EntityHandle entityId, float x, float y);
+    extern Rigidbody2DComponent_applyForce rigidbody2DComponent_applyForce;
+    using Rigidbody2DComponent_applyLinearImpulse =
+        void (*)(EntityHandle entityId, float x, float y);
+    extern Rigidbody2DComponent_applyLinearImpulse rigidbody2DComponent_applyLinearImpulse;
+    using Rigidbody2DComponent_getLinearVelocity =
+        void (*)(EntityHandle entityId, float *x, float *y);
+    extern Rigidbody2DComponent_getLinearVelocity rigidbody2DComponent_getLinearVelocity;
+    using Rigidbody2DComponent_setLinearVelocity =
+        void (*)(EntityHandle entityId, float x, float y);
+    extern Rigidbody2DComponent_setLinearVelocity rigidbody2DComponent_setLinearVelocity;
     /// LOG
     using Console_Log = void (*)(const char *);
     extern Console_Log console_Log;
+
 } // namespace ExternalCalls
 
 }; // namespace Panda

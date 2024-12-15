@@ -1,4 +1,4 @@
-#include "Physics2D.hpp"
+#include "Panda/Physics/Physics2D.hpp"
 #include "Panda/GameLogic/World.hpp"
 
 #include <box2d/box2d.h>
@@ -51,44 +51,19 @@ void Physics2D::init(World *world) {
     worldDef.restitutionThreshold = 0.5;
     b2WorldId worldId = b2CreateWorld(&worldDef);
     m_physicsWorldId = b2WorldIdToInt(worldId);
-
+    // Register all entities
     auto view = world->m_registry.view<Rigidbody2DComponent>();
     for (auto entityHandle : view) {
         if (!world->m_registry.valid(entityHandle)) {
             continue;
         }
         Entity entity = {entityHandle, world};
-        auto &transform = entity.getTransform();
-        auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
-
-        float rotationDeg = transform.getRotationEuler().z;
-        float rotationRad = glm::radians(rotationDeg);
-        b2BodyDef bodyDef = b2DefaultBodyDef();
-        bodyDef.type = rigidbody2DTypeToBox2DBody(rb2d.type);
-        bodyDef.position = {transform.getPosition().x, transform.getPosition().y};
-        bodyDef.rotation = {cos(rotationRad), sin(rotationRad)};
-        bodyDef.fixedRotation = rb2d.fixedRotation;
-
-        b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
-        memcpy(&rb2d.runtimeBody, &bodyId, sizeof(b2BodyId));
-
-        if (entity.hasComponent<BoxCollider2DComponent>()) {
-            auto &bc2d = entity.getComponent<BoxCollider2DComponent>();
-
-            b2Polygon boxShape = b2MakeOffsetBox(
-                bc2d.size.x * transform.getScale().x,
-                bc2d.size.y * transform.getScale().y,
-                {bc2d.offset.x, bc2d.offset.y},
-                {1.0f, 0.0f}
-            );
-
-            b2ShapeDef shapeDef = b2DefaultShapeDef();
-            shapeDef.density = bc2d.density;
-            shapeDef.friction = bc2d.friction;
-            shapeDef.restitution = bc2d.restitution;
-            b2CreatePolygonShape(bodyId, &shapeDef, &boxShape);
-        }
+        registerEntity(entity);
     }
+}
+
+bool Physics2D::isInitialized() {
+    return m_physicsWorldId;
 }
 
 void Physics2D::update(World *world, double deltaTime) {
@@ -116,6 +91,105 @@ void Physics2D::update(World *world, double deltaTime) {
         float rotationRad = b2Rot_GetAngle(rotation);
         transform.setRotationEuler({0.f, 0.f, glm::degrees(rotationRad)});
     }
+}
+
+void Physics2D::registerEntity(Entity entity) {
+    if (!isInitialized()) {
+        return;
+    }
+    b2WorldId worldId = IntToB2WorldId(m_physicsWorldId);
+    auto &transform = entity.getTransform();
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    float rotationDeg = transform.getRotationEuler().z;
+    float rotationRad = glm::radians(rotationDeg);
+    b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.type = rigidbody2DTypeToBox2DBody(rb2d.type);
+    bodyDef.position = {transform.getPosition().x, transform.getPosition().y};
+    bodyDef.rotation = {cos(rotationRad), sin(rotationRad)};
+    bodyDef.fixedRotation = rb2d.fixedRotation;
+
+    b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
+    memcpy(&rb2d.runtimeBody, &bodyId, sizeof(b2BodyId));
+
+    if (entity.hasComponent<BoxCollider2DComponent>()) {
+        auto &bc2d = entity.getComponent<BoxCollider2DComponent>();
+
+        b2Polygon boxShape = b2MakeOffsetBox(
+            bc2d.size.x * transform.getScale().x,
+            bc2d.size.y * transform.getScale().y,
+            {bc2d.offset.x, bc2d.offset.y},
+            {1.0f, 0.0f}
+        );
+
+        b2ShapeDef shapeDef = b2DefaultShapeDef();
+        shapeDef.density = bc2d.density;
+        shapeDef.friction = bc2d.friction;
+        shapeDef.restitution = bc2d.restitution;
+        b2CreatePolygonShape(bodyId, &shapeDef, &boxShape);
+    }
+}
+
+void Physics2D::updateEntity(Entity entity) {
+    if (!isInitialized()) {
+        return;
+    }
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    b2BodyId bodyId;
+    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
+    // TODO: Update body properties, not just recreate
+    b2DestroyBody(bodyId);
+    registerEntity(entity);
+}
+
+void Physics2D::removeEntity(Entity entity) {
+    if (!isInitialized()) {
+        return;
+    }
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    b2BodyId bodyId;
+    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
+    b2DestroyBody(bodyId);
+}
+
+void Physics2D::applyForce(Entity entity, Vec2 force) {
+    if (!isInitialized()) {
+        return;
+    }
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    b2BodyId bodyId;
+    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
+    b2Body_ApplyForceToCenter(bodyId, {force.x, force.y}, true);
+}
+
+void Physics2D::applyLinearImpulse(Entity entity, Vec2 impulse) {
+    if (!isInitialized()) {
+        return;
+    }
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    b2BodyId bodyId;
+    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
+    b2Body_ApplyLinearImpulseToCenter(bodyId, {impulse.x, impulse.y}, true);
+}
+
+void Physics2D::setLinearVelocity(Entity entity, Vec2 velocity) {
+    if (!isInitialized()) {
+        return;
+    }
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    b2BodyId bodyId;
+    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
+    b2Body_SetLinearVelocity(bodyId, {velocity.x, velocity.y});
+}
+
+Vec2 Physics2D::getLinearVelocity(Entity entity) {
+    if (!isInitialized()) {
+        return Vec2();
+    }
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    b2BodyId bodyId;
+    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
+    b2Vec2 result = b2Body_GetLinearVelocity(bodyId);
+    return Vec2(result.x, result.y);
 }
 
 void Physics2D::destroy() {
