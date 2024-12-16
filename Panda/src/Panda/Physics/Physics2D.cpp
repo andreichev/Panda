@@ -192,6 +192,16 @@ Vec2 Physics2D::getLinearVelocity(Entity entity) {
     return Vec2(result.x, result.y);
 }
 
+float Physics2D::getMass(Entity entity) {
+    if (!isInitialized()) {
+        return 0;
+    }
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    b2BodyId bodyId;
+    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
+    return b2Body_GetMass(bodyId);
+}
+
 void Physics2D::destroy() {
     if (m_physicsWorldId) {
         b2WorldId id = IntToB2WorldId(m_physicsWorldId);

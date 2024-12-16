@@ -20,6 +20,7 @@ public:
     void applyLinearImpulse(Entity entity, Vec2 impulse);
     void setLinearVelocity(Entity entity, Vec2 velocity);
     Vec2 getLinearVelocity(Entity entity);
+    float getMass(Entity entity);
     void destroy();
 
 private:

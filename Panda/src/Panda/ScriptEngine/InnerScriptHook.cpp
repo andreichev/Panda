@@ -156,6 +156,13 @@ namespace InternalCalls {
         physics2D.setLinearVelocity(entity, {x, y});
     }
 
+    void rigidbody2DComponent_getMass(EntityHandle entityId, float *mass) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        World *world = entity.getWorld();
+        Physics2D &physics2D = world->getPhysics2D();
+        *mass = physics2D.getMass(entity);
+    }
+
     /// CONSOLE
     void console_Log(const char *message) {
         LOG_EDITOR(message);
@@ -196,6 +203,8 @@ void initScriptHook() {
         (void *)InternalCalls::rigidbody2DComponent_getLinearVelocity;
     g_scriptSymbols["rigidbody2DComponent_setLinearVelocity"] =
         (void *)InternalCalls::rigidbody2DComponent_setLinearVelocity;
+    g_scriptSymbols["rigidbody2DComponent_getMass"] =
+        (void *)InternalCalls::rigidbody2DComponent_getMass;
     /// CONSOLE
     g_scriptSymbols["console_Log"] = (void *)InternalCalls::console_Log;
 

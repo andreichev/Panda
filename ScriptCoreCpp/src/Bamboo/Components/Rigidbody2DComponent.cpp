@@ -31,4 +31,11 @@ void Rigidbody2DComponent::setLinearVelocity(Vec2 velocity) {
     );
 }
 
+float Rigidbody2DComponent::getMass() {
+    Panda::EntityHandle entityHandle = getEntity().getId();
+    float mass;
+    Panda::ExternalCalls::rigidbody2DComponent_getMass(entityHandle, &mass);
+    return mass;
+}
+
 } // namespace Bamboo

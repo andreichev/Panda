@@ -10,6 +10,7 @@ public:
     void applyLinearImpulse(Vec2 impulse);
     Vec2 getLinearVelocity();
     void setLinearVelocity(Vec2 velocity);
+    float getMass();
 };
 
 } // namespace Bamboo

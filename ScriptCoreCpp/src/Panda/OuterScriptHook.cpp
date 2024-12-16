@@ -36,6 +36,7 @@ namespace ExternalCalls {
     Rigidbody2DComponent_applyLinearImpulse rigidbody2DComponent_applyLinearImpulse = nullptr;
     Rigidbody2DComponent_getLinearVelocity rigidbody2DComponent_getLinearVelocity = nullptr;
     Rigidbody2DComponent_setLinearVelocity rigidbody2DComponent_setLinearVelocity = nullptr;
+    Rigidbody2DComponent_getMass rigidbody2DComponent_getMass = nullptr;
     /// CONSOLE
     Console_Log console_Log = nullptr;
 } // namespace ExternalCalls
@@ -134,6 +135,8 @@ LIB_EXPORT int loadExternalCalls(SymbolsLoadFunc load) {
         (Rigidbody2DComponent_getLinearVelocity)load("rigidbody2DComponent_getLinearVelocity");
     rigidbody2DComponent_setLinearVelocity =
         (Rigidbody2DComponent_setLinearVelocity)load("rigidbody2DComponent_setLinearVelocity");
+    rigidbody2DComponent_getMass =
+        (Rigidbody2DComponent_getMass)load("rigidbody2DComponent_getMass");
     /// LOG
     console_Log = (Console_Log)load("console_Log");
     std::cout << "SCRIPT ENGINE: Outer functions binding done.\n";
