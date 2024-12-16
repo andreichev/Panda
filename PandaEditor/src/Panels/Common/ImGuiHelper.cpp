@@ -340,9 +340,7 @@ int combo(const std::string &label, const std::vector<std::string> &list, int cu
 }
 
 bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
 
     ImGuiIO &io = ImGui::GetIO();
     auto boldFont = io.Fonts->Fonts[0];
@@ -368,6 +366,7 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
     ImGui::PushFont(boldFont);
     if (ImGui::Button("X", buttonSize)) {
+        edited = true;
         values.x = resetValue;
     }
     ImGui::PopFont();
@@ -383,6 +382,7 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.7f, 0.2f, 1.0f));
     ImGui::PushFont(boldFont);
     if (ImGui::Button("Y", buttonSize)) {
+        edited = true;
         values.y = resetValue;
     }
     ImGui::PopFont();
@@ -398,6 +398,7 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
     ImGui::PushFont(boldFont);
     if (ImGui::Button("Z", buttonSize)) {
+        edited = true;
         values.z = resetValue;
     }
     ImGui::PopFont();
@@ -410,7 +411,7 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
     ImGui::PopStyleVar();
     ImGui::Columns(1);
     ImGui::PopID();
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopStyleVar();
     return edited;
 }
 
@@ -496,10 +497,7 @@ void endPropertiesGrid() {
 }
 
 bool propertyColor(const char *label, Color &value) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
-
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     shiftCursorY(6.0f);
     ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label);
@@ -508,14 +506,12 @@ bool propertyColor(const char *label, Color &value) {
     bool modified = ImGui::ColorEdit4(generateID(), &value.r);
     ImGui::PopItemWidth();
     ImGui::NextColumn();
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopStyleVar();
     return modified;
 }
 
 bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asset> asset) {
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = coefficientRounding;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     bool changed = false;
     shiftCursorY(6.0f);
     ImGui::SetColumnWidth(0, firstColumnWidth);
@@ -560,7 +556,7 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
         }
     }
     ImGui::NextColumn();
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopStyleVar();
     return changed;
 }
 
