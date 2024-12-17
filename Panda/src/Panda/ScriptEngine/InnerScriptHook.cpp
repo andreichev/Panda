@@ -27,6 +27,7 @@ static void registerManagedComponent() {
 namespace InternalCalls {
 
     /// APPLICATION
+
     void application_Quit() {
         Panda::Application::get()->close();
     }
@@ -40,6 +41,7 @@ namespace InternalCalls {
     }
 
     /// INPUT
+
     bool input_IsKeyPressed(int key) {
         return Input::isKeyPressed((Key)key);
     }
@@ -49,6 +51,7 @@ namespace InternalCalls {
     }
 
     /// WORLD
+
     void world_Load(const char *name) {
         // TODO: Implement using AssetManager
     }
@@ -163,7 +166,22 @@ namespace InternalCalls {
         *mass = physics2D.getMass(entity);
     }
 
+    void rigidbody2DComponent_getFriction(EntityHandle entityId, float *friction) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        World *world = entity.getWorld();
+        Physics2D &physics2D = world->getPhysics2D();
+        *friction = physics2D.getFriction(entity);
+    }
+
+    void rigidbody2DComponent_setFriction(EntityHandle entityId, float friction) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        World *world = entity.getWorld();
+        Physics2D &physics2D = world->getPhysics2D();
+        physics2D.setFriction(entity, friction);
+    }
+
     /// CONSOLE
+
     void console_Log(const char *message) {
         LOG_EDITOR(message);
     }
@@ -205,6 +223,10 @@ void initScriptHook() {
         (void *)InternalCalls::rigidbody2DComponent_setLinearVelocity;
     g_scriptSymbols["rigidbody2DComponent_getMass"] =
         (void *)InternalCalls::rigidbody2DComponent_getMass;
+    g_scriptSymbols["rigidbody2DComponent_getFriction"] =
+        (void *)InternalCalls::rigidbody2DComponent_getFriction;
+    g_scriptSymbols["rigidbody2DComponent_setFriction"] =
+        (void *)InternalCalls::rigidbody2DComponent_setFriction;
     /// CONSOLE
     g_scriptSymbols["console_Log"] = (void *)InternalCalls::console_Log;
 

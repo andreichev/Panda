@@ -38,4 +38,16 @@ float Rigidbody2DComponent::getMass() {
     return mass;
 }
 
+float Rigidbody2DComponent::getFriction() {
+    Panda::EntityHandle entityHandle = getEntity().getId();
+    float friction;
+    Panda::ExternalCalls::rigidbody2DComponent_getFriction(entityHandle, &friction);
+    return friction;
+}
+
+void Rigidbody2DComponent::setFriction(float friction) {
+    Panda::EntityHandle entityHandle = getEntity().getId();
+    Panda::ExternalCalls::rigidbody2DComponent_setFriction(entityHandle, friction);
+}
+
 } // namespace Bamboo

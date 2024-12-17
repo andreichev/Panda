@@ -55,6 +55,10 @@ namespace ExternalCalls {
     extern Rigidbody2DComponent_setLinearVelocity rigidbody2DComponent_setLinearVelocity;
     using Rigidbody2DComponent_getMass = void (*)(EntityHandle entityId, float *mass);
     extern Rigidbody2DComponent_getMass rigidbody2DComponent_getMass;
+    using Rigidbody2DComponent_getFriction = void (*)(EntityHandle entityId, float *friction);
+    extern Rigidbody2DComponent_getFriction rigidbody2DComponent_getFriction;
+    using Rigidbody2DComponent_setFriction = void (*)(EntityHandle entityId, float friction);
+    extern Rigidbody2DComponent_setFriction rigidbody2DComponent_setFriction;
     /// LOG
     using Console_Log = void (*)(const char *);
     extern Console_Log console_Log;

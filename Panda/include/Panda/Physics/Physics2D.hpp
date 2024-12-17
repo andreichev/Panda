@@ -21,6 +21,8 @@ public:
     void setLinearVelocity(Entity entity, Vec2 velocity);
     Vec2 getLinearVelocity(Entity entity);
     float getMass(Entity entity);
+    float getFriction(Entity entity);
+    void setFriction(Entity entity, float friction);
     void destroy();
 
 private:

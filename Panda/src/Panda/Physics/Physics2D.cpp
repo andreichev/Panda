@@ -5,6 +5,12 @@
 
 namespace Panda {
 
+struct RuntimeBodyData {
+    b2BodyId bodyId;
+    // One body can have an array of shapes
+    b2ShapeId primaryShapeId;
+};
+
 inline b2BodyType rigidbody2DTypeToBox2DBody(Rigidbody2DComponent::BodyType bodyType) {
     switch (bodyType) {
         case Rigidbody2DComponent::BodyType::STATIC:
@@ -82,11 +88,11 @@ void Physics2D::update(World *world, double deltaTime) {
         auto &transform = entity.getTransform();
         auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
 
-        b2BodyId bodyId;
-        memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
+        RuntimeBodyData bodyData;
+        memcpy(&bodyData, &rb2d.runtimeBody, sizeof(RuntimeBodyData));
 
-        b2Vec2 position = b2Body_GetPosition(bodyId);
-        b2Rot rotation = b2Body_GetRotation(bodyId);
+        b2Vec2 position = b2Body_GetPosition(bodyData.bodyId);
+        b2Rot rotation = b2Body_GetRotation(bodyData.bodyId);
         transform.setPosition({position.x, position.y, 0.f});
         float rotationRad = b2Rot_GetAngle(rotation);
         transform.setRotationEuler({0.f, 0.f, glm::degrees(rotationRad)});
@@ -108,9 +114,8 @@ void Physics2D::registerEntity(Entity entity) {
     bodyDef.rotation = {cos(rotationRad), sin(rotationRad)};
     bodyDef.fixedRotation = rb2d.fixedRotation;
 
-    b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
-    memcpy(&rb2d.runtimeBody, &bodyId, sizeof(b2BodyId));
-
+    RuntimeBodyData bodyData;
+    bodyData.bodyId = b2CreateBody(worldId, &bodyDef);
     if (entity.hasComponent<BoxCollider2DComponent>()) {
         auto &bc2d = entity.getComponent<BoxCollider2DComponent>();
 
@@ -125,8 +130,9 @@ void Physics2D::registerEntity(Entity entity) {
         shapeDef.density = bc2d.density;
         shapeDef.friction = bc2d.friction;
         shapeDef.restitution = bc2d.restitution;
-        b2CreatePolygonShape(bodyId, &shapeDef, &boxShape);
+        bodyData.primaryShapeId = b2CreatePolygonShape(bodyData.bodyId, &shapeDef, &boxShape);
     }
+    memcpy(&rb2d.runtimeBody, &bodyData, sizeof(RuntimeBodyData));
 }
 
 void Physics2D::updateEntity(Entity entity) {
@@ -134,10 +140,10 @@ void Physics2D::updateEntity(Entity entity) {
         return;
     }
     auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
-    b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
+    RuntimeBodyData bodyData;
+    memcpy(&bodyData, &rb2d.runtimeBody, sizeof(RuntimeBodyData));
     // TODO: Update body properties, not just recreate
-    b2DestroyBody(bodyId);
+    b2DestroyBody(bodyData.bodyId);
     registerEntity(entity);
 }
 
@@ -146,9 +152,9 @@ void Physics2D::removeEntity(Entity entity) {
         return;
     }
     auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
-    b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
-    b2DestroyBody(bodyId);
+    RuntimeBodyData bodyData;
+    memcpy(&bodyData, &rb2d.runtimeBody, sizeof(RuntimeBodyData));
+    b2DestroyBody(bodyData.bodyId);
 }
 
 void Physics2D::applyForce(Entity entity, Vec2 force) {
@@ -156,9 +162,9 @@ void Physics2D::applyForce(Entity entity, Vec2 force) {
         return;
     }
     auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
-    b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
-    b2Body_ApplyForceToCenter(bodyId, {force.x, force.y}, true);
+    RuntimeBodyData bodyData;
+    memcpy(&bodyData, &rb2d.runtimeBody, sizeof(RuntimeBodyData));
+    b2Body_ApplyForceToCenter(bodyData.bodyId, {force.x, force.y}, true);
 }
 
 void Physics2D::applyLinearImpulse(Entity entity, Vec2 impulse) {
@@ -166,9 +172,9 @@ void Physics2D::applyLinearImpulse(Entity entity, Vec2 impulse) {
         return;
     }
     auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
-    b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
-    b2Body_ApplyLinearImpulseToCenter(bodyId, {impulse.x, impulse.y}, true);
+    RuntimeBodyData bodyData;
+    memcpy(&bodyData, &rb2d.runtimeBody, sizeof(RuntimeBodyData));
+    b2Body_ApplyLinearImpulseToCenter(bodyData.bodyId, {impulse.x, impulse.y}, true);
 }
 
 void Physics2D::setLinearVelocity(Entity entity, Vec2 velocity) {
@@ -176,9 +182,9 @@ void Physics2D::setLinearVelocity(Entity entity, Vec2 velocity) {
         return;
     }
     auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
-    b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
-    b2Body_SetLinearVelocity(bodyId, {velocity.x, velocity.y});
+    RuntimeBodyData bodyData;
+    memcpy(&bodyData, &rb2d.runtimeBody, sizeof(RuntimeBodyData));
+    b2Body_SetLinearVelocity(bodyData.bodyId, {velocity.x, velocity.y});
 }
 
 Vec2 Physics2D::getLinearVelocity(Entity entity) {
@@ -186,9 +192,9 @@ Vec2 Physics2D::getLinearVelocity(Entity entity) {
         return Vec2();
     }
     auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
-    b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
-    b2Vec2 result = b2Body_GetLinearVelocity(bodyId);
+    RuntimeBodyData bodyData;
+    memcpy(&bodyData, &rb2d.runtimeBody, sizeof(RuntimeBodyData));
+    b2Vec2 result = b2Body_GetLinearVelocity(bodyData.bodyId);
     return Vec2(result.x, result.y);
 }
 
@@ -197,9 +203,29 @@ float Physics2D::getMass(Entity entity) {
         return 0;
     }
     auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
-    b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeBody, sizeof(b2BodyId));
-    return b2Body_GetMass(bodyId);
+    RuntimeBodyData bodyData;
+    memcpy(&bodyData, &rb2d.runtimeBody, sizeof(RuntimeBodyData));
+    return b2Body_GetMass(bodyData.bodyId);
+}
+
+float Physics2D::getFriction(Entity entity) {
+    if (!isInitialized()) {
+        return 0;
+    }
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    RuntimeBodyData bodyData;
+    memcpy(&bodyData, &rb2d.runtimeBody, sizeof(RuntimeBodyData));
+    return b2Shape_GetFriction(bodyData.primaryShapeId);
+}
+
+void Physics2D::setFriction(Entity entity, float friction) {
+    if (!isInitialized()) {
+        return;
+    }
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    RuntimeBodyData bodyData;
+    memcpy(&bodyData, &rb2d.runtimeBody, sizeof(RuntimeBodyData));
+    b2Shape_SetFriction(bodyData.primaryShapeId, friction);
 }
 
 void Physics2D::destroy() {

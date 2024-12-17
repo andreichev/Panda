@@ -11,6 +11,8 @@ public:
     Vec2 getLinearVelocity();
     void setLinearVelocity(Vec2 velocity);
     float getMass();
+    float getFriction();
+    void setFriction(float friction);
 };
 
 } // namespace Bamboo
