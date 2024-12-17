@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Bamboo/Base.hpp"
-#include "Panda/Base.hpp"
+
+#include <type_traits>
 
 namespace Bamboo {
 
@@ -10,7 +11,7 @@ class Component;
 class Entity final {
 public:
     Entity();
-    Entity(Panda::EntityHandle id);
+    Entity(EntityHandle id);
 
     template<typename T>
         requires std::is_base_of_v<Component, T>
@@ -29,7 +30,7 @@ public:
     }
 
 private:
-    Panda::EntityHandle m_id;
+    EntityHandle m_id;
 
     friend class World;
 };

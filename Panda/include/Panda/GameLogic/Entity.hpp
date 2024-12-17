@@ -49,6 +49,40 @@ public:
         setWorldChanged();
     }
 
+#pragma region PHYSICS
+    /*
+    ---------------------------------------------------
+                          PHYSICS
+    |         |         |         |         |         |
+    V         V         V         V         V         V
+    */
+
+    template<>
+    Rigidbody2DComponent &addComponent<Rigidbody2DComponent>() {
+        PND_ASSERT(!hasComponent<Rigidbody2DComponent>(), "Entity already has component!");
+        entt::registry &registry = worldGetRegistry();
+        Rigidbody2DComponent &component = registry.emplace<Rigidbody2DComponent>(m_handle);
+        physics2DRegister();
+        setWorldChanged();
+        return component;
+    }
+
+    template<>
+    void removeComponent<Rigidbody2DComponent>() {
+        physics2DRemove();
+        entt::registry &registry = worldGetRegistry();
+        registry.remove<Rigidbody2DComponent>(m_handle);
+        setWorldChanged();
+    }
+
+    /*
+    ^         ^         ^         ^         ^         ^
+    |         |         |         |         |         |
+                          PHYSICS
+    ---------------------------------------------------
+    */
+#pragma endregion
+
     template<typename T>
     T &getComponent() {
         PND_ASSERT(hasComponent<T>(), "Entity doesn't have component!");
@@ -114,6 +148,10 @@ public:
     UUID getId() {
         return getComponent<IdComponent>().id;
     }
+
+    void physics2DRegister();
+    void physics2DUpdate();
+    void physics2DRemove();
 
 private:
     Entity(entt::entity handle, World *world);

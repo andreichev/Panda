@@ -9,6 +9,7 @@
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Renderer/Renderer3D.hpp"
 #include "Panda/GameLogic/WorldCommands/WorldCommandManager.hpp"
+#include "Panda/Physics/Physics2D.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -54,6 +55,10 @@ public:
     World &operator=(World &other);
     void debugPrint();
 
+    Physics2D &getPhysics2D() {
+        return m_physics2D;
+    }
+
     /// --------- Editor stuff -----------------
 
     inline WorldCommandManager &getCommandManger() {
@@ -75,11 +80,14 @@ private:
     void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     Entity instantiateEntity(UUID id);
     void fillEntity(Entity entity, UUID id);
+    void physics2DRegisterEntity(Entity entity);
+    void physics2DUpdateEntity(Entity entity);
+    void physics2DRemoveEntity(Entity entity);
 
     std::unordered_map<UUID, Entity> m_entityIdMap;
     bool m_isRunning;
     entt::registry m_registry;
-    uint8_t m_physics2DInternal[64];
+    Physics2D m_physics2D;
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;
     Miren::ViewId m_renderingViewId;

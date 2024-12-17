@@ -1,6 +1,10 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Bamboo {
+
+using EntityHandle = uint32_t;
 
 struct Vec2 {
     union {
@@ -24,6 +28,10 @@ struct Vec2 {
 
     bool operator!=(const Vec2 &l) {
         return !(*this == l);
+    }
+
+    static Vec2 zero() {
+        return Vec2();
     }
 };
 

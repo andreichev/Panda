@@ -31,6 +31,14 @@ namespace ExternalCalls {
     /// TRANSFORM COMPONENT
     TransformComponent_GetPosition transformComponent_GetPosition = nullptr;
     TransformComponent_SetPosition transformComponent_SetPosition = nullptr;
+    /// RIGIDBODY2D COMPONENT
+    Rigidbody2DComponent_applyForce rigidbody2DComponent_applyForce = nullptr;
+    Rigidbody2DComponent_applyLinearImpulse rigidbody2DComponent_applyLinearImpulse = nullptr;
+    Rigidbody2DComponent_getLinearVelocity rigidbody2DComponent_getLinearVelocity = nullptr;
+    Rigidbody2DComponent_setLinearVelocity rigidbody2DComponent_setLinearVelocity = nullptr;
+    Rigidbody2DComponent_getMass rigidbody2DComponent_getMass = nullptr;
+    Rigidbody2DComponent_getFriction rigidbody2DComponent_getFriction = nullptr;
+    Rigidbody2DComponent_setFriction rigidbody2DComponent_setFriction = nullptr;
     /// CONSOLE
     Console_Log console_Log = nullptr;
 } // namespace ExternalCalls
@@ -120,6 +128,21 @@ LIB_EXPORT int loadExternalCalls(SymbolsLoadFunc load) {
         (TransformComponent_GetPosition)load("transformComponent_GetPosition");
     transformComponent_SetPosition =
         (TransformComponent_SetPosition)load("transformComponent_SetPosition");
+    /// RIGIDBODY2D COMPONENT
+    rigidbody2DComponent_applyForce =
+        (Rigidbody2DComponent_applyForce)load("rigidbody2DComponent_applyForce");
+    rigidbody2DComponent_applyLinearImpulse =
+        (Rigidbody2DComponent_applyLinearImpulse)load("rigidbody2DComponent_applyLinearImpulse");
+    rigidbody2DComponent_getLinearVelocity =
+        (Rigidbody2DComponent_getLinearVelocity)load("rigidbody2DComponent_getLinearVelocity");
+    rigidbody2DComponent_setLinearVelocity =
+        (Rigidbody2DComponent_setLinearVelocity)load("rigidbody2DComponent_setLinearVelocity");
+    rigidbody2DComponent_getMass =
+        (Rigidbody2DComponent_getMass)load("rigidbody2DComponent_getMass");
+    rigidbody2DComponent_getFriction =
+        (Rigidbody2DComponent_getFriction)load("rigidbody2DComponent_getFriction");
+    rigidbody2DComponent_setFriction =
+        (Rigidbody2DComponent_setFriction)load("rigidbody2DComponent_setFriction");
     /// LOG
     console_Log = (Console_Log)load("console_Log");
     std::cout << "SCRIPT ENGINE: Outer functions binding done.\n";
