@@ -4,6 +4,7 @@
 
 #include "WorldHierarchyPanel.hpp"
 #include "EntityComponents/ComponentsDraw.hpp"
+#include "Model/DragDropItem.hpp"
 
 #include <imgui.h>
 
@@ -55,7 +56,15 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
     void *id = reinterpret_cast<void *>(entity.m_handle);
     bool opened = ImGui::TreeNodeEx(id, flags, "%s", tag.c_str());
-    if (ImGui::IsItemClicked()) {
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        DragDropItem item;
+        item.type = DragDropItemType::ENTITY;
+        item.assetId = entity.getId();
+        ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        ImGui::Text("Entity: %s", entity.getName().c_str());
+        ImGui::EndDragDropSource();
+    }
+    if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
         m_world->setSelectedEntity(entity);
     }
     if (ImGui::BeginPopupContextItem()) {

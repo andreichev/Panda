@@ -301,6 +301,10 @@ void EditorLayer::addScriptToEntity(Entity entity) {
                             data = Foundation::Memory::alloc(sizeof(int));
                             break;
                         }
+                        case ScriptFieldType::ENTITY: {
+                            data = Foundation::Memory::alloc(sizeof(UUID));
+                            break;
+                        }
                         default: {
                             PND_ASSERT(false, "Unknown field type");
                         }

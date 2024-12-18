@@ -139,6 +139,11 @@ struct ScriptFieldDto : public Rain::Codable {
                 encoder->encode("value", *value);
                 break;
             }
+            case ScriptFieldType::ENTITY: {
+                UUID *value = (UUID *)data.value.data;
+                encoder->encode("value", *value);
+                break;
+            }
             default: {
                 PND_ASSERT(false, "Unknown field type");
                 break;
@@ -163,6 +168,13 @@ struct ScriptFieldDto : public Rain::Codable {
                 int value = 0;
                 decoder->decode("value", value);
                 memcpy(data.value.data, &value, sizeof(int));
+                break;
+            }
+            case ScriptFieldType::ENTITY: {
+                data.value = Foundation::Memory::alloc(sizeof(UUID));
+                UUID value = 0;
+                decoder->decode("value", value);
+                memcpy(data.value.data, &value, sizeof(UUID));
                 break;
             }
             default: {

@@ -2,6 +2,7 @@
 #include "Model/DragDropItem.hpp"
 #include "ProjectLoader/AssetHandlerEditor.hpp"
 
+#include "Panda/GameLogic/GameContext.hpp"
 #include <Panda/ImGui/FontAwesome.h>
 #include <string>
 
@@ -511,8 +512,8 @@ bool propertyColor(const char *label, Color &value) {
 }
 
 bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asset> asset) {
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     bool changed = false;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     shiftCursorY(6.0f);
     ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label);
@@ -543,8 +544,10 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
         if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
-            textureId = item.assetId;
-            changed = true;
+            if (item.type == DragDropItemType::TEXTURE) {
+                textureId = item.assetId;
+                changed = true;
+            }
         }
         ImGui::EndDragDropTarget();
     }
@@ -565,12 +568,73 @@ bool property(const char *label, int *value) {
     return modified;
 }
 
+bool propertyEntity(const char *label, UUID *value) {
+    bool changed = false;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+
+    ImGui::PushID(label);
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
+    ImGui::Text("%s", label);
+    ImGui::NextColumn();
+    ImGui::Spacing();
+
+    ImGui::PushItemWidth(-1);
+    World *currentWorld = GameContext::s_currentWorld;
+    if (value && *value && currentWorld) {
+        Entity entity = currentWorld->getById(*value);
+        ImGui::Text("%s", entity.getName().c_str());
+    } else {
+        ImGui::Text("%s", "nil");
+    }
+    ImGui::PopItemWidth();
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        DragDropItem item;
+        item.type = DragDropItemType::ENTITY;
+        item.assetId = *value;
+        ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        ImGui::Text("Entity: %d", *(uint32_t *)(value));
+        ImGui::EndDragDropSource();
+    }
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
+            PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
+            DragDropItem &item = *(DragDropItem *)payload->Data;
+            if (item.type == DragDropItemType::ENTITY) {
+                *value = item.assetId;
+                changed = true;
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    ImGui::Columns(1);
+    ImGui::PopID();
+    if (value && *value) {
+        ImGui::SameLine();
+        if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+            changed = true;
+            *value = 0;
+        }
+    }
+    ImGui::PopStyleVar(2);
+    return changed;
+}
+
 bool drawFieldValue(ScriptField &field) {
     bool changed = false;
     ImGui::PushID(field.fieldId);
     switch (field.type) {
         case ScriptFieldType::INTEGER: {
             if (property(field.name.c_str(), (int *)field.value.data)) {
+                ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
+                changed = true;
+            }
+            break;
+        }
+        case ScriptFieldType::ENTITY: {
+            if (propertyEntity(field.name.c_str(), (UUID *)field.value.data)) {
                 ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
                 changed = true;
             }

@@ -278,6 +278,11 @@ void World::bindScriptsAndFields() {
                             memset(value.data, 0, sizeof(int));
                             break;
                         }
+                        case ScriptFieldType::ENTITY: {
+                            value = Foundation::Memory::alloc(sizeof(UUID));
+                            memset(value.data, 0, sizeof(UUID));
+                            break;
+                        }
                         default: {
                             PND_ASSERT(false, "Unknown field type");
                             break;
