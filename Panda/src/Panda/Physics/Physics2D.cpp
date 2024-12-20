@@ -53,8 +53,8 @@ b2WorldId IntToB2WorldId(uint32_t val) {
 }
 
 void Physics2D::init(World *world) {
-    PND_ASSERT(
-        sizeof(RuntimeBodyData) >= sizeof(Rigidbody2DComponent::runtimeBody),
+    PND_STATIC_ASSERT(
+        sizeof(RuntimeBodyData) <= sizeof(Rigidbody2DComponent::runtimeBody),
         "Rigidbody2D runtime body wrong data size"
     );
     b2WorldDef worldDef = b2DefaultWorldDef();

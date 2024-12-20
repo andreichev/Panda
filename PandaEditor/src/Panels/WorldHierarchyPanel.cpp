@@ -49,11 +49,15 @@ void WorldHierarchyPanel::onImGuiRender() {
 }
 
 void WorldHierarchyPanel::drawEntityNode(Entity entity) {
+    // TODO: Remove unindent when hierarchy is implemented
+    float indent = ImGui::GetTreeNodeToLabelSpacing() - 5;
+    ImGui::Unindent(indent);
     Entity selected = m_world->getSelectedEntity();
     auto &tag = entity.getComponent<TagComponent>().tag;
     ImGuiTreeNodeFlags flags =
         ((selected == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
     flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+    flags |= ImGuiTreeNodeFlags_Leaf;
     void *id = reinterpret_cast<void *>(entity.m_handle);
     bool opened = ImGui::TreeNodeEx(id, flags, "%s", tag.c_str());
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
@@ -76,6 +80,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     if (opened) {
         ImGui::TreePop();
     }
+    ImGui::Indent(indent);
 }
 
 void WorldHierarchyPanel::drawEntityCreateMenu() {

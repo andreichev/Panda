@@ -187,7 +187,6 @@ void ComponentsDraw::drawComponents(Entity entity) {
         entity,
         true,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
-            beginPropertiesGrid();
             SpriteRendererComponent spriteRenderer = component;
             if (propertyColor("Color", spriteRenderer.color)) {
                 UpdateSpriteRendererCommand update(entity, spriteRenderer);
@@ -198,7 +197,6 @@ void ComponentsDraw::drawComponents(Entity entity) {
                 UpdateSpriteRendererCommand update(entity, spriteRenderer);
                 cmd.DO(update);
             }
-            endPropertiesGrid();
         }
     );
     drawComponent<DynamicMeshComponent>(
