@@ -2,46 +2,14 @@
 #include "Model/DragDropItem.hpp"
 #include "ProjectLoader/AssetHandlerEditor.hpp"
 
+#include "Panda/GameLogic/GameContext.hpp"
 #include <Panda/ImGui/FontAwesome.h>
 #include <string>
 
 namespace Panda {
 
-static int s_uiContextID = 0;
-static uint32_t s_counter = 0;
-static char s_idBuffer[16] = "##";
 static float firstColumnWidth = 120.f;
-
 static float coefficientRounding = 3.0f;
-
-const char *generateID() {
-    snprintf(s_idBuffer + 2, sizeof(s_idBuffer) - 2, "%x", s_counter++);
-    return s_idBuffer;
-}
-
-void pushID() {
-    ImGui::PushID(s_uiContextID++);
-    s_counter = 0;
-}
-
-void popID() {
-    ImGui::PopID();
-    s_uiContextID--;
-}
-
-bool beginTreeNode(const char *name, bool defaultOpen) {
-    ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_Framed |
-                                       ImGuiTreeNodeFlags_SpanAvailWidth |
-                                       ImGuiTreeNodeFlags_FramePadding;
-    if (defaultOpen) {
-        treeNodeFlags |= ImGuiTreeNodeFlags_DefaultOpen;
-    }
-    return ImGui::TreeNodeEx(name, treeNodeFlags);
-}
-
-void endTreeNode() {
-    ImGui::TreePop();
-}
 
 void shiftCursorX(float distance) {
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + distance);
@@ -61,6 +29,45 @@ void separator(ImVec2 size, ImVec4 color) {
     ImGui::BeginChild("sep", size);
     ImGui::EndChild();
     ImGui::PopStyleColor();
+}
+
+void beginDisabled(bool disabled) {
+    if (disabled) {
+        ImGui::BeginDisabled(true);
+    }
+}
+
+bool isItemDisabled() {
+    return ImGui::GetItemFlags() & ImGuiItemFlags_Disabled;
+}
+
+void endDisabled() {
+    if (GImGui->DisabledStackSize > 0) {
+        ImGui::EndDisabled();
+    }
+}
+
+void underline(bool fullWidth, float offsetX, float offsetY) {
+    if (fullWidth) {
+        if (ImGui::GetCurrentWindow()->DC.CurrentColumns != nullptr)
+            ImGui::PushColumnsBackground();
+        else if (ImGui::GetCurrentTable() != nullptr)
+            ImGui::TablePushBackgroundChannel();
+    }
+    const float width = fullWidth ? ImGui::GetWindowWidth() : ImGui::GetContentRegionAvail().x;
+    const ImVec2 cursor = ImGui::GetCursorScreenPos();
+    ImGui::GetWindowDrawList()->AddLine(
+        ImVec2(cursor.x + offsetX, cursor.y + offsetY),
+        ImVec2(cursor.x + width, cursor.y + offsetY),
+        Theme::backgroundDark,
+        1.0f
+    );
+    if (fullWidth) {
+        if (ImGui::GetCurrentWindow()->DC.CurrentColumns != nullptr)
+            ImGui::PopColumnsBackground();
+        else if (ImGui::GetCurrentTable() != nullptr)
+            ImGui::TablePopBackgroundChannel();
+    }
 }
 
 bool dragFloat(
@@ -415,105 +422,27 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
     return edited;
 }
 
-void separator() {
-    ImGui::Separator();
-}
-
-void beginDisabled(bool disabled) {
-    if (disabled) {
-        ImGui::BeginDisabled(true);
-    }
-}
-
-bool isItemDisabled() {
-    return ImGui::GetItemFlags() & ImGuiItemFlags_Disabled;
-}
-
-void endDisabled() {
-    if (GImGui->DisabledStackSize > 0) {
-        ImGui::EndDisabled();
-    }
-}
-
-inline ImRect getItemRect() {
-    return ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
-}
-
-inline ImRect rectExpanded(const ImRect &rect, float x, float y) {
-    ImRect result = rect;
-    result.Min.x -= x;
-    result.Min.y -= y;
-    result.Max.x += x;
-    result.Max.y += y;
-    return result;
-}
-
-void drawItemActivityOutline(float rounding, bool drawWhenInactive, ImColor colourWhenActive) {
-    auto *drawList = ImGui::GetWindowDrawList();
-    const ImRect rect = rectExpanded(getItemRect(), 1.0f, 1.0f);
-    if (ImGui::IsItemHovered() && !ImGui::IsItemActive()) {
-        drawList->AddRect(rect.Min, rect.Max, ImColor(60, 60, 60), rounding, 0, 1.5f);
-    }
-    if (ImGui::IsItemActive()) {
-        drawList->AddRect(rect.Min, rect.Max, colourWhenActive, rounding, 0, 1.0f);
-    } else if (!ImGui::IsItemHovered() && drawWhenInactive) {
-        drawList->AddRect(rect.Min, rect.Max, ImColor(50, 50, 50), rounding, 0, 1.0f);
-    }
-}
-
-void underline(bool fullWidth, float offsetX, float offsetY) {
-    if (fullWidth) {
-        if (ImGui::GetCurrentWindow()->DC.CurrentColumns != nullptr)
-            ImGui::PushColumnsBackground();
-        else if (ImGui::GetCurrentTable() != nullptr)
-            ImGui::TablePushBackgroundChannel();
-    }
-    const float width = fullWidth ? ImGui::GetWindowWidth() : ImGui::GetContentRegionAvail().x;
-    const ImVec2 cursor = ImGui::GetCursorScreenPos();
-    ImGui::GetWindowDrawList()->AddLine(
-        ImVec2(cursor.x + offsetX, cursor.y + offsetY),
-        ImVec2(cursor.x + width, cursor.y + offsetY),
-        Theme::backgroundDark,
-        1.0f
-    );
-    if (fullWidth) {
-        if (ImGui::GetCurrentWindow()->DC.CurrentColumns != nullptr)
-            ImGui::PopColumnsBackground();
-        else if (ImGui::GetCurrentTable() != nullptr)
-            ImGui::TablePopBackgroundChannel();
-    }
-}
-
-/// Component properties list
-void beginPropertiesGrid(int columns) {
-    pushID();
-    ImGui::Columns(columns, nullptr, false);
-}
-
-void endPropertiesGrid() {
-    ImGui::Columns(1);
-    shiftCursorY(18.0f);
-    popID();
-}
-
 bool propertyColor(const char *label, Color &value) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     shiftCursorY(6.0f);
+    ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label);
     ImGui::NextColumn();
     ImGui::PushItemWidth(-1);
-    bool modified = ImGui::ColorEdit4(generateID(), &value.r);
+    bool modified = ImGui::ColorEdit4(label, &value.r);
     ImGui::PopItemWidth();
     ImGui::NextColumn();
     ImGui::PopStyleVar();
+    ImGui::Columns(1);
     return modified;
 }
 
 bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asset> asset) {
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     bool changed = false;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     shiftCursorY(6.0f);
+    ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text("%s", label);
     ImGui::NextColumn();
@@ -543,8 +472,10 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
         if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
-            textureId = item.assetId;
-            changed = true;
+            if (item.type == DragDropItemType::TEXTURE) {
+                textureId = item.assetId;
+                changed = true;
+            }
         }
         ImGui::EndDragDropTarget();
     }
@@ -557,12 +488,63 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
     }
     ImGui::NextColumn();
     ImGui::PopStyleVar();
+    ImGui::Columns(1);
     return changed;
 }
 
-bool property(const char *label, int *value) {
-    bool modified = dragInt(label, value);
-    return modified;
+bool propertyEntity(const char *label, UUID *value) {
+    bool changed = false;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
+
+    ImGui::PushID(label);
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
+    ImGui::Text("%s", label);
+    ImGui::NextColumn();
+    ImGui::Spacing();
+
+    ImGui::PushItemWidth(-1);
+    World *currentWorld = GameContext::s_currentWorld;
+    if (value && *value && currentWorld) {
+        Entity entity = currentWorld->getById(*value);
+        ImGui::Text("%s", entity.getName().c_str());
+    } else {
+        ImGui::Text("%s", "nil");
+    }
+    ImGui::PopItemWidth();
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        DragDropItem item;
+        item.type = DragDropItemType::ENTITY;
+        item.assetId = *value;
+        ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        ImGui::Text("Entity: %d", *(uint32_t *)(value));
+        ImGui::EndDragDropSource();
+    }
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
+            PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
+            DragDropItem &item = *(DragDropItem *)payload->Data;
+            if (item.type == DragDropItemType::ENTITY) {
+                *value = item.assetId;
+                changed = true;
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    ImGui::PopID();
+    if (value && *value) {
+        ImGui::SameLine();
+        shiftCursorX(15);
+        if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+            changed = true;
+            *value = 0;
+        }
+    }
+    ImGui::Columns(1);
+    ImGui::PopStyleVar(2);
+    return changed;
 }
 
 bool drawFieldValue(ScriptField &field) {
@@ -570,7 +552,14 @@ bool drawFieldValue(ScriptField &field) {
     ImGui::PushID(field.fieldId);
     switch (field.type) {
         case ScriptFieldType::INTEGER: {
-            if (property(field.name.c_str(), (int *)field.value.data)) {
+            if (dragInt(field.name.c_str(), (int *)field.value.data)) {
+                ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
+                changed = true;
+            }
+            break;
+        }
+        case ScriptFieldType::ENTITY: {
+            if (propertyEntity(field.name.c_str(), (UUID *)field.value.data)) {
                 ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
                 changed = true;
             }

@@ -4,6 +4,7 @@
 
 #include "WorldHierarchyPanel.hpp"
 #include "EntityComponents/ComponentsDraw.hpp"
+#include "Model/DragDropItem.hpp"
 
 #include <imgui.h>
 
@@ -48,14 +49,26 @@ void WorldHierarchyPanel::onImGuiRender() {
 }
 
 void WorldHierarchyPanel::drawEntityNode(Entity entity) {
+    // TODO: Remove unindent when hierarchy is implemented
+    float indent = ImGui::GetTreeNodeToLabelSpacing() - 5;
+    ImGui::Unindent(indent);
     Entity selected = m_world->getSelectedEntity();
     auto &tag = entity.getComponent<TagComponent>().tag;
     ImGuiTreeNodeFlags flags =
         ((selected == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
     flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+    flags |= ImGuiTreeNodeFlags_Leaf;
     void *id = reinterpret_cast<void *>(entity.m_handle);
     bool opened = ImGui::TreeNodeEx(id, flags, "%s", tag.c_str());
-    if (ImGui::IsItemClicked()) {
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        DragDropItem item;
+        item.type = DragDropItemType::ENTITY;
+        item.assetId = entity.getId();
+        ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        ImGui::Text("Entity: %s", entity.getName().c_str());
+        ImGui::EndDragDropSource();
+    }
+    if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
         m_world->setSelectedEntity(entity);
     }
     if (ImGui::BeginPopupContextItem()) {
@@ -67,6 +80,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     if (opened) {
         ImGui::TreePop();
     }
+    ImGui::Indent(indent);
 }
 
 void WorldHierarchyPanel::drawEntityCreateMenu() {

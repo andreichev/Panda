@@ -33,6 +33,11 @@ public:
         return ScriptFieldType::INTEGER;
     }
 
+    template<>
+    ScriptFieldType getType<Bamboo::Entity>() {
+        return ScriptFieldType::ENTITY;
+    }
+
     template<typename FieldType>
     ScriptFieldInfo makeFieldInfo(const char *fieldName, uint32_t offset) {
         ScriptFieldType type = getType<FieldType>();

@@ -109,7 +109,7 @@ struct Rigidbody2DComponent final {
     bool fixedRotation = false;
 
     // Storage for runtime
-    uint8_t runtimeBody[8];
+    uint8_t runtimeBody[16];
 };
 
 struct BoxCollider2DComponent final {

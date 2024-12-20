@@ -38,7 +38,7 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
 
     glm::mat4 view = m_cameraController->getViewMatrix();
     glm::mat4 projection = m_camera->getProjection();
-    TransformComponent transformComponent = selected.getTransform();
+    TransformComponent &transformComponent = selected.getTransform();
     glm::mat4 transform = transformComponent.getTransform();
 
     ImGuizmo::Manipulate(
@@ -51,10 +51,18 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
 
     if (isUsing()) {
         glm::vec3 pos = glm::vec3(transform[3]);
-        transformComponent.setPosition(pos);
-        EntityTransformCommand move(selected, transformComponent);
-        WorldCommandManager &cmd = m_world->getCommandManger();
-        cmd.DO(move);
+        if (m_world->isRunning()) {
+            transformComponent.setPosition(pos);
+            if (selected.hasComponent<Rigidbody2DComponent>()) {
+                selected.physics2DUpdate();
+            }
+        } else {
+            TransformComponent transformCopy = transformComponent;
+            transformCopy.setPosition(pos);
+            EntityTransformCommand move(selected, transformCopy);
+            WorldCommandManager &cmd = m_world->getCommandManger();
+            cmd.DO(move);
+        }
     }
 }
 

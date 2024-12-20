@@ -25,7 +25,9 @@ static void registerManagedComponent() {
 }
 
 namespace InternalCalls {
+
     /// APPLICATION
+
     void application_Quit() {
         Panda::Application::get()->close();
     }
@@ -39,6 +41,7 @@ namespace InternalCalls {
     }
 
     /// INPUT
+
     bool input_IsKeyPressed(int key) {
         return Input::isKeyPressed((Key)key);
     }
@@ -48,28 +51,29 @@ namespace InternalCalls {
     }
 
     /// WORLD
+
     void world_Load(const char *name) {
         // TODO: Implement using AssetManager
     }
 
-    UUID world_FindByTag(const char *tag) {
+    EntityHandle world_FindByTag(const char *tag) {
         return GameContext::s_currentWorld->findByTag(tag).getId();
     }
 
-    UUID world_CreateEntity(const char *tag) {
+    EntityHandle world_CreateEntity(const char *tag) {
         Entity entity = GameContext::s_currentWorld->instantiateEntity();
         entity.setName(tag);
         return entity.getId();
     }
 
-    void world_DestroyEntity(UUID id) {
+    void world_DestroyEntity(EntityHandle id) {
         Entity entity = GameContext::s_currentWorld->getById(id);
         GameContext::s_currentWorld->destroy(entity);
     }
 
     /// ENTITY
 
-    void entity_CreateComponent(UUID entityId, const char *type) {
+    void entity_CreateComponent(EntityHandle entityId, const char *type) {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         PND_ASSERT(type != nullptr, "TYPE IS NULL");
         if (s_createComponentFuncs.find(type) == s_createComponentFuncs.end()) {
@@ -79,7 +83,7 @@ namespace InternalCalls {
         s_createComponentFuncs.at(type)(entity);
     }
 
-    bool entity_HasComponent(UUID entityId, const char *type) {
+    bool entity_HasComponent(EntityHandle entityId, const char *type) {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         PND_ASSERT(type != nullptr, "TYPE IS NULL");
         if (s_hasComponentFuncs.find(type) == s_hasComponentFuncs.end()) {
@@ -89,7 +93,7 @@ namespace InternalCalls {
         return s_hasComponentFuncs.at(type)(entity);
     }
 
-    void entity_RemoveComponent(UUID entityId, const char *type) {
+    void entity_RemoveComponent(EntityHandle entityId, const char *type) {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         PND_ASSERT(type != nullptr, "TYPE IS NULL");
         if (s_removeComponentFuncs.find(type) == s_removeComponentFuncs.end()) {
@@ -105,7 +109,7 @@ namespace InternalCalls {
 
     /// TRANSFORM COMPONENT
 
-    void transformComponent_GetPosition(UUID entityId, float *x, float *y, float *z) {
+    void transformComponent_GetPosition(EntityHandle entityId, float *x, float *y, float *z) {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         glm::vec3 position = transformComponent.getPosition();
@@ -114,16 +118,74 @@ namespace InternalCalls {
         *z = position.z;
     }
 
-    void transformComponent_SetPosition(UUID entityId, float x, float y, float z) {
+    void transformComponent_SetPosition(EntityHandle entityId, float x, float y, float z) {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         transformComponent.setPosition({x, y, z});
+        if (entity.hasComponent<Rigidbody2DComponent>()) {
+            entity.physics2DUpdate();
+        }
+    }
+
+    /// RIGIDBODY2D COMPONENT
+
+    void rigidbody2DComponent_applyForce(EntityHandle entityId, float x, float y) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        World *world = entity.getWorld();
+        Physics2D &physics2D = world->getPhysics2D();
+        physics2D.applyForce(entity, {x, y});
+    }
+
+    void rigidbody2DComponent_applyLinearImpulse(EntityHandle entityId, float x, float y) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        World *world = entity.getWorld();
+        Physics2D &physics2D = world->getPhysics2D();
+        physics2D.applyLinearImpulse(entity, {x, y});
+    }
+
+    void rigidbody2DComponent_getLinearVelocity(EntityHandle entityId, float *x, float *y) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        World *world = entity.getWorld();
+        Physics2D &physics2D = world->getPhysics2D();
+        Vec2 velocity = physics2D.getLinearVelocity(entity);
+        *x = velocity.x;
+        *y = velocity.y;
+    }
+
+    void rigidbody2DComponent_setLinearVelocity(EntityHandle entityId, float x, float y) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        World *world = entity.getWorld();
+        Physics2D &physics2D = world->getPhysics2D();
+        physics2D.setLinearVelocity(entity, {x, y});
+    }
+
+    void rigidbody2DComponent_getMass(EntityHandle entityId, float *mass) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        World *world = entity.getWorld();
+        Physics2D &physics2D = world->getPhysics2D();
+        *mass = physics2D.getMass(entity);
+    }
+
+    void rigidbody2DComponent_getFriction(EntityHandle entityId, float *friction) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        World *world = entity.getWorld();
+        Physics2D &physics2D = world->getPhysics2D();
+        *friction = physics2D.getFriction(entity);
+    }
+
+    void rigidbody2DComponent_setFriction(EntityHandle entityId, float friction) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        World *world = entity.getWorld();
+        Physics2D &physics2D = world->getPhysics2D();
+        physics2D.setFriction(entity, friction);
     }
 
     /// CONSOLE
+
     void console_Log(const char *message) {
         LOG_EDITOR(message);
     }
+
 } // namespace InternalCalls
 
 std::unordered_map<std::string, void *> g_scriptSymbols;
@@ -150,6 +212,21 @@ void initScriptHook() {
         (void *)InternalCalls::transformComponent_GetPosition;
     g_scriptSymbols["transformComponent_SetPosition"] =
         (void *)InternalCalls::transformComponent_SetPosition;
+    /// RIGIDBODY2D COMPONENT
+    g_scriptSymbols["rigidbody2DComponent_applyForce"] =
+        (void *)InternalCalls::rigidbody2DComponent_applyForce;
+    g_scriptSymbols["rigidbody2DComponent_applyLinearImpulse"] =
+        (void *)InternalCalls::rigidbody2DComponent_applyLinearImpulse;
+    g_scriptSymbols["rigidbody2DComponent_getLinearVelocity"] =
+        (void *)InternalCalls::rigidbody2DComponent_getLinearVelocity;
+    g_scriptSymbols["rigidbody2DComponent_setLinearVelocity"] =
+        (void *)InternalCalls::rigidbody2DComponent_setLinearVelocity;
+    g_scriptSymbols["rigidbody2DComponent_getMass"] =
+        (void *)InternalCalls::rigidbody2DComponent_getMass;
+    g_scriptSymbols["rigidbody2DComponent_getFriction"] =
+        (void *)InternalCalls::rigidbody2DComponent_getFriction;
+    g_scriptSymbols["rigidbody2DComponent_setFriction"] =
+        (void *)InternalCalls::rigidbody2DComponent_setFriction;
     /// CONSOLE
     g_scriptSymbols["console_Log"] = (void *)InternalCalls::console_Log;
 

@@ -6,7 +6,7 @@ Toolbar::Toolbar(ToolbarOutput *output)
     : m_output(output) {}
 
 void Toolbar::onImGuiRender(float offsetY) {
-    pushID();
+    ImGui::PushID("Editor: Toolbar");
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -61,7 +61,7 @@ void Toolbar::onImGuiRender(float offsetY) {
     ImGui::End();
     ImGui::PopStyleVar(3);
     style.FrameRounding = lastFrameRounding;
-    popID();
+    ImGui::PopID();
 }
 
 } // namespace Panda
