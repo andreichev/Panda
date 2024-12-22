@@ -88,4 +88,21 @@ using Size = Vec2;
 using Color = Vec4;
 using Quat = Vec4;
 
+template<typename Ty>
+inline void swap(Ty &_a, Ty &_b) {
+    Ty tmp = _a;
+    _a = _b;
+    _b = tmp;
+}
+
+template<typename Ty>
+inline constexpr Ty min(const Ty &_a, const Ty &_b) {
+    return _a < _b ? _a : _b;
+}
+
+template<typename Ty>
+inline constexpr Ty max(const Ty &_a, const Ty &_b) {
+    return _a > _b ? _a : _b;
+}
+
 } // namespace Bamboo

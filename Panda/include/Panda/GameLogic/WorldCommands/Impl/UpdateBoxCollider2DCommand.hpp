@@ -2,24 +2,23 @@
 
 #include "Panda/GameLogic/WorldCommands/WorldCommand.hpp"
 #include "Panda/GameLogic/Entity.hpp"
-#include "Panda/GameLogic/Components/TransformComponent.hpp"
 
 namespace Panda {
 
-class EntityTransformCommand : public WorldCommand {
+class UpdateBoxCollider2DCommand : public WorldCommand {
 public:
-    EntityTransformCommand(Entity entity, TransformComponent newTransform)
+    UpdateBoxCollider2DCommand(Entity entity, BoxCollider2DComponent newCollider)
         : m_entity(entity)
-        , m_newTransform(newTransform)
-        , m_prevTransform(entity.getTransform()) {}
+        , m_newCollider(newCollider)
+        , m_prevCollider(entity.getComponent<BoxCollider2DComponent>()) {}
 
     bool undo() override {
         if (!m_entity.isValid()) {
             return false;
         }
-        m_entity.setComponent(m_prevTransform);
-        m_entity.setWorldChanged();
+        m_entity.setComponent(m_prevCollider);
         m_entity.physics2DUpdate();
+        m_entity.setWorldChanged();
         return true;
     }
 
@@ -27,9 +26,9 @@ public:
         if (!m_entity.isValid()) {
             return false;
         }
-        m_entity.setComponent(m_newTransform);
-        m_entity.setWorldChanged();
+        m_entity.setComponent(m_newCollider);
         m_entity.physics2DUpdate();
+        m_entity.setWorldChanged();
         return true;
     }
 
@@ -37,19 +36,19 @@ public:
         if (typeid(command) != typeid(*this)) {
             return false;
         }
-        EntityTransformCommand &other = static_cast<EntityTransformCommand &>(command);
+        UpdateBoxCollider2DCommand &other = static_cast<UpdateBoxCollider2DCommand &>(command);
         return other.m_entity == m_entity;
     }
 
     void merge(WorldCommand &command) override {
-        EntityTransformCommand &cmd = static_cast<EntityTransformCommand &>(command);
-        m_newTransform = cmd.m_newTransform;
+        UpdateBoxCollider2DCommand &cmd = static_cast<UpdateBoxCollider2DCommand &>(command);
+        m_newCollider = cmd.m_newCollider;
     }
 
 private:
     Entity m_entity;
-    TransformComponent m_newTransform;
-    TransformComponent m_prevTransform;
+    BoxCollider2DComponent m_newCollider;
+    BoxCollider2DComponent m_prevCollider;
 };
 
 } // namespace Panda

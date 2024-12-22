@@ -109,7 +109,7 @@ struct Rigidbody2DComponent final {
     bool fixedRotation = false;
 
     // Storage for runtime
-    uint8_t runtimeBody[16];
+    uint8_t runtimeData[8];
 };
 
 struct BoxCollider2DComponent final {
@@ -121,7 +121,7 @@ struct BoxCollider2DComponent final {
     float restitution = 0.0f;
 
     // Storage for runtime
-    uint8_t runtimeFixture[8];
+    uint8_t runtimeData[8];
 };
 
 } // namespace Panda
