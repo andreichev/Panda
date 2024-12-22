@@ -547,7 +547,7 @@ bool propertyEntity(const char *label, UUID *value) {
     return changed;
 }
 
-bool drawFieldValue(ScriptField &field) {
+bool drawScriptFieldValue(ScriptField &field) {
     bool changed = false;
     ImGui::PushID(field.fieldId);
     switch (field.type) {

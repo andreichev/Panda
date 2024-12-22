@@ -101,6 +101,6 @@ int combo(const std::string &label, const std::vector<std::string> &list, int cu
 bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.f);
 bool propertyColor(const char *label, Color &value);
 bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asset> asset);
-bool drawFieldValue(ScriptField &field);
+bool drawScriptFieldValue(ScriptField &field);
 
 } // namespace Panda

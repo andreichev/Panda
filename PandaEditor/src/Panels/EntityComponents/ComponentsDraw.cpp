@@ -7,6 +7,8 @@
 
 #include <Panda/GameLogic/WorldCommands/Impl/EntityTransformCommand.hpp>
 #include <Panda/GameLogic/WorldCommands/Impl/UpdateSpriteRendererCommand.hpp>
+#include <Panda/GameLogic/WorldCommands/Impl/UpdateRigidbody2DCommand.hpp>
+#include <Panda/GameLogic/WorldCommands/Impl/UpdateBoxCollider2DCommand.hpp>
 #include <Panda/GameLogic/WorldCommands/Impl/AddRemoveComponentCommand.hpp>
 #include <Panda/GameLogic/Components/SkyComponent.hpp>
 #include <Panda/ImGui/FontAwesome.h>
@@ -160,17 +162,19 @@ void ComponentsDraw::drawComponents(Entity entity) {
         entity,
         false,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
+            bool modified = false;
             for (auto &script : component.scripts) {
-                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
+                shiftCursorY(8);
                 ImGui::Text("%s", script.getName().c_str());
                 // TODO: Add opening script .cpp file in editor or displaying .cpp file name
                 ImGui::SameLine();
                 if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
                     entity.removeScript(script);
+                    modified = true;
                     break;
                 }
                 for (auto &field : script.getFields()) {
-                    drawFieldValue(field);
+                    modified |= drawScriptFieldValue(field);
                 }
                 underline();
             }
@@ -179,6 +183,9 @@ void ComponentsDraw::drawComponents(Entity entity) {
             } else {
                 ImGui::Separator();
                 ImGui::Text("%lu scripts", component.scripts.size());
+            }
+            if (modified) {
+                // TODO: Change script command in history
             }
         }
     );
@@ -261,10 +268,18 @@ void ComponentsDraw::drawComponents(Entity entity) {
             const char *currentBodyTypeString = bodyTypeStrings[(int)component.type];
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0);
 
+            Rigidbody2DComponent rb2d = component;
             int selectedPos =
                 combo("Body Type", {"Static", "Dynamic", "Kinematic"}, (int)component.type);
-            component.type = (Rigidbody2DComponent::BodyType)selectedPos;
-            checkbox("Fixed Rotation", &component.fixedRotation);
+            if (selectedPos != (int)component.type) {
+                rb2d.type = (Rigidbody2DComponent::BodyType)selectedPos;
+                UpdateRigidbody2DCommand update(entity, rb2d);
+                cmd.DO(update);
+            }
+            if (checkbox("Fixed Rotation", &rb2d.fixedRotation)) {
+                UpdateRigidbody2DCommand update(entity, rb2d);
+                cmd.DO(update);
+            }
             ImGui::PopStyleVar();
         }
     );
@@ -273,11 +288,17 @@ void ComponentsDraw::drawComponents(Entity entity) {
         entity,
         true,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
-            dragFloat2("Offset", glm::value_ptr(component.offset));
-            dragFloat("Size", glm::value_ptr(component.size));
-            dragFloat("Density", &component.density, 0.01f, 0.0f, 1.0f);
-            dragFloat("Friction", &component.friction, 0.01f, 0.0f, 1.0f);
-            dragFloat("Restitution", &component.restitution, 0.01f, 0.0f, 1.0f);
+            BoxCollider2DComponent bc2d = component;
+            bool modified = false;
+            modified |= dragFloat2("Offset", glm::value_ptr(bc2d.offset));
+            modified |= dragFloat("Size", glm::value_ptr(bc2d.size));
+            modified |= dragFloat("Density", &bc2d.density, 0.01f, 0.0f, 1.0f);
+            modified |= dragFloat("Friction", &bc2d.friction, 0.01f, 0.0f, 1.0f);
+            modified |= dragFloat("Restitution", &bc2d.restitution, 0.01f, 0.0f, 1.0f);
+            if (modified) {
+                UpdateBoxCollider2DCommand update(entity, bc2d);
+                cmd.DO(update);
+            }
         }
     );
     drawComponent<SkyComponent>(
