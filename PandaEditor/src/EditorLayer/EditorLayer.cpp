@@ -44,7 +44,7 @@ void EditorLayer::onAttach() {
     m_loader.loadInitialData();
     GameContext::s_currentWorld = m_currentWorld;
     GameContext::s_assetHandler = &m_loader.getAssetHandler();
-    LOG_EDITOR("EDITOR INITIALIZED");
+    LOG_INFO_EDITOR("EDITOR INITIALIZED");
 }
 
 void EditorLayer::onDetach() {
@@ -498,7 +498,7 @@ void EditorLayer::saveWorld() {
             m_loader.saveWorld();
             break;
     }
-    LOG_EDITOR("World saved.");
+    LOG_INFO_EDITOR("World saved.");
 }
 
 void EditorLayer::closeApp() {

@@ -125,13 +125,12 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     m_gizmos.onImGuiRender(sceneState, m_frame);
 
     ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = 3.0f;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
     ImGui::SetCursorPos({10, 40});
     if (ImGui::Button(getString(ICON_HOME).c_str())) {
         m_cameraController->reset({0, 0, 0});
     }
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopStyleVar();
 
     ImGui::End();
     ImGui::PopStyleVar();
@@ -154,7 +153,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
             m_output->viewportPickEntityWithEnttId(m_hoveredId);
         }
     }
-    // LOG_EDITOR("id: {}", m_hoveredId);
+    // LOG_INFO_EDITOR("id: {}", m_hoveredId);
 }
 
 void Viewport::setCamera(Camera *camera) {

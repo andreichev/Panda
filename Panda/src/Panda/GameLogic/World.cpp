@@ -241,7 +241,7 @@ void World::bindScriptsAndFields() {
                 ExternalCalls::instantiateScript(entityId, container.getName().c_str());
             if (!scriptInstanceId) {
                 Entity entity = Entity(entityHandle, this);
-                LOG_EDITOR("SCRIPT {} NOT FOUND.", container.getName(), entity.getName());
+                LOG_INFO_EDITOR("SCRIPT {} NOT FOUND.", container.getName(), entity.getName());
                 // TODO: Remove unbound script after N times unfixed.
                 // if(container.unusedCount() > N) {
                 //     component.remove(container);
@@ -251,7 +251,7 @@ void World::bindScriptsAndFields() {
             const ScriptClassManifest &clazz = manifest.getClass(container.getName().c_str());
             if (!clazz) {
                 Entity entity = Entity(entityHandle, this);
-                LOG_EDITOR(
+                LOG_INFO_EDITOR(
                     "SCRIPT CLASS MANIFEST {} NOT FOUND.", container.getName(), entity.getName()
                 );
                 continue;
@@ -263,7 +263,7 @@ void World::bindScriptsAndFields() {
             for (ScriptField &field : container.getFields()) {
                 const ScriptFieldManifest &fieldManifest = clazz.getField(field.name.c_str());
                 if (!fieldManifest) {
-                    LOG_EDITOR("SCRIPT {} FIELD {} NOT FOUND.", container.getName(), field.name);
+                    LOG_INFO_EDITOR("SCRIPT {} FIELD {} NOT FOUND.", container.getName(), field.name);
                     container.removeField(field);
                     continue;
                 }

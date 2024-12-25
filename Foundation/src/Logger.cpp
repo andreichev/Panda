@@ -20,8 +20,8 @@ void EditorLogger::init(EditorLoggerCallback callback) {
     s_callback = callback;
 }
 
-void EditorLogger::log(std::string_view message) {
-    s_callback(message);
+void EditorLogger::log(std::string_view message, MessageType type) {
+    s_callback(message, type);
 }
 
 } // namespace Foundation

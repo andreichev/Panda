@@ -123,7 +123,7 @@ void AssetHandlerEditor::saveAssetRegistry() {
         Rain::Encoder *encoder = &m_jsonEncoder;
         encoder->encode(file, registryDto);
         file.close();
-        LOG_EDITOR("Asset registry saved.");
+        LOG_INFO_EDITOR("Asset registry saved.");
     } else {
         LOG_INFO("ASSET REGISTRY SAVING ERROR");
     }
