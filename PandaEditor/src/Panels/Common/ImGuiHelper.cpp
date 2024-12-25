@@ -430,7 +430,7 @@ bool propertyColor(const char *label, Color &value) {
     ImGui::Text("%s", label);
     ImGui::NextColumn();
     ImGui::PushItemWidth(-1);
-    bool modified = ImGui::ColorEdit4(label, &value.r);
+    bool modified = ImGui::ColorEdit4("", &value.r);
     ImGui::PopItemWidth();
     ImGui::NextColumn();
     ImGui::PopStyleVar();

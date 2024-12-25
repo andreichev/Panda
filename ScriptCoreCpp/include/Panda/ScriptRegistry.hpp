@@ -23,10 +23,7 @@ public:
     std::unordered_map<ScriptInstanceHandle, Bamboo::Script *> m_instances;
 
     template<typename T>
-    ScriptFieldType getType() {
-        static_assert(false, "Unknown field type");
-        return ScriptFieldType::UNKNOWN;
-    }
+    ScriptFieldType getType() = delete;
 
     template<>
     ScriptFieldType getType<int>() {

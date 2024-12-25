@@ -10,6 +10,7 @@ void Toolbar::onImGuiRender(float offsetY) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2.0f);
     ImGui::SetNextWindowPos({0, offsetY});
     const ImGuiViewport *viewport = ImGui::GetMainViewport();
     ImVec2 size = viewport->WorkSize;
@@ -18,10 +19,6 @@ void Toolbar::onImGuiRender(float offsetY) {
     ImGui::Begin(
         "##viewport_central_toolbar", 0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking
     );
-    ImGuiStyle &style = ImGui::GetStyle();
-    float lastFrameRounding = style.FrameRounding;
-    style.FrameRounding = 2.0f;
-
     ImGui::SetCursorPos({200.f, 4.f});
     ImGui::BeginDisabled(m_output->toolbarCanUndo() == false);
     if (ImGui::Button(getString(ICON_UNDO).c_str())) {
@@ -59,8 +56,7 @@ void Toolbar::onImGuiRender(float offsetY) {
         }
     }
     ImGui::End();
-    ImGui::PopStyleVar(3);
-    style.FrameRounding = lastFrameRounding;
+    ImGui::PopStyleVar(4);
     ImGui::PopID();
 }
 

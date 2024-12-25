@@ -60,7 +60,7 @@ namespace ExternalCalls {
     using Rigidbody2DComponent_setFriction = void (*)(EntityHandle entityId, float friction);
     extern Rigidbody2DComponent_setFriction rigidbody2DComponent_setFriction;
     /// LOG
-    using Console_Log = void (*)(const char *);
+    using Console_Log = void (*)(int type, const char *);
     extern Console_Log console_Log;
 
 } // namespace ExternalCalls

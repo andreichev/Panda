@@ -182,8 +182,16 @@ namespace InternalCalls {
 
     /// CONSOLE
 
-    void console_Log(const char *message) {
-        LOG_EDITOR(message);
+    void console_Log(int type, const char *message) {
+        if (type == 0) {
+            // info
+            LOG_INFO_EDITOR("{}", message);
+        } else if (type == 1) {
+            // warning
+            LOG_WARN_EDITOR("{}", message);
+        } else if (type == 2) {
+            LOG_ERROR_EDITOR("{}", message);
+        }
     }
 
 } // namespace InternalCalls

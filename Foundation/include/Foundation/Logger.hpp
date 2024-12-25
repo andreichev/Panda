@@ -22,19 +22,20 @@ private:
 
 class EditorLogger {
 public:
-    using EditorLoggerCallback = void (*)(std::string_view message);
+    enum MessageType { INFO, WARNING, ERROR };
+    using EditorLoggerCallback = void (*)(std::string_view message, MessageType type);
 
     static void init(EditorLoggerCallback callback);
-    static void log(std::string_view message);
+    static void log(std::string_view message, MessageType type);
 
     template<typename... Args>
     using format_string_t = fmt::format_string<Args...>;
 
     template<typename... Args>
-    static void log(format_string_t<Args...> fmt, Args &&...args) {
+    static void log(MessageType type, format_string_t<Args...> fmt, Args &&...args) {
         fmt::basic_memory_buffer<char, 250> buf;
         fmt::vformat_to(fmt::appender(buf), fmt, fmt::make_format_args(args...));
-        log(std::string_view(buf.data(), buf.size()));
+        log(std::string_view(buf.data(), buf.size()), type);
     }
 
 private:
@@ -49,4 +50,6 @@ private:
 #define LOG_ERROR(...) ::Foundation::Logger::getLogger()->error(__VA_ARGS__)
 #define LOG_CRITICAL(...) ::Foundation::Logger::getLogger()->critical(__VA_ARGS__)
 
-#define LOG_EDITOR(...) ::Foundation::EditorLogger::log(__VA_ARGS__)
+#define LOG_INFO_EDITOR(...) ::Foundation::EditorLogger::log(Foundation::EditorLogger::MessageType::INFO, __VA_ARGS__)
+#define LOG_WARN_EDITOR(...) ::Foundation::EditorLogger::log(Foundation::EditorLogger::MessageType::WARNING, __VA_ARGS__)
+#define LOG_ERROR_EDITOR(...) ::Foundation::EditorLogger::log(Foundation::EditorLogger::MessageType::ERROR, __VA_ARGS__)
