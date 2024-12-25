@@ -421,8 +421,8 @@ void EditorLayer::toolbarDidPickSceneState(SceneState state) {
 }
 
 void EditorLayer::toolbarDidTapReloadScripts() {
+    PND_ASSERT(m_sceneState == SceneState::EDIT, "RELOADING SCRIP ASSEMBLY NOT AVAILABLE WHEN WORLD IS RUNNING");
     m_loader.reloadScriptsDll();
-    m_currentWorld->bindScriptsAndFields();
 }
 
 SceneState EditorLayer::toolbarGetCurrentSceneState() {

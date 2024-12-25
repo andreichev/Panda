@@ -1,6 +1,4 @@
 #include "Panda/Serialization/WorldMapper.hpp"
-
-#include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 namespace Panda {
@@ -63,19 +61,13 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         {
             ScriptListComponentDto scriptsComponentDto = entityDto.scriptListComponent;
             for (auto &scriptDto : scriptsComponentDto.scripts) {
-                ScriptInstanceHandle id;
-                if (GameContext::s_scriptEngine && GameContext::s_scriptEngine->isLoaded()) {
-                    id = ExternalCalls::instantiateScript(entity.getId(), scriptDto.name.c_str());
-                } else {
-                    id = 0;
-                }
                 std::vector<ScriptField> fields;
                 for (ScriptFieldDto &fieldDto : scriptDto.scriptFields) {
                     fields.emplace_back(
-                        id, fieldDto.fieldId, fieldDto.name, fieldDto.type, fieldDto.value
+                        0, fieldDto.fieldId, fieldDto.name, fieldDto.type, fieldDto.value
                     );
                 }
-                entity.addScript(Panda::ExternalScript(id, scriptDto.name, fields));
+                entity.addScript(Panda::ExternalScript(0, scriptDto.name, fields));
             }
         }
     }

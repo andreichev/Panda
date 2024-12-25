@@ -27,6 +27,8 @@ World::~World() {
 void World::startRunning() {
     // Init physics
     m_physics2D.init(this);
+    // Instantiate script instances, bind ids
+    initializeScriptCore();
     // Call start at native scripts
     {
         auto view = m_registry.view<ScriptListComponent>();
@@ -44,6 +46,7 @@ void World::startRunning() {
 }
 
 void World::finishRunning() {
+    shutdownScriptCore();
     m_physics2D.destroy();
     m_isRunning = false;
 }
@@ -221,7 +224,7 @@ Entity World::instantiateEntity(UUID id) {
     return entity;
 }
 
-void World::bindScriptsAndFields() {
+void World::initializeScriptCore() {
     if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
         return;
     }
@@ -233,9 +236,9 @@ void World::bindScriptsAndFields() {
         }
         auto &component = view.get<ScriptListComponent>(entityHandle);
         UUID entityId = Entity(entityHandle, this).getId();
-        //-----------------------------------
-        //              CLASSES
-        //-----------------------------------
+        //-----------------------------------//
+        //              CLASSES              //
+        //-----------------------------------//
         for (auto &container : component.scripts) {
             ScriptInstanceHandle scriptInstanceId =
                 ExternalCalls::instantiateScript(entityId, container.getName().c_str());
@@ -257,9 +260,9 @@ void World::bindScriptsAndFields() {
                 continue;
             }
             container.rebindId(scriptInstanceId);
-            //-----------------------------------
-            //              FIELDS
-            //-----------------------------------
+            //----------------------------------//
+            //              FIELDS              //
+            //----------------------------------//
             for (ScriptField &field : container.getFields()) {
                 const ScriptFieldManifest &fieldManifest = clazz.getField(field.name.c_str());
                 if (!fieldManifest) {
@@ -304,6 +307,10 @@ void World::bindScriptsAndFields() {
             }
         }
     }
+}
+
+void World::shutdownScriptCore() {
+    ExternalCalls::clear();
 }
 
 void World::fillEntity(Entity entity, UUID id) {

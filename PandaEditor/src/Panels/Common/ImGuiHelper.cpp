@@ -552,17 +552,11 @@ bool drawScriptFieldValue(ScriptField &field) {
     ImGui::PushID(field.fieldId);
     switch (field.type) {
         case ScriptFieldType::INTEGER: {
-            if (dragInt(field.name.c_str(), (int *)field.value.data)) {
-                ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
-                changed = true;
-            }
+            changed |= dragInt(field.name.c_str(), (int *)field.value.data);
             break;
         }
         case ScriptFieldType::ENTITY: {
-            if (propertyEntity(field.name.c_str(), (UUID *)field.value.data)) {
-                ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
-                changed = true;
-            }
+            changed |= propertyEntity(field.name.c_str(), (UUID *)field.value.data);
             break;
         }
         default: {

@@ -75,10 +75,7 @@ struct CameraComponentDto : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-struct CubeMapDto : public Rain::Codable {
-    RAIN_FIELDS_BEGIN(CubeMapDto)
-    RAIN_FIELDS_END
-};
+struct CubeMapDto : public Rain::Codable {};
 
 struct Rigidbody2DComponentDto : public Rain::Codable {
     Rigidbody2DComponent::BodyType type;

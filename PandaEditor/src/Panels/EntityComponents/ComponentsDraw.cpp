@@ -11,6 +11,7 @@
 #include <Panda/GameLogic/WorldCommands/Impl/UpdateBoxCollider2DCommand.hpp>
 #include <Panda/GameLogic/WorldCommands/Impl/AddRemoveComponentCommand.hpp>
 #include <Panda/GameLogic/Components/SkyComponent.hpp>
+#include <Panda/GameLogic/GameContext.hpp>
 #include <Panda/ImGui/FontAwesome.h>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -163,6 +164,8 @@ void ComponentsDraw::drawComponents(Entity entity) {
         false,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
             bool modified = false;
+            World* world = entity.getWorld();
+            ScriptEngine* scriptEngine = GameContext::s_scriptEngine;
             for (auto &script : component.scripts) {
                 shiftCursorY(8);
                 ImGui::Text("%s", script.getName().c_str());
@@ -174,7 +177,12 @@ void ComponentsDraw::drawComponents(Entity entity) {
                     break;
                 }
                 for (auto &field : script.getFields()) {
-                    modified |= drawScriptFieldValue(field);
+                    if(drawScriptFieldValue(field)) {
+                        if(world && world->isRunning() && scriptEngine && scriptEngine->isLoaded()) {
+                            ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
+                        }
+                        modified = true;
+                    }
                 }
                 underline();
             }
