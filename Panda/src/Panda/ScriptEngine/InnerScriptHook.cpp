@@ -127,6 +127,80 @@ namespace InternalCalls {
         }
     }
 
+    void transformComponent_GetRotationEuler(EntityHandle entityId, float *x, float *y, float *z) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        TransformComponent &transformComponent = entity.getTransform();
+        glm::vec3 rotation = transformComponent.getRotationEuler();
+        *x = rotation.x;
+        *y = rotation.y;
+        *z = rotation.z;
+    }
+
+    void transformComponent_SetRotationEuler(EntityHandle entityId, float x, float y, float z) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        TransformComponent &transformComponent = entity.getTransform();
+        transformComponent.setRotationEuler({x, y, z});
+        if (entity.hasComponent<Rigidbody2DComponent>()) {
+            entity.physics2DUpdate();
+        }
+    }
+
+    void transformComponent_GetScale(EntityHandle entityId, float *x, float *y, float *z) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        TransformComponent &transformComponent = entity.getTransform();
+        glm::vec3 scale = transformComponent.getScale();
+        *x = scale.x;
+        *y = scale.y;
+        *z = scale.z;
+    }
+
+    void transformComponent_SetScale(EntityHandle entityId, float x, float y, float z) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        TransformComponent &transformComponent = entity.getTransform();
+        transformComponent.setScale({x, y, z});
+        if (entity.hasComponent<Rigidbody2DComponent>()) {
+            entity.physics2DUpdate();
+        }
+    }
+
+    /// SPRITE RENDERER COMPONENT
+
+    void spriteRendererComponent_GetColor(
+        EntityHandle entityId, float *r, float *g, float *b, float *a
+    ) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
+        *r = sr.color.r;
+        *g = sr.color.g;
+        *b = sr.color.b;
+        *a = sr.color.a;
+    }
+
+    void
+    spriteRendererComponent_SetColor(EntityHandle entityId, float r, float g, float b, float a) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
+        sr.color.r = r;
+        sr.color.g = g;
+        sr.color.b = b;
+        sr.color.a = a;
+    }
+
+    void spriteRendererComponent_SetTexture(EntityHandle entityId, TextureHandle textureId) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
+        sr.textureId = textureId;
+        sr.resetCache();
+    }
+
+    void spriteRendererComponent_SetCell(EntityHandle entityId, int cols, int rows, int index) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
+        sr.cols = cols;
+        sr.rows = rows;
+        sr.index = index;
+    }
+
     /// RIGIDBODY2D COMPONENT
 
     void rigidbody2DComponent_applyForce(EntityHandle entityId, float x, float y) {
@@ -220,6 +294,23 @@ void initScriptHook() {
         (void *)InternalCalls::transformComponent_GetPosition;
     g_scriptSymbols["transformComponent_SetPosition"] =
         (void *)InternalCalls::transformComponent_SetPosition;
+    g_scriptSymbols["transformComponent_GetRotationEuler"] =
+        (void *)InternalCalls::transformComponent_GetRotationEuler;
+    g_scriptSymbols["transformComponent_SetRotationEuler"] =
+        (void *)InternalCalls::transformComponent_SetRotationEuler;
+    g_scriptSymbols["transformComponent_GetScale"] =
+        (void *)InternalCalls::transformComponent_GetScale;
+    g_scriptSymbols["transformComponent_SetScale"] =
+        (void *)InternalCalls::transformComponent_SetScale;
+    /// SPRITE RENDERER COMPONENT
+    g_scriptSymbols["spriteRendererComponent_GetColor"] =
+        (void *)InternalCalls::spriteRendererComponent_GetColor;
+    g_scriptSymbols["spriteRendererComponent_SetColor"] =
+        (void *)InternalCalls::spriteRendererComponent_SetColor;
+    g_scriptSymbols["spriteRendererComponent_SetTexture"] =
+        (void *)InternalCalls::spriteRendererComponent_SetTexture;
+    g_scriptSymbols["spriteRendererComponent_SetCell"] =
+        (void *)InternalCalls::spriteRendererComponent_SetCell;
     /// RIGIDBODY2D COMPONENT
     g_scriptSymbols["rigidbody2DComponent_applyForce"] =
         (void *)InternalCalls::rigidbody2DComponent_applyForce;

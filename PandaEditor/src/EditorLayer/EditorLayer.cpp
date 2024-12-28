@@ -302,6 +302,11 @@ void EditorLayer::addScriptToEntity(Entity entity) {
                             data = Foundation::Memory::alloc(sizeof(int));
                             break;
                         }
+                        case ScriptFieldType::FLOAT: {
+                            data = Foundation::Memory::alloc(sizeof(float));
+                            break;
+                        }
+                        case ScriptFieldType::TEXTURE:
                         case ScriptFieldType::ENTITY: {
                             data = Foundation::Memory::alloc(sizeof(UUID));
                             break;
@@ -568,7 +573,7 @@ void EditorLayer::processShortcuts() {
         m_viewportFullscreen = !m_viewportFullscreen;
     }
     if (ImGui::IsKeyPressed(ImGuiKey_D, false) && ctrl) {
-        if(m_currentWorld) {
+        if (m_currentWorld) {
             Entity selected = m_currentWorld->getSelectedEntity();
             Entity duplicate = m_currentWorld->duplicateEntity(selected);
             WorldCommandManager &cmd = m_currentWorld->getCommandManger();

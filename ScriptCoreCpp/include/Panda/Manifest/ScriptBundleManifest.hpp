@@ -6,7 +6,7 @@ namespace Panda {
 
 using FieldHandle = uint32_t;
 
-enum class ScriptFieldType { INTEGER, TEXTURE, COMPONENT, ENTITY, SCRIPT, UNKNOWN };
+enum class ScriptFieldType { INTEGER, FLOAT, ENTITY, TEXTURE, UNKNOWN };
 
 struct ScriptFieldManifest final {
     constexpr ScriptFieldManifest(FieldHandle handle, const char *name, ScriptFieldType type)

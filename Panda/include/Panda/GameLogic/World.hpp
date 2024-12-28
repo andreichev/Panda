@@ -27,6 +27,7 @@ public:
     void updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     void updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     Entity instantiateEntity();
+    void updateScriptsAndFields();
     void initializeScriptCore();
     void shutdownScriptCore();
     void destroy(Entity entity);

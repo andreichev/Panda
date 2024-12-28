@@ -179,7 +179,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
                 for (auto &field : script.getFields()) {
                     if (drawScriptFieldValue(field)) {
                         if (world && world->isRunning() && scriptEngine &&
-                            scriptEngine->isLoaded()) {
+                            scriptEngine->isLoaded() && field.instanceId) {
                             ExternalCalls::setFieldValue(
                                 field.instanceId, field.fieldId, field.value.data
                             );
@@ -210,18 +210,16 @@ void ComponentsDraw::drawComponents(Entity entity) {
             // Color
             modified |= propertyColor("Color", spriteRenderer.color);
             // Texture
-            if (propertyTexture("Texture", spriteRenderer.textureId, spriteRenderer.texture)) {
-                spriteRenderer.resetTextureCache();
+            if (propertyTexture("Texture", spriteRenderer.textureId, spriteRenderer.asset)) {
+                spriteRenderer.resetCache();
                 modified = true;
             }
             // Horizontal Images Count
-            modified |= dragInt("Horizontal", &spriteRenderer.horizontalCount, 1, 1, 30);
+            modified |= dragInt("Columns", &spriteRenderer.cols, 1, 1, 30);
             // Vertical Images Count
-            modified |= dragInt("Vertical", &spriteRenderer.verticalCount, 1, 1, 30);
-            // Total Images Count
-            modified |= dragInt("Images Count", &spriteRenderer.imagesCount, 1, 1, 900);
+            modified |= dragInt("Rows", &spriteRenderer.rows, 1, 1, 30);
             // Current Image Index
-            modified |= dragInt("Current Index", &spriteRenderer.currentIndex, 1, 0, 900);
+            modified |= dragInt("Current Index", &spriteRenderer.index, 1, 0, 900);
             if (modified) {
                 UpdateSpriteRendererCommand update(entity, spriteRenderer);
                 cmd.SAVE(update);

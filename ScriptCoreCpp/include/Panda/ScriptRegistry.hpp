@@ -3,6 +3,7 @@
 #include "ScriptClass.hpp"
 #include "Panda/Base.hpp"
 #include "Bamboo/Script.hpp"
+#include "Bamboo/Texture.hpp"
 
 #include <unordered_map>
 
@@ -31,8 +32,18 @@ public:
     }
 
     template<>
+    ScriptFieldType getType<float>() {
+        return ScriptFieldType::FLOAT;
+    }
+
+    template<>
     ScriptFieldType getType<Bamboo::Entity>() {
         return ScriptFieldType::ENTITY;
+    }
+
+    template<>
+    ScriptFieldType getType<Bamboo::Texture>() {
+        return ScriptFieldType::TEXTURE;
     }
 
     template<typename FieldType>

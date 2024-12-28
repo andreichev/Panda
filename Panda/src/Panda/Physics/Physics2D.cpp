@@ -122,8 +122,8 @@ void Physics2D::registerEntity(Entity entity) {
         auto &bc2d = entity.getComponent<BoxCollider2DComponent>();
 
         b2Polygon boxShape = b2MakeOffsetBox(
-            bc2d.size.x * transform.getScale().x,
-            bc2d.size.y * transform.getScale().y,
+            abs(bc2d.size.x * transform.getScale().x),
+            abs(bc2d.size.y * transform.getScale().y),
             {bc2d.offset.x, bc2d.offset.y},
             {1.0f, 0.0f}
         );
@@ -162,8 +162,8 @@ void Physics2D::updateEntity(Entity entity) {
         memcpy(&shapeId, &bc2d.runtimeData, sizeof(b2ShapeId));
 
         b2Polygon boxShape = b2MakeOffsetBox(
-            bc2d.size.x * transform.getScale().x,
-            bc2d.size.y * transform.getScale().y,
+            abs(bc2d.size.x * transform.getScale().x),
+            abs(bc2d.size.y * transform.getScale().y),
             {bc2d.offset.x, bc2d.offset.y},
             {1.0f, 0.0f}
         );

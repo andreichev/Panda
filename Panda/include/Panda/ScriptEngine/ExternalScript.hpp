@@ -2,6 +2,7 @@
 
 #include <Foundation/Memory.hpp>
 #include <Panda/ScriptEngine/InnerScriptHook.hpp>
+#include <Panda/Assets/Asset.hpp>
 
 namespace Panda {
 
@@ -31,6 +32,12 @@ struct ScriptField {
 
     bool operator==(const ScriptField &other) const {
         return instanceId == other.instanceId && fieldId == other.fieldId;
+    }
+
+    // Cache
+    Foundation::Shared<Asset> asset;
+    void resetCache() {
+        asset = nullptr;
     }
 };
 

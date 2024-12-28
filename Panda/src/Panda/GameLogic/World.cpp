@@ -165,16 +165,16 @@ void World::updateBasicComponents(
             rect.color = spriteComponent.color;
             // Load texture if it needs.
             AssetHandler *assetHandler = GameContext::s_assetHandler;
-            if (spriteComponent.textureId && !spriteComponent.texture && assetHandler) {
-                spriteComponent.texture = assetHandler->load(spriteComponent.textureId);
+            if (spriteComponent.textureId && !spriteComponent.asset && assetHandler) {
+                spriteComponent.asset = assetHandler->load(spriteComponent.textureId);
             }
-            rect.texture = spriteComponent.texture;
+            rect.texture = spriteComponent.asset;
             rect.size = {1.f, 1.f};
             rect.id = static_cast<int32_t>(entityHandle);
-            int xTileIndex = spriteComponent.currentIndex % spriteComponent.horizontalCount;
-            int yTileIndex = spriteComponent.currentIndex % spriteComponent.verticalCount;
-            float tileWidth = (1.f / spriteComponent.horizontalCount);
-            float tileHeight = (1.f / spriteComponent.verticalCount);
+            int xTileIndex = spriteComponent.index % spriteComponent.cols;
+            int yTileIndex = spriteComponent.index % spriteComponent.rows;
+            float tileWidth = (1.f / spriteComponent.cols);
+            float tileHeight = (1.f / spriteComponent.rows);
             float xTexCoord = tileWidth * xTileIndex;
             float yTexCoord = tileHeight * yTileIndex;
             rect.textureCoords = {xTexCoord, yTexCoord, tileWidth, tileHeight};
@@ -229,7 +229,7 @@ Entity World::instantiateEntity(UUID id) {
     return entity;
 }
 
-void World::initializeScriptCore() {
+void World::updateScriptsAndFields() {
     if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
         return;
     }
@@ -245,26 +245,18 @@ void World::initializeScriptCore() {
         //              CLASSES              //
         //-----------------------------------//
         for (auto &container : component.scripts) {
-            ScriptInstanceHandle scriptInstanceId =
-                ExternalCalls::instantiateScript(entityId, container.getName().c_str());
-            if (!scriptInstanceId) {
-                Entity entity = Entity(entityHandle, this);
-                LOG_INFO_EDITOR("SCRIPT {} NOT FOUND.", container.getName(), entity.getName());
-                // TODO: Remove unbound script after N times unfixed.
-                // if(container.unusedCount() > N) {
-                //     component.remove(container);
-                // }
-                continue;
-            }
             const ScriptClassManifest &clazz = manifest.getClass(container.getName().c_str());
             if (!clazz) {
                 Entity entity = Entity(entityHandle, this);
                 LOG_INFO_EDITOR(
                     "SCRIPT CLASS MANIFEST {} NOT FOUND.", container.getName(), entity.getName()
                 );
+                // TODO: Remove unbound script after N times unfixed.
+                // if(container.unusedCount() > N) {
+                //     component.remove(container);
+                // }
                 continue;
             }
-            container.rebindId(scriptInstanceId);
             //----------------------------------//
             //              FIELDS              //
             //----------------------------------//
@@ -288,6 +280,12 @@ void World::initializeScriptCore() {
                             memset(value.data, 0, sizeof(int));
                             break;
                         }
+                        case ScriptFieldType::FLOAT: {
+                            value = Foundation::Memory::alloc(sizeof(float));
+                            memset(value.data, 0, sizeof(float));
+                            break;
+                        }
+                        case ScriptFieldType::TEXTURE:
                         case ScriptFieldType::ENTITY: {
                             value = Foundation::Memory::alloc(sizeof(UUID));
                             memset(value.data, 0, sizeof(UUID));
@@ -299,16 +297,44 @@ void World::initializeScriptCore() {
                         }
                     }
                     ScriptField field = ScriptField(
-                        scriptInstanceId,
-                        fieldManifest.handle,
-                        fieldManifest.name,
-                        fieldManifest.type,
-                        value
+                        0, fieldManifest.handle, fieldManifest.name, fieldManifest.type, value
                     );
                     container.addField(field);
                     continue;
                 }
                 ScriptField &field = container.getField(fieldManifest.name);
+                field.type = fieldManifest.type;
+            }
+        }
+    }
+}
+
+void World::initializeScriptCore() {
+    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
+        return;
+    }
+    auto view = m_registry.view<ScriptListComponent>();
+    auto manifest = GameContext::s_scriptEngine->getManifest();
+    for (auto entityHandle : view) {
+        if (!isValidEntt(entityHandle)) {
+            continue;
+        }
+        auto &component = view.get<ScriptListComponent>(entityHandle);
+        UUID entityId = Entity(entityHandle, this).getId();
+        //-----------------------------------//
+        //              CLASSES              //
+        //-----------------------------------//
+        for (auto &container : component.scripts) {
+            ScriptInstanceHandle scriptInstanceId =
+                ExternalCalls::instantiateScript(entityId, container.getName().c_str());
+            PND_ASSERT_F(
+                scriptInstanceId, "CANNOT INSTANTIATE SCRIPT {}", container.getName().c_str()
+            );
+            container.rebindId(scriptInstanceId);
+            //----------------------------------//
+            //              FIELDS              //
+            //----------------------------------//
+            for (ScriptField &field : container.getFields()) {
                 field.instanceId = scriptInstanceId;
                 ExternalCalls::setFieldValue(scriptInstanceId, field.fieldId, field.value.data);
             }
@@ -318,6 +344,25 @@ void World::initializeScriptCore() {
 
 void World::shutdownScriptCore() {
     ExternalCalls::clear();
+    auto view = m_registry.view<ScriptListComponent>();
+    for (auto entityHandle : view) {
+        if (!isValidEntt(entityHandle)) {
+            continue;
+        }
+        auto &component = view.get<ScriptListComponent>(entityHandle);
+        //-----------------------------------//
+        //              CLASSES              //
+        //-----------------------------------//
+        for (auto &container : component.scripts) {
+            container.rebindId(0);
+            //----------------------------------//
+            //              FIELDS              //
+            //----------------------------------//
+            for (ScriptField &field : container.getFields()) {
+                field.instanceId = 0;
+            }
+        }
+    }
 }
 
 void World::fillEntity(Entity entity, UUID id) {

@@ -31,6 +31,15 @@ namespace ExternalCalls {
     /// TRANSFORM COMPONENT
     TransformComponent_GetPosition transformComponent_GetPosition = nullptr;
     TransformComponent_SetPosition transformComponent_SetPosition = nullptr;
+    TransformComponent_GetRotationEuler transformComponent_GetRotationEuler = nullptr;
+    TransformComponent_SetRotationEuler transformComponent_SetRotationEuler = nullptr;
+    TransformComponent_GetScale transformComponent_GetScale = nullptr;
+    TransformComponent_SetScale transformComponent_SetScale = nullptr;
+    /// SPRITE RENDERER COMPONENT
+    SpriteRendererComponent_GetColor spriteRendererComponent_GetColor = nullptr;
+    SpriteRendererComponent_SetColor spriteRendererComponent_SetColor = nullptr;
+    SpriteRendererComponent_SetTexture spriteRendererComponent_SetTexture = nullptr;
+    SpriteRendererComponent_SetCell spriteRendererComponent_SetCell = nullptr;
     /// RIGIDBODY2D COMPONENT
     Rigidbody2DComponent_applyForce rigidbody2DComponent_applyForce = nullptr;
     Rigidbody2DComponent_applyLinearImpulse rigidbody2DComponent_applyLinearImpulse = nullptr;
@@ -128,6 +137,21 @@ LIB_EXPORT int loadExternalCalls(SymbolsLoadFunc load) {
         (TransformComponent_GetPosition)load("transformComponent_GetPosition");
     transformComponent_SetPosition =
         (TransformComponent_SetPosition)load("transformComponent_SetPosition");
+    transformComponent_GetRotationEuler =
+        (TransformComponent_GetRotationEuler)load("transformComponent_GetRotationEuler");
+    transformComponent_SetRotationEuler =
+        (TransformComponent_SetRotationEuler)load("transformComponent_SetRotationEuler");
+    transformComponent_GetScale = (TransformComponent_GetScale)load("transformComponent_GetScale");
+    transformComponent_SetScale = (TransformComponent_SetScale)load("transformComponent_SetScale");
+    /// SPRITE RENDERER COMPONENT
+    spriteRendererComponent_GetColor =
+        (SpriteRendererComponent_GetColor)load("spriteRendererComponent_GetColor");
+    spriteRendererComponent_SetColor =
+        (SpriteRendererComponent_SetColor)load("spriteRendererComponent_SetColor");
+    spriteRendererComponent_SetTexture =
+        (SpriteRendererComponent_SetTexture)load("spriteRendererComponent_SetTexture");
+    spriteRendererComponent_SetCell =
+        (SpriteRendererComponent_SetCell)load("spriteRendererComponent_SetCell");
     /// RIGIDBODY2D COMPONENT
     rigidbody2DComponent_applyForce =
         (Rigidbody2DComponent_applyForce)load("rigidbody2DComponent_applyForce");

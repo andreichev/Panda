@@ -35,10 +35,9 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
                 entityDto.spriteRendererComponent.value();
             auto &spriteRenderer = entity.addComponent<SpriteRendererComponent>();
             spriteRenderer.color = spriteRendererDto.color;
-            spriteRenderer.horizontalCount = spriteRendererDto.horizontalCount;
-            spriteRenderer.verticalCount = spriteRendererDto.verticalCount;
-            spriteRenderer.imagesCount = spriteRendererDto.imagesCount;
-            spriteRenderer.currentIndex = spriteRendererDto.currentIndex;
+            spriteRenderer.cols = spriteRendererDto.cols;
+            spriteRenderer.rows = spriteRendererDto.rows;
+            spriteRenderer.index = spriteRendererDto.index;
             spriteRenderer.textureId = spriteRendererDto.texture;
         }
         // CUBE MAP COMPONENT
@@ -119,10 +118,9 @@ WorldDto WorldMapper::toDto(const World &world) {
                 entity.getComponent<SpriteRendererComponent>();
             SpriteRendererComponentDto spriteRendererDto;
             spriteRendererDto.color = spriteRenderer.color;
-            spriteRendererDto.horizontalCount = spriteRenderer.horizontalCount;
-            spriteRendererDto.verticalCount = spriteRenderer.verticalCount;
-            spriteRendererDto.imagesCount = spriteRenderer.imagesCount;
-            spriteRendererDto.currentIndex = spriteRenderer.currentIndex;
+            spriteRendererDto.cols = spriteRenderer.cols;
+            spriteRendererDto.rows = spriteRenderer.rows;
+            spriteRendererDto.index = spriteRenderer.index;
             spriteRendererDto.texture = spriteRenderer.textureId;
             entityDto.spriteRendererComponent = spriteRendererDto;
         }

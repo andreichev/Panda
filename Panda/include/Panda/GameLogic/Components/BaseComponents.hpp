@@ -74,20 +74,18 @@ struct RelationshipComponent final : public Rain::Codable {
 struct SpriteRendererComponent final {
     // Component
     Color color = Color(0.f, 0.f, 0.f, 1.f);
-    int horizontalCount = 1;
-    int verticalCount = 1;
-    int imagesCount = 1;
-    int currentIndex = 0;
+    int cols = 1;
+    int rows = 1;
+    int index = 0;
     UUID textureId = 0;
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const SpriteRendererComponent &other) = default;
 
     // Cache
-    Foundation::Shared<Asset> texture;
-
-    void resetTextureCache() {
-        texture = nullptr;
+    Foundation::Shared<Asset> asset;
+    void resetCache() {
+        asset = nullptr;
     }
 };
 

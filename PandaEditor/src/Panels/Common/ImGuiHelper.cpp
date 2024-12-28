@@ -555,8 +555,25 @@ bool drawScriptFieldValue(ScriptField &field) {
             changed |= dragInt(field.name.c_str(), (int *)field.value.data);
             break;
         }
+        case ScriptFieldType::FLOAT: {
+            changed |= dragFloat(field.name.c_str(), (float *)field.value.data, 0.2f);
+            break;
+        }
         case ScriptFieldType::ENTITY: {
             changed |= propertyEntity(field.name.c_str(), (UUID *)field.value.data);
+            break;
+        }
+        case ScriptFieldType::TEXTURE: {
+            // Load texture if it needs.
+            AssetHandler *assetHandler = GameContext::s_assetHandler;
+            UUID textureId = *(UUID *)field.value.data;
+            if (textureId && !field.asset && assetHandler) {
+                field.asset = assetHandler->load(textureId);
+            }
+            if (propertyTexture(field.name.c_str(), *(UUID *)field.value.data, field.asset)) {
+                field.resetCache();
+                changed = true;
+            }
             break;
         }
         default: {

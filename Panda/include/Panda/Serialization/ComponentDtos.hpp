@@ -54,10 +54,9 @@ struct WorldCameraDto : public Rain::Codable {
 
 struct SpriteRendererComponentDto : public Rain::Codable {
     Color color;
-    int horizontalCount = 1;
-    int verticalCount = 1;
-    int imagesCount = 1;
-    int currentIndex = 0;
+    int cols = 1;
+    int rows = 1;
+    int index = 0;
     UUID texture = 0;
 
     SpriteRendererComponentDto() = default;
@@ -65,10 +64,9 @@ struct SpriteRendererComponentDto : public Rain::Codable {
 
     RAIN_FIELDS_BEGIN(SpriteRendererComponentDto)
     RAIN_FIELD(color)
-    RAIN_FIELD(horizontalCount)
-    RAIN_FIELD(verticalCount)
-    RAIN_FIELD(imagesCount)
-    RAIN_FIELD(currentIndex)
+    RAIN_FIELD(cols)
+    RAIN_FIELD(rows)
+    RAIN_FIELD(index)
     RAIN_FIELD(texture)
     RAIN_FIELDS_END
 };
@@ -144,7 +142,13 @@ struct ScriptFieldDto : public Rain::Codable {
                 encoder->encode("value", *value);
                 break;
             }
-            case ScriptFieldType::ENTITY: {
+            case ScriptFieldType::FLOAT: {
+                float *value = (float *)data.value.data;
+                encoder->encode("value", *value);
+                break;
+            }
+            case ScriptFieldType::ENTITY:
+            case ScriptFieldType::TEXTURE: {
                 UUID *value = (UUID *)data.value.data;
                 encoder->encode("value", *value);
                 break;
@@ -175,6 +179,14 @@ struct ScriptFieldDto : public Rain::Codable {
                 memcpy(data.value.data, &value, sizeof(int));
                 break;
             }
+            case ScriptFieldType::FLOAT: {
+                data.value = Foundation::Memory::alloc(sizeof(float));
+                float value = 0;
+                decoder->decode("value", value);
+                memcpy(data.value.data, &value, sizeof(float));
+                break;
+            }
+            case ScriptFieldType::TEXTURE:
             case ScriptFieldType::ENTITY: {
                 data.value = Foundation::Memory::alloc(sizeof(UUID));
                 UUID value = 0;
