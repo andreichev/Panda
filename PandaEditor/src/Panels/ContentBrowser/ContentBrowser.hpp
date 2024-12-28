@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panda/Renderer/Texture.hpp"
+#include "Panda/Assets/Texture.hpp"
 #include "SystemTools/SystemTools.hpp"
 
 #include <filesystem>

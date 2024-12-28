@@ -5,6 +5,7 @@
 #include "Panels/Popups/EditorYesNoPopup.hpp"
 #include "Panels/Popups/PickScriptPopup.hpp"
 #include "Panels/Popups/EnterNamePopup.hpp"
+#include "Panda/GameLogic/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
 
 namespace Panda {
 
@@ -421,7 +422,10 @@ void EditorLayer::toolbarDidPickSceneState(SceneState state) {
 }
 
 void EditorLayer::toolbarDidTapReloadScripts() {
-    PND_ASSERT(m_sceneState == SceneState::EDIT, "RELOADING SCRIP ASSEMBLY NOT AVAILABLE WHEN WORLD IS RUNNING");
+    PND_ASSERT(
+        m_sceneState == SceneState::EDIT,
+        "RELOADING SCRIP ASSEMBLY NOT AVAILABLE WHEN WORLD IS RUNNING"
+    );
     m_loader.reloadScriptsDll();
 }
 
@@ -494,6 +498,8 @@ void EditorLayer::saveWorld() {
             m_loader.saveWorld();
             break;
         case SceneState::PLAY:
+            // TODO: Ask before overwriting
+            // https://ru.yougile.com/team/91006f9f80d3/#PANDA-39
             m_editingWorld = m_playingWorld;
             m_loader.saveWorld();
             break;
@@ -560,6 +566,16 @@ void EditorLayer::processShortcuts() {
     }
     if (ImGui::IsKeyPressed(ImGuiKey_W, false) && ctrl) {
         m_viewportFullscreen = !m_viewportFullscreen;
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_D, false) && ctrl) {
+        if(m_currentWorld) {
+            Entity selected = m_currentWorld->getSelectedEntity();
+            Entity duplicate = m_currentWorld->duplicateEntity(selected);
+            WorldCommandManager &cmd = m_currentWorld->getCommandManger();
+            AddRemoveEntityCommand update(duplicate);
+            cmd.SAVE(update, false);
+            m_currentWorld->setChanged();
+        }
     }
 }
 

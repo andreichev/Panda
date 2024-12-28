@@ -25,8 +25,9 @@ public:
         F_FREE(Foundation::getAllocator(), m_data);
     }
 
+    /// Save new command to history and execute if it needs to.
     template<typename CMD>
-    void DO(CMD cmd) {
+    void SAVE(CMD cmd, bool needToExecute = true) {
         static_assert(std::is_base_of_v<WorldCommand, CMD>, "Not inherited from WorldCommand");
         PND_ASSERT_F(
             sizeof(CMD) < WORLD_COMMAND_SIZE,
@@ -36,10 +37,10 @@ public:
         WorldCommand *last = PREVIOUS_COMMAND();
         if (last && last->canMerge(cmd)) {
             last->merge(cmd);
-            cmd.isValid = cmd.execute();
+            cmd.isValid = needToExecute ? cmd.execute() : true;
             return;
         }
-        cmd.isValid = cmd.execute();
+        cmd.isValid = needToExecute ? cmd.execute() : true;
         write(&cmd, sizeof(CMD), m_index);
         m_index++;
         m_index %= TOTAL_OPERATIONS_IN_CACHE;

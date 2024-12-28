@@ -1,7 +1,7 @@
 #include "AssetHandlerEditor.hpp"
 
 #include <Panda/Assets/AssetLoaderEditor.hpp>
-#include <Panda/Renderer/Texture.hpp>
+#include <Panda/Assets/Texture.hpp>
 #include <Panda/Renderer/GpuProgram.hpp>
 
 #include <fstream>
@@ -95,7 +95,7 @@ void AssetHandlerEditor::loadAssetRegistry() {
         decoder->decode(file, registryDto);
         file.close();
         for (auto &assetInfoDto : registryDto.assets) {
-            AssetInfoEditor assetInfo = AssetRegistryMapper::toEntity(assetInfoDto);
+            AssetInfoEditor assetInfo = AssetRegistryMapper::toInfo(assetInfoDto);
             m_registry[assetInfo.id] = assetInfo;
             m_importedAssets[assetInfo.path] = assetInfo.id;
         }

@@ -28,7 +28,7 @@ public:
         return !(*this == other);
     }
 
-private:
+protected:
     AssetId m_handle = 0;
     AssetType m_type;
 };

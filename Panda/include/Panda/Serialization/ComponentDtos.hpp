@@ -54,6 +54,10 @@ struct WorldCameraDto : public Rain::Codable {
 
 struct SpriteRendererComponentDto : public Rain::Codable {
     Color color;
+    int horizontalCount = 1;
+    int verticalCount = 1;
+    int imagesCount = 1;
+    int currentIndex = 0;
     UUID texture = 0;
 
     SpriteRendererComponentDto() = default;
@@ -61,6 +65,10 @@ struct SpriteRendererComponentDto : public Rain::Codable {
 
     RAIN_FIELDS_BEGIN(SpriteRendererComponentDto)
     RAIN_FIELD(color)
+    RAIN_FIELD(horizontalCount)
+    RAIN_FIELD(verticalCount)
+    RAIN_FIELD(imagesCount)
+    RAIN_FIELD(currentIndex)
     RAIN_FIELD(texture)
     RAIN_FIELDS_END
 };

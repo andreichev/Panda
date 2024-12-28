@@ -35,6 +35,10 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
                 entityDto.spriteRendererComponent.value();
             auto &spriteRenderer = entity.addComponent<SpriteRendererComponent>();
             spriteRenderer.color = spriteRendererDto.color;
+            spriteRenderer.horizontalCount = spriteRendererDto.horizontalCount;
+            spriteRenderer.verticalCount = spriteRendererDto.verticalCount;
+            spriteRenderer.imagesCount = spriteRendererDto.imagesCount;
+            spriteRenderer.currentIndex = spriteRendererDto.currentIndex;
             spriteRenderer.textureId = spriteRendererDto.texture;
         }
         // CUBE MAP COMPONENT
@@ -78,7 +82,7 @@ WorldDto WorldMapper::toDto(const World &world) {
     WorldDto worldDto;
     World &_world = const_cast<World &>(world);
     for (auto entityId : _world.m_registry.storage<entt::entity>()) {
-        if (!_world.m_registry.valid(entityId)) {
+        if (!_world.isValidEntt(entityId)) {
             continue;
         }
         Entity entity(entityId, &_world);
@@ -115,6 +119,10 @@ WorldDto WorldMapper::toDto(const World &world) {
                 entity.getComponent<SpriteRendererComponent>();
             SpriteRendererComponentDto spriteRendererDto;
             spriteRendererDto.color = spriteRenderer.color;
+            spriteRendererDto.horizontalCount = spriteRenderer.horizontalCount;
+            spriteRendererDto.verticalCount = spriteRenderer.verticalCount;
+            spriteRendererDto.imagesCount = spriteRenderer.imagesCount;
+            spriteRendererDto.currentIndex = spriteRenderer.currentIndex;
             spriteRendererDto.texture = spriteRenderer.textureId;
             entityDto.spriteRendererComponent = spriteRendererDto;
         }
@@ -126,6 +134,7 @@ WorldDto WorldMapper::toDto(const World &world) {
             rigidbody2dDto.fixedRotation = rigidbody2d.fixedRotation;
             entityDto.rigidbody2dComponent = rigidbody2dDto;
         }
+        // BOX COLLIDER 2D
         if (entity.hasComponent<BoxCollider2DComponent>()) {
             BoxCollider2DComponent &boxCollider2d = entity.getComponent<BoxCollider2DComponent>();
             BoxCollider2DComponentDto boxCollider2dDto;

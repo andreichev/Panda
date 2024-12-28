@@ -6,12 +6,12 @@
 namespace Panda {
 
 struct TextureData {
-    Miren::TextureFormat m_format;
-    Miren::TextureWrapMode m_wrap;
-    uint16_t m_width;
-    uint16_t m_height;
-    Foundation::Memory m_data;
-    bool m_isCubeMap;
+    Miren::TextureFormat m_format = Miren::RGBA8;
+    Miren::TextureWrapMode m_wrap = Miren::REPEAT;
+    uint16_t m_width = 1;
+    uint16_t m_height = 1;
+    Foundation::Memory m_data = nullptr;
+    bool m_isCubeMap = false;
 
     Miren::TextureCreate getMirenTextureCreate() {
         Miren::TextureCreate create;

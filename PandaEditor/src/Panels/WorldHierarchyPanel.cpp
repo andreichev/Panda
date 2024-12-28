@@ -5,6 +5,7 @@
 #include "WorldHierarchyPanel.hpp"
 #include "EntityComponents/ComponentsDraw.hpp"
 #include "Model/DragDropItem.hpp"
+#include "Panda/GameLogic/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
 
 #include <imgui.h>
 
@@ -71,9 +72,21 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
         m_world->setSelectedEntity(entity);
     }
+    WorldCommandManager &cmd = m_world->getCommandManger();
     if (ImGui::BeginPopupContextItem()) {
         if (ImGui::MenuItem("Delete", NULL)) {
-            m_world->destroy(entity);
+            AddRemoveEntityCommand update(entity);
+            cmd.SAVE(update, true);
+            m_world->setChanged();
+            if (m_world->isSelected(entity)) {
+                m_world->setSelectedEntity({});
+            }
+        }
+        if (ImGui::MenuItem("Duplicate", NULL)) {
+            Entity duplicate = m_world->duplicateEntity(entity);
+            AddRemoveEntityCommand update(duplicate);
+            cmd.SAVE(update, false);
+            m_world->setChanged();
         }
         ImGui::EndPopup();
     }
@@ -84,11 +97,15 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
 }
 
 void WorldHierarchyPanel::drawEntityCreateMenu() {
+    WorldCommandManager &cmd = m_world->getCommandManger();
     if (!ImGui::BeginMenu("Create"))
         return;
     if (ImGui::MenuItem("Empty Entity")) {
         Entity newEntity = m_world->instantiateEntity();
         newEntity.getComponent<TagComponent>().tag = "Empty Entity";
+        AddRemoveEntityCommand update(newEntity);
+        cmd.SAVE(update, false);
+        m_world->setChanged();
     }
     ImGui::EndMenu();
 }

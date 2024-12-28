@@ -62,7 +62,7 @@ void Physics2D::init(World *world) {
     // Register all entities
     auto view = world->m_registry.view<Rigidbody2DComponent>();
     for (auto entityHandle : view) {
-        if (!world->m_registry.valid(entityHandle)) {
+        if (!world->isValidEntt(entityHandle)) {
             continue;
         }
         Entity entity = {entityHandle, world};
@@ -83,7 +83,7 @@ void Physics2D::update(World *world, double deltaTime) {
     // Retrieve transform from Box2D
     auto view = world->m_registry.view<Rigidbody2DComponent>();
     for (auto entityHandle : view) {
-        if (!world->m_registry.valid(entityHandle)) {
+        if (!world->isValidEntt(entityHandle)) {
             continue;
         }
         Entity entity = {entityHandle, world};

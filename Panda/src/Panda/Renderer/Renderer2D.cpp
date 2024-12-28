@@ -95,16 +95,23 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     positions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
     positions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
     glm::vec2 textureCoords[4];
-    textureCoords[0] = {0.0f, 1.0f};
-    textureCoords[1] = {1.0f, 1.0f};
-    textureCoords[2] = {1.0f, 0.0f};
-    textureCoords[3] = {0.0f, 0.0f};
+    textureCoords[0] = {
+        rect.textureCoords.origin.x, rect.textureCoords.origin.y + rect.textureCoords.size.height
+    };
+    textureCoords[1] = {
+        rect.textureCoords.origin.x + rect.textureCoords.size.width,
+        rect.textureCoords.origin.y + rect.textureCoords.size.height
+    };
+    textureCoords[2] = {
+        rect.textureCoords.origin.x + rect.textureCoords.size.width, rect.textureCoords.origin.y
+    };
+    textureCoords[3] = {rect.textureCoords.origin.x, rect.textureCoords.origin.y};
 
     float textureIndex = 0.0f;
     if (rect.texture != nullptr) {
         for (uint32_t i = 1; i < m_drawData.textureSlotIndex; i++) {
             auto texture = Foundation::SharedCast<Texture>(rect.texture);
-            if (texture->getHandle().id == (*m_drawData.textures[i]).getHandle().id) {
+            if (texture->getMirenHandle().id == (*m_drawData.textures[i]).getMirenHandle().id) {
                 textureIndex = (float)i;
                 break;
             }
@@ -166,7 +173,7 @@ void Renderer2D::end() {
 
     Miren::setState(MIREN_STATE_DEPTH_TEST);
     for (int i = 0; i < m_drawData.textureSlotIndex; i++) {
-        Miren::setTexture(m_drawData.textures[i]->getHandle(), i);
+        Miren::setTexture(m_drawData.textures[i]->getMirenHandle(), i);
     }
     Miren::setVertexLayout(m_drawData.layout);
     Miren::setVertexBuffer(tvb.handle, tvb.startVertex);

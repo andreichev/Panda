@@ -62,3 +62,7 @@ target_link_libraries(PandaEditor PandaUI)
 add_subdirectory(Vendor/nfd)
 set_target_properties(nfd PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(PandaEditor nfd)
+
+# DEFINE EDITOR
+target_compile_definitions(PandaEditor PUBLIC PND_EDITOR)
+target_compile_definitions(Panda PUBLIC PND_EDITOR)

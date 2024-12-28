@@ -453,7 +453,7 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
             float aspect = texture->getSize().width / texture->getSize().height;
             aspect = Foundation::min(aspect, 4.f);
             float width = height * aspect;
-            ImGui::Image((ImTextureID)(intptr_t)texture->getHandle().id, {width, height});
+            ImGui::Image((ImTextureID)(intptr_t)texture->getMirenHandle().id, {width, height});
         } else {
             ImGui::Button("Texture Asset", {100, 55});
         }

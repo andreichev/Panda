@@ -61,7 +61,7 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
             transformCopy.setPosition(pos);
             EntityTransformCommand move(selected, transformCopy);
             WorldCommandManager &cmd = m_world->getCommandManger();
-            cmd.DO(move);
+            cmd.SAVE(move);
         }
     }
 }

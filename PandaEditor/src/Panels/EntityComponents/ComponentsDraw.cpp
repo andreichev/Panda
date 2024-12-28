@@ -65,7 +65,7 @@ drawComponent(const std::string &name, Entity entity, bool canRemove, UIFunction
         }
         if (removeComponent) {
             AddRemoveComponentCommand<T> update(entity);
-            cmd.DO(update);
+            cmd.SAVE(update);
         }
         style.IndentSpacing = indentSpacing;
     }
@@ -93,7 +93,7 @@ displayAddComponentEntry(Entity entity, WorldCommandManager &cmd, const std::str
     if (!entity.hasComponent<T>()) {
         if (ImGui::MenuItem(entryName.c_str())) {
             AddRemoveComponentCommand<T> update(entity);
-            cmd.DO(update);
+            cmd.SAVE(update);
             ImGui::CloseCurrentPopup();
         }
     }
@@ -142,19 +142,19 @@ void ComponentsDraw::drawComponents(Entity entity) {
             if (drawVec3Control("Translation", position)) {
                 transform.setPosition(position);
                 EntityTransformCommand move(entity, transform);
-                cmd.DO(move);
+                cmd.SAVE(move);
             }
             glm::vec3 rotation = transform.getRotationEuler();
             if (drawVec3Control("Rotation", rotation)) {
                 transform.setRotationEuler(rotation);
                 EntityTransformCommand rotate(entity, transform);
-                cmd.DO(rotate);
+                cmd.SAVE(rotate);
             }
             glm::vec3 scale = transform.getScale();
             if (drawVec3Control("Scale", scale)) {
                 transform.setScale(scale);
                 EntityTransformCommand scale(entity, transform);
-                cmd.DO(scale);
+                cmd.SAVE(scale);
             }
         }
     );
@@ -164,8 +164,8 @@ void ComponentsDraw::drawComponents(Entity entity) {
         false,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
             bool modified = false;
-            World* world = entity.getWorld();
-            ScriptEngine* scriptEngine = GameContext::s_scriptEngine;
+            World *world = entity.getWorld();
+            ScriptEngine *scriptEngine = GameContext::s_scriptEngine;
             for (auto &script : component.scripts) {
                 shiftCursorY(8);
                 ImGui::Text("%s", script.getName().c_str());
@@ -177,9 +177,12 @@ void ComponentsDraw::drawComponents(Entity entity) {
                     break;
                 }
                 for (auto &field : script.getFields()) {
-                    if(drawScriptFieldValue(field)) {
-                        if(world && world->isRunning() && scriptEngine && scriptEngine->isLoaded()) {
-                            ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
+                    if (drawScriptFieldValue(field)) {
+                        if (world && world->isRunning() && scriptEngine &&
+                            scriptEngine->isLoaded()) {
+                            ExternalCalls::setFieldValue(
+                                field.instanceId, field.fieldId, field.value.data
+                            );
                         }
                         modified = true;
                     }
@@ -203,14 +206,25 @@ void ComponentsDraw::drawComponents(Entity entity) {
         true,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
             SpriteRendererComponent spriteRenderer = component;
-            if (propertyColor("Color", spriteRenderer.color)) {
-                UpdateSpriteRendererCommand update(entity, spriteRenderer);
-                cmd.DO(update);
-            }
+            bool modified = false;
+            // Color
+            modified |= propertyColor("Color", spriteRenderer.color);
+            // Texture
             if (propertyTexture("Texture", spriteRenderer.textureId, spriteRenderer.texture)) {
-                spriteRenderer.texture = nullptr;
+                spriteRenderer.resetTextureCache();
+                modified = true;
+            }
+            // Horizontal Images Count
+            modified |= dragInt("Horizontal", &spriteRenderer.horizontalCount, 1, 1, 30);
+            // Vertical Images Count
+            modified |= dragInt("Vertical", &spriteRenderer.verticalCount, 1, 1, 30);
+            // Total Images Count
+            modified |= dragInt("Images Count", &spriteRenderer.imagesCount, 1, 1, 900);
+            // Current Image Index
+            modified |= dragInt("Current Index", &spriteRenderer.currentIndex, 1, 0, 900);
+            if (modified) {
                 UpdateSpriteRendererCommand update(entity, spriteRenderer);
-                cmd.DO(update);
+                cmd.SAVE(update);
             }
         }
     );
@@ -282,11 +296,11 @@ void ComponentsDraw::drawComponents(Entity entity) {
             if (selectedPos != (int)component.type) {
                 rb2d.type = (Rigidbody2DComponent::BodyType)selectedPos;
                 UpdateRigidbody2DCommand update(entity, rb2d);
-                cmd.DO(update);
+                cmd.SAVE(update);
             }
             if (checkbox("Fixed Rotation", &rb2d.fixedRotation)) {
                 UpdateRigidbody2DCommand update(entity, rb2d);
-                cmd.DO(update);
+                cmd.SAVE(update);
             }
             ImGui::PopStyleVar();
         }
@@ -305,7 +319,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
             modified |= dragFloat("Restitution", &bc2d.restitution, 0.01f, 0.0f, 1.0f);
             if (modified) {
                 UpdateBoxCollider2DCommand update(entity, bc2d);
-                cmd.DO(update);
+                cmd.SAVE(update);
             }
         }
     );

@@ -97,11 +97,11 @@ struct ConsolePanel {
         ImGui::Separator();
 
         if (ImGui::BeginChild(
-        "ScrollingRegion",
-        ImVec2(0, 0),
-        ImGuiChildFlags_None,
-        ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NavFlattened
-    )) {
+                "ScrollingRegion",
+                ImVec2(0, 0),
+                ImGuiChildFlags_None,
+                ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NavFlattened
+            )) {
             if (ImGui::BeginPopupContextWindow()) {
                 if (ImGui::Selectable("Clear"))
                     clearLog();
@@ -158,6 +158,7 @@ struct ConsolePanel {
         ImGui::EndChild();
         ImGui::End();
     }
+
 private:
     static constexpr int32_t MAX_LINES = 100;
     static constexpr int32_t MAX_LINE_SYMBOLS = 100;

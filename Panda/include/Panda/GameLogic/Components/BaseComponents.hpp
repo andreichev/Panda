@@ -17,6 +17,12 @@
 
 namespace Panda {
 
+#ifdef PND_EDITOR
+struct EditorMetadataComponent final {
+    bool isDeleted = false;
+};
+#endif
+
 struct IdComponent final : public Rain::Codable {
     UUID id;
 
@@ -66,12 +72,23 @@ struct RelationshipComponent final : public Rain::Codable {
 };
 
 struct SpriteRendererComponent final {
+    // Component
     Color color = Color(0.f, 0.f, 0.f, 1.f);
-    Foundation::Shared<Asset> texture;
+    int horizontalCount = 1;
+    int verticalCount = 1;
+    int imagesCount = 1;
+    int currentIndex = 0;
     UUID textureId = 0;
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const SpriteRendererComponent &other) = default;
+
+    // Cache
+    Foundation::Shared<Asset> texture;
+
+    void resetTextureCache() {
+        texture = nullptr;
+    }
 };
 
 struct StaticMeshComponent final {

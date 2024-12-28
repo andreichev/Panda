@@ -153,6 +153,11 @@ public:
     void physics2DUpdate();
     void physics2DRemove();
 
+#ifdef PND_EDITOR
+    bool isDeleted();
+    void setDeleted(bool deleted = true);
+#endif
+
 private:
     Entity(entt::entity handle, World *world);
 
@@ -163,6 +168,7 @@ private:
     friend class Physics2D;
     friend class WorldHierarchyPanel;
     friend class WorldMapper;
+    friend class AddRemoveEntityCommand;
 };
 
 } // namespace Panda
