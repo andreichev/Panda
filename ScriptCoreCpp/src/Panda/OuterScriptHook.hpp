@@ -41,6 +41,30 @@ namespace ExternalCalls {
     using TransformComponent_SetPosition =
         void (*)(EntityHandle entityId, float x, float y, float z);
     extern TransformComponent_SetPosition transformComponent_SetPosition;
+    using TransformComponent_GetRotationEuler =
+        void (*)(EntityHandle entityId, float *x, float *y, float *z);
+    extern TransformComponent_GetRotationEuler transformComponent_GetRotationEuler;
+    using TransformComponent_SetRotationEuler =
+        void (*)(EntityHandle entityId, float x, float y, float z);
+    extern TransformComponent_SetRotationEuler transformComponent_SetRotationEuler;
+    using TransformComponent_GetScale =
+        void (*)(EntityHandle entityId, float *x, float *y, float *z);
+    extern TransformComponent_GetScale transformComponent_GetScale;
+    using TransformComponent_SetScale = void (*)(EntityHandle entityId, float x, float y, float z);
+    extern TransformComponent_SetScale transformComponent_SetScale;
+    /// SPRITE RENDERER COMPONENT
+    using SpriteRendererComponent_GetColor =
+        void (*)(EntityHandle entityId, float *r, float *g, float *b, float *a);
+    extern SpriteRendererComponent_GetColor spriteRendererComponent_GetColor;
+    using SpriteRendererComponent_SetColor =
+        void (*)(EntityHandle entityId, float r, float g, float b, float a);
+    extern SpriteRendererComponent_SetColor spriteRendererComponent_SetColor;
+    using SpriteRendererComponent_SetTexture =
+        void (*)(EntityHandle entityId, TextureHandle textureId);
+    extern SpriteRendererComponent_SetTexture spriteRendererComponent_SetTexture;
+    using SpriteRendererComponent_SetCell =
+        void (*)(EntityHandle entityId, int cols, int rows, int index);
+    extern SpriteRendererComponent_SetCell spriteRendererComponent_SetCell;
     /// RIGIDBODY2D COMPONENT
     using Rigidbody2DComponent_applyForce = void (*)(EntityHandle entityId, float x, float y);
     extern Rigidbody2DComponent_applyForce rigidbody2DComponent_applyForce;

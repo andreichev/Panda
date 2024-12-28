@@ -1,6 +1,4 @@
 #include "Panda/Serialization/WorldMapper.hpp"
-
-#include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 namespace Panda {
@@ -37,6 +35,9 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
                 entityDto.spriteRendererComponent.value();
             auto &spriteRenderer = entity.addComponent<SpriteRendererComponent>();
             spriteRenderer.color = spriteRendererDto.color;
+            spriteRenderer.cols = spriteRendererDto.cols;
+            spriteRenderer.rows = spriteRendererDto.rows;
+            spriteRenderer.index = spriteRendererDto.index;
             spriteRenderer.textureId = spriteRendererDto.texture;
         }
         // CUBE MAP COMPONENT
@@ -63,19 +64,13 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         {
             ScriptListComponentDto scriptsComponentDto = entityDto.scriptListComponent;
             for (auto &scriptDto : scriptsComponentDto.scripts) {
-                ScriptInstanceHandle id;
-                if (GameContext::s_scriptEngine && GameContext::s_scriptEngine->isLoaded()) {
-                    id = ExternalCalls::instantiateScript(entity.getId(), scriptDto.name.c_str());
-                } else {
-                    id = 0;
-                }
                 std::vector<ScriptField> fields;
                 for (ScriptFieldDto &fieldDto : scriptDto.scriptFields) {
                     fields.emplace_back(
-                        id, fieldDto.fieldId, fieldDto.name, fieldDto.type, fieldDto.value
+                        0, fieldDto.fieldId, fieldDto.name, fieldDto.type, fieldDto.value
                     );
                 }
-                entity.addScript(Panda::ExternalScript(id, scriptDto.name, fields));
+                entity.addScript(Panda::ExternalScript(0, scriptDto.name, fields));
             }
         }
     }
@@ -86,7 +81,7 @@ WorldDto WorldMapper::toDto(const World &world) {
     WorldDto worldDto;
     World &_world = const_cast<World &>(world);
     for (auto entityId : _world.m_registry.storage<entt::entity>()) {
-        if (!_world.m_registry.valid(entityId)) {
+        if (!_world.isValidEntt(entityId)) {
             continue;
         }
         Entity entity(entityId, &_world);
@@ -123,6 +118,9 @@ WorldDto WorldMapper::toDto(const World &world) {
                 entity.getComponent<SpriteRendererComponent>();
             SpriteRendererComponentDto spriteRendererDto;
             spriteRendererDto.color = spriteRenderer.color;
+            spriteRendererDto.cols = spriteRenderer.cols;
+            spriteRendererDto.rows = spriteRenderer.rows;
+            spriteRendererDto.index = spriteRenderer.index;
             spriteRendererDto.texture = spriteRenderer.textureId;
             entityDto.spriteRendererComponent = spriteRendererDto;
         }
@@ -134,6 +132,7 @@ WorldDto WorldMapper::toDto(const World &world) {
             rigidbody2dDto.fixedRotation = rigidbody2d.fixedRotation;
             entityDto.rigidbody2dComponent = rigidbody2dDto;
         }
+        // BOX COLLIDER 2D
         if (entity.hasComponent<BoxCollider2DComponent>()) {
             BoxCollider2DComponent &boxCollider2d = entity.getComponent<BoxCollider2DComponent>();
             BoxCollider2DComponentDto boxCollider2dDto;

@@ -157,6 +157,12 @@ struct Rect : public Rain::Codable {
     Vec2 origin;
     Vec2 size;
 
+    Rect() {}
+
+    Rect(float x, float y, float width, float height)
+        : origin(x, y)
+        , size(width, height) {}
+
     RAIN_FIELDS_BEGIN(Rect)
     RAIN_FIELD(origin)
     RAIN_FIELD(size)

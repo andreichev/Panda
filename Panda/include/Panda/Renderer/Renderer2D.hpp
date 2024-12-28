@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-#include "Panda/Renderer/Texture.hpp"
+#include "Panda/Assets/Texture.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -26,9 +26,11 @@ public:
             , texture(nullptr)
             , rotation(0)
             , id(-1)
+            , textureCoords(0, 0, 1, 1)
             , transform(1.f) {}
 
         Vec3 center;
+        Rect textureCoords;
         Size size;
         Color color;
         int32_t id;

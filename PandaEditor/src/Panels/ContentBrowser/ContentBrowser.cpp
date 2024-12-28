@@ -118,7 +118,7 @@ void ContentBrowser::onImGuiRender() {
         ImVec2 thumbnailPos = ImGui::GetCursorPos();
         ImGui::ImageButton(
             filenameString.c_str(),
-            (ImTextureID)(intptr_t)icon->getHandle().id,
+            (ImTextureID)(intptr_t)icon->getMirenHandle().id,
             {thumbnailSize, thumbnailSize}
         );
         if (assetId) {
@@ -133,7 +133,7 @@ void ContentBrowser::onImGuiRender() {
 
             ImVec2 nextThumbnailPos = ImGui::GetCursorPos();
             ImGui::SetCursorPos({thumbnailPos.x + 10, thumbnailPos.y + 5});
-            ImGui::Image((ImTextureID)(intptr_t)m_importedIcon.getHandle().id, {24, 24});
+            ImGui::Image((ImTextureID)(intptr_t)m_importedIcon.getMirenHandle().id, {24, 24});
             ImGui::SetCursorPos(nextThumbnailPos);
         }
         ImGui::PopStyleColor();

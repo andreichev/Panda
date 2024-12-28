@@ -54,6 +54,9 @@ struct WorldCameraDto : public Rain::Codable {
 
 struct SpriteRendererComponentDto : public Rain::Codable {
     Color color;
+    int cols = 1;
+    int rows = 1;
+    int index = 0;
     UUID texture = 0;
 
     SpriteRendererComponentDto() = default;
@@ -61,6 +64,9 @@ struct SpriteRendererComponentDto : public Rain::Codable {
 
     RAIN_FIELDS_BEGIN(SpriteRendererComponentDto)
     RAIN_FIELD(color)
+    RAIN_FIELD(cols)
+    RAIN_FIELD(rows)
+    RAIN_FIELD(index)
     RAIN_FIELD(texture)
     RAIN_FIELDS_END
 };
@@ -75,10 +81,7 @@ struct CameraComponentDto : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-struct CubeMapDto : public Rain::Codable {
-    RAIN_FIELDS_BEGIN(CubeMapDto)
-    RAIN_FIELDS_END
-};
+struct CubeMapDto : public Rain::Codable {};
 
 struct Rigidbody2DComponentDto : public Rain::Codable {
     Rigidbody2DComponent::BodyType type;
@@ -139,7 +142,13 @@ struct ScriptFieldDto : public Rain::Codable {
                 encoder->encode("value", *value);
                 break;
             }
-            case ScriptFieldType::ENTITY: {
+            case ScriptFieldType::FLOAT: {
+                float *value = (float *)data.value.data;
+                encoder->encode("value", *value);
+                break;
+            }
+            case ScriptFieldType::ENTITY:
+            case ScriptFieldType::TEXTURE: {
                 UUID *value = (UUID *)data.value.data;
                 encoder->encode("value", *value);
                 break;
@@ -170,6 +179,14 @@ struct ScriptFieldDto : public Rain::Codable {
                 memcpy(data.value.data, &value, sizeof(int));
                 break;
             }
+            case ScriptFieldType::FLOAT: {
+                data.value = Foundation::Memory::alloc(sizeof(float));
+                float value = 0;
+                decoder->decode("value", value);
+                memcpy(data.value.data, &value, sizeof(float));
+                break;
+            }
+            case ScriptFieldType::TEXTURE:
             case ScriptFieldType::ENTITY: {
                 data.value = Foundation::Memory::alloc(sizeof(UUID));
                 UUID value = 0;

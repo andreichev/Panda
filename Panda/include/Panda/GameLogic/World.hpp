@@ -27,7 +27,9 @@ public:
     void updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     void updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     Entity instantiateEntity();
-    void bindScriptsAndFields();
+    void updateScriptsAndFields();
+    void initializeScriptCore();
+    void shutdownScriptCore();
     void destroy(Entity entity);
     void clear();
     bool isEmpty();
@@ -59,8 +61,7 @@ public:
         return m_physics2D;
     }
 
-    /// --------- Editor stuff -----------------
-
+#ifdef PND_EDITOR
     inline WorldCommandManager &getCommandManger() {
         return m_commandManager;
     }
@@ -72,9 +73,17 @@ public:
         return m_selectedEntity;
     }
 
+    bool isSelected(Entity entity) {
+        return m_selectedEntity == entity;
+    }
+
     void setSelectedEntity(Entity entity) {
         m_selectedEntity = entity;
     }
+
+    Entity duplicateEntity(Entity entity);
+#endif
+    bool isValidEntt(entt::entity entity);
 
 private:
     void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
@@ -92,10 +101,13 @@ private:
     Renderer3D m_renderer3d;
     Miren::ViewId m_renderingViewId;
 
-    /// -------- Editor stuff -----------
+#ifdef PND_EDITOR
     bool m_isChanged;
     WorldCommandManager m_commandManager;
+    // TODO: Multiple selection
+    // https://ru.yougile.com/team/91006f9f80d3/#PANDA-40
     Entity m_selectedEntity;
+#endif
 
     friend class Entity;
     friend class WorldHierarchyPanel;

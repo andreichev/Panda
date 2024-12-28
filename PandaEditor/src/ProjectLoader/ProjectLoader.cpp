@@ -108,15 +108,15 @@ void ProjectLoader::openProject(const path_t &path) {
     { m_assetHandler.openProject(m_projectPath); }
     m_worldPath = m_projectPath;
     m_worldPath.append(m_projectSettings.worldPath);
-    reloadScriptsDll();
     loadWorld();
-    m_world->bindScriptsAndFields();
+    reloadScriptsDll();
     appendRecentProject();
 }
 
 void ProjectLoader::reloadScriptsDll() {
     std::string projectName = m_projectPath.filename().string();
     m_scriptEngine.reload({m_projectPath / "Scripts" / projectName / "bin", projectName});
+    m_world->updateScriptsAndFields();
 }
 
 bool ProjectLoader::hasOpenedProject() {

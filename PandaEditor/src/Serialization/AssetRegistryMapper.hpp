@@ -7,20 +7,20 @@ namespace Panda {
 
 class AssetRegistryMapper final {
 public:
-    static AssetInfoEditorDto toDto(const AssetInfoEditor &entity) {
+    static AssetInfoEditorDto toDto(const AssetInfoEditor &info) {
         AssetInfoEditorDto dto;
-        dto.id = entity.id;
-        dto.path = entity.path;
-        dto.setAssetType(entity.type);
+        dto.id = info.id;
+        dto.path = info.path;
+        dto.setAssetType(info.type);
         return dto;
     }
 
-    static AssetInfoEditor toEntity(const AssetInfoEditorDto &dto) {
-        AssetInfoEditor entity;
-        entity.id = dto.id;
-        entity.path = dto.path;
-        entity.type = dto.getAssetType();
-        return entity;
+    static AssetInfoEditor toInfo(const AssetInfoEditorDto &dto) {
+        AssetInfoEditor info;
+        info.id = dto.id;
+        info.path = dto.path;
+        info.type = dto.getAssetType();
+        return info;
     }
 };
 

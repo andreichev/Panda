@@ -61,7 +61,7 @@ Entity Entity::getParent() {
 }
 
 bool Entity::isValid() const {
-    return (m_handle != entt::null) && m_world && m_world->m_registry.valid(m_handle);
+    return (m_handle != entt::null) && m_world && m_world->isValidEntt(m_handle);
 }
 
 Entity::operator bool() const {
@@ -79,5 +79,15 @@ void Entity::physics2DUpdate() {
 void Entity::physics2DRemove() {
     m_world->physics2DRemoveEntity(*this);
 }
+
+#ifdef PND_EDITOR
+bool Entity::isDeleted() {
+    return getComponent<EditorMetadataComponent>().isDeleted;
+}
+
+void Entity::setDeleted(bool deleted) {
+    getComponent<EditorMetadataComponent>().isDeleted = deleted;
+}
+#endif
 
 } // namespace Panda

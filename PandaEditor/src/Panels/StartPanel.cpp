@@ -24,7 +24,7 @@ void StartPanel::onImGuiRender() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(20, 25));
         ImGui::BeginChild("left pane", ImVec2(177, 0), true);
         ImGui::SetCursorPosX((177 - 50) / 2);
-        ImGui::Image((void *)(uintptr_t)m_logoImage.getHandle().id, {50, 50});
+        ImGui::Image((void *)(uintptr_t)m_logoImage.getMirenHandle().id, {50, 50});
         const char *title = "Panda v 0.1";
         auto textWidth = ImGui::CalcTextSize(title).x;
         ImGui::SetCursorPosX((177 - textWidth) * 0.5f);
@@ -96,7 +96,7 @@ void StartPanel::onImGuiRender() {
             }
             for (int i = 0; i < recentProjects.size(); i++) {
                 ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 4);
-                ImGui::Image((void *)(uintptr_t)m_iconProject.getHandle().id, {40, 40});
+                ImGui::Image((void *)(uintptr_t)m_iconProject.getMirenHandle().id, {40, 40});
                 ImGui::SameLine();
                 ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
                 ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, {0, 0.5});

@@ -16,6 +16,9 @@ TextureData AssetLoaderEditor::loadTexture(const path_t &path) {
 
     if (image == nullptr) {
         LOG_ERROR("Failed to load a texture file! {}", stbi_failure_reason());
+        // TODO: Return "Missing" texture
+        // https://ru.yougile.com/team/91006f9f80d3/#PANDA-41
+        return {};
     }
 
     TextureData texture;

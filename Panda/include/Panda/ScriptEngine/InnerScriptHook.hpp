@@ -8,6 +8,7 @@ namespace Panda {
 
 using ScriptInstanceHandle = uint32_t;
 using EntityHandle = uint32_t;
+using TextureHandle = uint32_t;
 
 namespace ExternalCalls {
     using Clear = void (*)();

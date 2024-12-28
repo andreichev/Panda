@@ -453,7 +453,7 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
             float aspect = texture->getSize().width / texture->getSize().height;
             aspect = Foundation::min(aspect, 4.f);
             float width = height * aspect;
-            ImGui::Image((ImTextureID)(intptr_t)texture->getHandle().id, {width, height});
+            ImGui::Image((ImTextureID)(intptr_t)texture->getMirenHandle().id, {width, height});
         } else {
             ImGui::Button("Texture Asset", {100, 55});
         }
@@ -552,15 +552,26 @@ bool drawScriptFieldValue(ScriptField &field) {
     ImGui::PushID(field.fieldId);
     switch (field.type) {
         case ScriptFieldType::INTEGER: {
-            if (dragInt(field.name.c_str(), (int *)field.value.data)) {
-                ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
-                changed = true;
-            }
+            changed |= dragInt(field.name.c_str(), (int *)field.value.data);
+            break;
+        }
+        case ScriptFieldType::FLOAT: {
+            changed |= dragFloat(field.name.c_str(), (float *)field.value.data, 0.2f);
             break;
         }
         case ScriptFieldType::ENTITY: {
-            if (propertyEntity(field.name.c_str(), (UUID *)field.value.data)) {
-                ExternalCalls::setFieldValue(field.instanceId, field.fieldId, field.value.data);
+            changed |= propertyEntity(field.name.c_str(), (UUID *)field.value.data);
+            break;
+        }
+        case ScriptFieldType::TEXTURE: {
+            // Load texture if it needs.
+            AssetHandler *assetHandler = GameContext::s_assetHandler;
+            UUID textureId = *(UUID *)field.value.data;
+            if (textureId && !field.asset && assetHandler) {
+                field.asset = assetHandler->load(textureId);
+            }
+            if (propertyTexture(field.name.c_str(), *(UUID *)field.value.data, field.asset)) {
+                field.resetCache();
                 changed = true;
             }
             break;

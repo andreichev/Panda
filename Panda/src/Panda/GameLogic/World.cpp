@@ -6,6 +6,7 @@
 #include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 #include "Panda/Physics/Physics2D.hpp"
+#include "Panda/GameLogic/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
 
 #include <Rain/Rain.hpp>
 #include <entt/entt.hpp>
@@ -27,11 +28,13 @@ World::~World() {
 void World::startRunning() {
     // Init physics
     m_physics2D.init(this);
+    // Instantiate script instances, bind ids
+    initializeScriptCore();
     // Call start at native scripts
     {
         auto view = m_registry.view<ScriptListComponent>();
         for (auto entityHandle : view) {
-            if (!m_registry.valid(entityHandle)) {
+            if (!isValidEntt(entityHandle)) {
                 continue;
             }
             auto &component = view.get<ScriptListComponent>(entityHandle);
@@ -44,6 +47,7 @@ void World::startRunning() {
 }
 
 void World::finishRunning() {
+    shutdownScriptCore();
     m_physics2D.destroy();
     m_isRunning = false;
 }
@@ -60,14 +64,11 @@ void World::updateRuntime(double deltaTime) {
     {
         auto view = m_registry.view<ScriptListComponent>();
         for (auto entityHandle : view) {
-            if (!m_registry.valid(entityHandle)) {
+            if (!isValidEntt(entityHandle)) {
                 continue;
             }
             auto &component = view.get<ScriptListComponent>(entityHandle);
             for (auto &container : component.scripts) {
-                if (!m_registry.valid(entityHandle)) {
-                    break;
-                }
                 container.invokeUpdate(deltaTime);
             }
         }
@@ -103,7 +104,7 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
     {
         auto view = m_registry.view<ScriptListComponent>();
         for (auto entityHandle : view) {
-            if (!m_registry.valid(entityHandle)) {
+            if (!isValidEntt(entityHandle)) {
                 continue;
             }
             auto &component = view.get<ScriptListComponent>(entityHandle);
@@ -142,7 +143,7 @@ void World::updateBasicComponents(
     {
         auto view = m_registry.view<SkyComponent>();
         for (auto &entityHandle : view) {
-            if (!m_registry.valid(entityHandle)) {
+            if (!isValidEntt(entityHandle)) {
                 continue;
             }
             auto &sky = view.get<SkyComponent>(entityHandle);
@@ -154,7 +155,7 @@ void World::updateBasicComponents(
     {
         auto view = m_registry.view<SpriteRendererComponent, TransformComponent>();
         for (auto entityHandle : view) {
-            if (!m_registry.valid(entityHandle)) {
+            if (!isValidEntt(entityHandle)) {
                 continue;
             }
             auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
@@ -164,12 +165,19 @@ void World::updateBasicComponents(
             rect.color = spriteComponent.color;
             // Load texture if it needs.
             AssetHandler *assetHandler = GameContext::s_assetHandler;
-            if (spriteComponent.textureId && !spriteComponent.texture && assetHandler) {
-                spriteComponent.texture = assetHandler->load(spriteComponent.textureId);
+            if (spriteComponent.textureId && !spriteComponent.asset && assetHandler) {
+                spriteComponent.asset = assetHandler->load(spriteComponent.textureId);
             }
-            rect.texture = spriteComponent.texture;
+            rect.texture = spriteComponent.asset;
             rect.size = {1.f, 1.f};
             rect.id = static_cast<int32_t>(entityHandle);
+            int xTileIndex = spriteComponent.index % spriteComponent.cols;
+            int yTileIndex = spriteComponent.index % spriteComponent.rows;
+            float tileWidth = (1.f / spriteComponent.cols);
+            float tileHeight = (1.f / spriteComponent.rows);
+            float xTexCoord = tileWidth * xTileIndex;
+            float yTexCoord = tileHeight * yTileIndex;
+            rect.textureCoords = {xTexCoord, yTexCoord, tileWidth, tileHeight};
             m_renderer2d.drawRect(rect);
         }
     }
@@ -177,7 +185,7 @@ void World::updateBasicComponents(
     {
         auto view = m_registry.view<StaticMeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
-            if (!m_registry.valid(entityHandle)) {
+            if (!isValidEntt(entityHandle)) {
                 continue;
             }
             auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
@@ -191,7 +199,7 @@ void World::updateBasicComponents(
     {
         auto view = m_registry.view<DynamicMeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
-            if (!m_registry.valid(entityHandle)) {
+            if (!isValidEntt(entityHandle)) {
                 continue;
             }
             auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
@@ -221,49 +229,43 @@ Entity World::instantiateEntity(UUID id) {
     return entity;
 }
 
-void World::bindScriptsAndFields() {
+void World::updateScriptsAndFields() {
     if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
         return;
     }
     auto view = m_registry.view<ScriptListComponent>();
     auto manifest = GameContext::s_scriptEngine->getManifest();
     for (auto entityHandle : view) {
-        if (!m_registry.valid(entityHandle)) {
+        if (!isValidEntt(entityHandle)) {
             continue;
         }
         auto &component = view.get<ScriptListComponent>(entityHandle);
         UUID entityId = Entity(entityHandle, this).getId();
-        //-----------------------------------
-        //              CLASSES
-        //-----------------------------------
+        //-----------------------------------//
+        //              CLASSES              //
+        //-----------------------------------//
         for (auto &container : component.scripts) {
-            ScriptInstanceHandle scriptInstanceId =
-                ExternalCalls::instantiateScript(entityId, container.getName().c_str());
-            if (!scriptInstanceId) {
-                Entity entity = Entity(entityHandle, this);
-                LOG_INFO_EDITOR("SCRIPT {} NOT FOUND.", container.getName(), entity.getName());
-                // TODO: Remove unbound script after N times unfixed.
-                // if(container.unusedCount() > N) {
-                //     component.remove(container);
-                // }
-                continue;
-            }
             const ScriptClassManifest &clazz = manifest.getClass(container.getName().c_str());
             if (!clazz) {
                 Entity entity = Entity(entityHandle, this);
                 LOG_INFO_EDITOR(
                     "SCRIPT CLASS MANIFEST {} NOT FOUND.", container.getName(), entity.getName()
                 );
+                // TODO: Remove unbound script after N times unfixed.
+                // if(container.unusedCount() > N) {
+                //     component.remove(container);
+                // }
                 continue;
             }
-            container.rebindId(scriptInstanceId);
-            //-----------------------------------
-            //              FIELDS
-            //-----------------------------------
+            //----------------------------------//
+            //              FIELDS              //
+            //----------------------------------//
             for (ScriptField &field : container.getFields()) {
                 const ScriptFieldManifest &fieldManifest = clazz.getField(field.name.c_str());
                 if (!fieldManifest) {
-                    LOG_INFO_EDITOR("SCRIPT {} FIELD {} NOT FOUND.", container.getName(), field.name);
+                    LOG_INFO_EDITOR(
+                        "SCRIPT {} FIELD {} NOT FOUND.", container.getName(), field.name
+                    );
                     container.removeField(field);
                     continue;
                 }
@@ -278,6 +280,12 @@ void World::bindScriptsAndFields() {
                             memset(value.data, 0, sizeof(int));
                             break;
                         }
+                        case ScriptFieldType::FLOAT: {
+                            value = Foundation::Memory::alloc(sizeof(float));
+                            memset(value.data, 0, sizeof(float));
+                            break;
+                        }
+                        case ScriptFieldType::TEXTURE:
                         case ScriptFieldType::ENTITY: {
                             value = Foundation::Memory::alloc(sizeof(UUID));
                             memset(value.data, 0, sizeof(UUID));
@@ -289,16 +297,44 @@ void World::bindScriptsAndFields() {
                         }
                     }
                     ScriptField field = ScriptField(
-                        scriptInstanceId,
-                        fieldManifest.handle,
-                        fieldManifest.name,
-                        fieldManifest.type,
-                        value
+                        0, fieldManifest.handle, fieldManifest.name, fieldManifest.type, value
                     );
                     container.addField(field);
                     continue;
                 }
                 ScriptField &field = container.getField(fieldManifest.name);
+                field.type = fieldManifest.type;
+            }
+        }
+    }
+}
+
+void World::initializeScriptCore() {
+    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
+        return;
+    }
+    auto view = m_registry.view<ScriptListComponent>();
+    auto manifest = GameContext::s_scriptEngine->getManifest();
+    for (auto entityHandle : view) {
+        if (!isValidEntt(entityHandle)) {
+            continue;
+        }
+        auto &component = view.get<ScriptListComponent>(entityHandle);
+        UUID entityId = Entity(entityHandle, this).getId();
+        //-----------------------------------//
+        //              CLASSES              //
+        //-----------------------------------//
+        for (auto &container : component.scripts) {
+            ScriptInstanceHandle scriptInstanceId =
+                ExternalCalls::instantiateScript(entityId, container.getName().c_str());
+            PND_ASSERT_F(
+                scriptInstanceId, "CANNOT INSTANTIATE SCRIPT {}", container.getName().c_str()
+            );
+            container.rebindId(scriptInstanceId);
+            //----------------------------------//
+            //              FIELDS              //
+            //----------------------------------//
+            for (ScriptField &field : container.getFields()) {
                 field.instanceId = scriptInstanceId;
                 ExternalCalls::setFieldValue(scriptInstanceId, field.fieldId, field.value.data);
             }
@@ -306,8 +342,34 @@ void World::bindScriptsAndFields() {
     }
 }
 
+void World::shutdownScriptCore() {
+    ExternalCalls::clear();
+    auto view = m_registry.view<ScriptListComponent>();
+    for (auto entityHandle : view) {
+        if (!isValidEntt(entityHandle)) {
+            continue;
+        }
+        auto &component = view.get<ScriptListComponent>(entityHandle);
+        //-----------------------------------//
+        //              CLASSES              //
+        //-----------------------------------//
+        for (auto &container : component.scripts) {
+            container.rebindId(0);
+            //----------------------------------//
+            //              FIELDS              //
+            //----------------------------------//
+            for (ScriptField &field : container.getFields()) {
+                field.instanceId = 0;
+            }
+        }
+    }
+}
+
 void World::fillEntity(Entity entity, UUID id) {
     entity.addComponent<IdComponent>(id);
+#ifdef PND_EDITOR
+    entity.addComponent<EditorMetadataComponent>();
+#endif
     entity.addComponent<TagComponent>("Entity");
     entity.addComponent<RelationshipComponent>();
     entity.addComponent<TransformComponent>();
@@ -337,6 +399,18 @@ void World::clear() {
     }
     m_registry.clear();
     m_commandManager.CLEAR();
+
+    // Delete all editor deleted entities
+#ifdef PND_EDITOR
+    for (auto entityHandle : m_registry.storage<entt::entity>()) {
+        if (!m_registry.valid(entityHandle)) {
+            continue;
+        }
+        if (m_registry.get<EditorMetadataComponent>(entityHandle).isDeleted) {
+            m_registry.destroy(entityHandle);
+        }
+    }
+#endif
 }
 
 bool World::isEmpty() {
@@ -346,7 +420,7 @@ bool World::isEmpty() {
 Entity World::findMainCameraEntity() {
     auto view = m_registry.view<CameraComponent>();
     for (auto entity : view) {
-        if (!m_registry.valid(entity)) {
+        if (!isValidEntt(entity)) {
             continue;
         }
         auto &comp = view.get<CameraComponent>(entity);
@@ -393,7 +467,7 @@ void World::setChanged(bool changed) {
 Entity World::findByTag(const char *tag) {
     auto view = m_registry.view<TagComponent>();
     for (auto entityHandle : view) {
-        if (!m_registry.valid(entityHandle)) {
+        if (!isValidEntt(entityHandle)) {
             continue;
         }
         auto &tagComponent = view.get<TagComponent>(entityHandle);
@@ -437,6 +511,9 @@ World &World::operator=(World &other) {
         UUID id = src.get<IdComponent>(entityHandle).id;
         m_entityIdMap[id] = Entity(entityHandle, this);
         copyAllComponents<IdComponent>(src, dst, entityHandle);
+#ifdef PND_EDITOR
+        copyAllComponents<EditorMetadataComponent>(src, dst, entityHandle);
+#endif
         copyAllComponents<TagComponent>(src, dst, entityHandle);
         copyAllComponents<TransformComponent>(src, dst, entityHandle);
         copyAllComponents<RelationshipComponent>(src, dst, entityHandle);
@@ -450,6 +527,55 @@ World &World::operator=(World &other) {
         copyAllComponents<BoxCollider2DComponent>(src, dst, entityHandle);
     }
     return *this;
+}
+
+template<typename T>
+void copyComponent(entt::entity src, entt::entity dst, entt::registry &registry) {
+    if (registry.any_of<T>(src)) {
+        registry.emplace<T>(dst, registry.get<T>(src));
+    }
+}
+
+Entity World::duplicateEntity(Entity entity) {
+    if (!entity) {
+        return {};
+    }
+    Entity src = entity;
+    entt::entity dstHandle = m_registry.create();
+    Entity dst = {dstHandle, this};
+    dst.addComponent<IdComponent>();
+    copyComponent<TagComponent>(src, dst, m_registry);
+#ifdef PND_EDITOR
+    copyComponent<EditorMetadataComponent>(src, dst, m_registry);
+#endif
+    copyComponent<TransformComponent>(src, dst, m_registry);
+    copyComponent<RelationshipComponent>(src, dst, m_registry);
+    copyComponent<SpriteRendererComponent>(src, dst, m_registry);
+    copyComponent<StaticMeshComponent>(src, dst, m_registry);
+    copyComponent<DynamicMeshComponent>(src, dst, m_registry);
+    copyComponent<CameraComponent>(src, dst, m_registry);
+    copyComponent<ScriptListComponent>(src, dst, m_registry);
+    copyComponent<SkyComponent>(src, dst, m_registry);
+    copyComponent<Rigidbody2DComponent>(src, dst, m_registry);
+    copyComponent<BoxCollider2DComponent>(src, dst, m_registry);
+    m_entityIdMap[dst.getId()] = entity;
+    m_isChanged = true;
+    return dst;
+}
+
+bool World::isValidEntt(entt::entity entity) {
+    if (!m_registry.valid(entity)) {
+        return false;
+    }
+#ifdef PND_EDITOR
+    if (m_registry.any_of<EditorMetadataComponent>(entity)) {
+        EditorMetadataComponent &metadata = m_registry.get<EditorMetadataComponent>(entity);
+        if (metadata.isDeleted) {
+            return false;
+        }
+    }
+#endif
+    return true;
 }
 
 void World::physics2DRegisterEntity(Entity entity) {

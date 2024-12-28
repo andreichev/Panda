@@ -18,15 +18,14 @@ struct SkyVertex {
 class SkyComponent final {
 public:
     SkyComponent(SkyComponent &other)
-        : m_sceneViewId(other.m_sceneViewId)
-        , m_useHdr(false) {
+        : m_sceneViewId(other.m_sceneViewId) {
         // TODO: Добавить переиспользование ресурсов между мирами при помощи AssetManager
+        // https://ru.yougile.com/team/91006f9f80d3/#PANDA-34
         initResources();
     }
 
     SkyComponent()
-        : m_sceneViewId(0)
-        , m_useHdr(false) {
+        : m_sceneViewId(0) {
         initResources();
     }
 
@@ -41,18 +40,14 @@ public:
     }
 
     Miren::TextureHandle getSkyTexture() {
-        return m_skyDefaultTexture;
-    }
-
-    Miren::TextureHandle getSkyHdrTexture() {
-        return m_skyHdrTexture;
+        return m_texture;
     }
 
     void freeResources() {
         Miren::deleteVertexBuffer(m_vertexBuffer);
         Miren::deleteIndexBuffer(m_indexBuffer);
-        Miren::deleteProgram(m_defaultShader);
-        Miren::deleteTexture(m_skyDefaultTexture);
+        Miren::deleteProgram(m_shader);
+        Miren::deleteTexture(m_texture);
     }
 
     void initResources() {
@@ -113,74 +108,37 @@ public:
         m_indexBuffer =
             Miren::createIndexBuffer(indicesMemory, Miren::BufferElementType::UnsignedInt, 36);
 
-        Panda::TextureData m_skyDefaultTextureAsset = AssetLoaderEditor::loadCubeMapTexture({
-            "default-textures/skybox/3/px.png",
-            "default-textures/skybox/3/nx.png",
-            "default-textures/skybox/3/py.png",
-            "default-textures/skybox/3/ny.png",
-            "default-textures/skybox/3/pz.png",
-            "default-textures/skybox/3/nz.png",
-        });
-        Miren::TextureCreate m_skyDefaultTextureConfig =
-            m_skyDefaultTextureAsset.getMirenTextureCreate();
-        m_skyDefaultTextureConfig.m_minFiltering = NEAREST;
-        m_skyDefaultTextureConfig.m_magFiltering = LINEAR;
-        m_skyDefaultTextureConfig.m_wrap = CLAMP;
-        m_skyDefaultTexture = Miren::createTexture(m_skyDefaultTextureConfig);
-
         Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
-            "default-shaders/sky/sky_vertex.glsl", "default-shaders/sky/sky_fragment.glsl"
-        );
-        m_defaultShader = Miren::createProgram(programAsset.getMirenProgramCreate());
-
-        programAsset = Panda::AssetLoaderEditor::loadProgram(
             "default-shaders/sky/sky_vertex_hdr.glsl", "default-shaders/sky/sky_fragment_hdr.glsl"
         );
-        m_hdrShader = Miren::createProgram(programAsset.getMirenProgramCreate());
-        m_model = glm::mat4(1.f);
+        m_shader = Miren::createProgram(programAsset.getMirenProgramCreate());
 
-        setHdrTexture("default-textures/skybox/hdr/field.jpeg");
+        Panda::TextureData m_skyDefaultTextureAsset =
+            AssetLoaderEditor::loadTexture("default-textures/skybox/hdr/night_sky.png");
+        Miren::TextureCreate m_skyHdrTextureConfig =
+            m_skyDefaultTextureAsset.getMirenTextureCreate();
+        m_skyHdrTextureConfig.m_minFiltering = NEAREST;
+        m_skyHdrTextureConfig.m_magFiltering = NEAREST;
+        m_skyHdrTextureConfig.m_wrap = CLAMP;
+        m_texture = Miren::createTexture(m_skyHdrTextureConfig);
+
+        m_model = glm::mat4(1.f);
     }
 
     void update(glm::mat4 &viewProjection) {
         m_viewProjection = viewProjection;
-        auto &shader = m_useHdr ? m_hdrShader : m_defaultShader;
-        Miren::setShader(shader);
+        Miren::setShader(m_shader);
         int samplerCube = 0;
-        Miren::setTexture(m_useHdr ? m_skyHdrTexture : m_skyDefaultTexture, samplerCube);
-        Miren::setUniform(shader, "skyTexture", &samplerCube, Miren::UniformType::Sampler);
-        Miren::setUniform(shader, "model", &m_model[0][0], Miren::UniformType::Mat4);
-        Miren::setUniform(shader, "projViewMtx", &m_viewProjection[0][0], Miren::UniformType::Mat4);
+        Miren::setTexture(m_texture, samplerCube);
+        Miren::setUniform(m_shader, "skyTexture", &samplerCube, Miren::UniformType::Sampler);
+        Miren::setUniform(m_shader, "model", &m_model[0][0], Miren::UniformType::Mat4);
+        Miren::setUniform(
+            m_shader, "projViewMtx", &m_viewProjection[0][0], Miren::UniformType::Mat4
+        );
         Miren::setVertexBuffer(m_vertexBuffer);
         Miren::setIndexBuffer(m_indexBuffer, 0, 36);
         Miren::setState(0);
         Miren::submit(m_sceneViewId);
-    }
-
-    void setHdrTexture(const path_t &pathHdrTexture) {
-        using namespace Miren;
-        if (!std::filesystem::exists(pathHdrTexture)) {
-            LOG_ERROR("Path not exists");
-            return;
-        }
-        deleteHdrTexture();
-        m_useHdr = true;
-
-        Panda::TextureData m_skyDefaultTextureAsset =
-            AssetLoaderEditor::loadTexture(pathHdrTexture);
-        Miren::TextureCreate m_skyHdrTextureConfig =
-            m_skyDefaultTextureAsset.getMirenTextureCreate();
-        m_skyHdrTextureConfig.m_minFiltering = NEAREST;
-        m_skyHdrTextureConfig.m_magFiltering = LINEAR;
-        m_skyHdrTextureConfig.m_wrap = CLAMP;
-        m_skyHdrTexture = Miren::createTexture(m_skyHdrTextureConfig);
-    }
-
-    void deleteHdrTexture() {
-        if (m_skyHdrTexture.isValid()) {
-            Miren::deleteTexture(m_skyHdrTexture);
-        }
-        m_useHdr = false;
     }
 
     void setViewId(Miren::ViewId viewId) {
@@ -188,15 +146,12 @@ public:
     }
 
 private:
-    bool m_useHdr;
     glm::mat4 m_model;
     glm::mat4 m_viewProjection;
     Miren::ViewId m_sceneViewId;
 
-    Miren::TextureHandle m_skyDefaultTexture;
-    Miren::TextureHandle m_skyHdrTexture;
-    Miren::ProgramHandle m_defaultShader;
-    Miren::ProgramHandle m_hdrShader;
+    Miren::TextureHandle m_texture;
+    Miren::ProgramHandle m_shader;
 
     Miren::IndexBufferHandle m_indexBuffer;
     Miren::VertexBufferHandle m_vertexBuffer;
