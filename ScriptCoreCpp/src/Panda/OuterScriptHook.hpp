@@ -34,6 +34,8 @@ namespace ExternalCalls {
     extern Entity_HasComponent entity_HasComponent;
     using Entity_RemoveComponent = void (*)(EntityHandle entityId, const char *type);
     extern Entity_RemoveComponent entity_RemoveComponent;
+    using Entity_GetName = const char *(*)(EntityHandle entityId);
+    extern Entity_GetName entity_GetName;
     /// TRANSFORM COMPONENT
     using TransformComponent_GetPosition =
         void (*)(EntityHandle entityId, float *x, float *y, float *z);

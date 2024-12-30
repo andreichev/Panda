@@ -28,6 +28,7 @@ namespace ExternalCalls {
     Entity_CreateComponent entity_CreateComponent = nullptr;
     Entity_HasComponent entity_HasComponent = nullptr;
     Entity_RemoveComponent entity_RemoveComponent = nullptr;
+    Entity_GetName entity_GetName = nullptr;
     /// TRANSFORM COMPONENT
     TransformComponent_GetPosition transformComponent_GetPosition = nullptr;
     TransformComponent_SetPosition transformComponent_SetPosition = nullptr;
@@ -79,6 +80,42 @@ namespace InternalCalls {
         script->start();
     }
 
+    void invokeCollisionBeginTouch(ScriptInstanceHandle handle, EntityHandle entityId) {
+        Bamboo::Script *script = getScriptRegistry()->getInstanceWithId(handle);
+        if (!script) {
+            // assert(false);
+            return;
+        }
+        script->collisionBeginTouch(Bamboo::Entity(entityId));
+    }
+
+    void invokeCollisionEndTouch(ScriptInstanceHandle handle, EntityHandle entityId) {
+        Bamboo::Script *script = getScriptRegistry()->getInstanceWithId(handle);
+        if (!script) {
+            // assert(false);
+            return;
+        }
+        script->collisionEndTouch(Bamboo::Entity(entityId));
+    }
+
+    void invokeBeginSensorOverlap(ScriptInstanceHandle handle, EntityHandle entityId) {
+        Bamboo::Script *script = getScriptRegistry()->getInstanceWithId(handle);
+        if (!script) {
+            // assert(false);
+            return;
+        }
+        script->beginSensorOverlap(Bamboo::Entity(entityId));
+    }
+
+    void invokeEndSensorOverlap(ScriptInstanceHandle handle, EntityHandle entityId) {
+        Bamboo::Script *script = getScriptRegistry()->getInstanceWithId(handle);
+        if (!script) {
+            // assert(false);
+            return;
+        }
+        script->endSensorOverlap(Bamboo::Entity(entityId));
+    }
+
     void setFieldValue(ScriptInstanceHandle scriptId, FieldHandle fieldId, void *value) {
         getScriptRegistry()->setFieldValue(scriptId, fieldId, value);
     }
@@ -97,6 +134,10 @@ void initScriptHook() {
     g_scriptSymbols["setFieldValue"] = (void *)setFieldValue;
     g_scriptSymbols["invokeStartAtScript"] = (void *)invokeStartAtScript;
     g_scriptSymbols["invokeUpdateAtScript"] = (void *)invokeUpdateAtScript;
+    g_scriptSymbols["invokeCollisionBeginTouch"] = (void *)invokeCollisionBeginTouch;
+    g_scriptSymbols["invokeCollisionEndTouch"] = (void *)invokeCollisionEndTouch;
+    g_scriptSymbols["invokeBeginSensorOverlap"] = (void *)invokeBeginSensorOverlap;
+    g_scriptSymbols["invokeEndSensorOverlap"] = (void *)invokeEndSensorOverlap;
     g_scriptSymbols["getManifest"] = (void *)getManifest;
 }
 
@@ -125,6 +166,7 @@ LIB_EXPORT int loadExternalCalls(SymbolsLoadFunc load) {
     world_FindByTag = (World_FindByTag)load("world_FindByTag");
     world_CreateEntity = (World_CreateEntity)load("world_CreateEntity");
     world_DestroyEntity = (World_DestroyEntity)load("world_DestroyEntity");
+    entity_GetName = (Entity_GetName)load("entity_GetName");
     /// INPUT
     input_IsKeyPressed = (Input_IsKeyPressed)load("input_IsKeyPressed");
     input_IsKeyJustPressed = (Input_IsKeyJustPressed)load("input_IsKeyJustPressed");

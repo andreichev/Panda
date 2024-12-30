@@ -29,6 +29,8 @@ public:
         return m_id;
     }
 
+    const char *getName();
+
 private:
     EntityHandle m_id;
 

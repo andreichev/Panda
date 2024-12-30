@@ -56,6 +56,22 @@ public:
         ExternalCalls::invokeUpdateAtScript(id, deltaTime);
     }
 
+    void invokeCollisionBeginTouch(EntityHandle other) {
+        ExternalCalls::invokeCollisionBeginTouch(id, other);
+    }
+
+    void invokeCollisionEndTouch(EntityHandle other) {
+        ExternalCalls::invokeCollisionEndTouch(id, other);
+    }
+
+    void invokeBeginSensorOverlap(EntityHandle other) {
+        ExternalCalls::invokeBeginSensorOverlap(id, other);
+    }
+
+    void invokeEndSensorOverlap(EntityHandle other) {
+        ExternalCalls::invokeEndSensorOverlap(id, other);
+    }
+
     const std::string &getName() {
         return name;
     }

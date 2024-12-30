@@ -107,6 +107,11 @@ namespace InternalCalls {
         s_removeComponentFuncs.at(type)(entity);
     }
 
+    const char *entity_GetName(EntityHandle entityId) {
+        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        return entity.getName().c_str();
+    }
+
     /// TRANSFORM COMPONENT
 
     void transformComponent_GetPosition(EntityHandle entityId, float *x, float *y, float *z) {
@@ -289,6 +294,7 @@ void initScriptHook() {
     g_scriptSymbols["entity_CreateComponent"] = (void *)InternalCalls::entity_CreateComponent;
     g_scriptSymbols["entity_HasComponent"] = (void *)InternalCalls::entity_HasComponent;
     g_scriptSymbols["entity_RemoveComponent"] = (void *)InternalCalls::entity_RemoveComponent;
+    g_scriptSymbols["entity_GetName"] = (void *)InternalCalls::entity_GetName;
     /// TRANSFORM COMPONENT
     g_scriptSymbols["transformComponent_GetPosition"] =
         (void *)InternalCalls::transformComponent_GetPosition;
@@ -342,6 +348,10 @@ namespace ExternalCalls {
     SetFieldValue setFieldValue = nullptr;
     InvokeUpdateAtScript invokeUpdateAtScript = nullptr;
     InvokeStartAtScript invokeStartAtScript = nullptr;
+    InvokeCollisionBeginTouch invokeCollisionBeginTouch = nullptr;
+    InvokeCollisionEndTouch invokeCollisionEndTouch = nullptr;
+    InvokeBeginSensorOverlap invokeBeginSensorOverlap = nullptr;
+    InvokeEndSensorOverlap invokeEndSensorOverlap = nullptr;
     GetManifest getManifest = nullptr;
 } // namespace ExternalCalls
 
@@ -368,6 +378,10 @@ int loadExternalCalls(SymbolsLoadFunc load) {
     setFieldValue = (SetFieldValue)load("setFieldValue");
     invokeUpdateAtScript = (InvokeUpdateAtScript)load("invokeUpdateAtScript");
     invokeStartAtScript = (InvokeStartAtScript)load("invokeStartAtScript");
+    invokeCollisionBeginTouch = (InvokeCollisionBeginTouch)load("invokeCollisionBeginTouch");
+    invokeCollisionEndTouch = (InvokeCollisionEndTouch)load("invokeCollisionEndTouch");
+    invokeBeginSensorOverlap = (InvokeBeginSensorOverlap)load("invokeBeginSensorOverlap");
+    invokeEndSensorOverlap = (InvokeEndSensorOverlap)load("invokeEndSensorOverlap");
     getManifest = (GetManifest)load("getManifest");
     LOG_INFO("SCRIPT ENGINE: Inner functions binding done.");
     return 0;

@@ -99,6 +99,66 @@ void Physics2D::update(World *world, double deltaTime) {
         float rotationRad = b2Rot_GetAngle(rotation);
         transform.setRotationEuler({0.f, 0.f, glm::degrees(rotationRad)});
     }
+    //----------------------------------//
+    //          CONTACT EVENTS          //
+    //----------------------------------//
+    b2ContactEvents contactEvents = b2World_GetContactEvents(worldId);
+    for (int i = 0; i < contactEvents.endCount; ++i) {
+        b2ContactEndTouchEvent event = contactEvents.endEvents[i];
+        b2BodyId bodyIdA = b2Shape_GetBody(event.shapeIdA);
+        b2BodyId bodyIdB = b2Shape_GetBody(event.shapeIdB);
+        Entity entityA = m_bodyEntityMap.at(bodyIdA.index1);
+        Entity entityB = m_bodyEntityMap.at(bodyIdB.index1);
+        ScriptListComponent &scriptListA = entityA.getComponent<ScriptListComponent>();
+        for (ExternalScript &script : scriptListA.scripts) {
+            script.invokeCollisionEndTouch(entityB.getId());
+        }
+        ScriptListComponent &scriptListB = entityB.getComponent<ScriptListComponent>();
+        for (ExternalScript &script : scriptListB.scripts) {
+            script.invokeCollisionEndTouch(entityA.getId());
+        }
+    }
+    for (int i = 0; i < contactEvents.beginCount; ++i) {
+        b2ContactBeginTouchEvent event = contactEvents.beginEvents[i];
+        b2BodyId bodyIdA = b2Shape_GetBody(event.shapeIdA);
+        b2BodyId bodyIdB = b2Shape_GetBody(event.shapeIdB);
+        Entity entityA = m_bodyEntityMap.at(bodyIdA.index1);
+        Entity entityB = m_bodyEntityMap.at(bodyIdB.index1);
+        ScriptListComponent &scriptListA = entityA.getComponent<ScriptListComponent>();
+        for (ExternalScript &script : scriptListA.scripts) {
+            script.invokeCollisionBeginTouch(entityB.getId());
+        }
+        ScriptListComponent &scriptListB = entityB.getComponent<ScriptListComponent>();
+        for (ExternalScript &script : scriptListB.scripts) {
+            script.invokeCollisionBeginTouch(entityA.getId());
+        }
+    }
+    //----------------------------------//
+    //          SENSOR EVENTS           //
+    //----------------------------------//
+    b2SensorEvents sensorEvents = b2World_GetSensorEvents(worldId);
+    for (int i = 0; i < sensorEvents.beginCount; ++i) {
+        b2SensorBeginTouchEvent event = sensorEvents.beginEvents[i];
+        b2BodyId bodyIdSensor = b2Shape_GetBody(event.sensorShapeId);
+        b2BodyId bodyIdVisitor = b2Shape_GetBody(event.visitorShapeId);
+        Entity entitySensor = m_bodyEntityMap.at(bodyIdSensor.index1);
+        Entity entityVisitor = m_bodyEntityMap.at(bodyIdVisitor.index1);
+        ScriptListComponent &scriptListVisitor = entityVisitor.getComponent<ScriptListComponent>();
+        for (ExternalScript &script : scriptListVisitor.scripts) {
+            script.invokeBeginSensorOverlap(entitySensor.getId());
+        }
+    }
+    for (int i = 0; i < sensorEvents.endCount; ++i) {
+        b2SensorEndTouchEvent event = sensorEvents.endEvents[i];
+        b2BodyId bodyIdSensor = b2Shape_GetBody(event.sensorShapeId);
+        b2BodyId bodyIdVisitor = b2Shape_GetBody(event.visitorShapeId);
+        Entity entitySensor = m_bodyEntityMap.at(bodyIdSensor.index1);
+        Entity entityVisitor = m_bodyEntityMap.at(bodyIdVisitor.index1);
+        ScriptListComponent &scriptListVisitor = entityVisitor.getComponent<ScriptListComponent>();
+        for (ExternalScript &script : scriptListVisitor.scripts) {
+            script.invokeEndSensorOverlap(entitySensor.getId());
+        }
+    }
 }
 
 void Physics2D::registerEntity(Entity entity) {
@@ -115,26 +175,25 @@ void Physics2D::registerEntity(Entity entity) {
     bodyDef.position = {transform.getPosition().x, transform.getPosition().y};
     bodyDef.rotation = {cos(rotationRad), sin(rotationRad)};
     bodyDef.fixedRotation = rb2d.fixedRotation;
-
     b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
     memcpy(&rb2d.runtimeData, &bodyId, sizeof(b2BodyId));
     if (entity.hasComponent<BoxCollider2DComponent>()) {
         auto &bc2d = entity.getComponent<BoxCollider2DComponent>();
-
         b2Polygon boxShape = b2MakeOffsetBox(
             abs(bc2d.size.x * transform.getScale().x),
             abs(bc2d.size.y * transform.getScale().y),
             {bc2d.offset.x, bc2d.offset.y},
             {1.0f, 0.0f}
         );
-
         b2ShapeDef shapeDef = b2DefaultShapeDef();
         shapeDef.density = bc2d.density;
         shapeDef.friction = bc2d.friction;
         shapeDef.restitution = bc2d.restitution;
+        shapeDef.isSensor = bc2d.isSensor;
         b2ShapeId shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &boxShape);
         memcpy(&bc2d.runtimeData, &shapeId, sizeof(b2ShapeId));
     }
+    m_bodyEntityMap[bodyId.index1] = entity;
 }
 
 void Physics2D::updateEntity(Entity entity) {
@@ -171,6 +230,10 @@ void Physics2D::updateEntity(Entity entity) {
         b2Shape_SetDensity(shapeId, bc2d.density, true);
         b2Shape_SetFriction(shapeId, bc2d.friction);
         b2Shape_SetRestitution(shapeId, bc2d.restitution);
+        PND_ASSERT(
+            b2Shape_IsSensor(shapeId) == bc2d.isSensor,
+            "CHANGING IS SENSOR IN RUNTIME IS NOT SUPPORTED"
+        );
     }
     b2Body_SetLinearVelocity(bodyId, {0, 0});
     b2Body_SetAngularVelocity(bodyId, 0);
@@ -184,6 +247,7 @@ void Physics2D::removeEntity(Entity entity) {
     b2BodyId bodyId;
     memcpy(&bodyId, &rb2d.runtimeData, sizeof(b2BodyId));
     b2DestroyBody(bodyId);
+    m_bodyEntityMap.erase(bodyId.index1);
 }
 
 void Physics2D::applyForce(Entity entity, Vec2 force) {
@@ -257,12 +321,13 @@ void Physics2D::setFriction(Entity entity, float friction) {
     b2Shape_SetFriction(shapeId, friction);
 }
 
-void Physics2D::destroy() {
+void Physics2D::shutdown() {
     if (m_physicsWorldId) {
         b2WorldId id = IntToB2WorldId(m_physicsWorldId);
         b2DestroyWorld(id);
         m_physicsWorldId = 0;
     }
+    m_bodyEntityMap.clear();
 }
 
 } // namespace Panda

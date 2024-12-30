@@ -1,4 +1,5 @@
 #include "Bamboo/Entity.hpp"
+#include "Panda/OuterScriptHook.hpp"
 
 namespace Bamboo {
 
@@ -7,5 +8,9 @@ Entity::Entity()
 
 Entity::Entity(EntityHandle id)
     : m_id(id) {}
+
+const char *Entity::getName() {
+    return Panda::ExternalCalls::entity_GetName(m_id);
+}
 
 } // namespace Bamboo

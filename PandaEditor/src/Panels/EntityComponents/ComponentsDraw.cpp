@@ -310,6 +310,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
             BoxCollider2DComponent bc2d = component;
             bool modified = false;
+            modified |= checkbox("Is Sensor", &bc2d.isSensor);
             modified |= dragFloat2("Offset", glm::value_ptr(bc2d.offset));
             modified |= dragFloat("Size", glm::value_ptr(bc2d.size));
             modified |= dragFloat("Density", &bc2d.density, 0.01f, 0.0f, 1.0f);
