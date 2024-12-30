@@ -248,7 +248,7 @@ void World::updateScriptsAndFields() {
             const ScriptClassManifest &clazz = manifest.getClass(container.getName().c_str());
             if (!clazz) {
                 Entity entity = Entity(entityHandle, this);
-                LOG_INFO_EDITOR(
+                LOG_ERROR_EDITOR(
                     "SCRIPT CLASS MANIFEST {} NOT FOUND.", container.getName(), entity.getName()
                 );
                 // TODO: Remove unbound script after N times unfixed.

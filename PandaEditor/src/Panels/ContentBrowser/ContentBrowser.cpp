@@ -53,6 +53,7 @@ void ContentBrowser::onImGuiRender() {
             m_currentDirectory = m_currentDirectory.parent_path();
         }
     }
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
     if (ImGui::BeginPopupContextWindow()) {
         if (ImGui::BeginMenu("Create")) {
             if (ImGui::MenuItem("Folder", NULL)) {
@@ -166,6 +167,7 @@ void ContentBrowser::onImGuiRender() {
         ImGui::PopID();
     }
     ImGui::Columns(1);
+    ImGui::PopStyleVar();
     // ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
     // ImGui::SliderFloat("Padding", &padding, 0, 32);
     ImGui::End();

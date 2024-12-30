@@ -33,12 +33,14 @@ void WorldHierarchyPanel::onImGuiRender() {
             drawEntityNode(entity);
         }
     }
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
     if (ImGui::BeginPopupContextWindow(
             nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems
         )) {
         drawEntityCreateMenu();
         ImGui::EndPopup();
     }
+    ImGui::PopStyleVar();
     ImGui::End();
 
     Entity selected = m_world->getSelectedEntity();
@@ -73,6 +75,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
         m_world->setSelectedEntity(entity);
     }
     WorldCommandManager &cmd = m_world->getCommandManger();
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
     if (ImGui::BeginPopupContextItem()) {
         if (ImGui::MenuItem("Delete", NULL)) {
             AddRemoveEntityCommand update(entity);
@@ -90,6 +93,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
         }
         ImGui::EndPopup();
     }
+    ImGui::PopStyleVar();
     if (opened) {
         ImGui::TreePop();
     }
