@@ -23,5 +23,8 @@ void main() {
         case  6: outColor *= texture(u_textures[ 6], fragTexCoord.st); break;
         case  7: outColor *= texture(u_textures[ 7], fragTexCoord.st); break;
     }
+    if (outColor.a <= 0.01) {
+        discard;
+    }
     outId = int(fragId);
 }

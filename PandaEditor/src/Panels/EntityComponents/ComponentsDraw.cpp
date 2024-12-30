@@ -151,7 +151,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
                 cmd.SAVE(rotate);
             }
             glm::vec3 scale = transform.getScale();
-            if (drawVec3Control("Scale", scale)) {
+            if (drawVec3Control("Scale", scale, 1.0)) {
                 transform.setScale(scale);
                 EntityTransformCommand scale(entity, transform);
                 cmd.SAVE(scale);

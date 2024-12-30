@@ -424,6 +424,8 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
 
 bool propertyColor(const char *label, Color &value) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+//    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, coefficientRounding);
+    ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, coefficientRounding);
     shiftCursorY(6.0f);
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
@@ -433,7 +435,7 @@ bool propertyColor(const char *label, Color &value) {
     bool modified = ImGui::ColorEdit4("", &value.r);
     ImGui::PopItemWidth();
     ImGui::NextColumn();
-    ImGui::PopStyleVar();
+    ImGui::PopStyleVar(2);
     ImGui::Columns(1);
     return modified;
 }

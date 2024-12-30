@@ -42,6 +42,7 @@ struct ConsolePanel {
             return;
         }
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 3.0f);
         ImGui::SetNextItemShortcut(ImGuiMod_Ctrl | ImGuiKey_O, ImGuiInputFlags_Tooltip);
         if (ImGui::Button("Options")) {
             ImGui::OpenPopup("Options");
@@ -154,7 +155,7 @@ struct ConsolePanel {
                 ImGui::SetScrollHereY(1.0f);
             }
         }
-        ImGui::PopStyleVar();
+        ImGui::PopStyleVar(2);
         ImGui::EndChild();
         ImGui::End();
     }
