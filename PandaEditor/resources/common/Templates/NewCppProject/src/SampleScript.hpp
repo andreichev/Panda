@@ -3,7 +3,9 @@
 #include <Bamboo/Script.hpp>
 #include <Bamboo/Bamboo.hpp>
 
-class SampleScript : public Bamboo::Script {
+using namespace Bamboo;
+
+class SampleScript : public Script {
 public:
     int var;
 

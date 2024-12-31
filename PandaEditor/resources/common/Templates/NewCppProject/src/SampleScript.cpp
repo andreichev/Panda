@@ -3,10 +3,8 @@
 #include <Bamboo/Input.hpp>
 #include <Bamboo/Logger.hpp>
 
-using namespace Bamboo;
-
 void SampleScript::update(float dt) {
     if (Input::isKeyPressed(Key::L)) {
-        LOG("Hello Panda! var: {}", var);
+        LOG_INFO("Hello Panda! var: {}", var);
     }
 }
