@@ -109,6 +109,7 @@ struct Rigidbody2DComponentDto : public Rain::Codable {
 };
 
 struct BoxCollider2DComponentDto : public Rain::Codable {
+    bool isSensor = false;
     Vec2 offset;
     Vec2 size;
     float density;
@@ -116,6 +117,7 @@ struct BoxCollider2DComponentDto : public Rain::Codable {
     float restitution;
 
     RAIN_FIELDS_BEGIN(BoxCollider2DComponentDto)
+    RAIN_FIELD(isSensor)
     RAIN_FIELD(offset)
     RAIN_FIELD(size)
     RAIN_FIELD(density)

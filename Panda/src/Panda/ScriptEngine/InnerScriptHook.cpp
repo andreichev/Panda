@@ -348,8 +348,8 @@ namespace ExternalCalls {
     SetFieldValue setFieldValue = nullptr;
     InvokeUpdateAtScript invokeUpdateAtScript = nullptr;
     InvokeStartAtScript invokeStartAtScript = nullptr;
-    InvokeCollisionBeginTouch invokeCollisionBeginTouch = nullptr;
-    InvokeCollisionEndTouch invokeCollisionEndTouch = nullptr;
+    InvokeBeginCollisionTouch invokeBeginCollisionTouch = nullptr;
+    InvokeEndCollisionTouch invokeEndCollisionTouch = nullptr;
     InvokeBeginSensorOverlap invokeBeginSensorOverlap = nullptr;
     InvokeEndSensorOverlap invokeEndSensorOverlap = nullptr;
     GetManifest getManifest = nullptr;
@@ -378,8 +378,8 @@ int loadExternalCalls(SymbolsLoadFunc load) {
     setFieldValue = (SetFieldValue)load("setFieldValue");
     invokeUpdateAtScript = (InvokeUpdateAtScript)load("invokeUpdateAtScript");
     invokeStartAtScript = (InvokeStartAtScript)load("invokeStartAtScript");
-    invokeCollisionBeginTouch = (InvokeCollisionBeginTouch)load("invokeCollisionBeginTouch");
-    invokeCollisionEndTouch = (InvokeCollisionEndTouch)load("invokeCollisionEndTouch");
+    invokeBeginCollisionTouch = (InvokeBeginCollisionTouch)load("invokeBeginCollisionTouch");
+    invokeEndCollisionTouch = (InvokeEndCollisionTouch)load("invokeEndCollisionTouch");
     invokeBeginSensorOverlap = (InvokeBeginSensorOverlap)load("invokeBeginSensorOverlap");
     invokeEndSensorOverlap = (InvokeEndSensorOverlap)load("invokeEndSensorOverlap");
     getManifest = (GetManifest)load("getManifest");

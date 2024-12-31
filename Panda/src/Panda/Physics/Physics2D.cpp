@@ -111,11 +111,11 @@ void Physics2D::update(World *world, double deltaTime) {
         Entity entityB = m_bodyEntityMap.at(bodyIdB.index1);
         ScriptListComponent &scriptListA = entityA.getComponent<ScriptListComponent>();
         for (ExternalScript &script : scriptListA.scripts) {
-            script.invokeCollisionEndTouch(entityB.getId());
+            script.invokeEndCollisionTouch(entityB.getId());
         }
         ScriptListComponent &scriptListB = entityB.getComponent<ScriptListComponent>();
         for (ExternalScript &script : scriptListB.scripts) {
-            script.invokeCollisionEndTouch(entityA.getId());
+            script.invokeEndCollisionTouch(entityA.getId());
         }
     }
     for (int i = 0; i < contactEvents.beginCount; ++i) {
@@ -126,11 +126,11 @@ void Physics2D::update(World *world, double deltaTime) {
         Entity entityB = m_bodyEntityMap.at(bodyIdB.index1);
         ScriptListComponent &scriptListA = entityA.getComponent<ScriptListComponent>();
         for (ExternalScript &script : scriptListA.scripts) {
-            script.invokeCollisionBeginTouch(entityB.getId());
+            script.invokeBeginCollisionTouch(entityB.getId());
         }
         ScriptListComponent &scriptListB = entityB.getComponent<ScriptListComponent>();
         for (ExternalScript &script : scriptListB.scripts) {
-            script.invokeCollisionBeginTouch(entityA.getId());
+            script.invokeBeginCollisionTouch(entityA.getId());
         }
     }
     //----------------------------------//
