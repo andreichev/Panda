@@ -114,7 +114,7 @@ public:
         m_shader = Miren::createProgram(programAsset.getMirenProgramCreate());
 
         Panda::TextureData m_skyDefaultTextureAsset =
-            AssetLoaderEditor::loadTexture("default-textures/skybox/hdr/night_sky.png");
+            AssetLoaderEditor::loadTexture("default-textures/skybox/hdr/clouds.png");
         Miren::TextureCreate m_skyHdrTextureConfig =
             m_skyDefaultTextureAsset.getMirenTextureCreate();
         m_skyHdrTextureConfig.m_minFiltering = NEAREST;

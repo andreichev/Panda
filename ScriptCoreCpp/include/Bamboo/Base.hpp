@@ -106,4 +106,18 @@ inline constexpr Ty max(const Ty &_a, const Ty &_b) {
     return _a > _b ? _a : _b;
 }
 
+inline int32_t strCmp(const char *lhs, const char *rhs, int32_t max) {
+    for (; max > 0 && *lhs == *rhs; ++lhs, ++rhs, --max) {
+        if (*lhs == '\0' || *rhs == '\0') {
+            break;
+        }
+    }
+
+    if (0 == max) {
+        return 0;
+    }
+
+    return *lhs - *rhs;
+}
+
 } // namespace Bamboo

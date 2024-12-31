@@ -22,7 +22,7 @@ World::World()
     , m_physics2D() {}
 
 World::~World() {
-    m_physics2D.destroy();
+    m_physics2D.shutdown();
 }
 
 void World::startRunning() {
@@ -48,7 +48,7 @@ void World::startRunning() {
 
 void World::finishRunning() {
     shutdownScriptCore();
-    m_physics2D.destroy();
+    m_physics2D.shutdown();
     m_isRunning = false;
 }
 

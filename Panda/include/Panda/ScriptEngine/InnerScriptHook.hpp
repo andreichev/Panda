@@ -26,6 +26,18 @@ namespace ExternalCalls {
     using InvokeStartAtScript = void (*)(ScriptInstanceHandle handle);
     extern InvokeStartAtScript invokeStartAtScript;
 
+    using InvokeCollisionBeginTouch = void (*)(ScriptInstanceHandle handle, EntityHandle entityId);
+    extern InvokeCollisionBeginTouch invokeCollisionBeginTouch;
+
+    using InvokeCollisionEndTouch = void (*)(ScriptInstanceHandle handle, EntityHandle entityId);
+    extern InvokeCollisionEndTouch invokeCollisionEndTouch;
+
+    using InvokeBeginSensorOverlap = void (*)(ScriptInstanceHandle handle, EntityHandle entityId);
+    extern InvokeBeginSensorOverlap invokeBeginSensorOverlap;
+
+    using InvokeEndSensorOverlap = void (*)(ScriptInstanceHandle handle, EntityHandle entityId);
+    extern InvokeEndSensorOverlap invokeEndSensorOverlap;
+
     using GetManifest = ScriptBundleManifest (*)();
     extern GetManifest getManifest;
 } // namespace ExternalCalls

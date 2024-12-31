@@ -23,9 +23,10 @@ public:
     float getMass(Entity entity);
     float getFriction(Entity entity);
     void setFriction(Entity entity, float friction);
-    void destroy();
+    void shutdown();
 
 private:
+    std::unordered_map<uint32_t, Entity> m_bodyEntityMap;
     uint32_t m_physicsWorldId;
 };
 
