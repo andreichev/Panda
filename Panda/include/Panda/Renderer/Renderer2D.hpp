@@ -107,6 +107,9 @@ private:
     glm::mat4 m_viewProj;
     Miren::ViewId m_viewId;
     DrawCallData m_drawData;
+
+    void reset();
+    void flush();
     void drawRect(glm::mat4 &transform, RectData rect);
 };
 

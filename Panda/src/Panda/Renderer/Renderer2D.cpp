@@ -44,6 +44,7 @@ Renderer2D::Renderer2D()
         Miren::UniformType::Sampler,
         MAX_TEXTURE_SLOTS
     );
+    reset();
 }
 
 Renderer2D::~Renderer2D() {
@@ -66,13 +67,7 @@ Renderer2D::~Renderer2D() {
 }
 
 void Renderer2D::begin() {
-    m_drawData.stats.quadCount = 0;
-    m_drawData.stats.drawCalls = 0;
-    m_drawData.verticesCount = 0;
-    m_drawData.vbSize = 0;
-    m_drawData.indicesCount = 0;
-    m_drawData.ibSize = 0;
-    m_drawData.textureSlotIndex = 1;
+    reset();
 }
 
 void Renderer2D::drawRect(RectData rect) {
@@ -87,6 +82,28 @@ void Renderer2D::drawRect(RectData rect) {
 }
 
 void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
+    float textureIndex = 0.0f;
+    if (rect.texture != nullptr) {
+        for (uint32_t i = 1; i < m_drawData.textureSlotIndex; i++) {
+            auto texture = Foundation::SharedCast<Texture>(rect.texture);
+            if (texture->getMirenHandle().id == (*m_drawData.textures[i]).getMirenHandle().id) {
+                textureIndex = (float)i;
+                break;
+            }
+        }
+        if (textureIndex == 0.0f) {
+            textureIndex = (float)m_drawData.textureSlotIndex;
+            if (textureIndex == MAX_TEXTURE_SLOTS) {
+                flush();
+                textureIndex = (float)m_drawData.textureSlotIndex;
+            }
+            m_drawData.textures[m_drawData.textureSlotIndex] =
+                Foundation::SharedCast<Texture>(rect.texture);
+            m_drawData.textureSlotIndex++;
+        }
+    }
+
+    // TODO: Check if next batch is needed
     uint16_t indicesOffset = m_drawData.verticesCount;
     uint32_t &verticesCount = m_drawData.verticesCount;
     glm::vec4 positions[4];
@@ -106,24 +123,6 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
         rect.textureCoords.origin.x + rect.textureCoords.size.width, rect.textureCoords.origin.y
     };
     textureCoords[3] = {rect.textureCoords.origin.x, rect.textureCoords.origin.y};
-
-    float textureIndex = 0.0f;
-    if (rect.texture != nullptr) {
-        for (uint32_t i = 1; i < m_drawData.textureSlotIndex; i++) {
-            auto texture = Foundation::SharedCast<Texture>(rect.texture);
-            if (texture->getMirenHandle().id == (*m_drawData.textures[i]).getMirenHandle().id) {
-                textureIndex = (float)i;
-                break;
-            }
-        }
-        if (textureIndex == 0.0f) {
-            // TODO: Check if next batch is needed
-            textureIndex = (float)m_drawData.textureSlotIndex;
-            m_drawData.textures[m_drawData.textureSlotIndex] =
-                Foundation::SharedCast<Texture>(rect.texture);
-            m_drawData.textureSlotIndex++;
-        }
-    }
 
     for (int i = 0; i < 4; i++) {
         m_drawData.vertices[verticesCount].pos = rect.transform * transform * positions[i];
@@ -153,6 +152,20 @@ Renderer2D::Statistics Renderer2D::getStats() {
 }
 
 void Renderer2D::end() {
+    flush();
+}
+
+void Renderer2D::reset() {
+    m_drawData.stats.quadCount = 0;
+    m_drawData.stats.drawCalls = 0;
+    m_drawData.verticesCount = 0;
+    m_drawData.vbSize = 0;
+    m_drawData.indicesCount = 0;
+    m_drawData.ibSize = 0;
+    m_drawData.textureSlotIndex = 1;
+}
+
+void Renderer2D::flush() {
     if (m_drawData.verticesCount == 0) {
         return;
     }
@@ -179,6 +192,7 @@ void Renderer2D::end() {
     Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
     Miren::setIndexBuffer(tib.handle, tib.startIndex, m_drawData.indicesCount);
     Miren::submit(m_viewId);
+    reset();
 }
 
 void Renderer2D::setViewId(Miren::ViewId id) {
