@@ -16,8 +16,8 @@ public:
 
     virtual void start() {};
     virtual void update(float deltaTime) {};
-    virtual void collisionBeginTouch(Entity other) {};
-    virtual void collisionEndTouch(Entity other) {};
+    virtual void beginCollisionTouch(Entity other) {};
+    virtual void endCollisionTouch(Entity other) {};
     virtual void beginSensorOverlap(Entity sensor) {};
     virtual void endSensorOverlap(Entity sensor) {};
 

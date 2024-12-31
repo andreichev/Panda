@@ -80,22 +80,22 @@ namespace InternalCalls {
         script->start();
     }
 
-    void invokeCollisionBeginTouch(ScriptInstanceHandle handle, EntityHandle entityId) {
+    void invokeBeginCollisionTouch(ScriptInstanceHandle handle, EntityHandle entityId) {
         Bamboo::Script *script = getScriptRegistry()->getInstanceWithId(handle);
         if (!script) {
             // assert(false);
             return;
         }
-        script->collisionBeginTouch(Bamboo::Entity(entityId));
+        script->beginCollisionTouch(Bamboo::Entity(entityId));
     }
 
-    void invokeCollisionEndTouch(ScriptInstanceHandle handle, EntityHandle entityId) {
+    void invokeEndCollisionTouch(ScriptInstanceHandle handle, EntityHandle entityId) {
         Bamboo::Script *script = getScriptRegistry()->getInstanceWithId(handle);
         if (!script) {
             // assert(false);
             return;
         }
-        script->collisionEndTouch(Bamboo::Entity(entityId));
+        script->endCollisionTouch(Bamboo::Entity(entityId));
     }
 
     void invokeBeginSensorOverlap(ScriptInstanceHandle handle, EntityHandle entityId) {
@@ -134,8 +134,8 @@ void initScriptHook() {
     g_scriptSymbols["setFieldValue"] = (void *)setFieldValue;
     g_scriptSymbols["invokeStartAtScript"] = (void *)invokeStartAtScript;
     g_scriptSymbols["invokeUpdateAtScript"] = (void *)invokeUpdateAtScript;
-    g_scriptSymbols["invokeCollisionBeginTouch"] = (void *)invokeCollisionBeginTouch;
-    g_scriptSymbols["invokeCollisionEndTouch"] = (void *)invokeCollisionEndTouch;
+    g_scriptSymbols["invokeBeginCollisionTouch"] = (void *)invokeBeginCollisionTouch;
+    g_scriptSymbols["invokeEndCollisionTouch"] = (void *)invokeEndCollisionTouch;
     g_scriptSymbols["invokeBeginSensorOverlap"] = (void *)invokeBeginSensorOverlap;
     g_scriptSymbols["invokeEndSensorOverlap"] = (void *)invokeEndSensorOverlap;
     g_scriptSymbols["getManifest"] = (void *)getManifest;

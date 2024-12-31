@@ -56,12 +56,12 @@ public:
         ExternalCalls::invokeUpdateAtScript(id, deltaTime);
     }
 
-    void invokeCollisionBeginTouch(EntityHandle other) {
-        ExternalCalls::invokeCollisionBeginTouch(id, other);
+    void invokeBeginCollisionTouch(EntityHandle other) {
+        ExternalCalls::invokeBeginCollisionTouch(id, other);
     }
 
-    void invokeCollisionEndTouch(EntityHandle other) {
-        ExternalCalls::invokeCollisionEndTouch(id, other);
+    void invokeEndCollisionTouch(EntityHandle other) {
+        ExternalCalls::invokeEndCollisionTouch(id, other);
     }
 
     void invokeBeginSensorOverlap(EntityHandle other) {

@@ -26,11 +26,11 @@ namespace ExternalCalls {
     using InvokeStartAtScript = void (*)(ScriptInstanceHandle handle);
     extern InvokeStartAtScript invokeStartAtScript;
 
-    using InvokeCollisionBeginTouch = void (*)(ScriptInstanceHandle handle, EntityHandle entityId);
-    extern InvokeCollisionBeginTouch invokeCollisionBeginTouch;
+    using InvokeBeginCollisionTouch = void (*)(ScriptInstanceHandle handle, EntityHandle entityId);
+    extern InvokeBeginCollisionTouch invokeBeginCollisionTouch;
 
-    using InvokeCollisionEndTouch = void (*)(ScriptInstanceHandle handle, EntityHandle entityId);
-    extern InvokeCollisionEndTouch invokeCollisionEndTouch;
+    using InvokeEndCollisionTouch = void (*)(ScriptInstanceHandle handle, EntityHandle entityId);
+    extern InvokeEndCollisionTouch invokeEndCollisionTouch;
 
     using InvokeBeginSensorOverlap = void (*)(ScriptInstanceHandle handle, EntityHandle entityId);
     extern InvokeBeginSensorOverlap invokeBeginSensorOverlap;

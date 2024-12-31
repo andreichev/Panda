@@ -54,6 +54,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         if (entityDto.boxCollider2dComponent.has_value()) {
             BoxCollider2DComponentDto &boxCollider2dDto = entityDto.boxCollider2dComponent.value();
             auto &boxCollider2d = entity.addComponent<BoxCollider2DComponent>();
+            boxCollider2d.isSensor = boxCollider2dDto.isSensor;
             boxCollider2d.offset = boxCollider2dDto.offset;
             boxCollider2d.size = boxCollider2dDto.size;
             boxCollider2d.density = boxCollider2dDto.density;
@@ -136,6 +137,7 @@ WorldDto WorldMapper::toDto(const World &world) {
         if (entity.hasComponent<BoxCollider2DComponent>()) {
             BoxCollider2DComponent &boxCollider2d = entity.getComponent<BoxCollider2DComponent>();
             BoxCollider2DComponentDto boxCollider2dDto;
+            boxCollider2dDto.isSensor = boxCollider2d.isSensor;
             boxCollider2dDto.offset = boxCollider2d.offset;
             boxCollider2dDto.size = boxCollider2d.size;
             boxCollider2dDto.density = boxCollider2d.density;
