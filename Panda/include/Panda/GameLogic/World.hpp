@@ -89,9 +89,8 @@ private:
     void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     Entity instantiateEntity(UUID id);
     void fillEntity(Entity entity, UUID id);
-    void physics2DRegisterEntity(Entity entity);
-    void physics2DUpdateEntity(Entity entity);
-    void physics2DRemoveEntity(Entity entity);
+    void physics2DComponentsUpdatedAt(Entity entity);
+    void physics2DPropertiesUpdatedAt(Entity entity);
 
     std::unordered_map<UUID, Entity> m_entityIdMap;
     bool m_isRunning;
