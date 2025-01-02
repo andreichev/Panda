@@ -325,6 +325,7 @@ void World::initializeScriptCore() {
         //              CLASSES              //
         //-----------------------------------//
         for (auto &container : component.scripts) {
+            // ScriptClassManifest classManifest = manifest.getClass(container.getName().c_str());
             ScriptInstanceHandle scriptInstanceId =
                 ExternalCalls::instantiateScript(entityId, container.getName().c_str());
             PND_ASSERT_F(
@@ -336,6 +337,7 @@ void World::initializeScriptCore() {
             //----------------------------------//
             for (ScriptField &field : container.getFields()) {
                 field.instanceId = scriptInstanceId;
+                // field.fieldId = classManifest.getField(field.name.c_str()).handle;
                 ExternalCalls::setFieldValue(scriptInstanceId, field.fieldId, field.value.data);
             }
         }
