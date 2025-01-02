@@ -122,9 +122,6 @@ struct Rigidbody2DComponent final {
     enum class BodyType { STATIC = 0, DYNAMIC, KINEMATIC };
     BodyType type = BodyType::STATIC;
     bool fixedRotation = false;
-
-    // Storage for runtime
-    uint8_t runtimeData[8];
 };
 
 struct BoxCollider2DComponent final {

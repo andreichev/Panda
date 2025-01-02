@@ -68,16 +68,12 @@ Entity::operator bool() const {
     return isValid();
 }
 
-void Entity::physics2DRegister() {
-    m_world->physics2DRegisterEntity(*this);
+void Entity::physics2DComponentsUpdated() {
+    m_world->physics2DComponentsUpdatedAt(*this);
 }
 
-void Entity::physics2DUpdate() {
-    m_world->physics2DUpdateEntity(*this);
-}
-
-void Entity::physics2DRemove() {
-    m_world->physics2DRemoveEntity(*this);
+void Entity::physics2DPropertiesUpdated() {
+    m_world->physics2DPropertiesUpdatedAt(*this);
 }
 
 #ifdef PND_EDITOR

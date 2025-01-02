@@ -39,6 +39,10 @@ public:
         entt::registry &registry = worldGetRegistry();
         T &component = registry.emplace<T>(m_handle, std::forward<Args>(args)...);
         setWorldChanged();
+        if constexpr (std::is_same_v<T, Rigidbody2DComponent> ||
+                      std::is_same_v<T, BoxCollider2DComponent>) {
+            physics2DComponentsUpdated();
+        }
         return component;
     }
 
@@ -47,41 +51,11 @@ public:
         entt::registry &registry = worldGetRegistry();
         registry.remove<T>(m_handle);
         setWorldChanged();
+        if constexpr (std::is_same_v<T, Rigidbody2DComponent> ||
+                      std::is_same_v<T, BoxCollider2DComponent>) {
+            physics2DComponentsUpdated();
+        }
     }
-
-#pragma region PHYSICS
-    /*
-    ---------------------------------------------------
-                          PHYSICS
-    |         |         |         |         |         |
-    V         V         V         V         V         V
-    */
-
-    template<>
-    Rigidbody2DComponent &addComponent<Rigidbody2DComponent>() {
-        PND_ASSERT(!hasComponent<Rigidbody2DComponent>(), "Entity already has component!");
-        entt::registry &registry = worldGetRegistry();
-        Rigidbody2DComponent &component = registry.emplace<Rigidbody2DComponent>(m_handle);
-        physics2DRegister();
-        setWorldChanged();
-        return component;
-    }
-
-    template<>
-    void removeComponent<Rigidbody2DComponent>() {
-        physics2DRemove();
-        entt::registry &registry = worldGetRegistry();
-        registry.remove<Rigidbody2DComponent>(m_handle);
-        setWorldChanged();
-    }
-
-    /*
-    ^         ^         ^         ^         ^         ^
-    |         |         |         |         |         |
-                          PHYSICS
-    ---------------------------------------------------
-    */
-#pragma endregion
 
     template<typename T>
     T &getComponent() {
@@ -149,9 +123,8 @@ public:
         return getComponent<IdComponent>().id;
     }
 
-    void physics2DRegister();
-    void physics2DUpdate();
-    void physics2DRemove();
+    void physics2DComponentsUpdated();
+    void physics2DPropertiesUpdated();
 
 #ifdef PND_EDITOR
     bool isDeleted();
