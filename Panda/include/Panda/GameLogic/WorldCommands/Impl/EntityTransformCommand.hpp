@@ -19,7 +19,7 @@ public:
         }
         m_entity.setComponent(m_prevTransform);
         m_entity.setWorldChanged();
-        m_entity.physics2DUpdate();
+        m_entity.physics2DPropertiesUpdated();
         return true;
     }
 
@@ -29,7 +29,7 @@ public:
         }
         m_entity.setComponent(m_newTransform);
         m_entity.setWorldChanged();
-        m_entity.physics2DUpdate();
+        m_entity.physics2DPropertiesUpdated();
         return true;
     }
 
