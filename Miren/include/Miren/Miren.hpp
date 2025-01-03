@@ -73,7 +73,4 @@ bool renderFrame();
 /// Returns frame number
 uint32_t frame();
 
-void renderSemaphoreWait();
-void renderSemaphorePost();
-
 } // namespace Miren
