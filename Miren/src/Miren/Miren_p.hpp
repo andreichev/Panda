@@ -275,9 +275,9 @@ struct Context {
             m_rendererSemaphore.post();
         }
         if (m_renderer == nullptr) {
-//            m_preCommandQueue.reset();
-//            m_postCommandQueue.reset();
-//            m_rendererSemaphore.post();
+            m_render->getPreCommandQueue().finishWriting();
+            m_render->getPostCommandQueue().finishWriting();
+            m_rendererSemaphore.post();
             return true;
         }
         rendererExecuteCommands(m_render->getPreCommandQueue());
@@ -287,6 +287,7 @@ struct Context {
         }
         rendererExecuteCommands(m_render->getPostCommandQueue());
         MIREN_LOG("RENDER FRAME END");
+        m_rendererSemaphore.post();
         return m_renderer != nullptr;
     }
 

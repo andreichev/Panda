@@ -106,7 +106,6 @@ void Application::loop() {
         m_deltaTimeMillis = 0;
 
         // LOG_INFO("APP UPDATE BEGIN");
-        Miren::renderSemaphoreWait();
         EASY_BLOCK("Update")
         LayerStack &layerStack = *m_layerStack;
         for (Layer *layer : layerStack) {
