@@ -33,7 +33,6 @@ uint64_t getMillis() {
 
 Application::~Application() {
     LOG_INFO("APP SHUTDOWN BEGIN");
-    Miren::renderSemaphoreWait();
     F_DELETE(Foundation::getAllocator(), m_layerStack);
 #ifdef PLATFORM_DESKTOP
     Miren::terminate();
@@ -74,7 +73,6 @@ Application::Application(ApplicationStartupSettings &settings)
 #ifdef PLATFORM_DESKTOP
     Miren::initialize();
 #endif
-    Miren::renderSemaphoreWait();
     Random::init();
     m_ImGuiLayer = F_NEW(Foundation::getAllocator(), ImGuiLayer);
     pushOverlay(m_ImGuiLayer);
@@ -85,7 +83,6 @@ void Application::startBasicGame(Level *level) {
 }
 
 void Application::loop() {
-    Miren::renderSemaphorePost();
     while (!m_isApplicationShouldClose) {
         uint64_t lastTime = m_timeMillis;
         m_timeMillis = getMillis();
@@ -127,7 +124,6 @@ void Application::loop() {
         processEvents();
         Miren::frame();
         // LOG_INFO("APP UPDATE END");
-        Miren::renderSemaphorePost();
     }
 }
 

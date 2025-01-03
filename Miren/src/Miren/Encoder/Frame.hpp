@@ -9,6 +9,8 @@
 #include "Miren/VertexBufferLayoutData.hpp"
 #include "Miren/Encoder/RenderDraw.hpp"
 
+#include <Foundation/CommandBuffer.hpp>
+
 namespace Miren {
 
 /// Класс используемый для хранения данных о кадре.
@@ -42,6 +44,8 @@ public:
     uint32_t getDrawCallsCount();
     RenderDraw *getDrawCalls();
     void reset();
+    Foundation::CommandBuffer &getPreCommandQueue();
+    Foundation::CommandBuffer &getPostCommandQueue();
 
     TransientIndexBuffer m_transientIb;
     TransientVertexBuffer m_transientVb;
@@ -57,6 +61,8 @@ private:
     FreeHandleQueue<VertexLayoutHandle, MAX_BUFFER_LAYOUTS> m_vertexLayoutsFreeHandle;
     FreeHandleQueue<VertexBufferHandle, MAX_VERTEX_BUFFERS> m_vertexBuffersFreeHandle;
     FreeHandleQueue<IndexBufferHandle, MAX_INDEX_BUFFERS> m_indexBuffersFreeHandle;
+    Foundation::CommandBuffer m_preCommandQueue;
+    Foundation::CommandBuffer m_postCommandQueue;
 };
 
 } // namespace Miren

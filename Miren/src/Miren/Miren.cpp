@@ -16,16 +16,13 @@ void initialize() {
     MIREN_LOG("ALLOCATING MIREN CONTEXT, {} BYTES", sizeof(Context));
     MIREN_LOG("FRAME DATA SIZE: {} BYTES", sizeof(Frame));
     s_context = F_ALIGNED_NEW(Foundation::getAllocator(), Context, CONTEXT_ALIGNMENT);
-    // Вызвано из главного потока: можно стартовать поток отрисовки.
-#ifdef PLATFORM_DESKTOP
-    s_context->m_thread.init(s_context->renderThread, nullptr, 0, "Render thread");
-#endif
-    renderSemaphorePost();
+    s_context->init();
     MIREN_LOG("MIREN INIT END");
 }
 
 void terminate() {
     MIREN_LOG("MIREN SHUTDOWN BEGIN");
+    s_context->shutdown();
     F_ALIGNED_DELETE(Foundation::getAllocator(), s_context, CONTEXT_ALIGNMENT);
     s_context = nullptr;
     MIREN_LOG("MIREN SHUTDOWN END");
@@ -224,16 +221,6 @@ void setVertexLayout(VertexLayoutHandle handle) {
 void submit(ViewId id) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     s_context->submit(id);
-}
-
-void renderSemaphoreWait() {
-    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
-    s_context->m_rendererSemaphore.wait();
-}
-
-void renderSemaphorePost() {
-    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
-    s_context->m_rendererSemaphore.post();
 }
 
 } // namespace Miren

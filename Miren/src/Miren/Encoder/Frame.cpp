@@ -9,7 +9,9 @@
 namespace Miren {
 
 Frame::Frame()
-    : m_drawCallsCount(0) {}
+    : m_drawCallsCount(0)
+    , m_preCommandQueue(300000)
+    , m_postCommandQueue(300000) {}
 
 void Frame::beginDrawCall() {
     m_drawCallsCount++;
@@ -146,8 +148,18 @@ void Frame::reset() {
     m_vertexLayoutsFreeHandle.reset();
     m_vertexBuffersFreeHandle.reset();
     m_indexBuffersFreeHandle.reset();
+    m_preCommandQueue.reset();
+    m_postCommandQueue.reset();
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.reset();
+}
+
+Foundation::CommandBuffer &Frame::getPreCommandQueue() {
+    return m_preCommandQueue;
+}
+
+Foundation::CommandBuffer &Frame::getPostCommandQueue() {
+    return m_postCommandQueue;
 }
 
 } // namespace Miren

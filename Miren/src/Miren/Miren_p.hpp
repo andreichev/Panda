@@ -21,7 +21,7 @@
 namespace Miren {
 
 struct Context {
-    // Должно быть вызвано из главного потока и не из цикла обновления.
+    // Main thread
     Context()
         : m_renderer(nullptr)
         , m_frameNumber(0)
@@ -31,15 +31,22 @@ struct Context {
         , m_vertexLayoutsHandleAlloc(MAX_BUFFER_LAYOUTS)
         , m_vertexBuffersHandleAlloc(MAX_VERTEX_BUFFERS)
         , m_indexBuffersHandleAlloc(MAX_INDEX_BUFFERS)
-        , m_preCommandQueue(300000)
-        , m_postCommandQueue(300000)
-        , m_rendererSemaphore("Render semaphore") {
-
+        , m_rendererSemaphore("Render semaphore")
+        , m_apiSemaphore("Api semaphore") {
         m_render = &m_frame[0];
         m_submit = &m_frame[1];
+    }
 
+    // Main thread
+    void init() {
+        // Вызвано из главного потока: можно стартовать поток отрисовки.
+#ifdef PLATFORM_DESKTOP
+        m_thread.init(renderThread, nullptr, 0, "Render thread");
+#endif
         Foundation::CommandBuffer::Command cmd(RendererCommandType::RendererInit);
-        m_preCommandQueue.write(cmd);
+        m_render->getPreCommandQueue().write(cmd);
+        m_apiSemaphore.post();
+        frame();
         m_submit->m_transientVb = createTransientVertexBuffer(TRANSIENT_VERTEX_BUFFER_SIZE);
         m_submit->m_transientIb = createTransientIndexBuffer(TRANSIENT_INDEX_BUFFER_SIZE);
         frame();
@@ -48,8 +55,8 @@ struct Context {
         frame();
     }
 
-    // Должно быть вызвано из главного потока и не из цикла обновления.
-    ~Context() {
+    // Main thread
+    void shutdown() {
         destroyTransientVertexBuffer(m_submit->m_transientVb);
         destroyTransientIndexBuffer(m_submit->m_transientIb);
         frame();
@@ -57,8 +64,8 @@ struct Context {
         destroyTransientIndexBuffer(m_submit->m_transientIb);
         frame();
         Foundation::CommandBuffer::Command cmd(RendererCommandType::RendererShutdown);
-        m_postCommandQueue.write(cmd);
-        m_rendererSemaphore.post();
+        m_submit->getPostCommandQueue().write(cmd);
+        frame();
         m_thread.shutdown();
     }
 
@@ -241,7 +248,7 @@ struct Context {
     }
 
     void checkIfHasInitCommand() {
-        Foundation::CommandBuffer::Command *command = m_preCommandQueue.read();
+        Foundation::CommandBuffer::Command *command = m_submit->getPreCommandQueue().read();
         if (command != nullptr) {
             CMDBUF_LOG("RENDERER INIT COMMAND");
             PND_ASSERT(
@@ -255,21 +262,16 @@ struct Context {
 
     bool renderFrame() {
         EASY_BLOCK("Render Frame")
-        static Foundation::CommandBuffer preCommandQueue(0);
-        static Foundation::CommandBuffer postCommandQueue(0);
-        {
-            m_rendererSemaphore.wait();
-            EASY_BLOCK("Render Start")
-            MIREN_LOG("RENDER FRAME BEGIN");
-            m_preCommandQueue.finishWriting();
-            m_postCommandQueue.finishWriting();
-            if (m_renderer == nullptr) {
-                checkIfHasInitCommand();
-            }
-            preCommandQueue.copy(m_preCommandQueue);
-            postCommandQueue.copy(m_postCommandQueue);
-            m_preCommandQueue.reset();
-            m_postCommandQueue.reset();
+        m_apiSemaphore.wait();
+        MIREN_LOG("RENDER FRAME BEGIN");
+        m_render->getPreCommandQueue().finishWriting();
+        m_render->getPostCommandQueue().finishWriting();
+        if (m_renderer == nullptr) {
+            checkIfHasInitCommand();
+        }
+        if (m_renderer == nullptr) {
+            m_render->getPreCommandQueue().reset();
+            m_render->getPostCommandQueue().reset();
             m_rendererSemaphore.post();
         }
         if (m_renderer == nullptr) {
@@ -278,15 +280,12 @@ struct Context {
 //            m_rendererSemaphore.post();
             return true;
         }
-        rendererExecuteCommands(preCommandQueue);
+        rendererExecuteCommands(m_render->getPreCommandQueue());
         if (m_render->getDrawCallsCount() != 0) {
             m_renderer->submit(m_render, m_views);
             m_renderer->flip();
         }
-        rendererExecuteCommands(postCommandQueue);
-//        m_preCommandQueue.reset();
-//        m_postCommandQueue.reset();
-//        m_rendererSemaphore.post();
+        rendererExecuteCommands(m_render->getPostCommandQueue());
         MIREN_LOG("RENDER FRAME END");
         return m_renderer != nullptr;
     }
@@ -303,7 +302,7 @@ struct Context {
     FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification) {
         FrameBufferHandle handle = m_frameBuffersHandleAlloc.alloc();
         CreateFrameBufferCommand cmd(handle, specification);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
         return handle;
     }
 
@@ -311,52 +310,52 @@ struct Context {
         FrameBufferHandle handle, int attachIndex, int x, int y, int width, int height, void *data
     ) {
         ReadFrameBufferCommand cmd(handle, attachIndex, x, y, width, height, data);
-        m_postCommandQueue.write(cmd);
+        m_submit->getPostCommandQueue().write(cmd);
         return m_frameNumber + 1;
     }
 
     void deleteFrameBuffer(FrameBufferHandle handle) {
         m_submit->queueFree(handle);
         DeleteFrameBufferCommand cmd(handle);
-        m_postCommandQueue.write(cmd);
+        m_submit->getPostCommandQueue().write(cmd);
     }
 
     ProgramHandle createProgram(ProgramCreate create) {
         ProgramHandle handle = m_shadersHandleAlloc.alloc();
         CreateProgramCommand cmd(handle, create);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
         return handle;
     }
 
     void deleteProgram(ProgramHandle handle) {
         m_submit->queueFree(handle);
         DeleteProgramCommand cmd(handle);
-        m_postCommandQueue.write(cmd);
+        m_submit->getPostCommandQueue().write(cmd);
     }
 
     TextureHandle createTexture(TextureCreate create) {
         TextureHandle handle = m_texturesHandleAlloc.alloc();
         CreateTextureCommand cmd(handle, create);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
         return handle;
     }
 
     void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) {
         ResizeTextureCommand cmd(handle, width, height);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
     }
 
     void deleteTexture(TextureHandle handle) {
         m_submit->queueFree(handle);
         DeleteTextureCommand cmd(handle);
-        m_postCommandQueue.write(cmd);
+        m_submit->getPostCommandQueue().write(cmd);
     }
 
     IndexBufferHandle
     createIndexBuffer(Foundation::Memory indices, BufferElementType elementType, size_t count) {
         IndexBufferHandle handle = m_indexBuffersHandleAlloc.alloc();
         CreateIndexBufferCommand cmd(handle, indices, elementType, count);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
         return handle;
     }
 
@@ -365,27 +364,27 @@ struct Context {
     ) {
         IndexBufferHandle handle = m_indexBuffersHandleAlloc.alloc();
         CreateDynamicIndexBufferCommand cmd(handle, indices, elementType, count);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
         return handle;
     }
 
     void
     updateDynamicIndexBuffer(IndexBufferHandle handle, Foundation::Memory indices, size_t count) {
         UpdateDynamicIndexBufferCommand cmd(handle, indices, count);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
     }
 
     void deleteIndexBuffer(IndexBufferHandle handle) {
         m_submit->queueFree(handle);
         DeleteIndexBufferCommand cmd(handle);
-        m_postCommandQueue.write(cmd);
+        m_submit->getPostCommandQueue().write(cmd);
     }
 
     VertexBufferHandle
     createVertexBuffer(Foundation::Memory data, uint32_t size, VertexLayoutHandle layoutHandle) {
         VertexBufferHandle handle = m_vertexBuffersHandleAlloc.alloc();
         CreateVertexBufferCommand cmd(handle, data, size, layoutHandle);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
         return handle;
     }
 
@@ -396,33 +395,33 @@ struct Context {
     ) {
         VertexBufferHandle handle = m_vertexBuffersHandleAlloc.alloc();
         CreateDynamicVertexBufferCommand cmd(handle, data, size, layoutHandle);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
         return handle;
     }
 
     void
     updateDynamicVertexBuffer(VertexBufferHandle handle, Foundation::Memory data, uint32_t size) {
         UpdateDynamicVertexBufferCommand cmd(handle, data, size);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
     }
 
     void deleteVertexBuffer(VertexBufferHandle handle) {
         m_submit->queueFree(handle);
         DeleteVertexBufferCommand cmd(handle);
-        m_postCommandQueue.write(cmd);
+        m_submit->getPostCommandQueue().write(cmd);
     }
 
     VertexLayoutHandle createVertexLayout(VertexBufferLayoutData data) {
         VertexLayoutHandle handle = m_vertexLayoutsHandleAlloc.alloc();
         CreateVertexLayoutCommand cmd(handle, data);
-        m_preCommandQueue.write(cmd);
+        m_submit->getPreCommandQueue().write(cmd);
         return handle;
     }
 
     void deleteVertexLayout(VertexLayoutHandle handle) {
         m_submit->queueFree(handle);
         DeleteVertexLayoutCommand cmd(handle);
-        m_postCommandQueue.write(cmd);
+        m_submit->getPostCommandQueue().write(cmd);
     }
 
     void destroyTransientVertexBuffer(TransientVertexBuffer &tvb) {
@@ -485,7 +484,7 @@ struct Context {
 
     uint32_t readTexture(TextureHandle handle, void *data) {
         ReadTextureCommand cmd(handle, data);
-        m_postCommandQueue.write(cmd);
+        m_submit->getPostCommandQueue().write(cmd);
         return m_frameNumber + 1;
     }
 
@@ -531,10 +530,13 @@ struct Context {
         Foundation::swap(m_render, m_submit);
     }
 
+    // Main thread
     uint32_t frame() {
+        m_rendererSemaphore.wait();
         freeAllHandles(m_submit);
         swap();
         m_submit->reset();
+        m_apiSemaphore.post();
         return m_frameNumber++;
     }
 
@@ -574,11 +576,10 @@ private:
     HandleAllocator<VertexLayoutHandle> m_vertexLayoutsHandleAlloc;
     HandleAllocator<VertexBufferHandle> m_vertexBuffersHandleAlloc;
     HandleAllocator<IndexBufferHandle> m_indexBuffersHandleAlloc;
-    Foundation::CommandBuffer m_preCommandQueue;
-    Foundation::CommandBuffer m_postCommandQueue;
 
 public:
     Foundation::Semaphore m_rendererSemaphore;
+    Foundation::Semaphore m_apiSemaphore;
 };
 
 } // namespace Miren
