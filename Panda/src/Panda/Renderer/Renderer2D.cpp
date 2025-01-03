@@ -23,7 +23,7 @@ Renderer2D::Renderer2D()
     // Texture coordinates
     layoutData.pushVec2();
     // Texture Index
-    layoutData.pushFloat(1);
+    layoutData.pushInt(1);
     // Object id
     layoutData.pushInt(1);
     // Color
@@ -82,20 +82,20 @@ void Renderer2D::drawRect(RectData rect) {
 }
 
 void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
-    float textureIndex = 0.0f;
+    int textureIndex = -1;
     if (rect.texture != nullptr) {
         for (uint32_t i = 1; i < m_drawData.textureSlotIndex; i++) {
             auto texture = Foundation::SharedCast<Texture>(rect.texture);
             if (texture->getMirenHandle().id == (*m_drawData.textures[i]).getMirenHandle().id) {
-                textureIndex = (float)i;
+                textureIndex = i;
                 break;
             }
         }
-        if (textureIndex == 0.0f) {
-            textureIndex = (float)m_drawData.textureSlotIndex;
+        if (textureIndex == -1) {
+            textureIndex = m_drawData.textureSlotIndex;
             if (textureIndex == MAX_TEXTURE_SLOTS) {
                 flush();
-                textureIndex = (float)m_drawData.textureSlotIndex;
+                textureIndex = m_drawData.textureSlotIndex;
             }
             m_drawData.textures[m_drawData.textureSlotIndex] =
                 Foundation::SharedCast<Texture>(rect.texture);

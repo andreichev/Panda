@@ -1,4 +1,0 @@
-LIBRARY ScriptCoreCpp
-EXPORTS
-    loadInternalCall
-    loadExternalCalls

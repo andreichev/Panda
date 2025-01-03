@@ -54,7 +54,7 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
         if (m_world->isRunning()) {
             transformComponent.setPosition(pos);
             if (selected.hasComponent<Rigidbody2DComponent>()) {
-                selected.physics2DUpdate();
+                selected.physics2DPropertiesUpdated();
             }
         } else {
             TransformComponent transformCopy = transformComponent;

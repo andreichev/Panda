@@ -70,7 +70,7 @@ public:
 
         glm::vec3 pos;
         glm::vec2 textureCoords;
-        float textureIndex;
+        int32_t textureIndex;
         int32_t id;
         glm::vec4 color;
     };

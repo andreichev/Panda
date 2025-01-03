@@ -10,7 +10,7 @@ public:
     static AssetInfoEditorDto toDto(const AssetInfoEditor &info) {
         AssetInfoEditorDto dto;
         dto.id = info.id;
-        dto.path = info.path;
+        dto.path = info.path.string();
         dto.setAssetType(info.type);
         return dto;
     }

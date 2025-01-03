@@ -48,7 +48,7 @@ b2WorldId IntToB2WorldId(uint32_t val) {
 
 void Physics2D::init(World *world) {
     PND_STATIC_ASSERT(
-        sizeof(b2BodyId) <= sizeof(Rigidbody2DComponent::runtimeData),
+        sizeof(b2BodyId) <= sizeof(RuntimeBodyData::data),
         "Rigidbody2D runtime body wrong data size"
     );
     PND_STATIC_ASSERT(
@@ -87,11 +87,14 @@ void Physics2D::update(World *world, double deltaTime) {
             continue;
         }
         Entity entity = {entityHandle, world};
+        if (!isRegistered(entity)) {
+            continue;
+        }
         auto &transform = entity.getTransform();
-        auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
 
+        RuntimeBodyData runtimeData = m_entityBodyMap[entity.getId()];
         b2BodyId bodyId;
-        memcpy(&bodyId, &rb2d.runtimeData, sizeof(b2BodyId));
+        memcpy(&bodyId, &runtimeData.data, sizeof(b2BodyId));
 
         b2Vec2 position = b2Body_GetPosition(bodyId);
         b2Rot rotation = b2Body_GetRotation(bodyId);
@@ -105,6 +108,9 @@ void Physics2D::update(World *world, double deltaTime) {
     b2ContactEvents contactEvents = b2World_GetContactEvents(worldId);
     for (int i = 0; i < contactEvents.endCount; ++i) {
         b2ContactEndTouchEvent event = contactEvents.endEvents[i];
+        if (!b2Shape_IsValid(event.shapeIdA) || !b2Shape_IsValid(event.shapeIdB)) {
+            continue;
+        }
         b2BodyId bodyIdA = b2Shape_GetBody(event.shapeIdA);
         b2BodyId bodyIdB = b2Shape_GetBody(event.shapeIdB);
         Entity entityA = m_bodyEntityMap.at(bodyIdA.index1);
@@ -120,6 +126,9 @@ void Physics2D::update(World *world, double deltaTime) {
     }
     for (int i = 0; i < contactEvents.beginCount; ++i) {
         b2ContactBeginTouchEvent event = contactEvents.beginEvents[i];
+        if (!b2Shape_IsValid(event.shapeIdA) || !b2Shape_IsValid(event.shapeIdB)) {
+            continue;
+        }
         b2BodyId bodyIdA = b2Shape_GetBody(event.shapeIdA);
         b2BodyId bodyIdB = b2Shape_GetBody(event.shapeIdB);
         Entity entityA = m_bodyEntityMap.at(bodyIdA.index1);
@@ -139,6 +148,9 @@ void Physics2D::update(World *world, double deltaTime) {
     b2SensorEvents sensorEvents = b2World_GetSensorEvents(worldId);
     for (int i = 0; i < sensorEvents.beginCount; ++i) {
         b2SensorBeginTouchEvent event = sensorEvents.beginEvents[i];
+        if (!b2Shape_IsValid(event.sensorShapeId) || !b2Shape_IsValid(event.visitorShapeId)) {
+            continue;
+        }
         b2BodyId bodyIdSensor = b2Shape_GetBody(event.sensorShapeId);
         b2BodyId bodyIdVisitor = b2Shape_GetBody(event.visitorShapeId);
         Entity entitySensor = m_bodyEntityMap.at(bodyIdSensor.index1);
@@ -150,6 +162,9 @@ void Physics2D::update(World *world, double deltaTime) {
     }
     for (int i = 0; i < sensorEvents.endCount; ++i) {
         b2SensorEndTouchEvent event = sensorEvents.endEvents[i];
+        if (!b2Shape_IsValid(event.sensorShapeId) || !b2Shape_IsValid(event.visitorShapeId)) {
+            continue;
+        }
         b2BodyId bodyIdSensor = b2Shape_GetBody(event.sensorShapeId);
         b2BodyId bodyIdVisitor = b2Shape_GetBody(event.visitorShapeId);
         Entity entitySensor = m_bodyEntityMap.at(bodyIdSensor.index1);
@@ -176,7 +191,8 @@ void Physics2D::registerEntity(Entity entity) {
     bodyDef.rotation = {cos(rotationRad), sin(rotationRad)};
     bodyDef.fixedRotation = rb2d.fixedRotation;
     b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
-    memcpy(&rb2d.runtimeData, &bodyId, sizeof(b2BodyId));
+    RuntimeBodyData runtimeData;
+    memcpy(&runtimeData.data, &bodyId, sizeof(b2BodyId));
     if (entity.hasComponent<BoxCollider2DComponent>()) {
         auto &bc2d = entity.getComponent<BoxCollider2DComponent>();
         b2Polygon boxShape = b2MakeOffsetBox(
@@ -194,19 +210,38 @@ void Physics2D::registerEntity(Entity entity) {
         memcpy(&bc2d.runtimeData, &shapeId, sizeof(b2ShapeId));
     }
     m_bodyEntityMap[bodyId.index1] = entity;
+    m_entityBodyMap[entity.getId()] = runtimeData;
 }
 
-void Physics2D::updateEntity(Entity entity) {
+void Physics2D::componentsUpdated(Entity entity) {
     if (!isInitialized()) {
         return;
     }
-    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    if (!canUse(entity) && isRegistered(entity)) {
+        removeEntity(entity);
+        return;
+    }
+    if (canUse(entity) && !isRegistered(entity)) {
+        registerEntity(entity);
+        return;
+    }
+}
+
+void Physics2D::propertiesUpdated(Panda::Entity entity) {
+    if (!isInitialized()) {
+        return;
+    }
+    if (!isRegistered(entity)) {
+        return;
+    }
+    RuntimeBodyData runtimeData = m_entityBodyMap[entity.getId()];
     b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeData, sizeof(b2BodyId));
+    memcpy(&bodyId, &runtimeData.data, sizeof(b2BodyId));
 
     auto &transform = entity.getTransform();
     float rotationDeg = transform.getRotationEuler().z;
     float rotationRad = glm::radians(rotationDeg);
+    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
     b2Body_SetType(bodyId, rigidbody2DTypeToBox2DBody(rb2d.type));
     b2Body_SetTransform(
         bodyId,
@@ -243,20 +278,21 @@ void Physics2D::removeEntity(Entity entity) {
     if (!isInitialized()) {
         return;
     }
-    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    RuntimeBodyData runtimeData = m_entityBodyMap[entity.getId()];
     b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeData, sizeof(b2BodyId));
+    memcpy(&bodyId, &runtimeData.data, sizeof(b2BodyId));
     b2DestroyBody(bodyId);
     m_bodyEntityMap.erase(bodyId.index1);
+    m_entityBodyMap.erase(entity.getId());
 }
 
 void Physics2D::applyForce(Entity entity, Vec2 force) {
     if (!isInitialized()) {
         return;
     }
-    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    RuntimeBodyData runtimeData = m_entityBodyMap[entity.getId()];
     b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeData, sizeof(b2BodyId));
+    memcpy(&bodyId, &runtimeData.data, sizeof(b2BodyId));
     b2Body_ApplyForceToCenter(bodyId, {force.x, force.y}, true);
 }
 
@@ -264,9 +300,9 @@ void Physics2D::applyLinearImpulse(Entity entity, Vec2 impulse) {
     if (!isInitialized()) {
         return;
     }
-    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    RuntimeBodyData runtimeData = m_entityBodyMap[entity.getId()];
     b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeData, sizeof(b2BodyId));
+    memcpy(&bodyId, &runtimeData.data, sizeof(b2BodyId));
     b2Body_ApplyLinearImpulseToCenter(bodyId, {impulse.x, impulse.y}, true);
 }
 
@@ -274,9 +310,9 @@ void Physics2D::setLinearVelocity(Entity entity, Vec2 velocity) {
     if (!isInitialized()) {
         return;
     }
-    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    RuntimeBodyData runtimeData = m_entityBodyMap[entity.getId()];
     b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeData, sizeof(b2BodyId));
+    memcpy(&bodyId, &runtimeData.data, sizeof(b2BodyId));
     b2Body_SetLinearVelocity(bodyId, {velocity.x, velocity.y});
 }
 
@@ -284,9 +320,9 @@ Vec2 Physics2D::getLinearVelocity(Entity entity) {
     if (!isInitialized()) {
         return Vec2();
     }
-    auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    RuntimeBodyData runtimeData = m_entityBodyMap[entity.getId()];
     b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeData, sizeof(b2BodyId));
+    memcpy(&bodyId, &runtimeData.data, sizeof(b2BodyId));
     b2Vec2 result = b2Body_GetLinearVelocity(bodyId);
     return Vec2(result.x, result.y);
 }
@@ -296,8 +332,9 @@ float Physics2D::getMass(Entity entity) {
         return 0;
     }
     auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
+    RuntimeBodyData runtimeData = m_entityBodyMap[entity.getId()];
     b2BodyId bodyId;
-    memcpy(&bodyId, &rb2d.runtimeData, sizeof(b2BodyId));
+    memcpy(&bodyId, &runtimeData.data, sizeof(b2BodyId));
     return b2Body_GetMass(bodyId);
 }
 
@@ -328,6 +365,16 @@ void Physics2D::shutdown() {
         m_physicsWorldId = 0;
     }
     m_bodyEntityMap.clear();
+    m_entityBodyMap.clear();
+}
+
+bool Physics2D::isRegistered(Entity entity) {
+    return m_entityBodyMap.contains(entity.getId());
+}
+
+bool Physics2D::canUse(Entity entity) {
+    return entity.hasComponent<Rigidbody2DComponent>() &&
+           entity.hasComponent<BoxCollider2DComponent>();
 }
 
 } // namespace Panda

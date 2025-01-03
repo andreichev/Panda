@@ -1,6 +1,6 @@
 #version 330 core
 
-in float fragTextureIndex;
+flat in int fragTextureIndex;
 in vec4 fragColor;
 in vec2 fragTexCoord;
 flat in int fragId;
@@ -12,8 +12,8 @@ uniform sampler2D u_textures[8];
 
 void main() {
     outColor = fragColor;
-    // * texture(u_textures[int(fragTextureIndex)], fragTexCoord.st);
-    switch(int(fragTextureIndex)) {
+    // outColor = texture(u_textures[fragTextureIndex], fragTexCoord.st);
+    switch(fragTextureIndex) {
 		case  0: outColor *= texture(u_textures[ 0], fragTexCoord.st); break;
 		case  1: outColor *= texture(u_textures[ 1], fragTexCoord.st); break;
 		case  2: outColor *= texture(u_textures[ 2], fragTexCoord.st); break;

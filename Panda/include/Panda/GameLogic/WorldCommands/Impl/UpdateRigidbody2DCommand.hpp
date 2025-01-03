@@ -17,7 +17,7 @@ public:
             return false;
         }
         m_entity.setComponent(m_prevRigidbody);
-        m_entity.physics2DUpdate();
+        m_entity.physics2DPropertiesUpdated();
         m_entity.setWorldChanged();
         return true;
     }
@@ -27,7 +27,7 @@ public:
             return false;
         }
         m_entity.setComponent(m_newRigidbody);
-        m_entity.physics2DUpdate();
+        m_entity.physics2DPropertiesUpdated();
         m_entity.setWorldChanged();
         return true;
     }

@@ -7,7 +7,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BIN_DIRECTORY})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BIN_DIRECTORY})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_DIRECTORY})
 
-link_directories("$ENV{PANDA_SCPRIPT_CORE_PATH}/bin")
+link_directories("$ENV{BAMBOO_DIR}/bin")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-DPROFILE)
@@ -31,6 +31,6 @@ set_target_properties(___PROJECTNAME___
 
 target_include_directories(___PROJECTNAME___ PUBLIC ${PROJECT_SOURCE_DIR}/src)
 
-# Dependencies - ScriptCore
-target_include_directories(___PROJECTNAME___ PUBLIC $ENV{PANDA_SCPRIPT_CORE_PATH}/include)
-target_link_libraries(___PROJECTNAME___ ScriptCoreCpp)
+# Dependencies - Bamboo
+target_include_directories(___PROJECTNAME___ PUBLIC $ENV{BAMBOO_DIR}/include)
+target_link_libraries(___PROJECTNAME___ Bamboo)

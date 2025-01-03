@@ -327,6 +327,7 @@ void World::initializeScriptCore() {
         //              CLASSES              //
         //-----------------------------------//
         for (auto &container : component.scripts) {
+            // ScriptClassManifest classManifest = manifest.getClass(container.getName().c_str());
             ScriptInstanceHandle scriptInstanceId =
                 ExternalCalls::instantiateScript(entityId, container.getName().c_str());
             PND_ASSERT_F(
@@ -338,6 +339,7 @@ void World::initializeScriptCore() {
             //----------------------------------//
             for (ScriptField &field : container.getFields()) {
                 field.instanceId = scriptInstanceId;
+                // field.fieldId = classManifest.getField(field.name.c_str()).handle;
                 ExternalCalls::setFieldValue(scriptInstanceId, field.fieldId, field.value.data);
             }
         }
@@ -580,16 +582,12 @@ bool World::isValidEntt(entt::entity entity) {
     return true;
 }
 
-void World::physics2DRegisterEntity(Entity entity) {
-    m_physics2D.registerEntity(entity);
+void World::physics2DComponentsUpdatedAt(Entity entity) {
+    m_physics2D.componentsUpdated(entity);
 }
 
-void World::physics2DUpdateEntity(Entity entity) {
-    m_physics2D.updateEntity(entity);
-}
-
-void World::physics2DRemoveEntity(Entity entity) {
-    m_physics2D.removeEntity(entity);
+void World::physics2DPropertiesUpdatedAt(Entity entity) {
+    m_physics2D.propertiesUpdated(entity);
 }
 
 void World::debugPrint() {

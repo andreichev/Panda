@@ -127,9 +127,7 @@ namespace InternalCalls {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         transformComponent.setPosition({x, y, z});
-        if (entity.hasComponent<Rigidbody2DComponent>()) {
-            entity.physics2DUpdate();
-        }
+        entity.physics2DPropertiesUpdated();
     }
 
     void transformComponent_GetRotationEuler(EntityHandle entityId, float *x, float *y, float *z) {
@@ -145,9 +143,7 @@ namespace InternalCalls {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         transformComponent.setRotationEuler({x, y, z});
-        if (entity.hasComponent<Rigidbody2DComponent>()) {
-            entity.physics2DUpdate();
-        }
+        entity.physics2DPropertiesUpdated();
     }
 
     void transformComponent_GetScale(EntityHandle entityId, float *x, float *y, float *z) {
@@ -163,9 +159,7 @@ namespace InternalCalls {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         transformComponent.setScale({x, y, z});
-        if (entity.hasComponent<Rigidbody2DComponent>()) {
-            entity.physics2DUpdate();
-        }
+        entity.physics2DPropertiesUpdated();
     }
 
     /// SPRITE RENDERER COMPONENT

@@ -312,7 +312,7 @@ void ComponentsDraw::drawComponents(Entity entity) {
             bool modified = false;
             modified |= checkbox("Is Sensor", &bc2d.isSensor);
             modified |= dragFloat2("Offset", glm::value_ptr(bc2d.offset));
-            modified |= dragFloat("Size", glm::value_ptr(bc2d.size));
+            modified |= dragFloat2("Size", glm::value_ptr(bc2d.size));
             modified |= dragFloat("Density", &bc2d.density, 0.01f, 0.0f, 1.0f);
             modified |= dragFloat("Friction", &bc2d.friction, 0.01f, 0.0f, 1.0f);
             modified |= dragFloat("Restitution", &bc2d.restitution, 0.01f, 0.0f, 1.0f);

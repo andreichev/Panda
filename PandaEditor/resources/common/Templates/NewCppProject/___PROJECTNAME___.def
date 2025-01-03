@@ -1,4 +1,4 @@
-LIBRARY TestProject
+LIBRARY ___PROJECTNAME___
 EXPORTS
     loadInternalCall
     loadExternalCalls
