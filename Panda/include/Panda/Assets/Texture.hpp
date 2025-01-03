@@ -24,7 +24,7 @@ public:
         textureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
         textureCreate.m_numMips = 3;
         m_mirenHandle = Miren::createTexture(textureCreate);
-        LOG_INFO("CREATED TEXTURE, path: {}", path.c_str());
+        LOG_INFO("CREATED TEXTURE, path: {}", path.string().c_str());
     }
 
     /// Runtime constructor
