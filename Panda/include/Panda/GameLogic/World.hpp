@@ -86,6 +86,7 @@ public:
     bool isValidEntt(entt::entity entity);
 
 private:
+    void releaseAllScriptingFields();
     void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     Entity instantiateEntity(UUID id);
     void fillEntity(Entity entity, UUID id);

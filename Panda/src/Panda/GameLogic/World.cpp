@@ -23,6 +23,7 @@ World::World()
 
 World::~World() {
     m_physics2D.shutdown();
+    releaseAllScriptingFields();
 }
 
 void World::startRunning() {
@@ -394,6 +395,7 @@ void World::destroy(Entity entity) {
 }
 
 void World::clear() {
+    releaseAllScriptingFields();
     m_isChanged = false;
     m_selectedEntity = Entity();
     for (auto id : m_registry.storage<entt::entity>()) {
@@ -496,10 +498,20 @@ void World::setViewId(Miren::ViewId id) {
     m_renderingViewId = id;
 }
 
+// Copy all components from registry to registry
 template<typename T>
-void copyAllComponents(entt::registry &src, entt::registry &dst, entt::entity entity) {
-    if (src.any_of<T>(entity)) {
+void copyAllComponents(entt::registry &src, entt::registry &dst) {
+    auto view = src.view<T>();
+    for (auto entity : view) {
         dst.emplace<T>(entity, src.get<T>(entity));
+    }
+}
+
+// Copy component from entity to entity in registry
+template<typename T>
+void copyComponent(entt::entity src, entt::entity dst, entt::registry &registry) {
+    if (registry.any_of<T>(src)) {
+        registry.emplace<T>(dst, registry.get<T>(src));
     }
 }
 
@@ -508,34 +520,39 @@ World &World::operator=(World &other) {
     clear();
     entt::registry &src = other.m_registry;
     entt::registry &dst = m_registry;
-    for (auto entityHandle : src.storage<entt::entity>()) {
+    for (auto entityHandle : src.view<entt::entity>()) {
         auto _ = dst.create(entityHandle);
         UUID id = src.get<IdComponent>(entityHandle).id;
         m_entityIdMap[id] = Entity(entityHandle, this);
-        copyAllComponents<IdComponent>(src, dst, entityHandle);
+    }
+    copyAllComponents<IdComponent>(src, dst);
 #ifdef PND_EDITOR
-        copyAllComponents<EditorMetadataComponent>(src, dst, entityHandle);
+    copyAllComponents<EditorMetadataComponent>(src, dst);
 #endif
-        copyAllComponents<TagComponent>(src, dst, entityHandle);
-        copyAllComponents<TransformComponent>(src, dst, entityHandle);
-        copyAllComponents<RelationshipComponent>(src, dst, entityHandle);
-        copyAllComponents<SpriteRendererComponent>(src, dst, entityHandle);
-        copyAllComponents<StaticMeshComponent>(src, dst, entityHandle);
-        copyAllComponents<DynamicMeshComponent>(src, dst, entityHandle);
-        copyAllComponents<CameraComponent>(src, dst, entityHandle);
-        copyAllComponents<ScriptListComponent>(src, dst, entityHandle);
-        copyAllComponents<SkyComponent>(src, dst, entityHandle);
-        copyAllComponents<Rigidbody2DComponent>(src, dst, entityHandle);
-        copyAllComponents<BoxCollider2DComponent>(src, dst, entityHandle);
+    copyAllComponents<TagComponent>(src, dst);
+    copyAllComponents<TransformComponent>(src, dst);
+    copyAllComponents<RelationshipComponent>(src, dst);
+    copyAllComponents<SpriteRendererComponent>(src, dst);
+    copyAllComponents<StaticMeshComponent>(src, dst);
+    copyAllComponents<DynamicMeshComponent>(src, dst);
+    copyAllComponents<CameraComponent>(src, dst);
+    copyAllComponents<SkyComponent>(src, dst);
+    copyAllComponents<Rigidbody2DComponent>(src, dst);
+    copyAllComponents<BoxCollider2DComponent>(src, dst);
+    copyAllComponents<ScriptListComponent>(src, dst);
+    // Duplicate scripting fields memory
+    {
+        auto view = dst.view<ScriptListComponent>();
+        for (auto entityHandle : view) {
+            auto &scriptList = view.get<ScriptListComponent>(entityHandle);
+            for (ExternalScript &script : scriptList.scripts) {
+                for (ScriptField &field : script.getFields()) {
+                    field.value = Foundation::Memory::copying(field.value.data, field.getSize());
+                }
+            }
+        }
     }
     return *this;
-}
-
-template<typename T>
-void copyComponent(entt::entity src, entt::entity dst, entt::registry &registry) {
-    if (registry.any_of<T>(src)) {
-        registry.emplace<T>(dst, registry.get<T>(src));
-    }
 }
 
 Entity World::duplicateEntity(Entity entity) {
@@ -556,13 +573,30 @@ Entity World::duplicateEntity(Entity entity) {
     copyComponent<StaticMeshComponent>(src, dst, m_registry);
     copyComponent<DynamicMeshComponent>(src, dst, m_registry);
     copyComponent<CameraComponent>(src, dst, m_registry);
-    copyComponent<ScriptListComponent>(src, dst, m_registry);
     copyComponent<SkyComponent>(src, dst, m_registry);
     copyComponent<Rigidbody2DComponent>(src, dst, m_registry);
     copyComponent<BoxCollider2DComponent>(src, dst, m_registry);
+    copyComponent<ScriptListComponent>(src, dst, m_registry);
+    // Duplicate scripting fields memory
+    {
+        auto &scriptList = dst.getComponent<ScriptListComponent>();
+        for (ExternalScript &script : scriptList.scripts) {
+            for (ScriptField &field : script.getFields()) {
+                field.value = Foundation::Memory::copying(field.value.data, field.getSize());
+            }
+        }
+    }
     m_entityIdMap[dst.getId()] = entity;
     m_isChanged = true;
     return dst;
+}
+
+void World::releaseAllScriptingFields() {
+    auto view = m_registry.view<ScriptListComponent>();
+    for (auto entityHandle : view) {
+        ScriptListComponent &scriptList = view.get<ScriptListComponent>(entityHandle);
+        scriptList.releaseFields();
+    }
 }
 
 bool World::isValidEntt(entt::entity entity) {

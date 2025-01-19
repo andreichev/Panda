@@ -34,6 +34,25 @@ struct ScriptField {
         return instanceId == other.instanceId && fieldId == other.fieldId;
     }
 
+    size_t getSize() {
+        switch (type) {
+            case ScriptFieldType::INTEGER: {
+                return sizeof(int);
+            }
+            case ScriptFieldType::FLOAT: {
+                return sizeof(float);
+            }
+            case ScriptFieldType::TEXTURE:
+            case ScriptFieldType::ENTITY: {
+                return sizeof(UUID);
+            }
+            default: {
+                PND_ASSERT(false, "Unknown field type");
+                return 4;
+            }
+        }
+    }
+
     // Cache
     Foundation::Shared<Asset> asset;
     void resetCache() {

@@ -25,7 +25,7 @@ void WorldHierarchyPanel::onImGuiRender() {
     }
     ImGui::Begin("World Hierarchy", nullptr, flags);
     if (m_world && !m_world->isEmpty()) {
-        for (auto entityId : m_world->m_registry.storage<entt::entity>()) {
+        for (auto entityId : m_world->m_registry.view<entt::entity>()) {
             Entity entity(entityId, m_world);
             if (!entity.isValid()) {
                 continue;

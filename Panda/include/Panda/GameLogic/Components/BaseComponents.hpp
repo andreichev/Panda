@@ -113,6 +113,14 @@ struct ScriptListComponent final {
         scripts.emplace_back(script);
     }
 
+    void releaseFields() {
+        for (ExternalScript &script : scripts) {
+            for (ScriptField &field : script.getFields()) {
+                field.value.release();
+            }
+        }
+    }
+
     void remove(ExternalScript script) {
         scripts.erase(std::remove(scripts.begin(), scripts.end(), script), scripts.end());
     }
