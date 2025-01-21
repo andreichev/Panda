@@ -35,7 +35,6 @@ public:
     bool isEmpty();
     Entity findByTag(const char *tag);
     Entity getById(UUID id);
-    Entity getByEnttId(entt::entity id);
     inline bool isRunning() {
         return m_isRunning;
     }

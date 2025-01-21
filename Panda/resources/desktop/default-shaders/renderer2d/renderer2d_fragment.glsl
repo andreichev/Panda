@@ -3,10 +3,10 @@
 flat in int fragTextureIndex;
 in vec4 fragColor;
 in vec2 fragTexCoord;
-flat in int fragId;
+flat in uint fragId;
 
 layout(location = 0) out vec4 outColor;
-layout(location = 1) out int outId;
+layout(location = 1) out uint outId;
 
 uniform sampler2D u_textures[8];
 
@@ -26,5 +26,5 @@ void main() {
     if (outColor.a <= 0.01) {
         discard;
     }
-    outId = int(fragId);
+    outId = fragId;
 }

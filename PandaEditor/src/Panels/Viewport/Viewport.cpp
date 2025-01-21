@@ -32,7 +32,7 @@ void Viewport::initWithSize(Vec2 size) {
     create.m_width = m_frame.size.width * dpi.width;
     create.m_height = m_frame.size.height * dpi.height;
     m_colorAttachment = Miren::createTexture(create);
-    create.m_format = Miren::TextureFormat::RED_INTEGER;
+    create.m_format = Miren::TextureFormat::R32UI;
     Miren::TextureHandle idAttachment = Miren::createTexture(create);
     create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
     Miren::TextureHandle depthAttachment = Miren::createTexture(create);
@@ -47,8 +47,8 @@ void Viewport::initWithSize(Vec2 size) {
         0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
     );
     Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
-    Miren::setViewClear(m_sceneView, 0x12212bff);
-    Miren::setViewClearAttachments(m_sceneView, {Miren::Clear(1, -1)});
+    Miren::setViewClear(m_sceneView, 0x000000cff);
+    Miren::setViewClearAttachments(m_sceneView, {Miren::Clear(1, 0)});
     PandaUI::Context::shared().updateViewId(m_sceneView);
 }
 
@@ -147,10 +147,10 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     );
 
     if (m_focused && Input::isMouseButtonJustPressed(MouseButton::LEFT) && !m_gizmos.isUsing()) {
-        if (m_hoveredId == -1) {
+        if (m_hoveredId == 0) {
             m_output->viewportUnselectEntity();
         } else {
-            m_output->viewportPickEntityWithEnttId(m_hoveredId);
+            m_output->viewportPickEntityWithId(m_hoveredId);
         }
     }
     // LOG_INFO_EDITOR("id: {}", m_hoveredId);

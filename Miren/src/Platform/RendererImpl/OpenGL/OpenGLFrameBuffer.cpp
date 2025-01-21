@@ -73,6 +73,12 @@ void OpenGLFrameBuffer::clearIntAttachment(int index, int value) {
     glClearBufferiv(GL_COLOR, index, &value);
 }
 
+void OpenGLFrameBuffer::clearUIntAttachment(int index, uint32_t value) {
+    PND_ASSERT(index < spec.num, "INVALID ATTACHMENT INDEX");
+    bind();
+    glClearBufferuiv(GL_COLOR, index, &value);
+}
+
 void OpenGLFrameBuffer::readPixels(int index, int x, int y, int width, int height, void *data) {
     bind();
     OpenGLTexture &texture = RendererOpenGL::s_instance->getTexture(spec.attachments[index].handle);

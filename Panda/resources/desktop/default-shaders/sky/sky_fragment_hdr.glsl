@@ -5,7 +5,7 @@ in vec3 TexCoord;
 uniform sampler2D skyTexture;
 
 layout(location = 0) out vec4 outColor;
-layout(location = 1) out int outId;
+layout(location = 1) out uint outId;
 
 const vec2 invAtan = vec2(0.1591, 0.3183);
 vec2 sampleSphericalMap(vec3 v)  {
@@ -20,5 +20,5 @@ void main() {
 	vec3 color = texture(skyTexture, uv).rgb;
 
 	outColor = vec4(color, 1.0);
-	outId = -1;
+	outId = 0;
 }

@@ -154,11 +154,12 @@ void World::updateBasicComponents(
     }
     // Render Sprites
     {
-        auto view = m_registry.view<SpriteRendererComponent, TransformComponent>();
+        auto view = m_registry.view<IdComponent, SpriteRendererComponent, TransformComponent>();
         for (auto entityHandle : view) {
             if (!isValidEntt(entityHandle)) {
                 continue;
             }
+            auto &id = view.get<IdComponent>(entityHandle);
             auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
             auto &transform = view.get<TransformComponent>(entityHandle);
             Panda::Renderer2D::RectData rect;
@@ -171,7 +172,7 @@ void World::updateBasicComponents(
             }
             rect.texture = spriteComponent.asset;
             rect.size = {1.f, 1.f};
-            rect.id = static_cast<int32_t>(entityHandle);
+            rect.id = id.id;
             int xTileIndex = spriteComponent.index % spriteComponent.cols;
             int yTileIndex = spriteComponent.index % spriteComponent.rows;
             float tileWidth = (1.f / spriteComponent.cols);
@@ -485,11 +486,6 @@ Entity World::findByTag(const char *tag) {
 Entity World::getById(UUID id) {
     PND_ASSERT(m_entityIdMap.find(id) != m_entityIdMap.end(), "ENTITY DOES NOT EXISTS");
     return m_entityIdMap.at(id);
-}
-
-Entity World::getByEnttId(entt::entity id) {
-    PND_ASSERT(m_registry.valid(static_cast<entt::entity>(id)), "ENTITY DOES NOT EXISTS");
-    return Entity(id, this);
 }
 
 void World::setViewId(Miren::ViewId id) {

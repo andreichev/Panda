@@ -15,6 +15,7 @@ public:
     void unbind();
     void readPixels(int index, int x, int y, int width, int height, void *data);
     void clearIntAttachment(int index, int value);
+    void clearUIntAttachment(int index, uint32_t value);
 
 private:
     void checkStatus();

@@ -294,7 +294,8 @@ void RendererOpenGL::viewChanged(View &view) {
         return;
     }
     for (auto clear : view.m_clearAttachments) {
-        frameBuffers[view.m_frameBuffer.id].clearIntAttachment(clear.attachmentIndex, clear.value);
+        // TODO: Add different clear types
+        frameBuffers[view.m_frameBuffer.id].clearUIntAttachment(clear.attachmentIndex, clear.value);
     }
 }
 

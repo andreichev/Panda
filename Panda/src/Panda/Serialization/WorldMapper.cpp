@@ -81,7 +81,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
 WorldDto WorldMapper::toDto(const World &world) {
     WorldDto worldDto;
     World &_world = const_cast<World &>(world);
-    for (auto entityId : _world.m_registry.storage<entt::entity>()) {
+    for (auto entityId : _world.m_registry.view<entt::entity>()) {
         if (!_world.isValidEntt(entityId)) {
             continue;
         }

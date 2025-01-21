@@ -46,7 +46,8 @@ enum TextureFormat {
     // Color
     RGB8,
     RGBA8,
-    RED_INTEGER,
+    R32I,
+    R32UI,
     // Depth/stencil
     DEPTH24STENCIL8
 };
@@ -95,7 +96,8 @@ struct TextureCreate {
                 return 3;
             case RGBA8:
                 return 4;
-            case RED_INTEGER:
+            case R32I:
+            case R32UI:
                 return 4;
             case DEPTH24STENCIL8:
                 return 4;
@@ -216,9 +218,9 @@ struct Rect {
 
 struct Clear {
     int attachmentIndex;
-    int value;
+    uint32_t value;
 
-    Clear(int attachmentIndex, int value)
+    Clear(int attachmentIndex, uint32_t value)
         : attachmentIndex(attachmentIndex)
         , value(value) {}
 };

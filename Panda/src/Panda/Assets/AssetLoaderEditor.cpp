@@ -23,7 +23,7 @@ TextureData AssetLoaderEditor::loadTexture(const path_t &path) {
 
     TextureData texture;
     if (channels == 1) {
-        texture.m_format = Miren::TextureFormat::RED_INTEGER;
+        texture.m_format = Miren::TextureFormat::R32I;
     } else if (channels == 3) {
         texture.m_format = Miren::TextureFormat::RGB8;
     } else {
@@ -51,7 +51,7 @@ TextureData AssetLoaderEditor::loadCubeMapTexture(std::array<path_t, 6> paths) {
             continue;
         }
         if (channels == 1) {
-            texture.m_format = Miren::TextureFormat::RED_INTEGER;
+            texture.m_format = Miren::TextureFormat::R32I;
             bytesPerColor = 1;
         } else if (channels == 3) {
             texture.m_format = Miren::TextureFormat::RGB8;
