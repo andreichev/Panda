@@ -5,9 +5,11 @@
 #include "WorldHierarchyPanel.hpp"
 #include "EntityComponents/ComponentsDraw.hpp"
 #include "Model/DragDropItem.hpp"
-#include "Panda/GameLogic/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
+#include "Panda/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
+#include "Panda/WorldCommands/Impl/HierarchyCommand.hpp"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Panda {
 
@@ -24,6 +26,7 @@ void WorldHierarchyPanel::onImGuiRender() {
         flags |= ImGuiWindowFlags_UnsavedDocument;
     }
     ImGui::Begin("World Hierarchy", nullptr, flags);
+    ImRect windowRect = {ImGui::GetWindowContentRegionMin(), ImGui::GetWindowContentRegionMax()};
     m_focused = ImGui::IsWindowFocused();
     if (m_world && !m_world->isEmpty()) {
         for (auto entityId : m_world->m_registry.view<TagComponent>()) {
@@ -57,30 +60,26 @@ void WorldHierarchyPanel::onImGuiRender() {
             }
         }
     }
-    ImGui::End();
+    if (ImGui::BeginDragDropTargetCustom(windowRect, ImGui::GetCurrentWindow()->ID)) {
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
+            PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
+            DragDropItem &item = *(DragDropItem *)payload->Data;
+            if (item.type == DragDropItemType::ENTITY) {
+                UUID droppedId = item.assetId;
+                Entity entity = m_world->getById(droppedId);
+                WorldCommandManager &cmd = m_world->getCommandManger();
+                HierarchyCommand update(entity, {});
+                cmd.SAVE(update, true);
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
     ImGui::Begin("Properties");
     if (selected.isValid()) {
         m_componentsDraw.drawComponents(selected);
     }
     ImGui::End();
-}
-
-void handleDrop(Entity entity, Entity droppedEntity) {
-    auto &parentComponent = entity.getComponent<RelationshipComponent>();
-    auto &droppedComponent = droppedEntity.getComponent<RelationshipComponent>();
-
-    if (droppedComponent.parent) {
-        Entity previousParent = entity.getWorld()->getById(droppedComponent.parent);
-        auto &previousParentComponent = droppedEntity.getComponent<RelationshipComponent>();
-        auto &parentChildren = previousParentComponent.children;
-        parentChildren.erase(
-            std::remove(parentChildren.begin(), parentChildren.end(), droppedEntity.getId()),
-            parentChildren.end()
-        );
-    }
-
-    parentComponent.children.push_back(droppedEntity.getId());
-    droppedComponent.parent = entity.getId();
+    ImGui::End();
 }
 
 void WorldHierarchyPanel::drawEntityNode(Entity entity) {
@@ -114,7 +113,9 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
                 // If we didn't drop to the same entity
                 if (droppedId != entity.getId()) {
                     Entity droppedEntity = m_world->getById(droppedId);
-                    handleDrop(entity, droppedEntity);
+                    WorldCommandManager &cmd = m_world->getCommandManger();
+                    HierarchyCommand update(droppedEntity, entity);
+                    cmd.SAVE(update, true);
                 }
             }
         }

@@ -5,7 +5,7 @@
 #include "Panels/Popups/EditorYesNoPopup.hpp"
 #include "Panels/Popups/PickScriptPopup.hpp"
 #include "Panels/Popups/EnterNamePopup.hpp"
-#include "Panda/GameLogic/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
+#include "Panda/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
 
 namespace Panda {
 

@@ -6,7 +6,7 @@
 #include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 #include "Panda/Physics/Physics2D.hpp"
-#include "Panda/GameLogic/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
+#include "Panda/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
 
 #include <Rain/Rain.hpp>
 #include <entt/entt.hpp>
@@ -607,6 +607,9 @@ Entity World::duplicateEntity(Entity entity) {
     }
     m_isChanged = true;
     m_entityIdMap[newEntity.getId()] = newEntity;
+#ifdef PND_EDITOR
+    sort();
+#endif
     return newEntity;
 }
 

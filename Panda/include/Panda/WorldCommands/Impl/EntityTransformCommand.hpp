@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panda/GameLogic/WorldCommands/WorldCommand.hpp"
+#include "Panda/WorldCommands/WorldCommand.hpp"
 #include "Panda/GameLogic/Entity.hpp"
 #include "Panda/GameLogic/Components/TransformComponent.hpp"
 

@@ -8,7 +8,7 @@
 #include "Panda/Window/Window.hpp"
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Renderer/Renderer3D.hpp"
-#include "Panda/GameLogic/WorldCommands/WorldCommandManager.hpp"
+#include "Panda/WorldCommands/WorldCommandManager.hpp"
 #include "Panda/Physics/Physics2D.hpp"
 
 #include <Miren/Miren.hpp>

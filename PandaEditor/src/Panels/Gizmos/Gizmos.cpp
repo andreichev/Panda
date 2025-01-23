@@ -4,7 +4,7 @@
 
 #include "Gizmos.hpp"
 
-#include <Panda/GameLogic/WorldCommands/Impl/EntityTransformCommand.hpp>
+#include <Panda/WorldCommands/Impl/EntityTransformCommand.hpp>
 #include <ImGuizmo.h>
 #include <glm/gtc/type_ptr.hpp>
 
