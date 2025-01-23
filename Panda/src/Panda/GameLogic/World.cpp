@@ -565,16 +565,15 @@ Entity World::duplicateEntity(Entity entity) {
     if (!entity) {
         return {};
     }
-    Entity src = entity;
-    entt::entity dstHandle = m_registry.create();
-    Entity dst = {dstHandle, this};
-    dst.addComponent<IdComponent>();
+    entt::entity src = entity.m_handle;
+    entt::entity dst = m_registry.create();
+    Entity newEntity = {dst, this};
+    m_registry.emplace<IdComponent>(dst);
     copyComponent<TagComponent>(src, dst, m_registry);
 #ifdef PND_EDITOR
     copyComponent<EditorMetadataComponent>(src, dst, m_registry);
 #endif
     copyComponent<TransformComponent>(src, dst, m_registry);
-    copyComponent<RelationshipComponent>(src, dst, m_registry);
     copyComponent<SpriteRendererComponent>(src, dst, m_registry);
     copyComponent<StaticMeshComponent>(src, dst, m_registry);
     copyComponent<DynamicMeshComponent>(src, dst, m_registry);
@@ -585,16 +584,30 @@ Entity World::duplicateEntity(Entity entity) {
     copyComponent<ScriptListComponent>(src, dst, m_registry);
     // Duplicate scripting fields memory
     {
-        auto &scriptList = dst.getComponent<ScriptListComponent>();
+        auto &scriptList = m_registry.get<ScriptListComponent>(dst);
         for (ExternalScript &script : scriptList.scripts) {
             for (ScriptField &field : script.getFields()) {
                 field.value = Foundation::Memory::copying(field.value.data, field.getSize());
             }
         }
     }
-    m_entityIdMap[dst.getId()] = entity;
+    // Duplicate relationship component
+    {
+        RelationshipComponent &srcRelationship = m_registry.get<RelationshipComponent>(src);
+        RelationshipComponent dstRelationship = srcRelationship;
+        if (srcRelationship.parent) {
+            Entity parent = getById(srcRelationship.parent);
+            RelationshipComponent &parentRelationship =
+                parent.getComponent<RelationshipComponent>();
+            parentRelationship.children.push_back(newEntity.getId());
+        }
+        // TODO: Clone recursively children
+        dstRelationship.children = {};
+        m_registry.emplace<RelationshipComponent>(dst, dstRelationship);
+    }
     m_isChanged = true;
-    return dst;
+    m_entityIdMap[newEntity.getId()] = newEntity;
+    return newEntity;
 }
 
 void World::releaseAllScriptingFields() {
