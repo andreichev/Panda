@@ -24,13 +24,16 @@ void WorldHierarchyPanel::onImGuiRender() {
         flags |= ImGuiWindowFlags_UnsavedDocument;
     }
     ImGui::Begin("World Hierarchy", nullptr, flags);
+    m_focused = ImGui::IsWindowFocused();
     if (m_world && !m_world->isEmpty()) {
-        for (auto entityId : m_world->m_registry.view<entt::entity>()) {
+        for (auto entityId : m_world->m_registry.view<TagComponent>()) {
             Entity entity(entityId, m_world);
             if (!entity.isValid()) {
                 continue;
             }
-            drawEntityNode(entity);
+            if (!entity.getParent()) {
+                drawEntityNode(entity);
+            }
         }
     }
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
@@ -41,9 +44,20 @@ void WorldHierarchyPanel::onImGuiRender() {
         ImGui::EndPopup();
     }
     ImGui::PopStyleVar();
-    ImGui::End();
-
     Entity selected = m_world->getSelectedEntity();
+    if (m_focused) {
+        if (ImGui::IsKeyPressed(ImGuiKey_Backspace, false) ||
+            ImGui::IsKeyPressed(ImGuiKey_Delete, false)) {
+            if (selected) {
+                WorldCommandManager &cmd = m_world->getCommandManger();
+                AddRemoveEntityCommand update(selected);
+                cmd.SAVE(update, true);
+                m_world->setChanged();
+                selected = {};
+            }
+        }
+    }
+    ImGui::End();
     ImGui::Begin("Properties");
     if (selected.isValid()) {
         m_componentsDraw.drawComponents(selected);
@@ -51,16 +65,36 @@ void WorldHierarchyPanel::onImGuiRender() {
     ImGui::End();
 }
 
+void handleDrop(Entity entity, Entity droppedEntity) {
+    auto &parentComponent = entity.getComponent<RelationshipComponent>();
+    auto &droppedComponent = droppedEntity.getComponent<RelationshipComponent>();
+
+    if (droppedComponent.parent) {
+        Entity previousParent = entity.getWorld()->getById(droppedComponent.parent);
+        auto &previousParentComponent = droppedEntity.getComponent<RelationshipComponent>();
+        auto &parentChildren = previousParentComponent.children;
+        parentChildren.erase(
+            std::remove(parentChildren.begin(), parentChildren.end(), droppedEntity.getId()),
+            parentChildren.end()
+        );
+    }
+
+    parentComponent.children.push_back(droppedEntity.getId());
+    droppedComponent.parent = entity.getId();
+}
+
 void WorldHierarchyPanel::drawEntityNode(Entity entity) {
-    // TODO: Remove unindent when hierarchy is implemented
-    float indent = ImGui::GetTreeNodeToLabelSpacing() - 5;
-    ImGui::Unindent(indent);
+    // Uncomment if you need to remove bullets
+    // float indent = ImGui::GetTreeNodeToLabelSpacing() - 5;
+    // ImGui::Unindent(indent);
     Entity selected = m_world->getSelectedEntity();
     auto &tag = entity.getComponent<TagComponent>().tag;
     ImGuiTreeNodeFlags flags =
         ((selected == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
     flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-    flags |= ImGuiTreeNodeFlags_Leaf;
+    if (entity.getChildEntities().empty()) {
+        flags |= ImGuiTreeNodeFlags_Leaf;
+    }
     void *id = reinterpret_cast<void *>(entity.m_handle);
     bool opened = ImGui::TreeNodeEx(id, flags, "%s", tag.c_str());
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
@@ -70,6 +104,21 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
         ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
         ImGui::Text("Entity: %s", entity.getName().c_str());
         ImGui::EndDragDropSource();
+    }
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
+            PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
+            DragDropItem &item = *(DragDropItem *)payload->Data;
+            if (item.type == DragDropItemType::ENTITY) {
+                UUID droppedId = item.assetId;
+                // If we didn't drop to the same entity
+                if (droppedId != entity.getId()) {
+                    Entity droppedEntity = m_world->getById(droppedId);
+                    handleDrop(entity, droppedEntity);
+                }
+            }
+        }
+        ImGui::EndDragDropTarget();
     }
     if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
         m_world->setSelectedEntity(entity);
@@ -81,9 +130,6 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
             AddRemoveEntityCommand update(entity);
             cmd.SAVE(update, true);
             m_world->setChanged();
-            if (m_world->isSelected(entity)) {
-                m_world->setSelectedEntity({});
-            }
         }
         if (ImGui::MenuItem("Duplicate", NULL)) {
             Entity duplicate = m_world->duplicateEntity(entity);
@@ -95,9 +141,12 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     }
     ImGui::PopStyleVar();
     if (opened) {
+        for (auto child : entity.getChildEntities()) {
+            drawEntityNode(m_world->getById(child));
+        }
         ImGui::TreePop();
     }
-    ImGui::Indent(indent);
+    // ImGui::Indent(indent);
 }
 
 void WorldHierarchyPanel::drawEntityCreateMenu() {

@@ -57,6 +57,9 @@ void Entity::removeFromParent() {
 
 Entity Entity::getParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
+    if (!thisRelationship.parent) {
+        return {};
+    }
     return m_world->getById(thisRelationship.parent);
 }
 
@@ -79,6 +82,10 @@ void Entity::physics2DPropertiesUpdated() {
 #ifdef PND_EDITOR
 bool Entity::isDeleted() {
     return getComponent<EditorMetadataComponent>().isDeleted;
+}
+
+void Entity::sortWorld() {
+    m_world->sort();
 }
 
 void Entity::setDeleted(bool deleted) {

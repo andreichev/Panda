@@ -330,9 +330,10 @@ void World::initializeScriptCore() {
             // ScriptClassManifest classManifest = manifest.getClass(container.getName().c_str());
             ScriptInstanceHandle scriptInstanceId =
                 ExternalCalls::instantiateScript(entityId, container.getName().c_str());
-            PND_ASSERT_F(
-                scriptInstanceId, "CANNOT INSTANTIATE SCRIPT {}", container.getName().c_str()
-            );
+            if (!scriptInstanceId) {
+                LOG_ERROR_EDITOR("CANNOT INSTANTIATE SCRIPT {}", container.getName().c_str());
+                continue;
+            }
             container.rebindId(scriptInstanceId);
             //----------------------------------//
             //              FIELDS              //
@@ -393,6 +394,9 @@ void World::destroy(Entity entity) {
     }
     m_registry.destroy(entity.m_handle);
     m_isChanged = true;
+    if (m_selectedEntity == entity) {
+        m_selectedEntity = {};
+    }
 }
 
 void World::clear() {
@@ -459,6 +463,9 @@ void World::fillStartupData() {
     skyEntity.setName("Sky");
     skyEntity.addComponent<SkyComponent>();
     m_isChanged = true;
+#ifdef PND_EDITOR
+    sort();
+#endif
 }
 
 bool World::isChanged() {
@@ -548,6 +555,9 @@ World &World::operator=(World &other) {
             }
         }
     }
+#ifdef PND_EDITOR
+    sort();
+#endif
     return *this;
 }
 
@@ -618,6 +628,22 @@ void World::physics2DPropertiesUpdatedAt(Entity entity) {
     m_physics2D.propertiesUpdated(entity);
 }
 
+#ifdef PND_EDITOR
+
+void World::sort() {
+    m_registry.sort<TagComponent>([](auto l, auto r) { return l.tag < r.tag; });
+    auto view = m_registry.view<RelationshipComponent, TagComponent>();
+    for (auto entityId : view) {
+        auto &relationshipComponent = view.get<RelationshipComponent>(entityId);
+        auto &children = relationshipComponent.children;
+        std::sort(children.begin(), children.end(), [this](auto l, auto r) {
+            Entity le = getById(l);
+            Entity re = getById(r);
+            return le.getName() < re.getName();
+        });
+    }
+}
+
 void World::debugPrint() {
     LOG_INFO("WORLD DEBUG PRINT");
     {
@@ -632,5 +658,7 @@ void World::debugPrint() {
     }
     LOG_INFO("TOTAL: {} entities", m_registry.storage<entt::entity>().size());
 }
+
+#endif
 
 } // namespace Panda

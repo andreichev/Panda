@@ -54,7 +54,6 @@ public:
     }
 
     World &operator=(World &other);
-    void debugPrint();
 
     Physics2D &getPhysics2D() {
         return m_physics2D;
@@ -67,6 +66,7 @@ public:
 
     bool isChanged();
     void setChanged(bool changed = true);
+    void sort();
 
     Entity getSelectedEntity() {
         return m_selectedEntity;
@@ -101,6 +101,7 @@ private:
     Miren::ViewId m_renderingViewId;
 
 #ifdef PND_EDITOR
+    void debugPrint();
     bool m_isChanged;
     WorldCommandManager m_commandManager;
     // TODO: Multiple selection

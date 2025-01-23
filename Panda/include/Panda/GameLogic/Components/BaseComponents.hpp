@@ -57,7 +57,7 @@ struct TagComponent final : public Rain::Codable {
 };
 
 struct RelationshipComponent final : public Rain::Codable {
-    UUID parent = -1;
+    UUID parent = 0;
     std::vector<UUID> children;
 
     RelationshipComponent() = default;

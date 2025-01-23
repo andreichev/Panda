@@ -63,6 +63,9 @@ namespace InternalCalls {
     EntityHandle world_CreateEntity(const char *tag) {
         Entity entity = GameContext::s_currentWorld->instantiateEntity();
         entity.setName(tag);
+#ifdef PND_EDITOR
+        entity.sortWorld();
+#endif
         return entity.getId();
     }
 

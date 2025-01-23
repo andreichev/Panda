@@ -9,6 +9,8 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         Entity entity = world.instantiateEntity(entityDto.id);
         // TAG COMPONENT
         { entity.setName(entityDto.tagComponent.tag); }
+        // RELATIONSHIP COMPONENT
+        { entity.setComponent<RelationshipComponent>(entityDto.relationshipComponent); }
         // TRANSFORM COMPONENT
         {
             TransformComponentDto transformDto = entityDto.transformComponent;
@@ -76,12 +78,14 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
         }
     }
     world.setChanged(false);
+    world.sort();
 }
 
 WorldDto WorldMapper::toDto(const World &world) {
     WorldDto worldDto;
     World &_world = const_cast<World &>(world);
-    for (auto entityId : _world.m_registry.view<entt::entity>()) {
+    auto view = _world.m_registry.view<TagComponent>();
+    for (auto entityId : view) {
         if (!_world.isValidEntt(entityId)) {
             continue;
         }
@@ -90,7 +94,9 @@ WorldDto WorldMapper::toDto(const World &world) {
         // ID COMPONENT
         { entityDto.id = entity.getId(); }
         // TAG COMPONENT
-        { entityDto.tagComponent = entity.getComponent<TagComponent>(); }
+        { entityDto.tagComponent = view.get<TagComponent>(entityId); }
+        // RELATIONSHIP COMPONENT
+        { entityDto.relationshipComponent = entity.getComponent<RelationshipComponent>(); }
         // TRANSFORM COMPONENT
         {
             TransformComponentDto &transformDto = entityDto.transformComponent;

@@ -16,6 +16,9 @@ public:
     operator const uint32_t() const {
         return m_UUID;
     }
+    bool operator<(const UUID &rhs) const {
+        return m_UUID < rhs.m_UUID;
+    }
 
 private:
     uint32_t m_UUID;

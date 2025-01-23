@@ -8,6 +8,7 @@ namespace Panda {
 struct EntityDto : public Rain::Codable {
     UUID id;
     TagComponent tagComponent;
+    RelationshipComponent relationshipComponent;
     TransformComponentDto transformComponent;
     std::optional<CameraComponentDto> cameraComponent;
     std::optional<SpriteRendererComponentDto> spriteRendererComponent;
@@ -19,6 +20,7 @@ struct EntityDto : public Rain::Codable {
     RAIN_FIELDS_BEGIN(EntityDto)
     RAIN_FIELD(id)
     RAIN_FIELD(tagComponent)
+    RAIN_FIELD(relationshipComponent)
     RAIN_FIELD(transformComponent)
     RAIN_FIELD(cameraComponent)
     RAIN_FIELD(spriteRendererComponent)

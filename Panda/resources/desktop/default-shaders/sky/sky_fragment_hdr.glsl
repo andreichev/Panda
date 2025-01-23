@@ -20,5 +20,5 @@ void main() {
 	vec3 color = texture(skyTexture, uv).rgb;
 
 	outColor = vec4(color, 1.0);
-	outId = 0;
+	outId = 0u;
 }

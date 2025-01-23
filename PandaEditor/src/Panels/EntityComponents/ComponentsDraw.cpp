@@ -83,6 +83,7 @@ static void drawTag(Entity entity) {
             memcpy(buffer, "Unnamed Entity", 16);
         }
         entity.setName(buffer);
+        entity.sortWorld();
     }
     ImGui::PopStyleVar();
 }
