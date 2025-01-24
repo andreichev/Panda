@@ -115,7 +115,7 @@ void CameraController::updateVectors() {
 }
 
 const glm::mat4 CameraController::getViewMatrix() {
-    return glm::inverse(m_transform.getTransform());
+    return glm::inverse(m_transform.getLocalTransform());
 }
 
 const glm::mat4 CameraController::getSkyViewMatrix() {

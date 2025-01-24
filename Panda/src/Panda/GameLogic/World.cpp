@@ -80,7 +80,7 @@ void World::updateRuntime(double deltaTime) {
     if (cameraEntity.isValid()) {
         WorldCamera &camera = cameraEntity.getComponent<CameraComponent>().camera;
 
-        glm::mat4 viewMtx = glm::inverse(cameraEntity.getTransform().getTransform());
+        glm::mat4 viewMtx = glm::inverse(getWorldSpaceTransformMatrix(cameraEntity));
         glm::mat4 skyViewMtx = glm::inverse(cameraEntity.getTransform().getSkyTransform());
         glm::mat4 projMtx = camera.getProjection();
 
@@ -159,11 +159,12 @@ void World::updateBasicComponents(
             if (!isValidEntt(entityHandle)) {
                 continue;
             }
+            Entity entity = {entityHandle, this};
             auto &id = view.get<IdComponent>(entityHandle);
             auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
             auto &transform = view.get<TransformComponent>(entityHandle);
             Panda::Renderer2D::RectData rect;
-            rect.transform = transform.getTransform();
+            rect.transform = getWorldSpaceTransformMatrix(entity);
             rect.color = spriteComponent.color;
             // Load texture if it needs.
             AssetHandler *assetHandler = GameContext::s_assetHandler;
@@ -191,9 +192,9 @@ void World::updateBasicComponents(
                 continue;
             }
             auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
-            auto &transform = view.get<TransformComponent>(entityHandle);
+            auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
             for (auto &mesh : staticMeshComponent.meshes) {
-                m_renderer3d.submit(&transform, &mesh);
+                m_renderer3d.submit(transform, &mesh);
             }
         }
     }
@@ -205,9 +206,9 @@ void World::updateBasicComponents(
                 continue;
             }
             auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
-            auto &transform = view.get<TransformComponent>(entityHandle);
+            auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
             for (auto &mesh : dynamicMeshComponent.meshes) {
-                m_renderer3d.submit(&transform, &mesh);
+                m_renderer3d.submit(transform, &mesh);
             }
         }
     }
@@ -499,6 +500,15 @@ void World::setViewId(Miren::ViewId id) {
     m_renderer2d.setViewId(id);
     m_renderer3d.setViewId(id);
     m_renderingViewId = id;
+}
+
+glm::mat4 World::getWorldSpaceTransformMatrix(Entity entity) {
+    glm::mat4 result(1.0f);
+    Entity parent = entity.getParent();
+    if (parent) {
+        result = getWorldSpaceTransformMatrix(parent);
+    }
+    return result * entity.getTransform().getLocalTransform();
 }
 
 // Copy all components from registry to registry

@@ -28,7 +28,7 @@ public:
     glm::vec3 getScale();
     void setScale(glm::vec3 scale);
     // ------- Matrices -------
-    glm::mat4 getTransform() const;
+    glm::mat4 getLocalTransform() const;
     glm::mat4 getSkyTransform() const;
     // ------- Copy values --------
     void setTransform(TransformComponent &other);

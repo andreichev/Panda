@@ -45,6 +45,7 @@ public:
         return m_renderer3d;
     }
     void setViewId(Miren::ViewId id);
+    glm::mat4 getWorldSpaceTransformMatrix(Entity entity);
     Entity findMainCameraEntity();
     Camera *findMainCamera();
 

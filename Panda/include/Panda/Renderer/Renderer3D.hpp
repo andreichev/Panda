@@ -28,8 +28,8 @@ public:
     Renderer3D(Renderer3D &&other);
     ~Renderer3D() = default;
     void begin();
-    void submit(TransformComponent *transform, StaticMesh *mesh);
-    void submit(TransformComponent *transform, DynamicMesh *mesh);
+    void submit(glm::mat4 &transform, StaticMesh *mesh);
+    void submit(glm::mat4 &transform, DynamicMesh *mesh);
     void end();
     Statistics getStats();
     void setViewProj(glm::mat4 viewProj);

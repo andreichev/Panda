@@ -59,7 +59,7 @@ glm::vec4 TransformComponent::getPositionHomogeneous() {
     return {position.x, position.y, position.z, 1.0f};
 }
 
-glm::mat4 TransformComponent::getTransform() const {
+glm::mat4 TransformComponent::getLocalTransform() const {
     return glm::translate(glm::mat4(1.0f), position) * glm::toMat4(rotation) *
            glm::scale(glm::mat4(1.0f), scale);
 }
