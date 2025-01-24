@@ -32,6 +32,7 @@ public:
     glm::mat4 getSkyTransform() const;
     // ------- Copy values --------
     void setTransform(TransformComponent &other);
+    void setTransform(const glm::mat4 &transform);
 
 private:
     glm::quat rotation;

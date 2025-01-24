@@ -21,6 +21,10 @@ namespace Math {
         float maxSpeed = FLT_MAX
     );
 
-}
+    bool decomposeTransform(
+        const glm::mat4 &transform, glm::vec3 &translation, glm::quat &rotation, glm::vec3 &scale
+    );
+
+} // namespace Math
 
 } // namespace Panda

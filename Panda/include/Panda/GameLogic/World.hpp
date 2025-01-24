@@ -46,6 +46,8 @@ public:
     }
     void setViewId(Miren::ViewId id);
     glm::mat4 getWorldSpaceTransformMatrix(Entity entity);
+    void convertToWorldSpace(Entity entity);
+    void convertToLocalSpace(Entity entity);
     Entity findMainCameraEntity();
     Camera *findMainCamera();
 

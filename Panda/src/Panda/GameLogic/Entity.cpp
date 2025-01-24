@@ -34,6 +34,7 @@ void Entity::addChildEntity(Entity entity) {
     entity.removeFromParent();
     otherRelationship.parent = getId();
     thisRelationship.children.push_back(entity.getId());
+    m_world->convertToLocalSpace(entity);
     setWorldChanged();
 }
 
@@ -42,6 +43,7 @@ void Entity::removeChildEntity(Entity entity) {
     RelationshipComponent &otherRelationship = entity.getComponent<RelationshipComponent>();
     auto &children = thisRelationship.children;
     children.erase(std::remove(children.begin(), children.end(), entity.getId()), children.end());
+    m_world->convertToWorldSpace(entity);
     otherRelationship.parent = 0;
     setWorldChanged();
 }

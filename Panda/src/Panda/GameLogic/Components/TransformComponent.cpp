@@ -3,6 +3,7 @@
 //
 
 #include "Panda/GameLogic/Components/TransformComponent.hpp"
+#include "Panda/Math/Math.hpp"
 
 namespace Panda {
 
@@ -66,6 +67,11 @@ glm::mat4 TransformComponent::getLocalTransform() const {
 
 glm::mat4 TransformComponent::getSkyTransform() const {
     return glm::toMat4(rotation) * glm::scale(glm::mat4(1.0f), scale);
+}
+
+void TransformComponent::setTransform(const glm::mat4 &transform) {
+    Math::decomposeTransform(transform, position, rotation, scale);
+    rotationEuler = glm::eulerAngles(rotation);
 }
 
 glm::vec3 TransformComponent::getScale() {

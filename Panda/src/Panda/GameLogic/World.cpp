@@ -654,6 +654,28 @@ void World::physics2DPropertiesUpdatedAt(Entity entity) {
     m_physics2D.propertiesUpdated(entity);
 }
 
+void World::convertToLocalSpace(Entity entity) {
+    Entity parent = entity.getParent();
+    if (!parent) {
+        return;
+    }
+    auto &transformComponent = entity.getTransform();
+    glm::mat4 parentTransform = getWorldSpaceTransformMatrix(parent);
+    glm::mat4 localTransform =
+        glm::inverse(parentTransform) * transformComponent.getLocalTransform();
+    transformComponent.setTransform(localTransform);
+}
+
+void World::convertToWorldSpace(Entity entity) {
+    Entity parent = entity.getParent();
+    if (!parent) {
+        return;
+    }
+    glm::mat4 transform = getWorldSpaceTransformMatrix(entity);
+    auto &transformComponent = entity.getTransform();
+    transformComponent.setTransform(transform);
+}
+
 #ifdef PND_EDITOR
 
 void World::sort() {
