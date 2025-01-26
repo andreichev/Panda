@@ -33,7 +33,7 @@ public:
         Rect textureCoords;
         Size size;
         Color color;
-        int32_t id;
+        uint32_t id;
         float rotation;
         glm::mat4 transform;
         Foundation::Shared<Asset> texture;
@@ -71,7 +71,7 @@ public:
         glm::vec3 pos;
         glm::vec2 textureCoords;
         int32_t textureIndex;
-        int32_t id;
+        uint32_t id;
         glm::vec4 color;
     };
 

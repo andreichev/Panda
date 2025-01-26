@@ -8,7 +8,7 @@
 #include "Panda/Window/Window.hpp"
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Renderer/Renderer3D.hpp"
-#include "Panda/GameLogic/WorldCommands/WorldCommandManager.hpp"
+#include "Panda/WorldCommands/WorldCommandManager.hpp"
 #include "Panda/Physics/Physics2D.hpp"
 
 #include <Miren/Miren.hpp>
@@ -35,7 +35,6 @@ public:
     bool isEmpty();
     Entity findByTag(const char *tag);
     Entity getById(UUID id);
-    Entity getByEnttId(entt::entity id);
     inline bool isRunning() {
         return m_isRunning;
     }
@@ -46,6 +45,9 @@ public:
         return m_renderer3d;
     }
     void setViewId(Miren::ViewId id);
+    glm::mat4 getWorldSpaceTransformMatrix(Entity entity);
+    void convertToWorldSpace(Entity entity);
+    void convertToLocalSpace(Entity entity);
     Entity findMainCameraEntity();
     Camera *findMainCamera();
 
@@ -55,7 +57,6 @@ public:
     }
 
     World &operator=(World &other);
-    void debugPrint();
 
     Physics2D &getPhysics2D() {
         return m_physics2D;
@@ -68,6 +69,7 @@ public:
 
     bool isChanged();
     void setChanged(bool changed = true);
+    void sort();
 
     Entity getSelectedEntity() {
         return m_selectedEntity;
@@ -86,6 +88,7 @@ public:
     bool isValidEntt(entt::entity entity);
 
 private:
+    void releaseAllScriptingFields();
     void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     Entity instantiateEntity(UUID id);
     void fillEntity(Entity entity, UUID id);
@@ -101,6 +104,7 @@ private:
     Miren::ViewId m_renderingViewId;
 
 #ifdef PND_EDITOR
+    void debugPrint();
     bool m_isChanged;
     WorldCommandManager m_commandManager;
     // TODO: Multiple selection

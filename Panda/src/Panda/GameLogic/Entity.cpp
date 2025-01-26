@@ -31,32 +31,37 @@ void Entity::addChildEntity(Entity entity) {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
     RelationshipComponent &otherRelationship = entity.getComponent<RelationshipComponent>();
 
+    entity.removeFromParent();
     otherRelationship.parent = getId();
     thisRelationship.children.push_back(entity.getId());
+    m_world->convertToLocalSpace(entity);
     setWorldChanged();
 }
 
 void Entity::removeChildEntity(Entity entity) {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
     RelationshipComponent &otherRelationship = entity.getComponent<RelationshipComponent>();
-
-    auto _ = std::remove(
-        thisRelationship.children.begin(), thisRelationship.children.end(), entity.getId()
-    );
+    auto &children = thisRelationship.children;
+    children.erase(std::remove(children.begin(), children.end(), entity.getId()), children.end());
+    m_world->convertToWorldSpace(entity);
     otherRelationship.parent = 0;
     setWorldChanged();
 }
 
 void Entity::removeFromParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    if (thisRelationship.parent != 0) {
-        Entity parent = m_world->getById(thisRelationship.parent);
-        parent.removeChildEntity(*this);
+    if (!thisRelationship.parent) {
+        return;
     }
+    Entity parent = m_world->getById(thisRelationship.parent);
+    parent.removeChildEntity(*this);
 }
 
 Entity Entity::getParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
+    if (!thisRelationship.parent) {
+        return {};
+    }
     return m_world->getById(thisRelationship.parent);
 }
 
@@ -79,6 +84,10 @@ void Entity::physics2DPropertiesUpdated() {
 #ifdef PND_EDITOR
 bool Entity::isDeleted() {
     return getComponent<EditorMetadataComponent>().isDeleted;
+}
+
+void Entity::sortWorld() {
+    m_world->sort();
 }
 
 void Entity::setDeleted(bool deleted) {

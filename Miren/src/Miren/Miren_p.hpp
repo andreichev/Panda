@@ -253,6 +253,7 @@ struct Context {
                 command->type == RendererCommandType::RendererInit,
                 "First command should be RendererInit"
             );
+            // TODO: Add other renderers (metal, directx, vulkan, ...)
             m_renderer = F_NEW(Foundation::getAllocator(), RendererOpenGL);
             MIREN_LOG("RENDERER CREATED");
         }

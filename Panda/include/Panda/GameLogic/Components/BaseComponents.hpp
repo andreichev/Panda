@@ -57,7 +57,7 @@ struct TagComponent final : public Rain::Codable {
 };
 
 struct RelationshipComponent final : public Rain::Codable {
-    UUID parent = -1;
+    UUID parent = 0;
     std::vector<UUID> children;
 
     RelationshipComponent() = default;
@@ -111,6 +111,14 @@ struct ScriptListComponent final {
 
     void add(ExternalScript script) {
         scripts.emplace_back(script);
+    }
+
+    void releaseFields() {
+        for (ExternalScript &script : scripts) {
+            for (ScriptField &field : script.getFields()) {
+                field.value.release();
+            }
+        }
     }
 
     void remove(ExternalScript script) {

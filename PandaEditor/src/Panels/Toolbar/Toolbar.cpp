@@ -1,5 +1,7 @@
 #include "Toolbar.hpp"
 
+#include <Panda/GameLogic/GameContext.hpp>
+
 namespace Panda {
 
 Toolbar::Toolbar(ToolbarOutput *output)
@@ -34,6 +36,9 @@ void Toolbar::onImGuiRender(float offsetY) {
     ImGui::SetCursorPos({width / 2.f - 70.f, 4.f});
     switch (m_output->toolbarGetCurrentSceneState()) {
         case SceneState::EDIT: {
+            ScriptEngine *scriptEngine = GameContext::s_scriptEngine;
+            bool scriptsLoaded = scriptEngine && scriptEngine->isLoaded();
+            ImGui::BeginDisabled(!scriptsLoaded);
             if (ImGui::Button(getString(ICON_PLAY).c_str())) {
                 m_output->toolbarDidPickSceneState(SceneState::PLAY);
             }
@@ -42,6 +47,7 @@ void Toolbar::onImGuiRender(float offsetY) {
                 m_output->toolbarDidPickSceneState(SceneState::SIMULATE);
             }
             ImGui::SameLine();
+            ImGui::EndDisabled();
             if (ImGui::Button(getString(ICON_REFRESH).c_str())) {
                 m_output->toolbarDidTapReloadScripts();
             }

@@ -5,11 +5,11 @@
 #include "Panels/Common/ImGuiHelper.hpp"
 #include "ComponentsDraw.hpp"
 
-#include <Panda/GameLogic/WorldCommands/Impl/EntityTransformCommand.hpp>
-#include <Panda/GameLogic/WorldCommands/Impl/UpdateSpriteRendererCommand.hpp>
-#include <Panda/GameLogic/WorldCommands/Impl/UpdateRigidbody2DCommand.hpp>
-#include <Panda/GameLogic/WorldCommands/Impl/UpdateBoxCollider2DCommand.hpp>
-#include <Panda/GameLogic/WorldCommands/Impl/AddRemoveComponentCommand.hpp>
+#include <Panda/WorldCommands/Impl/EntityTransformCommand.hpp>
+#include <Panda/WorldCommands/Impl/UpdateSpriteRendererCommand.hpp>
+#include <Panda/WorldCommands/Impl/UpdateRigidbody2DCommand.hpp>
+#include <Panda/WorldCommands/Impl/UpdateBoxCollider2DCommand.hpp>
+#include <Panda/WorldCommands/Impl/AddRemoveComponentCommand.hpp>
 #include <Panda/GameLogic/Components/SkyComponent.hpp>
 #include <Panda/GameLogic/GameContext.hpp>
 #include <Panda/ImGui/FontAwesome.h>
@@ -83,6 +83,7 @@ static void drawTag(Entity entity) {
             memcpy(buffer, "Unnamed Entity", 16);
         }
         entity.setName(buffer);
+        entity.sortWorld();
     }
     ImGui::PopStyleVar();
 }

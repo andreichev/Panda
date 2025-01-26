@@ -4,7 +4,7 @@
 
 #include "Gizmos.hpp"
 
-#include <Panda/GameLogic/WorldCommands/Impl/EntityTransformCommand.hpp>
+#include <Panda/WorldCommands/Impl/EntityTransformCommand.hpp>
 #include <ImGuizmo.h>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -39,7 +39,7 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
     glm::mat4 view = m_cameraController->getViewMatrix();
     glm::mat4 projection = m_camera->getProjection();
     TransformComponent &transformComponent = selected.getTransform();
-    glm::mat4 transform = transformComponent.getTransform();
+    glm::mat4 transform = m_world->getWorldSpaceTransformMatrix(selected);
 
     ImGuizmo::Manipulate(
         glm::value_ptr(view),
@@ -50,6 +50,11 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
     );
 
     if (isUsing()) {
+        Entity parent = selected.getParent();
+        if (parent) {
+            glm::mat4 parentTransform = m_world->getWorldSpaceTransformMatrix(parent);
+            transform = glm::inverse(parentTransform) * transform;
+        }
         glm::vec3 pos = glm::vec3(transform[3]);
         if (m_world->isRunning()) {
             transformComponent.setPosition(pos);

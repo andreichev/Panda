@@ -116,7 +116,12 @@ void ProjectLoader::openProject(const path_t &path) {
 void ProjectLoader::reloadScriptsDll() {
     std::string projectName = m_projectPath.filename().string();
     m_scriptEngine.reload({m_projectPath / "Scripts" / projectName / "bin", projectName});
-    m_world->updateScriptsAndFields();
+    if (m_scriptEngine.isLoaded()) {
+        m_world->updateScriptsAndFields();
+        LOG_INFO_EDITOR("SUCCESSFULLY LOADED SCRIPTING ASSEMBLY");
+    } else {
+        LOG_ERROR_EDITOR("ERROR LOADING SCRIPTING ASSEMBLY");
+    }
 }
 
 bool ProjectLoader::hasOpenedProject() {

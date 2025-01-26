@@ -128,6 +128,7 @@ public:
 
 #ifdef PND_EDITOR
     bool isDeleted();
+    void sortWorld();
     void setDeleted(bool deleted = true);
 #endif
 

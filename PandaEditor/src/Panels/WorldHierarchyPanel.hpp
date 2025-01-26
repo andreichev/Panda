@@ -17,11 +17,15 @@ public:
     void setWorld(World *world) {
         m_world = world;
     }
+    bool isFocused() {
+        return m_focused;
+    }
 
 private:
     void drawEntityNode(Entity entity);
     void drawEntityCreateMenu();
 
+    bool m_focused;
     ComponentsDraw m_componentsDraw;
     World *m_world;
 };

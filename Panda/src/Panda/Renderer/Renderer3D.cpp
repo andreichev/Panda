@@ -15,18 +15,14 @@ Renderer3D::Renderer3D(Panda::Renderer3D &&other)
     , m_viewProj(other.m_viewProj)
     , m_drawData(other.m_drawData) {}
 
-void updateModel(Panda::TransformComponent *transform, glm::mat4 &model) {
-    model = transform->getTransform();
-}
-
 void Renderer3D::begin() {
     m_drawData.stats.drawCalls = 0;
 }
 
-void Renderer3D::submit(TransformComponent *transform, StaticMesh *mesh) {
+void Renderer3D::submit(glm::mat4 &transform, StaticMesh *mesh) {
     PND_ASSERT(mesh->m_shaderHandle.isValid(), "Invalid shader for mesh");
     Miren::setShader(mesh->m_shaderHandle);
-    updateModel(transform, mesh->m_model);
+    mesh->m_model = transform;
     Miren::setUniform(
         mesh->m_shaderHandle, "model", &mesh->m_model[0][0], Miren::UniformType::Mat4
     );
@@ -42,10 +38,10 @@ void Renderer3D::submit(TransformComponent *transform, StaticMesh *mesh) {
     m_drawData.stats.drawCalls += 1;
 }
 
-void Renderer3D::submit(TransformComponent *transform, DynamicMesh *mesh) {
+void Renderer3D::submit(glm::mat4 &transform, DynamicMesh *mesh) {
     PND_ASSERT(mesh->m_shaderHandle.isValid(), "Invalid shader for mesh");
     Miren::setShader(mesh->m_shaderHandle);
-    updateModel(transform, mesh->m_model);
+    mesh->m_model = transform;
     Miren::setUniform(
         mesh->m_shaderHandle, "model", &mesh->m_model[0][0], Miren::UniformType::Mat4
     );

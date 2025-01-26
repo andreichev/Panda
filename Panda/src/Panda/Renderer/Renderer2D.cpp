@@ -25,7 +25,7 @@ Renderer2D::Renderer2D()
     // Texture Index
     layoutData.pushInt(1);
     // Object id
-    layoutData.pushInt(1);
+    layoutData.pushUInt(1);
     // Color
     layoutData.pushVec4();
     m_drawData.layout = Miren::createVertexLayout(layoutData);

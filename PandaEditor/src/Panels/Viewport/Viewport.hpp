@@ -16,7 +16,7 @@ namespace Panda {
 class ViewportOutput {
 public:
     virtual ~ViewportOutput() = default;
-    virtual void viewportPickEntityWithEnttId(uint32_t id) = 0;
+    virtual void viewportPickEntityWithId(UUID id) = 0;
     virtual void viewportUnselectEntity() = 0;
 };
 
@@ -46,7 +46,7 @@ private:
     CameraController *m_cameraController;
     bool m_focusNextFrame;
     bool m_focused;
-    int32_t m_hoveredId;
+    uint32_t m_hoveredId;
     Rect m_frame;
 };
 
