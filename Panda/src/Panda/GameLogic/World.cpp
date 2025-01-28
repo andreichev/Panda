@@ -6,7 +6,7 @@
 #include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 #include "Panda/Physics/Physics2D.hpp"
-#include "Panda/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
+#include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 
 #include <Rain/Rain.hpp>
 #include <entt/entt.hpp>
@@ -16,10 +16,14 @@ namespace Panda {
 World::World()
     : m_entityIdMap(100)
     , m_isRunning(false)
-    , m_isChanged(false)
     , m_registry()
+#ifdef PND_EDITOR
+    , m_isChanged(false)
     , m_commandManager()
-    , m_physics2D() {}
+    , m_selectionContext()
+#endif
+    , m_physics2D() {
+}
 
 World::~World() {
     m_physics2D.shutdown();
@@ -395,15 +399,15 @@ void World::destroy(Entity entity) {
     }
     m_registry.destroy(entity.m_handle);
     m_isChanged = true;
-    if (m_selectedEntity == entity) {
-        m_selectedEntity = {};
+    if (m_selectionContext.isSelected(entity)) {
+        m_selectionContext.removeSelectedEntity(entity);
     }
 }
 
 void World::clear() {
     releaseAllScriptingFields();
     m_isChanged = false;
-    m_selectedEntity = Entity();
+    m_selectionContext.unselectAll();
     for (auto id : m_registry.storage<entt::entity>()) {
         m_registry.destroy(id);
     }
@@ -641,6 +645,19 @@ bool World::isValidEntt(entt::entity entity) {
         if (metadata.isDeleted) {
             return false;
         }
+    }
+#endif
+    return true;
+}
+
+bool World::isValid(UUID entityId) {
+    if (m_entityIdMap.find(entityId) == m_entityIdMap.end()) {
+        return false;
+    }
+#ifdef PND_EDITOR
+    Entity entity = getById(entityId);
+    if (entity.isDeleted()) {
+        return false;
     }
 #endif
     return true;

@@ -462,10 +462,14 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
         ImGui::Button("No image", {100, 55});
     }
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-        DragDropItem item;
-        item.type = DragDropItemType::TEXTURE;
-        item.assetId = textureId;
-        ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        if (ImGui::GetDragDropPayload() == nullptr) {
+            DragDropItem item;
+            item.type = DragDropItemType::TEXTURE;
+            PND_STATIC_ASSERT(sizeof(textureId) <= sizeof(DragDropItem::data));
+            memcpy(item.data, &textureId, sizeof(textureId));
+            item.count = 1;
+            ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        }
         ImGui::Text("Texture");
         ImGui::EndDragDropSource();
     }
@@ -474,7 +478,7 @@ bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asse
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
             if (item.type == DragDropItemType::TEXTURE) {
-                textureId = item.assetId;
+                memcpy(&textureId, item.data, sizeof(textureId));
                 changed = true;
             }
         }
@@ -515,10 +519,15 @@ bool propertyEntity(const char *label, UUID *value) {
     }
     ImGui::PopItemWidth();
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-        DragDropItem item;
-        item.type = DragDropItemType::ENTITY;
-        item.assetId = *value;
-        ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        if (ImGui::GetDragDropPayload() == nullptr) {
+            DragDropItem item;
+            item.type = DragDropItemType::ENTITY;
+            UUID assetId = *value;
+            PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
+            memcpy(item.data, &assetId, sizeof(assetId));
+            item.count = 1;
+            ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        }
         ImGui::Text("Entity: %d", *(uint32_t *)(value));
         ImGui::EndDragDropSource();
     }
@@ -527,7 +536,7 @@ bool propertyEntity(const char *label, UUID *value) {
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
             if (item.type == DragDropItemType::ENTITY) {
-                *value = item.assetId;
+                memcpy(value, item.data, sizeof(UUID));
                 changed = true;
             }
         }

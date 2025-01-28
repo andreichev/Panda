@@ -5,7 +5,7 @@
 #include "Panels/Popups/EditorYesNoPopup.hpp"
 #include "Panels/Popups/PickScriptPopup.hpp"
 #include "Panels/Popups/EnterNamePopup.hpp"
-#include "Panda/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
+#include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 
 namespace Panda {
 
@@ -448,12 +448,12 @@ void EditorLayer::viewportPickEntityWithId(UUID id) {
     }
     Entity selected = m_currentWorld->getById(id);
     if (selected.isValid()) {
-        m_currentWorld->setSelectedEntity(selected);
+        m_currentWorld->getSelectionContext().addSelectedEntity(selected);
     }
 }
 
-void EditorLayer::viewportUnselectEntity() {
-    m_currentWorld->setSelectedEntity(Entity());
+void EditorLayer::viewportUnselectAll() {
+    m_currentWorld->getSelectionContext().unselectAll();
 }
 
 #pragma endregion
@@ -562,9 +562,10 @@ void EditorLayer::processShortcuts() {
         } else {
             // Move to selected entity
             if (m_currentWorld) {
-                Entity selected = m_currentWorld->getSelectedEntity();
-                if (selected.isValid()) {
-                    m_cameraController.reset(selected.getTransform().getPosition());
+                SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
+                auto selected = selectionContext.getSelectedEntities();
+                if (!selected.empty()) {
+                    m_cameraController.reset(selectionContext.getMedianPosition());
                 }
             }
         }
@@ -574,10 +575,15 @@ void EditorLayer::processShortcuts() {
     }
     if (ImGui::IsKeyPressed(ImGuiKey_D, false) && ctrl) {
         if (m_currentWorld) {
-            Entity selected = m_currentWorld->getSelectedEntity();
-            Entity duplicate = m_currentWorld->duplicateEntity(selected);
+            std::vector<Entity> selected =
+                m_currentWorld->getSelectionContext().getSelectedEntities();
+            std::vector<Entity> copies;
+            for (auto entity : selected) {
+                Entity duplicate = m_currentWorld->duplicateEntity(entity);
+                copies.push_back(duplicate);
+            }
             WorldCommandManager &cmd = m_currentWorld->getCommandManger();
-            AddRemoveEntityCommand update(duplicate);
+            AddRemoveEntitiesCommand update(copies);
             cmd.SAVE(update, false);
             m_currentWorld->setChanged();
         }

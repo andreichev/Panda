@@ -22,7 +22,12 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
     if (!m_camera || !m_world) {
         return;
     }
-    Entity selected = m_world->getSelectedEntity();
+    SelectionContext &selectionContext = m_world->getSelectionContext();
+    auto selectedList = selectionContext.getSelectedEntities();
+    if (selectedList.size() != 1) {
+        return;
+    }
+    Entity selected = selectedList[0];
     if (!selected.isValid()) {
         return;
     }

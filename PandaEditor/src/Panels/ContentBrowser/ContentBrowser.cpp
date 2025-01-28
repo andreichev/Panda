@@ -124,10 +124,14 @@ void ContentBrowser::onImGuiRender() {
         );
         if (assetId) {
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                DragDropItem item;
-                item.type = DragDropItemType::TEXTURE;
-                item.assetId = assetId;
-                ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+                if (ImGui::GetDragDropPayload() == nullptr) {
+                    DragDropItem item;
+                    item.type = DragDropItemType::TEXTURE;
+                    item.count = 1;
+                    PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
+                    memcpy(item.data, &assetId, sizeof(UUID));
+                    ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(assetId));
+                }
                 ImGui::Text("Texture");
                 ImGui::EndDragDropSource();
             }

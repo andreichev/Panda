@@ -89,7 +89,7 @@ public:
 
 #pragma region Viewport output
     void viewportPickEntityWithId(UUID id) override;
-    void viewportUnselectEntity() override;
+    void viewportUnselectAll() override;
 #pragma endregion
 
 private:

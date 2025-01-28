@@ -16,7 +16,7 @@ class World;
 
 class Entity final {
 private:
-    entt::registry &worldGetRegistry();
+    entt::registry &worldGetRegistry() const;
 
 public:
     Entity();
@@ -65,7 +65,14 @@ public:
     }
 
     template<typename T>
-    bool hasComponent() {
+    T &getComponent() const {
+        PND_ASSERT(hasComponent<T>(), "Entity doesn't have component!");
+        entt::registry &registry = worldGetRegistry();
+        return registry.get<T>(m_handle);
+    }
+
+    template<typename T>
+    bool hasComponent() const {
         entt::registry &registry = worldGetRegistry();
         return registry.any_of<T>(m_handle);
     }
@@ -75,6 +82,14 @@ public:
     void removeChildEntity(Entity entity);
 
     void removeFromParent();
+
+    bool hasChild(Entity entity);
+
+    bool hasAnyChild();
+
+    bool isAncestorOf(Entity entity);
+
+    bool isDescendantOf(Entity entity);
 
     TransformComponent &getTransform();
 
@@ -119,7 +134,7 @@ public:
     }
     operator bool() const;
 
-    UUID getId() {
+    UUID getId() const {
         return getComponent<IdComponent>().id;
     }
 
@@ -142,7 +157,7 @@ private:
     friend class Physics2D;
     friend class WorldHierarchyPanel;
     friend class WorldMapper;
-    friend class AddRemoveEntityCommand;
+    friend class AddRemoveEntitiesCommand;
 };
 
 } // namespace Panda

@@ -11,8 +11,8 @@ enum class DragDropItemType { TEXTURE, ENTITY };
 
 struct DragDropItem {
     DragDropItemType type;
-    UUID assetId;
-    Foundation::Memory data;
+    int count;
+    uint8_t data[32];
 };
 
 } // namespace Panda

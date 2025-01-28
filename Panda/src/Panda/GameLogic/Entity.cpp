@@ -15,7 +15,7 @@ Entity::Entity()
     : m_handle(entt::null)
     , m_world(nullptr) {}
 
-entt::registry &Entity::worldGetRegistry() {
+entt::registry &Entity::worldGetRegistry() const {
     return m_world->m_registry;
 }
 
@@ -28,6 +28,12 @@ TransformComponent &Entity::getTransform() {
 }
 
 void Entity::addChildEntity(Entity entity) {
+    if (entity.isAncestorOf(*this)) {
+        LOG_ERROR_EDITOR(
+            "The entity {} can't be moved into one of its children.", entity.getName()
+        );
+        return;
+    }
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
     RelationshipComponent &otherRelationship = entity.getComponent<RelationshipComponent>();
 
@@ -55,6 +61,51 @@ void Entity::removeFromParent() {
     }
     Entity parent = m_world->getById(thisRelationship.parent);
     parent.removeChildEntity(*this);
+}
+
+bool Entity::hasChild(Entity entity) {
+    RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
+    auto &children = thisRelationship.children;
+    return std::find(children.begin(), children.end(), entity.getId()) != children.end();
+}
+
+bool Entity::hasAnyChild() {
+    RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
+    auto &children = thisRelationship.children;
+#ifdef PND_EDITOR
+    std::vector<UUID> filtered;
+    std::copy_if(
+        children.begin(),
+        children.end(),
+        std::back_inserter(filtered),
+        [this](auto entityId) { return m_world->isValid(entityId); }
+    );
+    return !filtered.empty();
+#else
+    return !children.empty();
+#endif
+}
+
+bool Entity::isAncestorOf(Entity entity) {
+    auto &children = getChildEntities();
+    if (children.empty()) {
+        return false;
+    }
+    for (UUID childId : children) {
+        if (childId == entity.getId()) {
+            return true;
+        }
+    }
+    for (UUID childId : children) {
+        if (m_world->getById(childId).isAncestorOf(entity)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Entity::isDescendantOf(Entity entity) {
+    return entity.isAncestorOf(*this);
 }
 
 Entity Entity::getParent() {

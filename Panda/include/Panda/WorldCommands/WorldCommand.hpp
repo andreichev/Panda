@@ -14,8 +14,6 @@ public:
     virtual bool canMerge(WorldCommand &command) {
         return false;
     }
-
-    bool isValid = false;
 };
 
 } // namespace Panda

@@ -17,7 +17,7 @@ class ViewportOutput {
 public:
     virtual ~ViewportOutput() = default;
     virtual void viewportPickEntityWithId(UUID id) = 0;
-    virtual void viewportUnselectEntity() = 0;
+    virtual void viewportUnselectAll() = 0;
 };
 
 class Viewport final {

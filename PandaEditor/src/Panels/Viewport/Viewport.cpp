@@ -148,8 +148,14 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
 
     if (m_focused && Input::isMouseButtonJustPressed(MouseButton::LEFT) && !m_gizmos.isUsing()) {
         if (m_hoveredId == 0) {
-            m_output->viewportUnselectEntity();
+            m_output->viewportUnselectAll();
         } else {
+            bool ctrl = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+            bool shift =
+                ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
+            if (!ctrl && !shift) {
+                m_output->viewportUnselectAll();
+            }
             m_output->viewportPickEntityWithId(m_hoveredId);
         }
     }
