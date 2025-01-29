@@ -64,6 +64,9 @@ void WorldHierarchyPanel::onImGuiRender() {
             cmd.SAVE(update, true);
             m_world->setChanged();
             selected = {};
+            selectionContext.unselectAll();
+            m_firstSelectedRow = -1;
+            m_lastSelectedRow = -1;
         }
     }
     if (ImGui::BeginDragDropTargetCustom(windowRect, ImGui::GetCurrentWindow()->ID)) {
@@ -149,8 +152,12 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
                 for (auto selected : selectionContext.getSelectedEntities()) {
                     selectedIds.push_back(selected.getId());
                 }
-                PND_STATIC_ASSERT(sizeof(selectedIds) <= sizeof(DragDropItem::data));
-                memcpy(item.data, selectedIds.data(), sizeof(selectedIds));
+                PND_ASSERT_F(
+                    sizeof(UUID) * selectedIds.size() <= sizeof(DragDropItem::data),
+                    "NEED TO INCREASE DragDropItem.data SIZE. REQUIRED {}",
+                    sizeof(UUID) * selectedIds.size()
+                );
+                memcpy(item.data, selectedIds.data(), sizeof(UUID) * selectedIds.size());
                 item.count = selectionContext.selectedCount();
             } else {
                 selectionContext.unselectAll();
@@ -235,6 +242,9 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
             AddRemoveEntitiesCommand update({selectionContext.getSelectedEntities()});
             cmd.SAVE(update, true);
             m_world->setChanged();
+            selectionContext.unselectAll();
+            m_firstSelectedRow = -1;
+            m_lastSelectedRow = -1;
         }
         if (ImGui::MenuItem("Duplicate", NULL)) {
             std::vector<Entity> duplicates;
@@ -245,15 +255,21 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
             AddRemoveEntitiesCommand update(duplicates);
             cmd.SAVE(update, false);
             m_world->setChanged();
+            selectionContext.unselectAll();
+            selectionContext.addSelectedEntities(duplicates);
+            m_firstSelectedRow = -1;
+            m_lastSelectedRow = -1;
         }
         ImGui::EndPopup();
     }
     ImGui::PopStyleVar();
     if (opened) {
-        for (auto child : entity.getChildEntities()) {
-            if (m_world->isValid(child)) {
-                drawEntityNode(m_world->getById(child));
+        const std::vector<UUID> &children = entity.getChildEntities();
+        for (auto child : children) {
+            if (!m_world->isValid(child)) {
+                continue;
             }
+            drawEntityNode(m_world->getById(child));
         }
         ImGui::TreePop();
     }

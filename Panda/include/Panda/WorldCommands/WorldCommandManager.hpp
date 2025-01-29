@@ -7,7 +7,7 @@
 namespace Panda {
 
 class WorldCommandManager final {
-    inline static int MAX_OPERATIONS_IN_CACHE = 50;
+    inline static int MAX_OPERATIONS_IN_CACHE = 1;
 
 public:
     WorldCommandManager()
@@ -22,11 +22,14 @@ public:
         if (last && last->canMerge(cmd)) {
             last->merge(cmd);
         } else {
-            undoStack.push_back(Foundation::makeShared<CMD>(cmd));
+            undoStack.push_back(Foundation::makeShared<CMD>(std::move(cmd)));
         }
-        if (needToExecute && !cmd.execute()) {
-            LOG_ERROR("ERROR EXECUTING COMMAND");
-            CLEAR();
+        if (needToExecute) {
+            last = PREVIOUS_COMMAND();
+            if (!last->execute()) {
+                LOG_ERROR("ERROR EXECUTING COMMAND");
+                CLEAR();
+            }
         }
         if (undoStack.size() > MAX_OPERATIONS_IN_CACHE) {
             undoStack.pop_front();

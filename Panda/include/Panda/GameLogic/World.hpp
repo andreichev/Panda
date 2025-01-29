@@ -73,14 +73,23 @@ public:
         return m_selectionContext;
     }
     bool isChanged();
+    bool needToDestroy(Entity entity);
+    bool isDeleted(entt::entity handle);
     void setChanged(bool changed = true);
     void sort();
     Entity duplicateEntity(Entity entity);
 #endif
-    bool isValidEntt(entt::entity entity);
+    bool isValidEntt(entt::entity handle);
     bool isValid(UUID entityId);
 
 private:
+#ifdef PND_EDITOR
+    void debugPrint();
+    bool m_isChanged;
+    WorldCommandManager m_commandManager;
+    SelectionContext m_selectionContext;
+#endif
+
     void releaseAllScriptingFields();
     void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     Entity instantiateEntity(UUID id);
@@ -95,13 +104,6 @@ private:
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;
     Miren::ViewId m_renderingViewId;
-
-#ifdef PND_EDITOR
-    void debugPrint();
-    bool m_isChanged;
-    WorldCommandManager m_commandManager;
-    SelectionContext m_selectionContext;
-#endif
 
     friend class Entity;
     friend class WorldHierarchyPanel;

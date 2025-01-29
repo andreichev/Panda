@@ -142,6 +142,7 @@ public:
     void physics2DPropertiesUpdated();
 
 #ifdef PND_EDITOR
+    bool needToDestroy();
     bool isDeleted();
     void sortWorld();
     void setDeleted(bool deleted = true);

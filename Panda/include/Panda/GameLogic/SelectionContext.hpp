@@ -24,6 +24,11 @@ public:
         updateValues();
     }
 
+    void addSelectedEntities(std::vector<Entity> entities) {
+        m_selectedEntities.insert(m_selectedEntities.end(), entities.begin(), entities.end());
+        updateValues();
+    }
+
     void removeSelectedEntity(Entity entity) {
         m_selectedEntities.erase(
             std::remove(m_selectedEntities.begin(), m_selectedEntities.end(), entity),

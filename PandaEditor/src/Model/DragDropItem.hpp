@@ -12,7 +12,7 @@ enum class DragDropItemType { TEXTURE, ENTITY };
 struct DragDropItem {
     DragDropItemType type;
     int count;
-    uint8_t data[32];
+    uint8_t data[1024];
 };
 
 } // namespace Panda

@@ -10,7 +10,22 @@ public:
     AddRemoveEntitiesCommand(std::vector<Entity> entities)
         : m_entities(entities) {}
 
-    AddRemoveEntitiesCommand(const AddRemoveEntitiesCommand &) = default;
+    AddRemoveEntitiesCommand(AddRemoveEntitiesCommand &other) = default;
+
+    AddRemoveEntitiesCommand(AddRemoveEntitiesCommand &&other)
+        : m_entities(std::move(other.m_entities)) {}
+
+    ~AddRemoveEntitiesCommand() {
+        if (m_entities.empty()) {
+            return;
+        }
+        for (auto entity : m_entities) {
+            if (entity.needToDestroy()) {
+                auto world = entity.getWorld();
+                world->destroy(entity);
+            }
+        }
+    }
 
     bool undo() override {
         return execute();

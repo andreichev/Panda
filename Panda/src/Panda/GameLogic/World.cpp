@@ -6,7 +6,6 @@
 #include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 #include "Panda/Physics/Physics2D.hpp"
-#include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 
 #include <Rain/Rain.hpp>
 #include <entt/entt.hpp>
@@ -390,13 +389,12 @@ void World::fillEntity(Entity entity, UUID id) {
 
 void World::destroy(Entity entity) {
     entity.removeFromParent();
-    for (UUID childHandle : entity.getChildEntities()) {
+    std::vector<UUID> children = entity.getChildEntities();
+    for (UUID childHandle : children) {
         Entity child = getById(childHandle);
-        if (!child.isValid()) {
-            continue;
-        }
         destroy(child);
     }
+    m_entityIdMap.erase(entity.getId());
     m_registry.destroy(entity.m_handle);
     m_isChanged = true;
     if (m_selectionContext.isSelected(entity)) {
@@ -405,6 +403,7 @@ void World::destroy(Entity entity) {
 }
 
 void World::clear() {
+    m_commandManager.CLEAR();
     releaseAllScriptingFields();
     m_isChanged = false;
     m_selectionContext.unselectAll();
@@ -412,7 +411,6 @@ void World::clear() {
         m_registry.destroy(id);
     }
     m_registry.clear();
-    m_commandManager.CLEAR();
 
     // Delete all editor deleted entities
 #ifdef PND_EDITOR
@@ -473,14 +471,6 @@ void World::fillStartupData() {
 #endif
 }
 
-bool World::isChanged() {
-    return m_isChanged;
-}
-
-void World::setChanged(bool changed) {
-    m_isChanged = changed;
-}
-
 Entity World::findByTag(const char *tag) {
     auto view = m_registry.view<TagComponent>();
     for (auto entityHandle : view) {
@@ -496,7 +486,9 @@ Entity World::findByTag(const char *tag) {
 }
 
 Entity World::getById(UUID id) {
-    PND_ASSERT(m_entityIdMap.find(id) != m_entityIdMap.end(), "ENTITY DOES NOT EXISTS");
+    PND_ASSERT_F(
+        m_entityIdMap.find(id) != m_entityIdMap.end(), "ENTITY {} DOES NOT EXISTS", (uint32_t)id
+    );
     return m_entityIdMap.at(id);
 }
 
@@ -635,16 +627,14 @@ void World::releaseAllScriptingFields() {
     }
 }
 
-bool World::isValidEntt(entt::entity entity) {
-    if (!m_registry.valid(entity)) {
+bool World::isValidEntt(entt::entity handle) {
+    if (!m_registry.valid(handle)) {
         return false;
     }
 #ifdef PND_EDITOR
-    if (m_registry.any_of<EditorMetadataComponent>(entity)) {
-        EditorMetadataComponent &metadata = m_registry.get<EditorMetadataComponent>(entity);
-        if (metadata.isDeleted) {
-            return false;
-        }
+    Entity entity = {handle, this};
+    if (entity.isDeleted()) {
+        return false;
     }
 #endif
     return true;
@@ -722,6 +712,41 @@ void World::debugPrint() {
         }
     }
     LOG_INFO("TOTAL: {} entities", m_registry.storage<entt::entity>().size());
+}
+
+bool World::isChanged() {
+    return m_isChanged;
+}
+
+void World::setChanged(bool changed) {
+    m_isChanged = changed;
+}
+
+bool World::needToDestroy(Entity entity) {
+    PND_ASSERT(entity.getWorld() == this, "WRONG WORLD INSTANCE");
+    if (!m_registry.valid(entity.m_handle)) {
+        // Already destroyed
+        return false;
+    }
+    if (m_registry.get<EditorMetadataComponent>(entity.m_handle).isDeleted) {
+        return true;
+    }
+    return false;
+}
+
+bool World::isDeleted(entt::entity handle) {
+    if (!m_registry.valid(handle)) {
+        return true;
+    }
+    if (m_registry.get<EditorMetadataComponent>(handle).isDeleted) {
+        return true;
+    }
+    auto relationship = m_registry.get<RelationshipComponent>(handle);
+    if (relationship.parent) {
+        Entity parent = m_entityIdMap[relationship.parent];
+        return isDeleted(parent.m_handle);
+    }
+    return false;
 }
 
 #endif

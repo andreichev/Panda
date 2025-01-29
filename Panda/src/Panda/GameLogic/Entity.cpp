@@ -133,8 +133,12 @@ void Entity::physics2DPropertiesUpdated() {
 }
 
 #ifdef PND_EDITOR
+bool Entity::needToDestroy() {
+    return m_world->needToDestroy(*this);
+}
+
 bool Entity::isDeleted() {
-    return getComponent<EditorMetadataComponent>().isDeleted;
+    return m_world->isDeleted(m_handle);
 }
 
 void Entity::sortWorld() {
