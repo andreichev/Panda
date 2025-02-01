@@ -27,6 +27,13 @@ TransformComponent &Entity::getTransform() {
     return getComponent<TransformComponent>();
 }
 
+TransformComponent Entity::calculateWorldSpaceTransform() {
+    TransformComponent transformComponent;
+    glm::mat4 transform = m_world->getWorldSpaceTransformMatrix(*this);
+    transformComponent.setTransform(transform);
+    return transformComponent;
+}
+
 void Entity::addChildEntity(Entity entity) {
     if (entity.isAncestorOf(*this)) {
         LOG_ERROR_EDITOR(
@@ -78,7 +85,16 @@ bool Entity::hasAnyChild() {
         children.begin(),
         children.end(),
         std::back_inserter(filtered),
-        [this](auto entityId) { return m_world->isValid(entityId); }
+        [this](UUID entityId) {
+            entt::registry &registry = m_world->m_registry;
+            PND_ASSERT(
+                m_world->m_entityIdMap.find(entityId) != m_world->m_entityIdMap.end(),
+                "ENTITY DELETED"
+            );
+            entt::entity handle = m_world->m_entityIdMap.at(entityId);
+            auto &metadata = registry.get<EditorMetadataComponent>(handle);
+            return !metadata.isDeleted;
+        }
     );
     return !filtered.empty();
 #else

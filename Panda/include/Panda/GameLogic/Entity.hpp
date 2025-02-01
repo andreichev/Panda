@@ -93,6 +93,8 @@ public:
 
     TransformComponent &getTransform();
 
+    TransformComponent calculateWorldSpaceTransform();
+
     template<typename T>
     void setComponent(T &value) {
         getComponent<T>() = value;

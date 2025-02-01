@@ -585,6 +585,7 @@ void EditorLayer::processShortcuts() {
             WorldCommandManager &cmd = m_currentWorld->getCommandManger();
             AddRemoveEntitiesCommand update(copies);
             cmd.SAVE(update, false);
+            m_currentWorld->sort();
             m_currentWorld->setChanged();
         }
     }

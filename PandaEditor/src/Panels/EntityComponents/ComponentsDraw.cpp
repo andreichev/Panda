@@ -138,24 +138,31 @@ void ComponentsDraw::drawComponents(Entity entity) {
         entity,
         false,
         [](Entity entity, WorldCommandManager &cmd, auto &component) {
-            TransformComponent transform = component;
-            glm::vec3 position = transform.getPosition();
+            EntityTransformCommand command({entity});
+            glm::vec3 position = component.getPosition();
+            bool modified = false;
             if (drawVec3Control("Translation", position)) {
-                transform.setPosition(position);
-                EntityTransformCommand move(entity, transform);
-                cmd.SAVE(move);
+                command.saveBeforeTransforms();
+                component.setPosition(position);
+                modified = true;
             }
-            glm::vec3 rotation = transform.getRotationEuler();
+            glm::vec3 rotation = component.getRotationEuler();
             if (drawVec3Control("Rotation", rotation)) {
-                transform.setRotationEuler(rotation);
-                EntityTransformCommand rotate(entity, transform);
-                cmd.SAVE(rotate);
+                command.saveBeforeTransforms();
+                component.setRotationEuler(rotation);
+                modified = true;
             }
-            glm::vec3 scale = transform.getScale();
+            glm::vec3 scale = component.getScale();
             if (drawVec3Control("Scale", scale, 1.0)) {
-                transform.setScale(scale);
-                EntityTransformCommand scale(entity, transform);
-                cmd.SAVE(scale);
+                command.saveBeforeTransforms();
+                component.setScale(scale);
+                modified = true;
+            }
+            if (modified) {
+                command.saveAfterTransforms();
+                cmd.SAVE(command, false);
+                entity.getWorld()->getSelectionContext().updateValues();
+                entity.setWorldChanged();
             }
         }
     );

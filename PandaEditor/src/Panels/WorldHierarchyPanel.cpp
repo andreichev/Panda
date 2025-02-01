@@ -36,7 +36,7 @@ void WorldHierarchyPanel::onImGuiRender() {
     ImRect windowRect = {ImGui::GetWindowContentRegionMin(), ImGui::GetWindowContentRegionMax()};
     m_focused = ImGui::IsWindowFocused();
     if (m_world && !m_world->isEmpty()) {
-        for (auto entityId : m_world->m_registry.view<TagComponent>()) {
+        for (auto entityId : m_world->m_registry.view<entt::entity>()) {
             Entity entity(entityId, m_world);
             if (!entity.isValid()) {
                 continue;
@@ -255,6 +255,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
             AddRemoveEntitiesCommand update(duplicates);
             cmd.SAVE(update, false);
             m_world->setChanged();
+            m_world->sort();
             selectionContext.unselectAll();
             selectionContext.addSelectedEntities(duplicates);
             m_firstSelectedRow = -1;

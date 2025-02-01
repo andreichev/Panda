@@ -23,12 +23,7 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
         return;
     }
     SelectionContext &selectionContext = m_world->getSelectionContext();
-    auto selectedList = selectionContext.getSelectedEntities();
-    if (selectedList.size() != 1) {
-        return;
-    }
-    Entity selected = selectedList[0];
-    if (!selected.isValid()) {
+    if (selectionContext.empty()) {
         return;
     }
     ImGuizmo::SetOrthographic(false);
@@ -43,37 +38,48 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
 
     glm::mat4 view = m_cameraController->getViewMatrix();
     glm::mat4 projection = m_camera->getProjection();
-    TransformComponent &transformComponent = selected.getTransform();
-    glm::mat4 transform = m_world->getWorldSpaceTransformMatrix(selected);
-
-    ImGuizmo::Manipulate(
-        glm::value_ptr(view),
-        glm::value_ptr(projection),
-        ImGuizmo::OPERATION::TRANSLATE,
-        ImGuizmo::LOCAL,
-        glm::value_ptr(transform)
+    glm::mat4 transform = selectionContext.getMedianMatrix();
+    glm::mat4 delta = glm::mat4(1.0f);
+    if (!ImGuizmo::Manipulate(
+            glm::value_ptr(view),
+            glm::value_ptr(projection),
+            ImGuizmo::OPERATION::TRANSLATE,
+            ImGuizmo::LOCAL,
+            glm::value_ptr(transform),
+            glm::value_ptr(delta)
+        )) {
+        return;
+    }
+    /*
+     * IF NEED TO DECOMPOSE (TO APPLY ROTATION TO INDIVIDUAL ORIGINS)
+     *
+    glm::vec3 deltaPosition;
+    glm::vec3 deltaRotation;
+    glm::vec3 deltaScale;
+    ImGuizmo::DecomposeMatrixToComponents(
+        glm::value_ptr(delta),
+        glm::value_ptr(deltaPosition),
+        glm::value_ptr(deltaRotation),
+        glm::value_ptr(deltaScale)
     );
-
-    if (isUsing()) {
-        Entity parent = selected.getParent();
-        if (parent) {
-            glm::mat4 parentTransform = m_world->getWorldSpaceTransformMatrix(parent);
-            transform = glm::inverse(parentTransform) * transform;
-        }
-        glm::vec3 pos = glm::vec3(transform[3]);
-        if (m_world->isRunning()) {
-            transformComponent.setPosition(pos);
-            if (selected.hasComponent<Rigidbody2DComponent>()) {
-                selected.physics2DPropertiesUpdated();
-            }
-        } else {
-            TransformComponent transformCopy = transformComponent;
-            transformCopy.setPosition(pos);
-            EntityTransformCommand move(selected, transformCopy);
-            WorldCommandManager &cmd = m_world->getCommandManger();
-            cmd.SAVE(move);
+    LOG_INFO_EDITOR("{}, {}, {}", deltaPosition.x, deltaPosition.y, deltaPosition.z);
+    */
+    auto entities = selectionContext.getManipulatingEntities();
+    EntityTransformCommand move(entities);
+    move.saveBeforeTransforms();
+    for (auto entity : entities) {
+        TransformComponent &transformComponent = entity.getTransform();
+        glm::mat4 newTransform = delta * transformComponent.getLocalTransform();
+        transformComponent.setTransform(newTransform);
+        if (entity.hasComponent<Rigidbody2DComponent>()) {
+            entity.physics2DPropertiesUpdated();
         }
     }
+    move.saveAfterTransforms();
+    WorldCommandManager &cmd = m_world->getCommandManger();
+    cmd.SAVE(move, false);
+    selectionContext.updateValues();
+    m_world->setChanged();
 }
 
 bool Gizmos::isUsing() {

@@ -5,6 +5,8 @@
 #include "Panda/GameLogic/Components/TransformComponent.hpp"
 #include "Panda/Math/Math.hpp"
 
+#include <ImGuizmo.h>
+
 namespace Panda {
 
 TransformComponent::TransformComponent()
@@ -70,8 +72,14 @@ glm::mat4 TransformComponent::getSkyTransform() const {
 }
 
 void TransformComponent::setTransform(const glm::mat4 &transform) {
-    Math::decomposeTransform(transform, position, rotation, scale);
-    rotationEuler = glm::eulerAngles(rotation);
+    ImGuizmo::DecomposeMatrixToComponents(
+        glm::value_ptr(transform),
+        glm::value_ptr(position),
+        glm::value_ptr(rotationEuler),
+        glm::value_ptr(scale)
+    );
+    rotationEuler = glm::radians(rotationEuler);
+    rotation = glm::quat(rotationEuler);
 }
 
 glm::vec3 TransformComponent::getScale() {

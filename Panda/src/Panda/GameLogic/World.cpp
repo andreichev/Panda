@@ -613,9 +613,6 @@ Entity World::duplicateEntity(Entity entity) {
     }
     m_isChanged = true;
     m_entityIdMap[newEntity.getId()] = newEntity;
-#ifdef PND_EDITOR
-    sort();
-#endif
     return newEntity;
 }
 
@@ -686,15 +683,29 @@ void World::convertToWorldSpace(Entity entity) {
 #ifdef PND_EDITOR
 
 void World::sort() {
-    m_registry.sort<TagComponent>([](auto l, auto r) { return l.tag < r.tag; });
-    auto view = m_registry.view<RelationshipComponent, TagComponent>();
+    m_registry.sort<entt::entity>([this](auto l, auto r) {
+        Entity le = {l, this};
+        Entity re = {r, this};
+        bool lch = le.hasAnyChild();
+        bool rch = re.hasAnyChild();
+        if (lch == rch) {
+            return le.getName() < re.getName();
+        }
+        return lch > rch;
+    });
+    auto view = m_registry.view<RelationshipComponent>();
     for (auto entityId : view) {
         auto &relationshipComponent = view.get<RelationshipComponent>(entityId);
         auto &children = relationshipComponent.children;
         std::sort(children.begin(), children.end(), [this](auto l, auto r) {
             Entity le = getById(l);
             Entity re = getById(r);
-            return le.getName() < re.getName();
+            bool lch = le.hasAnyChild();
+            bool rch = re.hasAnyChild();
+            if (lch == rch) {
+                return le.getName() < re.getName();
+            }
+            return lch > rch;
         });
     }
 }

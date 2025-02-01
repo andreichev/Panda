@@ -7,7 +7,7 @@
 namespace Panda {
 
 class WorldCommandManager final {
-    inline static int MAX_OPERATIONS_IN_CACHE = 1;
+    inline static int MAX_OPERATIONS_IN_CACHE = 50;
 
 public:
     WorldCommandManager()

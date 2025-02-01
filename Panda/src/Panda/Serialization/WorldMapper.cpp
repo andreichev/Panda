@@ -84,7 +84,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
 WorldDto WorldMapper::toDto(const World &world) {
     WorldDto worldDto;
     World &_world = const_cast<World &>(world);
-    auto view = _world.m_registry.view<TagComponent>();
+    auto view = _world.m_registry.view<entt::entity>();
     for (auto entityId : view) {
         if (!_world.isValidEntt(entityId)) {
             continue;
@@ -94,7 +94,7 @@ WorldDto WorldMapper::toDto(const World &world) {
         // ID COMPONENT
         { entityDto.id = entity.getId(); }
         // TAG COMPONENT
-        { entityDto.tagComponent = view.get<TagComponent>(entityId); }
+        { entityDto.tagComponent = entity.getComponent<TagComponent>(); }
         // RELATIONSHIP COMPONENT
         { entityDto.relationshipComponent = entity.getComponent<RelationshipComponent>(); }
         // TRANSFORM COMPONENT
