@@ -68,9 +68,7 @@ void BlocksCreation::update(double deltaTime) {
         leftPressed = Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::LEFT);
         rightPressed = Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::RIGHT);
     }
-    if (!leftPressed && !rightPressed) {
-        return;
-    }
+    if (!leftPressed && !rightPressed) { return; }
     glm::vec3 position = m_transform->getPosition();
     glm::vec3 target = m_cameraMove->getFront();
     auto v = m_chunksStorage->bresenham3D(
@@ -93,15 +91,9 @@ void BlocksCreation::update(double deltaTime) {
 
 void BlocksCreation::onImGuiRender() {
     ImGui::Begin("Block");
-    if (ImGui::Button("TREE")) {
-        m_selectedBlock = VoxelType::TREE;
-    }
-    if (ImGui::Button("STONE BRICKS")) {
-        m_selectedBlock = VoxelType::STONE_BRICKS;
-    }
-    if (ImGui::Button("BOARDS")) {
-        m_selectedBlock = VoxelType::BOARDS;
-    }
+    if (ImGui::Button("TREE")) { m_selectedBlock = VoxelType::TREE; }
+    if (ImGui::Button("STONE BRICKS")) { m_selectedBlock = VoxelType::STONE_BRICKS; }
+    if (ImGui::Button("BOARDS")) { m_selectedBlock = VoxelType::BOARDS; }
     ImGui::End();
 }
 

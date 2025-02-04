@@ -36,23 +36,17 @@ void OrthographicCameraMove::update(double deltaTime) {
         cameraPosition.z = Foundation::max(cameraPosition.z, 1.f);
         moved = true;
     }
-    if (moved) {
-        m_transform->setPosition(cameraPosition);
-    }
+    if (moved) { m_transform->setPosition(cameraPosition); }
 
     glm::vec3 cameraRotation = glm::degrees(m_transform->getRotationEuler());
     if (Input::isKeyPressed(Key::Q)) {
         cameraRotation.z += m_rotationSpeed * deltaTime;
-        if (cameraRotation.z > 180.0f) {
-            cameraRotation -= 360.0f;
-        }
+        if (cameraRotation.z > 180.0f) { cameraRotation -= 360.0f; }
         m_transform->setRotationEuler(glm::radians(cameraRotation));
         updateVectors();
     } else if (Input::isKeyPressed(Key::E)) {
         cameraRotation.z -= m_rotationSpeed * deltaTime;
-        if (cameraRotation.z <= -180.0f) {
-            cameraRotation += 360.0f;
-        }
+        if (cameraRotation.z <= -180.0f) { cameraRotation += 360.0f; }
         m_transform->setRotationEuler(glm::radians(cameraRotation));
         updateVectors();
     }

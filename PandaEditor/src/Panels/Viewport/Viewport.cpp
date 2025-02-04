@@ -53,14 +53,10 @@ void Viewport::initWithSize(Vec2 size) {
 }
 
 void Viewport::updateViewportSize(Size size) {
-    if (size.width < 1 || size.height < 1) {
-        return;
-    }
+    if (size.width < 1 || size.height < 1) { return; }
     m_frame.size = size;
     PandaUI::Context::shared().updateViewportSize({size.width, size.height});
-    if (m_camera) {
-        m_camera->setViewportSize(size);
-    }
+    if (m_camera) { m_camera->setViewportSize(size); }
     Size dpi = Application::get()->getWindow()->getDpi();
     Miren::setViewport(
         m_sceneView, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
@@ -107,9 +103,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     ImGui::Begin(fullScreen ? "Viewport (fullscreen mode)" : "Viewport", NULL, window_flags);
     ImVec2 viewportSpace = ImGui::GetContentRegionAvail();
     viewportSpace = ImVec2(viewportSpace.x - 4, viewportSpace.y - 4);
-    if (m_frame.size != viewportSpace) {
-        updateViewportSize(viewportSpace);
-    }
+    if (m_frame.size != viewportSpace) { updateViewportSize(viewportSpace); }
     bool hovered = ImGui::IsWindowHovered();
     if (hovered && Input::isMouseButtonPressed(MouseButton::RIGHT) || m_focusNextFrame) {
         ImGui::SetWindowFocus();
@@ -127,9 +121,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     ImGuiStyle &style = ImGui::GetStyle();
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
     ImGui::SetCursorPos({10, 40});
-    if (ImGui::Button(getString(ICON_HOME).c_str())) {
-        m_cameraController->reset({0, 0, 0});
-    }
+    if (ImGui::Button(getString(ICON_HOME).c_str())) { m_cameraController->reset({0, 0, 0}); }
     ImGui::PopStyleVar();
 
     ImGui::End();
@@ -153,9 +145,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
             bool ctrl = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
             bool shift =
                 ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
-            if (!ctrl && !shift) {
-                m_output->viewportUnselectAll();
-            }
+            if (!ctrl && !shift) { m_output->viewportUnselectAll(); }
             m_output->viewportPickEntityWithId(m_hoveredId);
         }
     }
@@ -165,9 +155,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
 void Viewport::setCamera(Camera *camera) {
     m_camera = camera;
     m_gizmos.setCamera(camera);
-    if (m_camera) {
-        m_camera->setViewportSize(m_frame.size);
-    }
+    if (m_camera) { m_camera->setViewportSize(m_frame.size); }
 }
 
 void Viewport::setWorld(World *world) {

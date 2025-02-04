@@ -48,22 +48,14 @@ Renderer2D::Renderer2D()
 }
 
 Renderer2D::~Renderer2D() {
-    if (m_drawData.shader.isValid()) {
-        Miren::deleteProgram(m_drawData.shader);
-    }
-    if (m_drawData.layout.isValid()) {
-        Miren::deleteVertexLayout(m_drawData.layout);
-    }
+    if (m_drawData.shader.isValid()) { Miren::deleteProgram(m_drawData.shader); }
+    if (m_drawData.layout.isValid()) { Miren::deleteVertexLayout(m_drawData.layout); }
     for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i) {
         m_drawData.textures[i] = nullptr;
     }
     m_drawData.whiteTexture = nullptr;
-    if (m_drawData.vertices) {
-        F_FREE(Foundation::getAllocator(), m_drawData.vertices);
-    }
-    if (m_drawData.indices) {
-        F_FREE(Foundation::getAllocator(), m_drawData.indices);
-    }
+    if (m_drawData.vertices) { F_FREE(Foundation::getAllocator(), m_drawData.vertices); }
+    if (m_drawData.indices) { F_FREE(Foundation::getAllocator(), m_drawData.indices); }
 }
 
 void Renderer2D::begin() {
@@ -166,9 +158,7 @@ void Renderer2D::reset() {
 }
 
 void Renderer2D::flush() {
-    if (m_drawData.verticesCount == 0) {
-        return;
-    }
+    if (m_drawData.verticesCount == 0) { return; }
     Miren::setShader(m_drawData.shader);
     Miren::setUniform(
         m_drawData.shader, "projViewMtx", (void *)&m_viewProj, Miren::UniformType::Mat4

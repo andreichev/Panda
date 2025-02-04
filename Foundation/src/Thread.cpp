@@ -61,9 +61,7 @@ Thread::Thread()
 }
 
 Thread::~Thread() {
-    if (m_running) {
-        shutdown();
-    }
+    if (m_running) { shutdown(); }
 }
 
 bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char *_name) {
@@ -77,9 +75,7 @@ bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char
 #ifdef PLATFORM_WINDOWS
     ti->m_handle =
         ::CreateThread(NULL, m_stackSize, (LPTHREAD_START_ROUTINE)ti->threadFunc, this, 0, NULL);
-    if (ti->m_handle == nullptr) {
-        return false;
-    }
+    if (ti->m_handle == nullptr) { return false; }
 #elif defined(PLATFORM_POSIX)
     int result;
 
@@ -111,9 +107,7 @@ bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char
 
     m_running = true;
 
-    if (_name != nullptr) {
-        setThreadName(_name);
-    }
+    if (_name != nullptr) { setThreadName(_name); }
 
     return true;
 }

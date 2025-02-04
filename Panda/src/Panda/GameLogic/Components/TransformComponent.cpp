@@ -25,7 +25,7 @@ void TransformComponent::rotateEuler(glm::vec3 degrees) {
     rotation = glm::quat(rotationEuler);
 }
 
-glm::vec3 TransformComponent::getRotationEuler() {
+glm::vec3 TransformComponent::getRotationEuler() const {
     return glm::degrees(rotationEuler);
 }
 
@@ -34,7 +34,7 @@ void TransformComponent::setRotation(glm::quat quat) {
     rotationEuler = glm::eulerAngles(rotation);
 }
 
-glm::quat TransformComponent::getRotation() {
+glm::quat TransformComponent::getRotation() const {
     return rotation;
 }
 
@@ -54,7 +54,7 @@ void TransformComponent::setPosition(glm::vec3 pos) {
     position = pos;
 }
 
-glm::vec3 TransformComponent::getPosition() {
+glm::vec3 TransformComponent::getPosition() const {
     return position;
 }
 
@@ -82,7 +82,7 @@ void TransformComponent::setTransform(const glm::mat4 &transform) {
     rotation = glm::quat(rotationEuler);
 }
 
-glm::vec3 TransformComponent::getScale() {
+glm::vec3 TransformComponent::getScale() const {
     return scale;
 }
 

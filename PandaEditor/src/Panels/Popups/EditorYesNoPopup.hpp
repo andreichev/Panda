@@ -19,18 +19,14 @@ public:
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
             if (ImGui::Button(yesText.c_str(), {ImGui::GetContentRegionAvail().x, 24}) ||
                 Input::isKeyPressed(Key::ENTER)) {
-                if (yesAction) {
-                    yesAction(userData);
-                }
+                if (yesAction) { yesAction(userData); }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();
                 return;
             }
             if (ImGui::Button(noText.c_str(), {ImGui::GetContentRegionAvail().x, 24})) {
-                if (noAction) {
-                    noAction(userData);
-                }
+                if (noAction) { noAction(userData); }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();
@@ -38,9 +34,7 @@ public:
             }
             ImGui::Separator();
             if (ImGui::Button("Cancel", {ImGui::GetContentRegionAvail().x, 24})) {
-                if (closeAction) {
-                    closeAction(userData);
-                }
+                if (closeAction) { closeAction(userData); }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();

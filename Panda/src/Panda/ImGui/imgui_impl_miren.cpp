@@ -51,9 +51,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
     // framebuffer coordinates)
     int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
     int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
-    if (fb_width <= 0 || fb_height <= 0) {
-        return;
-    }
+    if (fb_width <= 0 || fb_height <= 0) { return; }
 
     ImGui_ImplMiren_SetProjMat(draw_data, fb_width, fb_height);
 
@@ -91,9 +89,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
                     (cmd->ClipRect.z - clip_off.x) * clip_scale.x,
                     (cmd->ClipRect.w - clip_off.y) * clip_scale.y
                 );
-                if (clip_max.x <= clip_min.x || clip_max.y <= clip_min.y) {
-                    continue;
-                }
+                if (clip_max.x <= clip_min.x || clip_max.y <= clip_min.y) { continue; }
                 Rect scissorRect = Rect(
                     clip_min.x,
                     ((float)fb_height - clip_max.y),

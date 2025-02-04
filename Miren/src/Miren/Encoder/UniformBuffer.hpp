@@ -44,9 +44,7 @@ public:
     Uniform *readUniform() {
         align(__alignof(Uniform));
         Uniform &uniform = *(Uniform *)read(sizeof(Uniform));
-        if (m_pos == 0 || uniform.handle.id == MIREN_INVALID_HANDLE) {
-            return nullptr;
-        }
+        if (m_pos == 0 || uniform.handle.id == MIREN_INVALID_HANDLE) { return nullptr; }
         align(uniform.alignment);
         skip(uniform.size);
         return &uniform;

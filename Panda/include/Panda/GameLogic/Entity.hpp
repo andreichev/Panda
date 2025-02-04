@@ -108,15 +108,13 @@ public:
 
     bool isValid() const;
 
-    std::string &getName() {
+    std::string &getName() const {
         return getComponent<TagComponent>().tag;
     }
 
     void setName(const std::string &name) {
         auto &tagComponent = getComponent<TagComponent>();
-        if (tagComponent.tag == name) {
-            return;
-        }
+        if (tagComponent.tag == name) { return; }
         tagComponent.tag = name;
         setWorldChanged();
     }
@@ -144,9 +142,9 @@ public:
     void physics2DPropertiesUpdated();
 
 #ifdef PND_EDITOR
-    bool needToDestroy();
-    bool isDeleted();
-    void sortWorld();
+    bool needToDestroy() const;
+    bool isDeleted() const;
+    void sortWorld() const;
     void setDeleted(bool deleted = true);
 #endif
 

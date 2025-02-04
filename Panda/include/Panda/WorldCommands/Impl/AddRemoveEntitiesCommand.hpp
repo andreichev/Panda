@@ -7,18 +7,14 @@ namespace Panda {
 
 class AddRemoveEntitiesCommand : public WorldCommand {
 public:
-    AddRemoveEntitiesCommand(std::vector<Entity> entities)
+    AddRemoveEntitiesCommand(const std::vector<Entity> &entities)
         : m_entities(entities) {}
-
-    AddRemoveEntitiesCommand(AddRemoveEntitiesCommand &other) = default;
 
     AddRemoveEntitiesCommand(AddRemoveEntitiesCommand &&other)
         : m_entities(std::move(other.m_entities)) {}
 
     ~AddRemoveEntitiesCommand() {
-        if (m_entities.empty()) {
-            return;
-        }
+        if (m_entities.empty()) { return; }
         for (auto entity : m_entities) {
             if (entity.needToDestroy()) {
                 auto world = entity.getWorld();

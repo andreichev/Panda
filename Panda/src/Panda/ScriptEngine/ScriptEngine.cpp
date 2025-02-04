@@ -30,9 +30,7 @@ ScriptBundleManifest ScriptEngine::getManifest() {
 }
 
 bool ScriptEngine::reload(ScriptEngineConfig config) {
-    if (m_lib) {
-        ExternalCalls::clear();
-    }
+    if (m_lib) { ExternalCalls::clear(); }
     terminate();
     m_manifest = {};
     m_lib = nullptr;

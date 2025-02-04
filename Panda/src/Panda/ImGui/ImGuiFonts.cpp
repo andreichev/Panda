@@ -26,9 +26,7 @@ void Fonts::add(const FontConfiguration &config, bool isDefault) {
     );
     PND_ASSERT(font != nullptr, "Failed to load font file!");
     s_fonts[config.fontName] = font;
-    if (isDefault) {
-        io.FontDefault = font;
-    }
+    if (isDefault) { io.FontDefault = font; }
 }
 
 ImFont *Fonts::get(const std::string &fontName) {

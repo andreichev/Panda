@@ -16,16 +16,10 @@ Gizmos::Gizmos(Camera *camera, CameraController *cameraController)
     , m_cameraController(cameraController) {}
 
 void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
-    if (sceneState == SceneState::PLAY) {
-        return;
-    }
-    if (!m_camera || !m_world) {
-        return;
-    }
+    if (sceneState == SceneState::PLAY) { return; }
+    if (!m_camera || !m_world) { return; }
     SelectionContext &selectionContext = m_world->getSelectionContext();
-    if (selectionContext.empty()) {
-        return;
-    }
+    if (selectionContext.empty()) { return; }
     ImGuizmo::SetOrthographic(false);
     ImGuizmo::SetDrawlist();
 
@@ -66,16 +60,14 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
     */
     auto entities = selectionContext.getManipulatingEntities();
     EntityTransformCommand move(entities);
-    move.saveBeforeTransforms();
+    move.saveBeforeEdit();
     for (auto entity : entities) {
         TransformComponent &transformComponent = entity.getTransform();
         glm::mat4 newTransform = delta * transformComponent.getLocalTransform();
         transformComponent.setTransform(newTransform);
-        if (entity.hasComponent<Rigidbody2DComponent>()) {
-            entity.physics2DPropertiesUpdated();
-        }
+        if (entity.hasComponent<Rigidbody2DComponent>()) { entity.physics2DPropertiesUpdated(); }
     }
-    move.saveAfterTransforms();
+    move.saveAfterEdit();
     WorldCommandManager &cmd = m_world->getCommandManger();
     cmd.SAVE(move, false);
     selectionContext.updateValues();

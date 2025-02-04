@@ -40,9 +40,7 @@ public:
         }
         manipulating.push_back(entity);
         m_manipulatingEntities = manipulating;
-        if (needToCalculateMedian) {
-            updateValues();
-        }
+        if (needToCalculateMedian) { updateValues(); }
     }
 
     void addSelectedEntities(std::vector<Entity> entities) {

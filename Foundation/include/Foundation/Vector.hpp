@@ -121,14 +121,12 @@ public:
     }
 
     inline void resize(int new_size) {
-        if (new_size > m_capacity)
-            reserve(growCapacity(new_size));
+        if (new_size > m_capacity) reserve(growCapacity(new_size));
         m_size = new_size;
     }
 
     inline void reserve(int new_capacity) {
-        if (new_capacity <= m_capacity)
-            return;
+        if (new_capacity <= m_capacity) return;
         T *new_data = (T *)F_ALLOC(getAllocator(), (size_t)new_capacity * sizeof(T));
         if (m_data) {
             memcpy(new_data, m_data, (size_t)m_size * sizeof(T));
@@ -139,10 +137,8 @@ public:
     }
 
     inline void reserve_discard(int new_capacity) {
-        if (new_capacity <= m_capacity)
-            return;
-        if (m_data)
-            FREE(getAllocator(), m_data);
+        if (new_capacity <= m_capacity) return;
+        if (m_data) FREE(getAllocator(), m_data);
         m_data = (T *)F_ALLOC(getAllocator(), (size_t)new_capacity * sizeof(T));
         m_capacity = new_capacity;
     }
@@ -150,8 +146,7 @@ public:
     // NB: It is illegal to call push_back/push_front/insert with a reference pointing inside the
     // ImVector data itself! e.g. v.push_back(v[10]) is forbidden.
     inline void push_back(const T &v) {
-        if (m_size == m_capacity)
-            reserve(growCapacity(m_size + 1));
+        if (m_size == m_capacity) reserve(growCapacity(m_size + 1));
         memcpy(&m_data[m_size], &v, sizeof(v));
         m_size++;
     }
@@ -195,8 +190,7 @@ public:
     inline T *erase_unsorted(const T *it) {
         PND_ASSERT(it >= m_data && it < m_data + m_size, "element not found");
         const ptrdiff_t off = it - m_data;
-        if (it < m_data + m_size - 1)
-            memcpy(m_data + off, m_data + m_size - 1, sizeof(T));
+        if (it < m_data + m_size - 1) memcpy(m_data + off, m_data + m_size - 1, sizeof(T));
         m_size--;
         return m_data + off;
     }
@@ -204,8 +198,7 @@ public:
     inline T *insert(const T *it, const T &v) {
         PND_ASSERT(it >= m_data && it <= m_data + m_size, "element not found");
         const ptrdiff_t off = it - m_data;
-        if (m_size == m_capacity)
-            reserve(growCapacity(m_size + 1));
+        if (m_size == m_capacity) reserve(growCapacity(m_size + 1));
         if (off < (int)m_size)
             memmove(m_data + off + 1, m_data + off, ((size_t)m_size - (size_t)off) * sizeof(T));
         memcpy(&m_data[off], &v, sizeof(v));
@@ -217,8 +210,7 @@ public:
         const T *data = m_data;
         const T *data_end = m_data + m_size;
         while (data < data_end)
-            if (*data++ == v)
-                return true;
+            if (*data++ == v) return true;
         return false;
     }
 

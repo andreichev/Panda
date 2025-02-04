@@ -1,16 +1,15 @@
-#include <imgui.h>
+#include "Panda/ImGui/ImGui+DragTarget.hpp"
+
 #include <imgui_internal.h>
 
 namespace ImGui {
 
 bool BeginDragDropTargetCustom(bool allowToDropToItself) {
     ImGuiContext &g = *GImGui;
-    if (!g.DragDropActive)
-        return false;
+    if (!g.DragDropActive) return false;
 
     ImGuiWindow *window = g.CurrentWindow;
-    if (!(g.LastItemData.StatusFlags & ImGuiItemStatusFlags_HoveredRect))
-        return false;
+    if (!(g.LastItemData.StatusFlags & ImGuiItemStatusFlags_HoveredRect)) return false;
     ImGuiWindow *hovered_window = g.HoveredWindowUnderMovingWindow;
     if (hovered_window == NULL ||
         window->RootWindowDockTree != hovered_window->RootWindowDockTree || window->SkipItems)
@@ -24,8 +23,7 @@ bool BeginDragDropTargetCustom(bool allowToDropToItself) {
         id = window->GetIDFromRectangle(display_rect);
         KeepAliveID(id);
     }
-    if (g.DragDropPayload.SourceId == id && !allowToDropToItself)
-        return false;
+    if (g.DragDropPayload.SourceId == id && !allowToDropToItself) return false;
 
     IM_ASSERT(
         g.DragDropWithinTarget == false && g.DragDropWithinSource == false

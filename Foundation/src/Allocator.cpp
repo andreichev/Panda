@@ -90,9 +90,7 @@ inline void *alignedRealloc(
     const char *_file,
     uint32_t _line
 ) {
-    if (nullptr == _ptr) {
-        return alignedAlloc(_allocator, _size, _align, _file, _line);
-    }
+    if (nullptr == _ptr) { return alignedAlloc(_allocator, _size, _align, _file, _line); }
 
     uint8_t *aligned = (uint8_t *)_ptr;
     uint32_t offset = *((uint32_t *)aligned - 1);
@@ -104,9 +102,7 @@ inline void *alignedRealloc(
     ptr = (uint8_t *)realloc(_allocator, ptr, total, 0, _file, _line);
     uint8_t *newAligned = (uint8_t *)alignPtr(ptr, sizeof(uint32_t), align);
 
-    if (newAligned == aligned) {
-        return aligned;
-    }
+    if (newAligned == aligned) { return aligned; }
 
     aligned = ptr + offset;
     memMove(newAligned, aligned, _size);
@@ -138,9 +134,7 @@ void *DefaultAllocator::realloc(
 
         return nullptr;
     } else if (_ptr == nullptr) {
-        if (_align <= CONFIG_ALLOCATOR_NATURAL_ALIGNMENT) {
-            return ::malloc(_size);
-        }
+        if (_align <= CONFIG_ALLOCATOR_NATURAL_ALIGNMENT) { return ::malloc(_size); }
 
 #if COMPILER_MSVC
         return _aligned_malloc(_size, _align);
@@ -149,9 +143,7 @@ void *DefaultAllocator::realloc(
 #endif
     }
 
-    if (_align <= CONFIG_ALLOCATOR_NATURAL_ALIGNMENT) {
-        return ::realloc(_ptr, _size);
-    }
+    if (_align <= CONFIG_ALLOCATOR_NATURAL_ALIGNMENT) { return ::realloc(_ptr, _size); }
 
 #if COMPILER_MSVC
     return _aligned_realloc(_ptr, _size, _align);

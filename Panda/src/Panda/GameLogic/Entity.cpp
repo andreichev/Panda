@@ -63,9 +63,7 @@ void Entity::removeChildEntity(Entity entity) {
 
 void Entity::removeFromParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    if (!thisRelationship.parent) {
-        return;
-    }
+    if (!thisRelationship.parent) { return; }
     Entity parent = m_world->getById(thisRelationship.parent);
     parent.removeChildEntity(*this);
 }
@@ -104,18 +102,12 @@ bool Entity::hasAnyChild() {
 
 bool Entity::isAncestorOf(Entity entity) {
     auto &children = getChildEntities();
-    if (children.empty()) {
-        return false;
+    if (children.empty()) { return false; }
+    for (UUID childId : children) {
+        if (childId == entity.getId()) { return true; }
     }
     for (UUID childId : children) {
-        if (childId == entity.getId()) {
-            return true;
-        }
-    }
-    for (UUID childId : children) {
-        if (m_world->getById(childId).isAncestorOf(entity)) {
-            return true;
-        }
+        if (m_world->getById(childId).isAncestorOf(entity)) { return true; }
     }
     return false;
 }
@@ -126,9 +118,7 @@ bool Entity::isDescendantOf(Entity entity) {
 
 Entity Entity::getParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    if (!thisRelationship.parent) {
-        return {};
-    }
+    if (!thisRelationship.parent) { return {}; }
     return m_world->getById(thisRelationship.parent);
 }
 
@@ -149,15 +139,15 @@ void Entity::physics2DPropertiesUpdated() {
 }
 
 #ifdef PND_EDITOR
-bool Entity::needToDestroy() {
+bool Entity::needToDestroy() const {
     return m_world->needToDestroy(*this);
 }
 
-bool Entity::isDeleted() {
+bool Entity::isDeleted() const {
     return m_world->isDeleted(m_handle);
 }
 
-void Entity::sortWorld() {
+void Entity::sortWorld() const {
     m_world->sort();
 }
 

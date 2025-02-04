@@ -7,37 +7,41 @@ namespace Panda {
 
 class UpdateBoxCollider2DCommand : public WorldCommand {
 public:
-    UpdateBoxCollider2DCommand(Entity entity, BoxCollider2DComponent newCollider)
-        : m_entity(entity)
+    UpdateBoxCollider2DCommand(
+        const std::vector<Entity> &entities, BoxCollider2DComponent newCollider
+    )
+        : m_entities(entities)
         , m_newCollider(newCollider)
-        , m_prevCollider(entity.getComponent<BoxCollider2DComponent>()) {}
+        , m_prevColliders() {
+        for (auto entity : entities) {
+            m_prevColliders[entity.getId()] = entity.getComponent<BoxCollider2DComponent>();
+        }
+    }
 
     bool undo() override {
-        if (!m_entity.isValid()) {
-            return false;
+        for (Entity entity : m_entities) {
+            if (!entity.isValid()) { return false; }
+            entity.setComponent(m_prevColliders[entity.getId()]);
+            entity.physics2DPropertiesUpdated();
+            entity.setWorldChanged();
         }
-        m_entity.setComponent(m_prevCollider);
-        m_entity.physics2DPropertiesUpdated();
-        m_entity.setWorldChanged();
         return true;
     }
 
     bool execute() override {
-        if (!m_entity.isValid()) {
-            return false;
+        for (Entity entity : m_entities) {
+            if (!entity.isValid()) { return false; }
+            entity.setComponent(m_newCollider);
+            entity.physics2DPropertiesUpdated();
+            entity.setWorldChanged();
         }
-        m_entity.setComponent(m_newCollider);
-        m_entity.physics2DPropertiesUpdated();
-        m_entity.setWorldChanged();
         return true;
     }
 
     bool canMerge(WorldCommand &command) override {
-        if (typeid(command) != typeid(*this)) {
-            return false;
-        }
+        if (typeid(command) != typeid(*this)) { return false; }
         UpdateBoxCollider2DCommand &other = static_cast<UpdateBoxCollider2DCommand &>(command);
-        return other.m_entity == m_entity;
+        return other.m_entities == m_entities;
     }
 
     void merge(WorldCommand &command) override {
@@ -46,9 +50,9 @@ public:
     }
 
 private:
-    Entity m_entity;
+    std::vector<Entity> m_entities;
     BoxCollider2DComponent m_newCollider;
-    BoxCollider2DComponent m_prevCollider;
+    std::unordered_map<UUID, BoxCollider2DComponent> m_prevColliders;
 };
 
 } // namespace Panda

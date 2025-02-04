@@ -83,9 +83,7 @@ inline void deleteObject(
     const char *_file = nullptr,
     uint32_t _line = 0
 ) {
-    if (_object == nullptr) {
-        return;
-    }
+    if (_object == nullptr) { return; }
     _object->~ObjectT();
     free(_allocator, _object, _align, _file, _line);
 }

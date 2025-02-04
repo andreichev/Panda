@@ -31,9 +31,7 @@ public:
                 CLEAR();
             }
         }
-        if (undoStack.size() > MAX_OPERATIONS_IN_CACHE) {
-            undoStack.pop_front();
-        }
+        if (undoStack.size() > MAX_OPERATIONS_IN_CACHE) { undoStack.pop_front(); }
         redoStack.clear();
     }
 
@@ -42,9 +40,7 @@ public:
     }
 
     void UNDO() {
-        if (!CAN_UNDO()) {
-            return;
-        }
+        if (!CAN_UNDO()) { return; }
         auto command = undoStack.back();
         undoStack.pop_back();
         if (!command->undo()) {
@@ -60,9 +56,7 @@ public:
     }
 
     void REDO() {
-        if (!CAN_REDO()) {
-            return;
-        }
+        if (!CAN_REDO()) { return; }
         auto command = redoStack.back();
         redoStack.pop_back();
         if (!command->execute()) {
@@ -74,9 +68,7 @@ public:
     }
 
     Foundation::Shared<WorldCommand> PREVIOUS_COMMAND() {
-        if (undoStack.empty()) {
-            return nullptr;
-        }
+        if (undoStack.empty()) { return nullptr; }
         return undoStack.back();
     }
 

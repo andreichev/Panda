@@ -9,8 +9,7 @@ namespace Panda {
 
 void ParticleSystem::update(Renderer2D *renderer, double deltaTime) {
     for (Particle &particle : m_particlePool) {
-        if (!particle.active)
-            continue;
+        if (!particle.active) continue;
 
         if (particle.lifeRemaining <= 0.0f) {
             particle.active = false;

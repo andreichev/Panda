@@ -18,21 +18,11 @@ void CameraMove::update(double deltaTime) {
     static double lastMouseX = Panda::Input::getMousePositionX();
     static double lastMouseY = Panda::Input::getMousePositionY();
     static bool cursorStarted = false;
-    if (Panda::Input::isKeyPressed(Panda::Key::W)) {
-        m_transform->translate(m_front * speed);
-    }
-    if (Panda::Input::isKeyPressed(Panda::Key::S)) {
-        m_transform->translate(-m_front * speed);
-    }
-    if (Panda::Input::isKeyPressed(Panda::Key::A)) {
-        m_transform->translate(-m_right * speed);
-    }
-    if (Panda::Input::isKeyPressed(Panda::Key::D)) {
-        m_transform->translate(m_right * speed);
-    }
-    if (Panda::Input::isKeyPressed(Panda::Key::SPACE)) {
-        m_transform->translate(m_up * speed);
-    }
+    if (Panda::Input::isKeyPressed(Panda::Key::W)) { m_transform->translate(m_front * speed); }
+    if (Panda::Input::isKeyPressed(Panda::Key::S)) { m_transform->translate(-m_front * speed); }
+    if (Panda::Input::isKeyPressed(Panda::Key::A)) { m_transform->translate(-m_right * speed); }
+    if (Panda::Input::isKeyPressed(Panda::Key::D)) { m_transform->translate(m_right * speed); }
+    if (Panda::Input::isKeyPressed(Panda::Key::SPACE)) { m_transform->translate(m_up * speed); }
     if (Panda::Input::isKeyPressed(Panda::Key::LEFT_SHIFT)) {
         m_transform->translate(-m_up * speed);
     }

@@ -7,28 +7,32 @@ namespace Panda {
 
 class UpdateRigidbody2DCommand : public WorldCommand {
 public:
-    UpdateRigidbody2DCommand(Entity entity, Rigidbody2DComponent newRigidbody)
-        : m_entity(entity)
+    UpdateRigidbody2DCommand(const std::vector<Entity> &entities, Rigidbody2DComponent newRigidbody)
+        : m_entities(entities)
         , m_newRigidbody(newRigidbody)
-        , m_prevRigidbody(entity.getComponent<Rigidbody2DComponent>()) {}
+        , m_prevRigidbodies() {
+        for (auto entity : entities) {
+            m_prevRigidbodies[entity.getId()] = entity.getComponent<Rigidbody2DComponent>();
+        }
+    }
 
     bool undo() override {
-        if (!m_entity.isValid()) {
-            return false;
+        for (Entity entity : m_entities) {
+            if (!entity.isValid()) { return false; }
+            entity.setComponent(m_prevRigidbodies[entity.getId()]);
+            entity.physics2DPropertiesUpdated();
+            entity.setWorldChanged();
         }
-        m_entity.setComponent(m_prevRigidbody);
-        m_entity.physics2DPropertiesUpdated();
-        m_entity.setWorldChanged();
         return true;
     }
 
     bool execute() override {
-        if (!m_entity.isValid()) {
-            return false;
+        for (Entity entity : m_entities) {
+            if (!entity.isValid()) { return false; }
+            entity.setComponent(m_newRigidbody);
+            entity.physics2DPropertiesUpdated();
+            entity.setWorldChanged();
         }
-        m_entity.setComponent(m_newRigidbody);
-        m_entity.physics2DPropertiesUpdated();
-        m_entity.setWorldChanged();
         return true;
     }
 
@@ -41,9 +45,9 @@ public:
     }
 
 private:
-    Entity m_entity;
+    std::vector<Entity> m_entities;
     Rigidbody2DComponent m_newRigidbody;
-    Rigidbody2DComponent m_prevRigidbody;
+    std::unordered_map<UUID, Rigidbody2DComponent> m_prevRigidbodies;
 };
 
 } // namespace Panda

@@ -57,9 +57,7 @@ void StartPanel::onImGuiRender() {
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
         if (m_newProjectMenu) {
             static std::string name;
-            if (name.size() < 40) {
-                name.resize(40);
-            }
+            if (name.size() < 40) { name.resize(40); }
             Fonts::pushFont("Bold");
             ImGui::TextColored({0.5, 0.5, 0.5, 1.0}, "New Project");
             Fonts::popFont();
@@ -123,9 +121,7 @@ void StartPanel::onImGuiRender() {
 
 void StartPanel::openProject() {
     auto pathOptional = SystemTools::openFolderDialog();
-    if (!pathOptional.has_value()) {
-        return;
-    }
+    if (!pathOptional.has_value()) { return; }
     std::string path = pathOptional.value().string();
     LOG_INFO("OPEN PROJECT AT PATH {}", path);
     m_loader->openProject(path);
@@ -134,9 +130,7 @@ void StartPanel::openProject() {
 void StartPanel::createProject(const std::string &name) {
     m_newProjectMenu = false;
     auto pathOptional = SystemTools::openFolderDialog();
-    if (!pathOptional.has_value()) {
-        return;
-    }
+    if (!pathOptional.has_value()) { return; }
     path_t path = pathOptional.value();
     path.append(name);
     LOG_INFO("CREATE PROJECT AT PATH {}", path.string());

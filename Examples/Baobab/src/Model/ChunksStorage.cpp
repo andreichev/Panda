@@ -123,12 +123,9 @@ std::optional<VoxelRaycastData> ChunksStorage::bresenham3D(
             normal.x = 0;
             normal.y = 0;
             normal.z = 0;
-            if (steppedIndex == 0)
-                normal.x = (int)-stepx;
-            if (steppedIndex == 1)
-                normal.y = (int)-stepy;
-            if (steppedIndex == 2)
-                normal.z = (int)-stepz;
+            if (steppedIndex == 0) normal.x = (int)-stepx;
+            if (steppedIndex == 1) normal.y = (int)-stepy;
+            if (steppedIndex == 2) normal.z = (int)-stepz;
             return VoxelRaycastData(voxel, end, normal);
         }
         if (txMax < tyMax) {

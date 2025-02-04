@@ -44,9 +44,7 @@ bool isMouseInsideWindow(ImVec2 windowPos, ImVec2 windowSize) {
 }
 
 void ContentBrowser::onImGuiRender() {
-    if (m_currentDirectory.empty()) {
-        return;
-    }
+    if (m_currentDirectory.empty()) { return; }
     ImGui::Begin("Content Browser");
     if (m_currentDirectory != path_t(m_baseDirectory)) {
         if (ImGui::Button(getString(ICON_ARROW_LEFT).c_str())) {
@@ -56,14 +54,10 @@ void ContentBrowser::onImGuiRender() {
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
     if (ImGui::BeginPopupContextWindow()) {
         if (ImGui::BeginMenu("Create")) {
-            if (ImGui::MenuItem("Folder", NULL)) {
-                m_output->showCreateFolderPopup();
-            }
+            if (ImGui::MenuItem("Folder", NULL)) { m_output->showCreateFolderPopup(); }
             ImGui::EndMenu();
         }
-        if (ImGui::MenuItem("Open in Finder", NULL)) {
-            SystemTools::open(m_currentDirectory);
-        }
+        if (ImGui::MenuItem("Open in Finder", NULL)) { SystemTools::open(m_currentDirectory); }
         ImGui::EndPopup();
     }
     static bool showHiddenFiles = false;
@@ -100,9 +94,7 @@ void ContentBrowser::onImGuiRender() {
         UUID assetId = m_output->getAssetId(path);
         std::string filenameString = path.filename().string();
 
-        if (!showHiddenFiles && filenameString[0] == '.') {
-            continue;
-        }
+        if (!showHiddenFiles && filenameString[0] == '.') { continue; }
 
         ImGui::PushID(filenameString.c_str());
         Texture *icon;
@@ -130,7 +122,7 @@ void ContentBrowser::onImGuiRender() {
                     item.count = 1;
                     PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
                     memcpy(item.data, &assetId, sizeof(UUID));
-                    ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(assetId));
+                    ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
                 }
                 ImGui::Text("Texture");
                 ImGui::EndDragDropSource();
@@ -143,22 +135,16 @@ void ContentBrowser::onImGuiRender() {
         }
         ImGui::PopStyleColor();
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            if (directoryEntry.is_directory()) {
-                m_currentDirectory /= path.filename();
-            }
+            if (directoryEntry.is_directory()) { m_currentDirectory /= path.filename(); }
         }
         if (ImGui::BeginPopupContextItem(filenameString.c_str())) {
-            if (ImGui::MenuItem("Show in Finder")) {
-                SystemTools::show(path.c_str());
-            }
+            if (ImGui::MenuItem("Show in Finder")) { SystemTools::show(path.c_str()); }
             if (ImGui::MenuItem("Delete")) {
                 m_deletingDirectory = path;
                 m_output->deleteFileShowPopup(path);
             }
             if (!assetId) {
-                if (ImGui::MenuItem("Import Asset")) {
-                    m_output->importAsset(path);
-                }
+                if (ImGui::MenuItem("Import Asset")) { m_output->importAsset(path); }
             }
             ImGui::EndPopup();
         }

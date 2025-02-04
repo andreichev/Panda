@@ -7,7 +7,7 @@ namespace Panda {
 
 class HierarchyCommand : public WorldCommand {
 public:
-    HierarchyCommand(std::vector<Entity> entities, Entity newParent)
+    HierarchyCommand(const std::vector<Entity> &entities, Entity newParent)
         : m_entities(entities)
         , m_newParent(newParent) {
         PND_ASSERT(!entities.empty(), "Entities should not be empty");

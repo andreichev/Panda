@@ -2,8 +2,9 @@
 #include "Model/DragDropItem.hpp"
 #include "ProjectLoader/AssetHandlerEditor.hpp"
 
-#include "Panda/GameLogic/GameContext.hpp"
+#include <Panda/GameLogic/GameContext.hpp>
 #include <Panda/ImGui/FontAwesome.h>
+#include <Panda/ImGui/ImGui+DragScalar.hpp>
 #include <string>
 
 namespace Panda {
@@ -32,9 +33,7 @@ void separator(ImVec2 size, ImVec4 color) {
 }
 
 void beginDisabled(bool disabled) {
-    if (disabled) {
-        ImGui::BeginDisabled(true);
-    }
+    if (disabled) { ImGui::BeginDisabled(true); }
 }
 
 bool isItemDisabled() {
@@ -42,9 +41,7 @@ bool isItemDisabled() {
 }
 
 void endDisabled() {
-    if (GImGui->DisabledStackSize > 0) {
-        ImGui::EndDisabled();
-    }
+    if (GImGui->DisabledStackSize > 0) { ImGui::EndDisabled(); }
 }
 
 void underline(bool fullWidth, float offsetX, float offsetY) {
@@ -188,7 +185,8 @@ bool dragInt(
     int v_min,
     int v_max,
     const char *format,
-    ImGuiSliderFlags flags
+    ImGuiSliderFlags flags,
+    bool isInconsistent
 ) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
@@ -196,12 +194,15 @@ bool dragInt(
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
-    bool result = ImGui::DragInt("", v, v_speed, v_min, v_max, format, flags);
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, isInconsistent);
+    bool result =
+        ImGui::DragScalarCustom("", ImGuiDataType_S32, v, v_speed, &v_min, &v_max, format, flags);
+    ImGui::PopItemFlag();
     ImGui::PopItemWidth();
     ImGui::Columns(1);
     ImGui::PopID();
@@ -292,19 +293,21 @@ bool dragInt4(
     return result;
 }
 
-bool checkbox(const std::string &label, bool *v) {
+bool checkbox(const std::string &label, bool *v, bool isInconsistent) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
 
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, isInconsistent);
     bool result = ImGui::Checkbox("", v);
+    ImGui::PopItemFlag();
     ImGui::PopItemWidth();
     ImGui::Columns(1);
     ImGui::PopID();
@@ -333,9 +336,7 @@ int combo(const std::string &label, const std::vector<std::string> &list, int cu
                 currentStr = list[i];
                 current = i;
             }
-            if (isSelected) {
-                ImGui::SetItemDefaultFocus();
-            }
+            if (isSelected) { ImGui::SetItemDefaultFocus(); }
         }
         ImGui::EndCombo();
     }
@@ -346,7 +347,9 @@ int combo(const std::string &label, const std::vector<std::string> &list, int cu
     return current;
 }
 
-bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue) {
+bool drawVec3Control(
+    const std::string &label, glm::vec3 &values, float resetValue, uint32_t inconsistentAxes
+) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
 
     ImGuiIO &io = ImGui::GetIO();
@@ -357,7 +360,7 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
     shiftCursorY(6.0f);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(inconsistentAxes ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 
@@ -381,7 +384,12 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
 
     ImGui::SameLine();
     ImGui::SetNextItemWidth(inputItemWidth);
-    edited = ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f") || edited;
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, inconsistentAxes & (uint32_t)VectorAxes::X);
+    edited = ImGui::DragScalarCustom(
+                 "##X", ImGuiDataType_Float, &values.x, 0.1f, nullptr, nullptr, "%.2f"
+             ) ||
+             edited;
+    ImGui::PopItemFlag();
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.0f));
@@ -397,7 +405,12 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
 
     ImGui::SameLine();
     ImGui::SetNextItemWidth(inputItemWidth);
-    edited = ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f") || edited;
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, inconsistentAxes & (uint32_t)VectorAxes::Y);
+    edited = ImGui::DragScalarCustom(
+                 "##Y", ImGuiDataType_Float, &values.y, 0.1f, nullptr, nullptr, "%.2f"
+             ) ||
+             edited;
+    ImGui::PopItemFlag();
     ImGui::SameLine();
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
@@ -413,7 +426,12 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
 
     ImGui::SameLine();
     ImGui::SetNextItemWidth(inputItemWidth);
-    edited = ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f") || edited;
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, inconsistentAxes & (uint32_t)VectorAxes::Z);
+    edited = ImGui::DragScalarCustom(
+                 "##Z", ImGuiDataType_Float, &values.z, 0.1f, nullptr, nullptr, "%.2f"
+             ) ||
+             edited;
+    ImGui::PopItemFlag();
 
     ImGui::PopStyleVar();
     ImGui::Columns(1);
@@ -422,13 +440,13 @@ bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetVal
     return edited;
 }
 
-bool propertyColor(const char *label, Color &value) {
+bool propertyColor(const char *label, Color &value, bool isInconsistent) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, coefficientRounding);
     shiftCursorY(6.0f);
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label);
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label);
     ImGui::NextColumn();
     ImGui::PushItemWidth(-1);
     bool modified = ImGui::ColorEdit4("", &value.r);
@@ -439,13 +457,15 @@ bool propertyColor(const char *label, Color &value) {
     return modified;
 }
 
-bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asset> asset) {
+bool propertyTexture(
+    const char *label, UUID &textureId, Foundation::Shared<Asset> asset, bool isInconsistent
+) {
     bool changed = false;
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     shiftCursorY(6.0f);
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label);
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label);
     ImGui::NextColumn();
     if (textureId) {
         if (asset) {
@@ -580,7 +600,9 @@ bool drawScriptFieldValue(ScriptField &field) {
             if (textureId && !field.asset && assetHandler) {
                 field.asset = assetHandler->load(textureId);
             }
-            if (propertyTexture(field.name.c_str(), *(UUID *)field.value.data, field.asset)) {
+            if (propertyTexture(
+                    field.name.c_str(), *(UUID *)field.value.data, field.asset, false
+                )) {
                 field.resetCache();
                 changed = true;
             }

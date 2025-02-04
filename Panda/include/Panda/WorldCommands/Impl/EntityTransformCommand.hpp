@@ -8,7 +8,7 @@ namespace Panda {
 
 class EntityTransformCommand : public WorldCommand {
 public:
-    EntityTransformCommand(std::vector<Entity> entities)
+    EntityTransformCommand(const std::vector<Entity> &entities)
         : m_entities(entities)
         , m_beforeTransforms()
         , m_afterTransforms() {}
@@ -18,9 +18,7 @@ public:
         bool selectionsUpdated = false;
         SelectionContext &selectionContext = m_entities[0].getWorld()->getSelectionContext();
         for (auto entity : m_entities) {
-            if (!entity.isValid()) {
-                return false;
-            }
+            if (!entity.isValid()) { return false; }
             auto &transformComponent = entity.getTransform();
             glm::mat4 prevTransform = m_beforeTransforms[entity.getId()];
             transformComponent.setTransform(prevTransform);
@@ -28,9 +26,7 @@ public:
             entity.physics2DPropertiesUpdated();
             selectionsUpdated |= selectionContext.isSelected(entity);
         }
-        if (selectionsUpdated) {
-            selectionContext.updateValues();
-        }
+        if (selectionsUpdated) { selectionContext.updateValues(); }
         return true;
     }
 
@@ -39,9 +35,7 @@ public:
         bool selectionsUpdated = false;
         SelectionContext &selectionContext = m_entities[0].getWorld()->getSelectionContext();
         for (auto entity : m_entities) {
-            if (!entity.isValid()) {
-                return false;
-            }
+            if (!entity.isValid()) { return false; }
             auto &transformComponent = entity.getTransform();
             glm::mat4 newTransform = m_afterTransforms[entity.getId()];
             transformComponent.setTransform(newTransform);
@@ -49,16 +43,12 @@ public:
             entity.physics2DPropertiesUpdated();
             selectionsUpdated |= selectionContext.isSelected(entity);
         }
-        if (selectionsUpdated) {
-            selectionContext.updateValues();
-        }
+        if (selectionsUpdated) { selectionContext.updateValues(); }
         return true;
     }
 
     bool canMerge(WorldCommand &command) override {
-        if (typeid(command) != typeid(*this)) {
-            return false;
-        }
+        if (typeid(command) != typeid(*this)) { return false; }
         EntityTransformCommand &other = static_cast<EntityTransformCommand &>(command);
         return other.m_entities == m_entities;
     }
@@ -68,13 +58,13 @@ public:
         m_afterTransforms = cmd.m_afterTransforms;
     }
 
-    void saveBeforeTransforms() {
+    void saveBeforeEdit() {
         for (auto entity : m_entities) {
             m_beforeTransforms[entity.getId()] = entity.getTransform().getLocalTransform();
         }
     }
 
-    void saveAfterTransforms() {
+    void saveAfterEdit() {
         for (auto entity : m_entities) {
             m_afterTransforms[entity.getId()] = entity.getTransform().getLocalTransform();
         }

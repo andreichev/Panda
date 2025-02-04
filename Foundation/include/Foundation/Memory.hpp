@@ -18,9 +18,7 @@ struct Memory {
     ReleaseFunction releaseFn;
 
     const void release() {
-        if (!data) {
-            return;
-        }
+        if (!data) { return; }
         if (releaseFn != nullptr) {
             releaseFn(data, userData);
         } else if (data != nullptr) {

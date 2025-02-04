@@ -163,9 +163,7 @@ void Input::nextFrame() {
 }
 
 Input::Touch Input::getTouch(int index) {
-    if (index >= 0 && index < activeTouches.size()) {
-        return activeTouches[index];
-    }
+    if (index >= 0 && index < activeTouches.size()) { return activeTouches[index]; }
     PND_ASSERT_F(false, "WRONG TOUCH INDEX {}", index);
     return Input::Touch(0, 0, 0);
 }
@@ -194,9 +192,7 @@ void Input::postTouchEndedEvent(int id) {
         return touch.id == id;
     });
     PND_ASSERT(touch != activeTouches.end(), "TOUCH NOT FOUND");
-    if (touch != activeTouches.end()) {
-        activeTouches.erase(touch);
-    }
+    if (touch != activeTouches.end()) { activeTouches.erase(touch); }
 }
 
 void Input::setViewportFrame(Rect _frame) {

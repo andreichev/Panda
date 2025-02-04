@@ -27,9 +27,7 @@ AssetHandlerEditor::~AssetHandlerEditor() {
 
 Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
     PND_ASSERT(m_registry.find(id) != m_registry.end(), "UNKNOWN ASSET ID");
-    if (m_cache.find(id) != m_cache.end()) {
-        return m_cache.at(id);
-    }
+    if (m_cache.find(id) != m_cache.end()) { return m_cache.at(id); }
     auto assetInfo = m_registry.at(id);
     Foundation::Shared<Asset> asset;
     switch (assetInfo.type) {
@@ -68,9 +66,7 @@ void AssetHandlerEditor::importAsset(const path_t &path) {
 
 UUID AssetHandlerEditor::getAssetId(path_t path) {
     path_t assetPath = std::filesystem::relative(path, m_projectPath);
-    if (m_importedAssets.find(assetPath) == m_importedAssets.end()) {
-        return 0;
-    }
+    if (m_importedAssets.find(assetPath) == m_importedAssets.end()) { return 0; }
     return m_importedAssets[assetPath];
 }
 

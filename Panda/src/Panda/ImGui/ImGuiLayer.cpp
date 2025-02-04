@@ -84,9 +84,7 @@ void ImGuiLayer::onDetach() {
 
 void ImGuiLayer::onEvent(Event *event) {
     ImGui_ImplPanda_HandleEvent(event);
-    if (!m_blockEvents) {
-        event->isHandled = false;
-    }
+    if (!m_blockEvents) { event->isHandled = false; }
 }
 
 void ImGuiLayer::begin(double deltaTime) {

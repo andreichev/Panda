@@ -38,9 +38,7 @@ void World::startRunning() {
     {
         auto view = m_registry.view<ScriptListComponent>();
         for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) {
-                continue;
-            }
+            if (!isValidEntt(entityHandle)) { continue; }
             auto &component = view.get<ScriptListComponent>(entityHandle);
             for (auto &container : component.scripts) {
                 container.invokeStart();
@@ -57,9 +55,7 @@ void World::finishRunning() {
 }
 
 void World::updateRuntime(double deltaTime) {
-    if (!m_isRunning) {
-        return;
-    }
+    if (!m_isRunning) { return; }
     m_renderer2d.begin();
     m_renderer3d.begin();
 
@@ -68,9 +64,7 @@ void World::updateRuntime(double deltaTime) {
     {
         auto view = m_registry.view<ScriptListComponent>();
         for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) {
-                continue;
-            }
+            if (!isValidEntt(entityHandle)) { continue; }
             auto &component = view.get<ScriptListComponent>(entityHandle);
             for (auto &container : component.scripts) {
                 container.invokeUpdate(deltaTime);
@@ -108,9 +102,7 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
     {
         auto view = m_registry.view<ScriptListComponent>();
         for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) {
-                continue;
-            }
+            if (!isValidEntt(entityHandle)) { continue; }
             auto &component = view.get<ScriptListComponent>(entityHandle);
             for (auto &container : component.scripts) {
                 container.invokeUpdate(deltaTime);
@@ -147,9 +139,7 @@ void World::updateBasicComponents(
     {
         auto view = m_registry.view<SkyComponent>();
         for (auto &entityHandle : view) {
-            if (!isValidEntt(entityHandle)) {
-                continue;
-            }
+            if (!isValidEntt(entityHandle)) { continue; }
             auto &sky = view.get<SkyComponent>(entityHandle);
             sky.setViewId(m_renderingViewId);
             sky.update(skyViewProjMtx);
@@ -159,9 +149,7 @@ void World::updateBasicComponents(
     {
         auto view = m_registry.view<IdComponent, SpriteRendererComponent, TransformComponent>();
         for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) {
-                continue;
-            }
+            if (!isValidEntt(entityHandle)) { continue; }
             Entity entity = {entityHandle, this};
             auto &id = view.get<IdComponent>(entityHandle);
             auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
@@ -191,9 +179,7 @@ void World::updateBasicComponents(
     {
         auto view = m_registry.view<StaticMeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) {
-                continue;
-            }
+            if (!isValidEntt(entityHandle)) { continue; }
             auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
             auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
             for (auto &mesh : staticMeshComponent.meshes) {
@@ -205,9 +191,7 @@ void World::updateBasicComponents(
     {
         auto view = m_registry.view<DynamicMeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) {
-                continue;
-            }
+            if (!isValidEntt(entityHandle)) { continue; }
             auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
             auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
             for (auto &mesh : dynamicMeshComponent.meshes) {
@@ -236,15 +220,11 @@ Entity World::instantiateEntity(UUID id) {
 }
 
 void World::updateScriptsAndFields() {
-    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
-        return;
-    }
+    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) { return; }
     auto view = m_registry.view<ScriptListComponent>();
     auto manifest = GameContext::s_scriptEngine->getManifest();
     for (auto entityHandle : view) {
-        if (!isValidEntt(entityHandle)) {
-            continue;
-        }
+        if (!isValidEntt(entityHandle)) { continue; }
         auto &component = view.get<ScriptListComponent>(entityHandle);
         UUID entityId = Entity(entityHandle, this).getId();
         //-----------------------------------//
@@ -316,15 +296,11 @@ void World::updateScriptsAndFields() {
 }
 
 void World::initializeScriptCore() {
-    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
-        return;
-    }
+    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) { return; }
     auto view = m_registry.view<ScriptListComponent>();
     auto manifest = GameContext::s_scriptEngine->getManifest();
     for (auto entityHandle : view) {
-        if (!isValidEntt(entityHandle)) {
-            continue;
-        }
+        if (!isValidEntt(entityHandle)) { continue; }
         auto &component = view.get<ScriptListComponent>(entityHandle);
         UUID entityId = Entity(entityHandle, this).getId();
         //-----------------------------------//
@@ -355,9 +331,7 @@ void World::shutdownScriptCore() {
     ExternalCalls::clear();
     auto view = m_registry.view<ScriptListComponent>();
     for (auto entityHandle : view) {
-        if (!isValidEntt(entityHandle)) {
-            continue;
-        }
+        if (!isValidEntt(entityHandle)) { continue; }
         auto &component = view.get<ScriptListComponent>(entityHandle);
         //-----------------------------------//
         //              CLASSES              //
@@ -397,9 +371,7 @@ void World::destroy(Entity entity) {
     m_entityIdMap.erase(entity.getId());
     m_registry.destroy(entity.m_handle);
     m_isChanged = true;
-    if (m_selectionContext.isSelected(entity)) {
-        m_selectionContext.removeSelectedEntity(entity);
-    }
+    if (m_selectionContext.isSelected(entity)) { m_selectionContext.removeSelectedEntity(entity); }
 }
 
 void World::clear() {
@@ -415,9 +387,7 @@ void World::clear() {
     // Delete all editor deleted entities
 #ifdef PND_EDITOR
     for (auto entityHandle : m_registry.storage<entt::entity>()) {
-        if (!m_registry.valid(entityHandle)) {
-            continue;
-        }
+        if (!m_registry.valid(entityHandle)) { continue; }
         if (m_registry.get<EditorMetadataComponent>(entityHandle).isDeleted) {
             m_registry.destroy(entityHandle);
         }
@@ -432,22 +402,16 @@ bool World::isEmpty() {
 Entity World::findMainCameraEntity() {
     auto view = m_registry.view<CameraComponent>();
     for (auto entity : view) {
-        if (!isValidEntt(entity)) {
-            continue;
-        }
+        if (!isValidEntt(entity)) { continue; }
         auto &comp = view.get<CameraComponent>(entity);
-        if (comp.isPrimary) {
-            return {entity, this};
-        }
+        if (comp.isPrimary) { return {entity, this}; }
     }
     return {};
 }
 
 Camera *World::findMainCamera() {
     Entity entity = findMainCameraEntity();
-    if (!entity.isValid()) {
-        return nullptr;
-    }
+    if (!entity.isValid()) { return nullptr; }
     return &entity.getComponent<CameraComponent>().camera;
 }
 
@@ -474,13 +438,9 @@ void World::fillStartupData() {
 Entity World::findByTag(const char *tag) {
     auto view = m_registry.view<TagComponent>();
     for (auto entityHandle : view) {
-        if (!isValidEntt(entityHandle)) {
-            continue;
-        }
+        if (!isValidEntt(entityHandle)) { continue; }
         auto &tagComponent = view.get<TagComponent>(entityHandle);
-        if (tagComponent.tag == tag) {
-            return Entity(entityHandle, this);
-        }
+        if (tagComponent.tag == tag) { return Entity(entityHandle, this); }
     }
     return Entity();
 }
@@ -501,9 +461,7 @@ void World::setViewId(Miren::ViewId id) {
 glm::mat4 World::getWorldSpaceTransformMatrix(Entity entity) {
     glm::mat4 result(1.0f);
     Entity parent = entity.getParent();
-    if (parent) {
-        result = getWorldSpaceTransformMatrix(parent);
-    }
+    if (parent) { result = getWorldSpaceTransformMatrix(parent); }
     return result * entity.getTransform().getLocalTransform();
 }
 
@@ -519,9 +477,7 @@ void copyAllComponents(entt::registry &src, entt::registry &dst) {
 // Copy component from entity to entity in registry
 template<typename T>
 void copyComponent(entt::entity src, entt::entity dst, entt::registry &registry) {
-    if (registry.any_of<T>(src)) {
-        registry.emplace<T>(dst, registry.get<T>(src));
-    }
+    if (registry.any_of<T>(src)) { registry.emplace<T>(dst, registry.get<T>(src)); }
 }
 
 World &World::operator=(World &other) {
@@ -568,9 +524,7 @@ World &World::operator=(World &other) {
 }
 
 Entity World::duplicateEntity(Entity entity) {
-    if (!entity) {
-        return {};
-    }
+    if (!entity) { return {}; }
     entt::entity src = entity.m_handle;
     entt::entity dst = m_registry.create();
     Entity newEntity = {dst, this};
@@ -625,27 +579,19 @@ void World::releaseAllScriptingFields() {
 }
 
 bool World::isValidEntt(entt::entity handle) {
-    if (!m_registry.valid(handle)) {
-        return false;
-    }
+    if (!m_registry.valid(handle)) { return false; }
 #ifdef PND_EDITOR
     Entity entity = {handle, this};
-    if (entity.isDeleted()) {
-        return false;
-    }
+    if (entity.isDeleted()) { return false; }
 #endif
     return true;
 }
 
 bool World::isValid(UUID entityId) {
-    if (m_entityIdMap.find(entityId) == m_entityIdMap.end()) {
-        return false;
-    }
+    if (m_entityIdMap.find(entityId) == m_entityIdMap.end()) { return false; }
 #ifdef PND_EDITOR
     Entity entity = getById(entityId);
-    if (entity.isDeleted()) {
-        return false;
-    }
+    if (entity.isDeleted()) { return false; }
 #endif
     return true;
 }
@@ -660,9 +606,7 @@ void World::physics2DPropertiesUpdatedAt(Entity entity) {
 
 void World::convertToLocalSpace(Entity entity) {
     Entity parent = entity.getParent();
-    if (!parent) {
-        return;
-    }
+    if (!parent) { return; }
     auto &transformComponent = entity.getTransform();
     glm::mat4 parentTransform = getWorldSpaceTransformMatrix(parent);
     glm::mat4 localTransform =
@@ -672,9 +616,7 @@ void World::convertToLocalSpace(Entity entity) {
 
 void World::convertToWorldSpace(Entity entity) {
     Entity parent = entity.getParent();
-    if (!parent) {
-        return;
-    }
+    if (!parent) { return; }
     glm::mat4 transform = getWorldSpaceTransformMatrix(entity);
     auto &transformComponent = entity.getTransform();
     transformComponent.setTransform(transform);
@@ -688,9 +630,7 @@ void World::sort() {
         Entity re = {r, this};
         bool lch = le.hasAnyChild();
         bool rch = re.hasAnyChild();
-        if (lch == rch) {
-            return le.getName() < re.getName();
-        }
+        if (lch == rch) { return le.getName() < re.getName(); }
         return lch > rch;
     });
     auto view = m_registry.view<RelationshipComponent>();
@@ -702,9 +642,7 @@ void World::sort() {
             Entity re = getById(r);
             bool lch = le.hasAnyChild();
             bool rch = re.hasAnyChild();
-            if (lch == rch) {
-                return le.getName() < re.getName();
-            }
+            if (lch == rch) { return le.getName() < re.getName(); }
             return lch > rch;
         });
     }
@@ -715,9 +653,7 @@ void World::debugPrint() {
     {
         auto view = m_registry.view<TagComponent>();
         for (auto entityHandle : view) {
-            if (!m_registry.valid(entityHandle)) {
-                continue;
-            }
+            if (!m_registry.valid(entityHandle)) { continue; }
             auto &tagComponent = view.get<TagComponent>(entityHandle);
             LOG_INFO("ENTITY: {}", tagComponent.tag);
         }
@@ -739,19 +675,13 @@ bool World::needToDestroy(Entity entity) {
         // Already destroyed
         return false;
     }
-    if (m_registry.get<EditorMetadataComponent>(entity.m_handle).isDeleted) {
-        return true;
-    }
+    if (m_registry.get<EditorMetadataComponent>(entity.m_handle).isDeleted) { return true; }
     return false;
 }
 
 bool World::isDeleted(entt::entity handle) {
-    if (!m_registry.valid(handle)) {
-        return true;
-    }
-    if (m_registry.get<EditorMetadataComponent>(handle).isDeleted) {
-        return true;
-    }
+    if (!m_registry.valid(handle)) { return true; }
+    if (m_registry.get<EditorMetadataComponent>(handle).isDeleted) { return true; }
     auto relationship = m_registry.get<RelationshipComponent>(handle);
     if (relationship.parent) {
         Entity parent = m_entityIdMap[relationship.parent];

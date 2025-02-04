@@ -357,12 +357,8 @@ namespace ExternalCalls {
 //////////////////////////////////////////////////////////////////
 
 void *loadInternalCall(const char *name) {
-    if (g_scriptSymbols.empty()) {
-        initScriptHook();
-    }
-    if (g_scriptSymbols.find(name) == g_scriptSymbols.end()) {
-        return nullptr;
-    }
+    if (g_scriptSymbols.empty()) { initScriptHook(); }
+    if (g_scriptSymbols.find(name) == g_scriptSymbols.end()) { return nullptr; }
     return g_scriptSymbols.at(name);
 }
 

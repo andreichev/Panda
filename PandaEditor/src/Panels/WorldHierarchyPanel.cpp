@@ -24,13 +24,9 @@ WorldHierarchyPanel::WorldHierarchyPanel(World *world, ComponentsDrawOutput *com
     , m_shiftSelectionRunning(false) {}
 
 void WorldHierarchyPanel::onImGuiRender() {
-    if (!m_world) {
-        return;
-    }
+    if (!m_world) { return; }
     ImGuiWindowFlags flags = 0;
-    if (m_world->isChanged()) {
-        flags |= ImGuiWindowFlags_UnsavedDocument;
-    }
+    if (m_world->isChanged()) { flags |= ImGuiWindowFlags_UnsavedDocument; }
     ImGui::Begin("World Hierarchy", nullptr, flags);
     m_rowIndex = 0;
     ImRect windowRect = {ImGui::GetWindowContentRegionMin(), ImGui::GetWindowContentRegionMax()};
@@ -38,12 +34,8 @@ void WorldHierarchyPanel::onImGuiRender() {
     if (m_world && !m_world->isEmpty()) {
         for (auto entityId : m_world->m_registry.view<entt::entity>()) {
             Entity entity(entityId, m_world);
-            if (!entity.isValid()) {
-                continue;
-            }
-            if (!entity.getParent()) {
-                drawEntityNode(entity);
-            }
+            if (!entity.isValid()) { continue; }
+            if (!entity.getParent()) { drawEntityNode(entity); }
         }
     }
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
@@ -78,9 +70,7 @@ void WorldHierarchyPanel::onImGuiRender() {
                 std::vector<Entity> droppedEntities;
                 for (int i = 0; i < item.count; i++) {
                     Entity entity = m_world->getById(droppedIds[i]);
-                    if (entity.getParent()) {
-                        droppedEntities.push_back(entity);
-                    }
+                    if (entity.getParent()) { droppedEntities.push_back(entity); }
                 }
                 if (!droppedEntities.empty()) {
                     WorldCommandManager &cmd = m_world->getCommandManger();
@@ -92,13 +82,7 @@ void WorldHierarchyPanel::onImGuiRender() {
         ImGui::EndDragDropTarget();
     }
     ImGui::Begin("Properties");
-    if (!selected.empty()) {
-        if (selected.size() == 1) {
-            m_componentsDraw.drawComponents(selected[0]);
-        } else {
-            ImGui::Text("Multiple edit not supported yet");
-        }
-    }
+    if (!selected.empty()) { m_componentsDraw.drawComponents(selected); }
     ImGui::End();
     ImGui::End();
 
@@ -126,9 +110,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     flags |= ImGuiTreeNodeFlags_OpenOnArrow;
     flags |= ImGuiTreeNodeFlags_SpanFullWidth;
     flags |= ImGuiTreeNodeFlags_FramePadding;
-    if (!entity.hasAnyChild()) {
-        flags |= ImGuiTreeNodeFlags_Leaf;
-    }
+    if (!entity.hasAnyChild()) { flags |= ImGuiTreeNodeFlags_Leaf; }
     void *id = reinterpret_cast<void *>(entity.m_handle);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {0, 0});
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 3});
@@ -187,14 +169,10 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
                 std::vector<Entity> droppedEntities;
                 for (int i = 0; i < item.count; i++) {
                     // If we didn't drop to the same entity
-                    if (droppedIds[i] == entity.getId()) {
-                        continue;
-                    }
+                    if (droppedIds[i] == entity.getId()) { continue; }
                     Entity droppedEntity = m_world->getById(droppedIds[i]);
                     // If entity doesn't have that child already
-                    if (entity.hasChild(droppedEntity)) {
-                        continue;
-                    }
+                    if (entity.hasChild(droppedEntity)) { continue; }
                     droppedEntities.push_back(droppedEntity);
                 }
                 if (!droppedEntities.empty()) {
@@ -267,9 +245,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     if (opened) {
         const std::vector<UUID> &children = entity.getChildEntities();
         for (auto child : children) {
-            if (!m_world->isValid(child)) {
-                continue;
-            }
+            if (!m_world->isValid(child)) { continue; }
             drawEntityNode(m_world->getById(child));
         }
         ImGui::TreePop();
@@ -278,9 +254,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
 }
 
 void WorldHierarchyPanel::drawEntityCreateMenu() {
-    if (!ImGui::BeginMenu("Create")) {
-        return;
-    }
+    if (!ImGui::BeginMenu("Create")) { return; }
     if (ImGui::MenuItem("Empty Entity")) {
         Entity newEntity = m_world->instantiateEntity();
         newEntity.getComponent<TagComponent>().tag = "Empty Entity";

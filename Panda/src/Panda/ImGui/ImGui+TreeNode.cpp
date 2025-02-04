@@ -1,4 +1,5 @@
-#include <imgui.h>
+#include "Panda/ImGui/ImGui+TreeNode.hpp"
+
 #include <imgui_internal.h>
 
 namespace ImGui {
@@ -11,8 +12,7 @@ bool TreeNodeCustom(
     bool *out_pressed
 ) {
     ImGuiWindow *window = GetCurrentWindow();
-    if (window->SkipItems)
-        return false;
+    if (window->SkipItems) return false;
 
     ImGuiContext &g = *GImGui;
     const ImGuiStyle &style = g.Style;
@@ -24,8 +24,7 @@ bool TreeNodeCustom(
                                      ImMin(window->DC.CurrLineTextBaseOffset, style.FramePadding.y)
                                  );
 
-    if (!label_end)
-        label_end = FindRenderedTextEnd(label);
+    if (!label_end) label_end = FindRenderedTextEnd(label);
     const ImVec2 label_size = CalcTextSize(label, label_end, false);
 
     const float text_offset_x = g.FontSize + (display_frame ? padding.x * 3 : padding.x * 2
@@ -110,8 +109,7 @@ bool TreeNodeCustom(
     if (!is_visible) {
         // if (store_tree_node_stack_data && is_open)
         //     TreeNodeStoreStackData(flags); // Call before TreePushOverrideID()
-        if (is_open && !(flags & ImGuiTreeNodeFlags_NoTreePushOnOpen))
-            TreePushOverrideID(id);
+        if (is_open && !(flags & ImGuiTreeNodeFlags_NoTreePushOnOpen)) TreePushOverrideID(id);
         IMGUI_TEST_ENGINE_ITEM_INFO(
             g.LastItemData.ID,
             label,
@@ -131,8 +129,7 @@ bool TreeNodeCustom(
     if ((flags & ImGuiTreeNodeFlags_AllowOverlap) ||
         (g.LastItemData.InFlags & ImGuiItemFlags_AllowOverlap))
         button_flags |= ImGuiButtonFlags_AllowOverlap;
-    if (!is_leaf)
-        button_flags |= ImGuiButtonFlags_PressedOnDragDropHold;
+    if (!is_leaf) button_flags |= ImGuiButtonFlags_PressedOnDragDropHold;
 
     // We allow clicking on the arrow section with keyboard modifiers held, in order to easily
     // allow browsing a tree while preserving selection with code implementing multi-selection
@@ -219,8 +216,7 @@ bool TreeNodeCustom(
     if (is_multi_select) {
         bool pressed_copy = pressed && !toggled;
         MultiSelectItemFooter(id, &selected, &pressed_copy);
-        if (pressed)
-            SetNavID(id, window->DC.NavLayerCurrent, g.CurrentFocusScopeId, interact_bb);
+        if (pressed) SetNavID(id, window->DC.NavLayerCurrent, g.CurrentFocusScopeId, interact_bb);
     }
 
     if (selected != was_selected)
@@ -262,8 +258,7 @@ bool TreeNodeCustom(
                 text_pos.x -= text_offset_x - padding.x;
             if (flags & ImGuiTreeNodeFlags_ClipLabelForTrailingButton)
                 frame_bb.Max.x -= g.FontSize + style.FramePadding.x;
-            if (g.LogEnabled)
-                LogSetNextTextDecoration("###", "###");
+            if (g.LogEnabled) LogSetNextTextDecoration("###", "###");
         } else {
             // Unframed typed for tree nodes
             if (hovered || selected) {
@@ -291,12 +286,10 @@ bool TreeNodeCustom(
                             : ImGuiDir_Right,
                     0.70f
                 );
-            if (g.LogEnabled)
-                LogSetNextTextDecoration(">", NULL);
+            if (g.LogEnabled) LogSetNextTextDecoration(">", NULL);
         }
 
-        if (span_all_columns)
-            TablePopBackgroundChannel();
+        if (span_all_columns) TablePopBackgroundChannel();
 
         // Label
         if (display_frame)
