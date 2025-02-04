@@ -24,6 +24,7 @@ public:
     }
 
     void addSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
+        if (isSelected(entity)) { return; }
         m_selectedEntities.push_back(entity);
         //  Далее избегаем того, что при перемещении родителя трансформация будет применяться и к
         //  детям.

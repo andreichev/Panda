@@ -7,14 +7,10 @@ namespace Panda {
 
 class UpdateRigidbody2DCommand : public WorldCommand {
 public:
-    UpdateRigidbody2DCommand(const std::vector<Entity> &entities, Rigidbody2DComponent newRigidbody)
+    UpdateRigidbody2DCommand(const std::vector<Entity> &entities)
         : m_entities(entities)
-        , m_newRigidbody(newRigidbody)
-        , m_prevRigidbodies() {
-        for (auto entity : entities) {
-            m_prevRigidbodies[entity.getId()] = entity.getComponent<Rigidbody2DComponent>();
-        }
-    }
+        , m_newRigidbodies()
+        , m_prevRigidbodies() {}
 
     bool undo() override {
         for (Entity entity : m_entities) {
@@ -29,7 +25,7 @@ public:
     bool execute() override {
         for (Entity entity : m_entities) {
             if (!entity.isValid()) { return false; }
-            entity.setComponent(m_newRigidbody);
+            entity.setComponent(m_newRigidbodies[entity.getId()]);
             entity.physics2DPropertiesUpdated();
             entity.setWorldChanged();
         }
@@ -44,9 +40,21 @@ public:
         PND_ASSERT(false, "NOT IMPLEMENTED");
     }
 
+    void saveBeforeEdit() {
+        for (auto entity : m_entities) {
+            m_prevRigidbodies[entity.getId()] = entity.getComponent<Rigidbody2DComponent>();
+        }
+    }
+
+    void saveAfterEdit() {
+        for (auto entity : m_entities) {
+            m_newRigidbodies[entity.getId()] = entity.getComponent<Rigidbody2DComponent>();
+        }
+    }
+
 private:
     std::vector<Entity> m_entities;
-    Rigidbody2DComponent m_newRigidbody;
+    std::unordered_map<UUID, Rigidbody2DComponent> m_newRigidbodies;
     std::unordered_map<UUID, Rigidbody2DComponent> m_prevRigidbodies;
 };
 

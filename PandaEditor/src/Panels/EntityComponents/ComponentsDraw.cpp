@@ -370,9 +370,11 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
             checkbox("Primary", &component.isPrimary, false);
             int selectedPos = combo(
-                "Projection", {"Perspective", "Orthographic"}, (int)camera.getProjectionType()
+                "Projection",
+                {"Perspective", "Orthographic"},
+                (int)camera.getProjectionType(),
+                false
             );
-
             camera.setProjectionType((WorldCamera::ProjectionType)selectedPos);
             if (camera.getProjectionType() == WorldCamera::ProjectionType::PERSPECTIVE) {
                 float perspectiveVerticalFov = camera.getFieldOfView();
@@ -395,50 +397,174 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
         "Rigidbody 2D",
         entities,
         true,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &component) {
-            if (isMultiSelect) {
-                ImGui::Text("Multi edit not supported");
-                return;
-            }
+        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &firstComponent) {
+            bool modified = false;
+            UpdateRigidbody2DCommand update(entities);
+            update.saveBeforeEdit();
+            // Body type
             const char *bodyTypeStrings[] = {"Static", "Dynamic", "Kinematic"};
-            const char *currentBodyTypeString = bodyTypeStrings[(int)component.type];
+            const char *currentBodyTypeString = bodyTypeStrings[(int)firstComponent.type];
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0);
-
-            Rigidbody2DComponent rb2d = component;
-            int selectedPos =
-                combo("Body Type", {"Static", "Dynamic", "Kinematic"}, (int)component.type);
-            if (selectedPos != (int)component.type) {
-                rb2d.type = (Rigidbody2DComponent::BodyType)selectedPos;
-                UpdateRigidbody2DCommand update(entities, rb2d);
-                cmd.SAVE(update);
+            bool bodyTypeInconsistent = isInconsistentPrimitive<int, Rigidbody2DComponent>(
+                entities, [](const Rigidbody2DComponent &other) { return (int)other.type; }
+            );
+            int selectedPos = combo(
+                "Body Type",
+                {"Static", "Dynamic", "Kinematic"},
+                (int)firstComponent.type,
+                bodyTypeInconsistent
+            );
+            if (selectedPos != (int)firstComponent.type) {
+                for (Entity entity : entities) {
+                    auto &component = entity.getComponent<Rigidbody2DComponent>();
+                    component.type = (Rigidbody2DComponent::BodyType)selectedPos;
+                }
+                modified = true;
             }
-            if (checkbox("Fixed Rotation", &rb2d.fixedRotation, false)) {
-                UpdateRigidbody2DCommand update(entities, rb2d);
-                cmd.SAVE(update);
+            // Fixed Rotation
+            bool fixedRotationInconsistent = isInconsistentPrimitive<bool, Rigidbody2DComponent>(
+                entities, [](const Rigidbody2DComponent &other) { return other.fixedRotation; }
+            );
+            if (checkbox(
+                    "Fixed Rotation", &firstComponent.fixedRotation, fixedRotationInconsistent
+                )) {
+                for (Entity entity : entities) {
+                    auto &component = entity.getComponent<Rigidbody2DComponent>();
+                    component.fixedRotation = firstComponent.fixedRotation;
+                }
+                modified = true;
             }
             ImGui::PopStyleVar();
+            if (modified) {
+                update.saveAfterEdit();
+                cmd.SAVE(update);
+                firstEntity.setWorldChanged();
+            }
         }
     );
     drawComponent<BoxCollider2DComponent>(
         "Box Collider 2D",
         entities,
         true,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &component) {
-            if (isMultiSelect) {
-                ImGui::Text("Multi edit not supported");
-                return;
-            }
-            BoxCollider2DComponent bc2d = component;
+        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &firstComponent) {
             bool modified = false;
-            modified |= checkbox("Is Sensor", &bc2d.isSensor, false);
-            modified |= dragFloat2("Offset", glm::value_ptr(bc2d.offset));
-            modified |= dragFloat2("Size", glm::value_ptr(bc2d.size));
-            modified |= dragFloat("Density", &bc2d.density, 0.01f, 0.0f, 1.0f);
-            modified |= dragFloat("Friction", &bc2d.friction, 0.01f, 0.0f, 1.0f);
-            modified |= dragFloat("Restitution", &bc2d.restitution, 0.01f, 0.0f, 1.0f);
+            UpdateBoxCollider2DCommand update(entities);
+            update.saveBeforeEdit();
+            // Is Sensor
+            bool isSensorInconsistent = isInconsistentPrimitive<bool, BoxCollider2DComponent>(
+                entities, [](const BoxCollider2DComponent &other) { return other.isSensor; }
+            );
+            if (checkbox("Is Sensor", &firstComponent.isSensor, isSensorInconsistent)) {
+                for (Entity entity : entities) {
+                    auto &component = entity.getComponent<BoxCollider2DComponent>();
+                    component.isSensor = firstComponent.isSensor;
+                }
+                modified = true;
+            }
+            // Offset
+            bool offsetInconsistent = isInconsistentPrimitive<glm::vec2, BoxCollider2DComponent>(
+                entities, [](const BoxCollider2DComponent &other) { return other.offset; }
+            );
+            if (dragFloat2(
+                    "Offset",
+                    glm::value_ptr(firstComponent.offset),
+                    0.01f,
+                    0.0f,
+                    0.0f,
+                    "%.3f",
+                    0,
+                    offsetInconsistent
+                )) {
+                for (Entity entity : entities) {
+                    auto &component = entity.getComponent<BoxCollider2DComponent>();
+                    component.offset = firstComponent.offset;
+                }
+                modified = true;
+            }
+            // Size
+            bool sizeInconsistent = isInconsistentPrimitive<glm::vec2, BoxCollider2DComponent>(
+                entities, [](const BoxCollider2DComponent &other) { return other.size; }
+            );
+            if (dragFloat2(
+                    "Size",
+                    glm::value_ptr(firstComponent.size),
+                    0.01f,
+                    0.0f,
+                    0.0f,
+                    "%.3f",
+                    0,
+                    sizeInconsistent
+                )) {
+                for (Entity entity : entities) {
+                    auto &component = entity.getComponent<BoxCollider2DComponent>();
+                    component.size = firstComponent.size;
+                }
+                modified = true;
+            }
+            // Density
+            bool densityInconsistent = isInconsistentPrimitive<float, BoxCollider2DComponent>(
+                entities, [](const BoxCollider2DComponent &other) { return other.density; }
+            );
+            if (dragFloat(
+                    "Density",
+                    &firstComponent.density,
+                    0.01f,
+                    0.0f,
+                    1.0f,
+                    "%.3f",
+                    0,
+                    densityInconsistent
+                )) {
+                for (Entity entity : entities) {
+                    auto &component = entity.getComponent<BoxCollider2DComponent>();
+                    component.density = firstComponent.density;
+                }
+                modified = true;
+            }
+            // Friction
+            bool frictionInconsistent = isInconsistentPrimitive<float, BoxCollider2DComponent>(
+                entities, [](const BoxCollider2DComponent &other) { return other.friction; }
+            );
+            if (dragFloat(
+                    "Friction",
+                    &firstComponent.friction,
+                    0.01f,
+                    0.0f,
+                    1.0f,
+                    "%.3f",
+                    0,
+                    frictionInconsistent
+                )) {
+                for (Entity entity : entities) {
+                    auto &component = entity.getComponent<BoxCollider2DComponent>();
+                    component.friction = firstComponent.friction;
+                }
+                modified = true;
+            }
+            // Restitution
+            bool restitutionInconsistent = isInconsistentPrimitive<float, BoxCollider2DComponent>(
+                entities, [](const BoxCollider2DComponent &other) { return other.restitution; }
+            );
+            if (dragFloat(
+                    "Restitution",
+                    &firstComponent.restitution,
+                    0.01f,
+                    0.0f,
+                    1.0f,
+                    "%.3f",
+                    0,
+                    restitutionInconsistent
+                )) {
+                for (Entity entity : entities) {
+                    auto &component = entity.getComponent<BoxCollider2DComponent>();
+                    component.restitution = firstComponent.restitution;
+                }
+                modified = true;
+            }
             if (modified) {
-                UpdateBoxCollider2DCommand update(entities, bc2d);
+                update.saveAfterEdit();
                 cmd.SAVE(update);
+                firstEntity.setWorldChanged();
             }
         }
     );

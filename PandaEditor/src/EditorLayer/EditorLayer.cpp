@@ -436,8 +436,15 @@ SceneState EditorLayer::toolbarGetCurrentSceneState() {
 
 void EditorLayer::viewportPickEntityWithId(UUID id) {
     if (!m_currentWorld) { return; }
+    SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
     Entity selected = m_currentWorld->getById(id);
-    if (selected.isValid()) { m_currentWorld->getSelectionContext().addSelectedEntity(selected); }
+    if (selected.isValid()) {
+        if (selectionContext.isSelected(selected)) {
+            selectionContext.removeSelectedEntity(selected);
+        } else {
+            selectionContext.addSelectedEntity(selected);
+        }
+    }
 }
 
 void EditorLayer::viewportUnselectAll() {

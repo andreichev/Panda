@@ -74,7 +74,8 @@ bool dragFloat(
     float v_min,
     float v_max,
     const char *format,
-    ImGuiSliderFlags flags
+    ImGuiSliderFlags flags,
+    bool isInconsistent
 ) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
@@ -82,12 +83,15 @@ bool dragFloat(
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
-    bool result = ImGui::DragFloat("", v, v_speed, v_min, v_max, format, flags);
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, isInconsistent);
+    bool result =
+        ImGui::DragScalarCustom("", ImGuiDataType_Float, v, v_speed, &v_min, &v_max, format, flags);
+    ImGui::PopItemFlag();
     ImGui::PopItemWidth();
     ImGui::Columns(1);
     ImGui::PopID();
@@ -102,7 +106,8 @@ bool dragFloat2(
     float v_min,
     float v_max,
     const char *format,
-    ImGuiSliderFlags flags
+    ImGuiSliderFlags flags,
+    bool isInconsistent
 ) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
@@ -110,12 +115,16 @@ bool dragFloat2(
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
-    bool result = ImGui::DragFloat2("", v, v_speed, v_min, v_max, format, flags);
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, isInconsistent);
+    bool result = ImGui::DragScalarCustomN(
+        "", ImGuiDataType_Float, v, 2, v_speed, &v_min, &v_max, format, flags
+    );
+    ImGui::PopItemFlag();
     ImGui::PopItemWidth();
     ImGui::Columns(1);
     ImGui::PopID();
@@ -130,7 +139,8 @@ bool dragFloat3(
     float v_min,
     float v_max,
     const char *format,
-    ImGuiSliderFlags flags
+    ImGuiSliderFlags flags,
+    bool isInconsistent
 ) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
@@ -138,12 +148,16 @@ bool dragFloat3(
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
-    bool result = ImGui::DragFloat3("", v, v_speed, v_min, v_max, format, flags);
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, isInconsistent);
+    bool result = ImGui::DragScalarCustomN(
+        "", ImGuiDataType_Float, v, 3, v_speed, &v_min, &v_max, format, flags
+    );
+    ImGui::PopItemFlag();
     ImGui::PopItemWidth();
     ImGui::Columns(1);
     ImGui::PopID();
@@ -158,19 +172,24 @@ bool dragFloat4(
     float v_min,
     float v_max,
     const char *format,
-    ImGuiSliderFlags flags
+    ImGuiSliderFlags flags,
+    bool isInconsistent
 ) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
-    bool result = ImGui::DragFloat4("", v, v_speed, v_min, v_max, format, flags);
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, isInconsistent);
+    bool result = ImGui::DragScalarCustomN(
+        "", ImGuiDataType_Float, v, 4, v_speed, &v_min, &v_max, format, flags
+    );
+    ImGui::PopItemFlag();
     ImGui::PopItemWidth();
     ImGui::Columns(1);
     ImGui::PopID();
@@ -217,19 +236,24 @@ bool dragInt2(
     int v_min,
     int v_max,
     const char *format,
-    ImGuiSliderFlags flags
+    ImGuiSliderFlags flags,
+    bool isInconsistent
 ) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
-    bool result = ImGui::DragInt2("", v, v_speed, v_min, v_max, format, flags);
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, isInconsistent);
+    bool result = ImGui::DragScalarCustomN(
+        "", ImGuiDataType_S32, v, 2, v_speed, &v_min, &v_max, format, flags
+    );
+    ImGui::PopItemFlag();
     ImGui::PopItemWidth();
     ImGui::Columns(1);
     ImGui::PopID();
@@ -244,7 +268,8 @@ bool dragInt3(
     int v_min,
     int v_max,
     const char *format,
-    ImGuiSliderFlags flags
+    ImGuiSliderFlags flags,
+    bool isInconsistent
 ) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
@@ -252,12 +277,16 @@ bool dragInt3(
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
-    bool result = ImGui::DragInt3("", v, v_speed, v_min, v_max, format, flags);
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, isInconsistent);
+    bool result = ImGui::DragScalarCustomN(
+        "", ImGuiDataType_S32, v, 3, v_speed, &v_min, &v_max, format, flags
+    );
+    ImGui::PopItemFlag();
     ImGui::PopItemWidth();
     ImGui::Columns(1);
     ImGui::PopID();
@@ -272,7 +301,8 @@ bool dragInt4(
     int v_min,
     int v_max,
     const char *format,
-    ImGuiSliderFlags flags
+    ImGuiSliderFlags flags,
+    bool isInconsistent
 ) {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
@@ -280,12 +310,16 @@ bool dragInt4(
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
-    bool result = ImGui::DragInt4("", v, v_speed, v_min, v_max, format, flags);
+    ImGui::PushItemFlag(ImGuiItemFlags_MixedValue, isInconsistent);
+    bool result = ImGui::DragScalarCustomN(
+        "", ImGuiDataType_S32, v, 4, v_speed, &v_min, &v_max, format, flags
+    );
+    ImGui::PopItemFlag();
     ImGui::PopItemWidth();
     ImGui::Columns(1);
     ImGui::PopID();
@@ -315,7 +349,9 @@ bool checkbox(const std::string &label, bool *v, bool isInconsistent) {
     return result;
 }
 
-int combo(const std::string &label, const std::vector<std::string> &list, int current) {
+int combo(
+    const std::string &label, const std::vector<std::string> &list, int current, bool isInconsistent
+) {
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 2));
@@ -323,7 +359,7 @@ int combo(const std::string &label, const std::vector<std::string> &list, int cu
     ImGui::PushID(label.c_str());
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label.c_str());
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label.c_str());
     ImGui::NextColumn();
     ImGui::Spacing();
 

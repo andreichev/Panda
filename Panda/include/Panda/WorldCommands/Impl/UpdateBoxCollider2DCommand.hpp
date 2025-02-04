@@ -7,16 +7,10 @@ namespace Panda {
 
 class UpdateBoxCollider2DCommand : public WorldCommand {
 public:
-    UpdateBoxCollider2DCommand(
-        const std::vector<Entity> &entities, BoxCollider2DComponent newCollider
-    )
+    UpdateBoxCollider2DCommand(const std::vector<Entity> &entities)
         : m_entities(entities)
-        , m_newCollider(newCollider)
-        , m_prevColliders() {
-        for (auto entity : entities) {
-            m_prevColliders[entity.getId()] = entity.getComponent<BoxCollider2DComponent>();
-        }
-    }
+        , m_newColliders()
+        , m_prevColliders() {}
 
     bool undo() override {
         for (Entity entity : m_entities) {
@@ -31,7 +25,7 @@ public:
     bool execute() override {
         for (Entity entity : m_entities) {
             if (!entity.isValid()) { return false; }
-            entity.setComponent(m_newCollider);
+            entity.setComponent(m_newColliders[entity.getId()]);
             entity.physics2DPropertiesUpdated();
             entity.setWorldChanged();
         }
@@ -46,12 +40,24 @@ public:
 
     void merge(WorldCommand &command) override {
         UpdateBoxCollider2DCommand &cmd = static_cast<UpdateBoxCollider2DCommand &>(command);
-        m_newCollider = cmd.m_newCollider;
+        m_newColliders = cmd.m_newColliders;
+    }
+
+    void saveBeforeEdit() {
+        for (auto entity : m_entities) {
+            m_prevColliders[entity.getId()] = entity.getComponent<BoxCollider2DComponent>();
+        }
+    }
+
+    void saveAfterEdit() {
+        for (auto entity : m_entities) {
+            m_newColliders[entity.getId()] = entity.getComponent<BoxCollider2DComponent>();
+        }
     }
 
 private:
     std::vector<Entity> m_entities;
-    BoxCollider2DComponent m_newCollider;
+    std::unordered_map<UUID, BoxCollider2DComponent> m_newColliders;
     std::unordered_map<UUID, BoxCollider2DComponent> m_prevColliders;
 };
 

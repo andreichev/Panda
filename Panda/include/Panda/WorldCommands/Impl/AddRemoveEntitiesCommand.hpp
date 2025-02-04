@@ -28,10 +28,18 @@ public:
     }
 
     bool execute() override {
+        if (m_entities.empty()) { return false; }
+        Entity firstEntity = m_entities[0];
+        World *world = firstEntity.getWorld();
+        SelectionContext &selectionContext = world->getSelectionContext();
         for (auto entity : m_entities) {
             EditorMetadataComponent &metadata = entity.getComponent<EditorMetadataComponent>();
             metadata.isDeleted = !metadata.isDeleted;
+            if (metadata.isDeleted && selectionContext.isSelected(entity)) {
+                selectionContext.removeSelectedEntity(entity);
+            }
         }
+        firstEntity.setWorldChanged();
         return true;
     }
 
