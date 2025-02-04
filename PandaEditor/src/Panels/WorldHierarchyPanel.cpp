@@ -229,6 +229,8 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
             for (auto entity : selectionContext.getSelectedEntities()) {
                 Entity duplicate = m_world->duplicateEntity(entity);
                 duplicates.push_back(duplicate);
+                selectionContext.removeSelectedEntity(entity, false);
+                selectionContext.addSelectedEntity(duplicate, false);
             }
             AddRemoveEntitiesCommand update(duplicates);
             cmd.SAVE(update, false);

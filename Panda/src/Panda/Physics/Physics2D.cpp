@@ -95,6 +95,7 @@ void Physics2D::update(World *world, double deltaTime) {
         transform.setPosition({position.x, position.y, 0.f});
         float rotationRad = b2Rot_GetAngle(rotation);
         transform.setRotationEuler({0.f, 0.f, glm::degrees(rotationRad)});
+        world->convertToLocalSpace(entity);
     }
     //----------------------------------//
     //          CONTACT EVENTS          //
@@ -169,7 +170,7 @@ void Physics2D::update(World *world, double deltaTime) {
 void Physics2D::registerEntity(Entity entity) {
     if (!isInitialized()) { return; }
     b2WorldId worldId = IntToB2WorldId(m_physicsWorldId);
-    auto &transform = entity.getTransform();
+    auto transform = entity.calculateWorldSpaceTransform();
     auto &rb2d = entity.getComponent<Rigidbody2DComponent>();
     float rotationDeg = transform.getRotationEuler().z;
     float rotationRad = glm::radians(rotationDeg);
@@ -220,7 +221,7 @@ void Physics2D::propertiesUpdated(Panda::Entity entity) {
     b2BodyId bodyId;
     memcpy(&bodyId, &runtimeData.data, sizeof(b2BodyId));
 
-    auto &transform = entity.getTransform();
+    auto transform = entity.calculateWorldSpaceTransform();
     float rotationDeg = transform.getRotationEuler().z;
     float rotationRad = glm::radians(rotationDeg);
     auto &rb2d = entity.getComponent<Rigidbody2DComponent>();

@@ -559,13 +559,15 @@ void EditorLayer::processShortcuts() {
         m_viewportFullscreen = !m_viewportFullscreen;
     }
     if (ImGui::IsKeyPressed(ImGuiKey_D, false) && ctrl) {
+        SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
         if (m_currentWorld) {
-            std::vector<Entity> selected =
-                m_currentWorld->getSelectionContext().getSelectedEntities();
+            std::vector<Entity> selected = selectionContext.getSelectedEntities();
             std::vector<Entity> copies;
             for (auto entity : selected) {
                 Entity duplicate = m_currentWorld->duplicateEntity(entity);
                 copies.push_back(duplicate);
+                selectionContext.removeSelectedEntity(entity, false);
+                selectionContext.addSelectedEntity(duplicate, false);
             }
             WorldCommandManager &cmd = m_currentWorld->getCommandManger();
             AddRemoveEntitiesCommand update(copies);

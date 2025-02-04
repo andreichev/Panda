@@ -527,8 +527,8 @@ Entity World::duplicateEntity(Entity entity) {
     if (!entity) { return {}; }
     entt::entity src = entity.m_handle;
     entt::entity dst = m_registry.create();
-    Entity newEntity = {dst, this};
     m_registry.emplace<IdComponent>(dst);
+    Entity newEntity = {dst, this};
     copyComponent<TagComponent>(src, dst, m_registry);
 #ifdef PND_EDITOR
     copyComponent<EditorMetadataComponent>(src, dst, m_registry);
@@ -554,19 +554,29 @@ Entity World::duplicateEntity(Entity entity) {
     // Duplicate relationship component
     {
         RelationshipComponent &srcRelationship = m_registry.get<RelationshipComponent>(src);
-        RelationshipComponent dstRelationship = srcRelationship;
+        RelationshipComponent &dstRelationship = m_registry.emplace<RelationshipComponent>(dst);
+        auto children = srcRelationship.children;
+        for (auto handle : children) {
+            if (!isValid(handle)) { continue; }
+            Entity child = getById(handle);
+            Entity clone = duplicateEntity(child);
+            clone.removeFromParent();
+            if (clone) {
+                clone.removeFromParent();
+                clone.getComponent<RelationshipComponent>().parent = newEntity.getId();
+                dstRelationship.children.push_back(clone.getId());
+            }
+        }
         if (srcRelationship.parent) {
+            dstRelationship.parent = srcRelationship.parent;
             Entity parent = getById(srcRelationship.parent);
             RelationshipComponent &parentRelationship =
                 parent.getComponent<RelationshipComponent>();
             parentRelationship.children.push_back(newEntity.getId());
         }
-        // TODO: Clone recursively children
-        dstRelationship.children = {};
-        m_registry.emplace<RelationshipComponent>(dst, dstRelationship);
     }
-    m_isChanged = true;
     m_entityIdMap[newEntity.getId()] = newEntity;
+    m_isChanged = true;
     return newEntity;
 }
 

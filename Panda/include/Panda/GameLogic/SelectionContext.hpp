@@ -51,7 +51,7 @@ public:
         updateValues();
     }
 
-    void removeSelectedEntity(Entity entity) {
+    void removeSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
         m_selectedEntities.erase(
             std::remove(m_selectedEntities.begin(), m_selectedEntities.end(), entity),
             m_selectedEntities.end()
@@ -60,7 +60,7 @@ public:
             std::remove(m_manipulatingEntities.begin(), m_manipulatingEntities.end(), entity),
             m_manipulatingEntities.end()
         );
-        updateValues();
+        if (needToCalculateMedian) { updateValues(); }
     }
 
     void unselectAll() {
