@@ -15,6 +15,8 @@
 
 namespace Panda {
 
+enum class VectorAxes { X = 1u << 0, Y = 1u << 1, Z = 1u << 2, W = 1u << 3 };
+
 void shiftCursorX(float distance);
 void shiftCursorY(float distance);
 void shiftCursor(float x, float y);
@@ -31,7 +33,8 @@ bool dragFloat(
     float v_min = 0.0f,
     float v_max = 0.0f,
     const char *format = "%.3f",
-    ImGuiSliderFlags flags = 0
+    ImGuiSliderFlags flags = 0,
+    bool isInconsistent = false
 );
 bool dragFloat2(
     const std::string &label,
@@ -40,7 +43,8 @@ bool dragFloat2(
     float v_min = 0.0f,
     float v_max = 0.0f,
     const char *format = "%.3f",
-    ImGuiSliderFlags flags = 0
+    ImGuiSliderFlags flags = 0,
+    bool isInconsistent = false
 );
 bool dragFloat3(
     const std::string &label,
@@ -49,7 +53,8 @@ bool dragFloat3(
     float v_min = 0.0f,
     float v_max = 0.0f,
     const char *format = "%.3f",
-    ImGuiSliderFlags flags = 0
+    ImGuiSliderFlags flags = 0,
+    bool isInconsistent = false
 );
 bool dragFloat4(
     const std::string &label,
@@ -58,7 +63,8 @@ bool dragFloat4(
     float v_min = 0.0f,
     float v_max = 0.0f,
     const char *format = "%.3f",
-    ImGuiSliderFlags flags = 0
+    ImGuiSliderFlags flags = 0,
+    bool isInconsistent = false
 );
 bool dragInt(
     const std::string &label,
@@ -67,7 +73,8 @@ bool dragInt(
     int v_min = 0,
     int v_max = 0,
     const char *format = "%d",
-    ImGuiSliderFlags flags = 0
+    ImGuiSliderFlags flags = 0,
+    bool isInconsistent = false
 ); // If v_min >= v_max we have no bound
 bool dragInt2(
     const std::string &label,
@@ -76,7 +83,8 @@ bool dragInt2(
     int v_min = 0,
     int v_max = 0,
     const char *format = "%d",
-    ImGuiSliderFlags flags = 0
+    ImGuiSliderFlags flags = 0,
+    bool isInconsistent = false
 );
 bool dragInt3(
     const std::string &label,
@@ -85,7 +93,8 @@ bool dragInt3(
     int v_min = 0,
     int v_max = 0,
     const char *format = "%d",
-    ImGuiSliderFlags flags = 0
+    ImGuiSliderFlags flags = 0,
+    bool isInconsistent = false
 );
 bool dragInt4(
     const std::string &label,
@@ -94,13 +103,23 @@ bool dragInt4(
     int v_min = 0,
     int v_max = 0,
     const char *format = "%d",
-    ImGuiSliderFlags flags = 0
+    ImGuiSliderFlags flags = 0,
+    bool isInconsistent = false
 );
-bool checkbox(const std::string &label, bool *v);
-int combo(const std::string &label, const std::vector<std::string> &list, int current);
-bool drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.f);
-bool propertyColor(const char *label, Color &value);
-bool propertyTexture(const char *label, UUID &textureId, Foundation::Shared<Asset> asset);
+bool checkbox(const std::string &label, bool *v, bool isInconsistent);
+int combo(
+    const std::string &label, const std::vector<std::string> &list, int current, bool isInconsistent
+);
+bool drawVec3Control(
+    const std::string &label,
+    glm::vec3 &values,
+    float resetValue = 0.f,
+    uint32_t inconsistentAxes = 0
+);
+bool propertyColor(const char *label, Color &value, bool isInconsistent);
+bool propertyTexture(
+    const char *label, UUID &textureId, Foundation::Shared<Asset> asset, bool isInconsistent
+);
 bool drawScriptFieldValue(ScriptField &field);
 
 } // namespace Panda

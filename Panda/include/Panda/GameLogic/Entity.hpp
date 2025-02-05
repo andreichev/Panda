@@ -16,7 +16,7 @@ class World;
 
 class Entity final {
 private:
-    entt::registry &worldGetRegistry();
+    entt::registry &worldGetRegistry() const;
 
 public:
     Entity();
@@ -65,7 +65,14 @@ public:
     }
 
     template<typename T>
-    bool hasComponent() {
+    T &getComponent() const {
+        PND_ASSERT(hasComponent<T>(), "Entity doesn't have component!");
+        entt::registry &registry = worldGetRegistry();
+        return registry.get<T>(m_handle);
+    }
+
+    template<typename T>
+    bool hasComponent() const {
         entt::registry &registry = worldGetRegistry();
         return registry.any_of<T>(m_handle);
     }
@@ -76,7 +83,17 @@ public:
 
     void removeFromParent();
 
+    bool hasChild(Entity entity);
+
+    bool hasAnyChild();
+
+    bool isAncestorOf(Entity entity);
+
+    bool isDescendantOf(Entity entity);
+
     TransformComponent &getTransform();
+
+    TransformComponent calculateWorldSpaceTransform();
 
     template<typename T>
     void setComponent(T &value) {
@@ -91,15 +108,13 @@ public:
 
     bool isValid() const;
 
-    std::string &getName() {
+    std::string &getName() const {
         return getComponent<TagComponent>().tag;
     }
 
     void setName(const std::string &name) {
         auto &tagComponent = getComponent<TagComponent>();
-        if (tagComponent.tag == name) {
-            return;
-        }
+        if (tagComponent.tag == name) { return; }
         tagComponent.tag = name;
         setWorldChanged();
     }
@@ -119,7 +134,7 @@ public:
     }
     operator bool() const;
 
-    UUID getId() {
+    UUID getId() const {
         return getComponent<IdComponent>().id;
     }
 
@@ -127,8 +142,9 @@ public:
     void physics2DPropertiesUpdated();
 
 #ifdef PND_EDITOR
-    bool isDeleted();
-    void sortWorld();
+    bool needToDestroy() const;
+    bool isDeleted() const;
+    void sortWorld() const;
     void setDeleted(bool deleted = true);
 #endif
 
@@ -142,7 +158,7 @@ private:
     friend class Physics2D;
     friend class WorldHierarchyPanel;
     friend class WorldMapper;
-    friend class AddRemoveEntityCommand;
+    friend class AddRemoveEntitiesCommand;
 };
 
 } // namespace Panda

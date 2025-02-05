@@ -113,9 +113,7 @@ public:
 
     void removeField(ScriptField &field) {
         auto it = std::remove(fields.begin(), fields.end(), field);
-        if (it != fields.end()) {
-            fields.erase(it);
-        }
+        if (it != fields.end()) { fields.erase(it); }
     }
 
     bool operator==(const ExternalScript &rhs) const {

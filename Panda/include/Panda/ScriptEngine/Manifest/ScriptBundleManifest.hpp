@@ -29,9 +29,7 @@ struct ScriptClassManifest final {
 
     ScriptFieldManifest getField(const char *name) const {
         for (auto &field : fields) {
-            if (strcmp(field.name, name) == 0) {
-                return field;
-            }
+            if (strcmp(field.name, name) == 0) { return field; }
         }
         return {0, nullptr, ScriptFieldType::UNKNOWN};
     }
@@ -46,9 +44,7 @@ struct ScriptBundleManifest final {
 
     ScriptClassManifest getClass(const char *name) const {
         for (auto &clazz : classes) {
-            if (strcmp(clazz.name, name) == 0) {
-                return clazz;
-            }
+            if (strcmp(clazz.name, name) == 0) { return clazz; }
         }
         return {};
     }

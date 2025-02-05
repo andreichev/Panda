@@ -9,9 +9,7 @@ void FullScreenToggle::initialize() {
 }
 
 void FullScreenToggle::update(double deltaTime) {
-    if (Panda::Input::isKeyJustPressed(Panda::Key::ESCAPE)) {
-        Panda::Application::get()->close();
-    }
+    if (Panda::Input::isKeyJustPressed(Panda::Key::ESCAPE)) { Panda::Application::get()->close(); }
     if (Panda::Input::isKeyJustPressed(Panda::Key::F)) {
         m_window->setFullScreen(!m_window->isFullScreen());
     }

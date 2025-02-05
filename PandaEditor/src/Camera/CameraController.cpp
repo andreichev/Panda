@@ -64,18 +64,10 @@ void CameraController::update(float deltaTime) {
     glm::vec3 cameraRotation = m_transform.getRotationEuler();
     glm::vec3 cameraPosition = m_transform.getPosition();
     float speed = m_moveSpeed * deltaTime;
-    if (ImGui::IsKeyDown(ImGuiKey_W)) {
-        m_transform.translate(m_front * speed);
-    }
-    if (ImGui::IsKeyDown(ImGuiKey_S)) {
-        m_transform.translate(-m_front * speed);
-    }
-    if (ImGui::IsKeyDown(ImGuiKey_A)) {
-        m_transform.translate(-m_right * speed);
-    }
-    if (ImGui::IsKeyDown(ImGuiKey_D)) {
-        m_transform.translate(m_right * speed);
-    }
+    if (ImGui::IsKeyDown(ImGuiKey_W)) { m_transform.translate(m_front * speed); }
+    if (ImGui::IsKeyDown(ImGuiKey_S)) { m_transform.translate(-m_front * speed); }
+    if (ImGui::IsKeyDown(ImGuiKey_A)) { m_transform.translate(-m_right * speed); }
+    if (ImGui::IsKeyDown(ImGuiKey_D)) { m_transform.translate(m_right * speed); }
     if (ImGui::IsKeyDown(ImGuiKey_MouseRight)) {
         ImVec2 mousePos = ImGui::GetMousePos();
         double mouseX = mousePos.x;

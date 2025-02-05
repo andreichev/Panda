@@ -60,9 +60,7 @@ private:
         const char *extension, const std::vector<std::string> &supportedExtensions
     ) {
         for (const auto &ext : supportedExtensions) {
-            if (strcmp(extension, ext.c_str()) == 0) {
-                return true;
-            }
+            if (strcmp(extension, ext.c_str()) == 0) { return true; }
         }
         return false;
     }
@@ -76,9 +74,7 @@ private:
         for (GLint i = 0; i < numExtensions; ++i) {
             const char *ext = reinterpret_cast<const char *>(glGetStringi(GL_EXTENSIONS, i));
             if (ext) {
-                if (Foundation::strCmp(ext, "GL_", 3) == 0) {
-                    ext += 3;
-                }
+                if (Foundation::strCmp(ext, "GL_", 3) == 0) { ext += 3; }
                 extensions.push_back(ext);
             }
         }

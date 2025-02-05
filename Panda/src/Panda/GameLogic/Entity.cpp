@@ -15,7 +15,7 @@ Entity::Entity()
     : m_handle(entt::null)
     , m_world(nullptr) {}
 
-entt::registry &Entity::worldGetRegistry() {
+entt::registry &Entity::worldGetRegistry() const {
     return m_world->m_registry;
 }
 
@@ -27,7 +27,20 @@ TransformComponent &Entity::getTransform() {
     return getComponent<TransformComponent>();
 }
 
+TransformComponent Entity::calculateWorldSpaceTransform() {
+    TransformComponent transformComponent;
+    glm::mat4 transform = m_world->getWorldSpaceTransformMatrix(*this);
+    transformComponent.setTransform(transform);
+    return transformComponent;
+}
+
 void Entity::addChildEntity(Entity entity) {
+    if (entity.isAncestorOf(*this)) {
+        LOG_ERROR_EDITOR(
+            "The entity {} can't be moved into one of its children.", entity.getName()
+        );
+        return;
+    }
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
     RelationshipComponent &otherRelationship = entity.getComponent<RelationshipComponent>();
 
@@ -50,18 +63,62 @@ void Entity::removeChildEntity(Entity entity) {
 
 void Entity::removeFromParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    if (!thisRelationship.parent) {
-        return;
-    }
+    if (!thisRelationship.parent) { return; }
     Entity parent = m_world->getById(thisRelationship.parent);
     parent.removeChildEntity(*this);
 }
 
+bool Entity::hasChild(Entity entity) {
+    RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
+    auto &children = thisRelationship.children;
+    return std::find(children.begin(), children.end(), entity.getId()) != children.end();
+}
+
+bool Entity::hasAnyChild() {
+    RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
+    auto &children = thisRelationship.children;
+#ifdef PND_EDITOR
+    std::vector<UUID> filtered;
+    std::copy_if(
+        children.begin(),
+        children.end(),
+        std::back_inserter(filtered),
+        [this](UUID entityId) {
+            entt::registry &registry = m_world->m_registry;
+            PND_ASSERT(
+                m_world->m_entityIdMap.find(entityId) != m_world->m_entityIdMap.end(),
+                "ENTITY DELETED"
+            );
+            entt::entity handle = m_world->m_entityIdMap.at(entityId);
+            auto &metadata = registry.get<EditorMetadataComponent>(handle);
+            return !metadata.isDeleted;
+        }
+    );
+    return !filtered.empty();
+#else
+    return !children.empty();
+#endif
+}
+
+bool Entity::isAncestorOf(Entity entity) {
+    auto &children = getChildEntities();
+    if (children.empty()) { return false; }
+    for (UUID childId : children) {
+        if (childId == entity.getId()) { return true; }
+    }
+    for (UUID childId : children) {
+        if (m_world->getById(childId).isAncestorOf(entity)) { return true; }
+    }
+    return false;
+}
+
+bool Entity::isDescendantOf(Entity entity) {
+    return entity.isAncestorOf(*this);
+}
+
 Entity Entity::getParent() {
     RelationshipComponent &thisRelationship = getComponent<RelationshipComponent>();
-    if (!thisRelationship.parent) {
-        return {};
-    }
+    if (!thisRelationship.parent) { return {}; }
     return m_world->getById(thisRelationship.parent);
 }
 
@@ -82,11 +139,15 @@ void Entity::physics2DPropertiesUpdated() {
 }
 
 #ifdef PND_EDITOR
-bool Entity::isDeleted() {
-    return getComponent<EditorMetadataComponent>().isDeleted;
+bool Entity::needToDestroy() const {
+    return m_world->needToDestroy(*this);
 }
 
-void Entity::sortWorld() {
+bool Entity::isDeleted() const {
+    return m_world->isDeleted(m_handle);
+}
+
+void Entity::sortWorld() const {
     m_world->sort();
 }
 

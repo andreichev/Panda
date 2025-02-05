@@ -26,6 +26,10 @@ private:
     void drawEntityCreateMenu();
 
     bool m_focused;
+    int m_rowIndex;
+    int m_firstSelectedRow;
+    int m_lastSelectedRow;
+    bool m_shiftSelectionRunning;
     ComponentsDraw m_componentsDraw;
     World *m_world;
 };

@@ -8,37 +8,42 @@ namespace Panda {
 template<typename T>
 class AddRemoveComponentCommand : public WorldCommand {
 public:
-    AddRemoveComponentCommand(Entity entity)
-        : m_entity(entity) {}
+    AddRemoveComponentCommand(const std::vector<Entity> &entities)
+        : m_entities(entities) {}
 
     bool undo() override {
         return execute();
     }
 
     bool execute() override {
-        if (!m_entity.isValid()) {
-            return false;
+        bool allEntitiesHaveComponent = true;
+        for (Entity entity : m_entities) {
+            if (!entity.hasComponent<T>()) {
+                allEntitiesHaveComponent = false;
+                break;
+            }
         }
-        if (m_entity.hasComponent<T>()) {
-            component = m_entity.getComponent<T>();
-            m_entity.removeComponent<T>();
-        } else {
-            m_entity.addComponent<T>(component);
+        for (Entity entity : m_entities) {
+            if (!entity.isValid()) { return false; }
+            if (allEntitiesHaveComponent) {
+                component = entity.getComponent<T>();
+                entity.removeComponent<T>();
+            } else if (!entity.hasComponent<T>()) {
+                entity.addComponent<T>(component);
+            }
+            entity.setWorldChanged();
         }
-        m_entity.setWorldChanged();
         return true;
     }
 
     bool canMerge(WorldCommand &command) override {
-        if (typeid(command) != typeid(*this)) {
-            return false;
-        }
+        if (typeid(command) != typeid(*this)) { return false; }
         AddRemoveComponentCommand &other = static_cast<AddRemoveComponentCommand &>(command);
-        return other.m_entity == m_entity;
+        return other.m_entities == m_entities;
     }
 
 private:
-    Entity m_entity;
+    std::vector<Entity> m_entities;
     T component;
 };
 

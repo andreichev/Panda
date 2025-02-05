@@ -23,15 +23,11 @@ void Toolbar::onImGuiRender(float offsetY) {
     );
     ImGui::SetCursorPos({200.f, 4.f});
     ImGui::BeginDisabled(m_output->toolbarCanUndo() == false);
-    if (ImGui::Button(getString(ICON_UNDO).c_str())) {
-        m_output->toolbarUndo();
-    }
+    if (ImGui::Button(getString(ICON_UNDO).c_str())) { m_output->toolbarUndo(); }
     ImGui::EndDisabled();
     ImGui::SameLine();
     ImGui::BeginDisabled(m_output->toolbarCanRedo() == false);
-    if (ImGui::Button(getString(ICON_REPEAT).c_str())) {
-        m_output->toolbarRedo();
-    }
+    if (ImGui::Button(getString(ICON_REPEAT).c_str())) { m_output->toolbarRedo(); }
     ImGui::EndDisabled();
     ImGui::SetCursorPos({width / 2.f - 70.f, 4.f});
     switch (m_output->toolbarGetCurrentSceneState()) {

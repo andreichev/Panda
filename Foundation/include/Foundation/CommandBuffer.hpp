@@ -53,9 +53,7 @@ public:
 
     Command *read() {
         Header &header = readHeader();
-        if (m_pos == 0 || header.size == COMMAND_BUFFER_FINISH_KEY) {
-            return nullptr;
-        }
+        if (m_pos == 0 || header.size == COMMAND_BUFFER_FINISH_KEY) { return nullptr; }
         align(header.align);
         Command *cmd = (Command *)read(header.size);
         return cmd;

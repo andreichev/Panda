@@ -7,31 +7,39 @@ namespace Panda {
 
 class HierarchyCommand : public WorldCommand {
 public:
-    HierarchyCommand(Entity entity, Entity newParent)
-        : m_entity(entity)
+    HierarchyCommand(const std::vector<Entity> &entities, Entity newParent)
+        : m_entities(entities)
         , m_newParent(newParent) {
-        m_prevParent = entity.getParent();
+        PND_ASSERT(!entities.empty(), "Entities should not be empty");
+        for (auto entity : entities) {
+            m_prevParents[entity.getId()] = entity.getParent();
+        }
     }
 
     bool undo() override {
-        if (m_prevParent) {
-            m_prevParent.addChildEntity(m_entity);
-        } else {
-            m_entity.removeFromParent();
+        for (auto entity : m_entities) {
+            UUID entityId = entity.getId();
+            if (m_prevParents.at(entityId).isValid()) {
+                m_prevParents.at(entityId).addChildEntity(entity);
+            } else {
+                entity.removeFromParent();
+            }
         }
-        m_entity.sortWorld();
-        m_entity.setWorldChanged();
+        m_entities[0].sortWorld();
+        m_entities[0].setWorldChanged();
         return true;
     }
 
     bool execute() override {
-        if (m_newParent) {
-            m_newParent.addChildEntity(m_entity);
-        } else {
-            m_entity.removeFromParent();
+        for (auto entity : m_entities) {
+            if (m_newParent) {
+                m_newParent.addChildEntity(entity);
+            } else {
+                entity.removeFromParent();
+            }
         }
-        m_entity.sortWorld();
-        m_entity.setWorldChanged();
+        m_entities[0].sortWorld();
+        m_entities[0].setWorldChanged();
         return true;
     }
 
@@ -40,9 +48,9 @@ public:
     }
 
 private:
-    Entity m_entity;
+    std::vector<Entity> m_entities;
     Entity m_newParent;
-    Entity m_prevParent;
+    std::unordered_map<UUID, Entity> m_prevParents;
 };
 
 } // namespace Panda

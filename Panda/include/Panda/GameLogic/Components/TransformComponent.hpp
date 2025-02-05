@@ -13,19 +13,19 @@ public:
     TransformComponent();
     // ------- Rotation -------
     void setRotationEuler(glm::vec3 degrees);
-    glm::vec3 getRotationEuler();
+    glm::vec3 getRotationEuler() const;
     void rotateEuler(glm::vec3 degrees);
     void setRotation(glm::quat quat);
-    glm::quat getRotation();
+    glm::quat getRotation() const;
     glm::mat4 getRotationMatrix();
     float distanceTo(TransformComponent tc);
     // ------- Position -------
-    glm::vec3 getPosition();
+    glm::vec3 getPosition() const;
     glm::vec4 getPositionHomogeneous();
     void translate(glm::vec3 offset);
     void setPosition(glm::vec3 pos);
     // ------- Scale -------
-    glm::vec3 getScale();
+    glm::vec3 getScale() const;
     void setScale(glm::vec3 scale);
     // ------- Matrices -------
     glm::mat4 getLocalTransform() const;

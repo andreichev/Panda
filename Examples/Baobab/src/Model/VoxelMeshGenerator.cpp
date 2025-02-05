@@ -49,9 +49,7 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
                 int z = voxelIndexZ + chunkIndexZ * Chunk::SIZE_Z;
 
                 Voxel *currentVoxel = chunk.get(voxelIndexX, voxelIndexY, voxelIndexZ);
-                if (currentVoxel == nullptr || currentVoxel->isAir()) {
-                    continue;
-                }
+                if (currentVoxel == nullptr || currentVoxel->isAir()) { continue; }
                 VoxelTextureData &textureData = VoxelTextureMapper::getTextureData(currentVoxel);
 
                 float uvSize = 1.f / 16.f;
@@ -470,8 +468,6 @@ void VoxelMeshGenerator::addFaceIndices(
 
 inline bool VoxelMeshGenerator::isAir(int x, int y, int z, ChunksStorage &chunks) {
     Voxel *voxel = chunks.getVoxel(x, y, z);
-    if (voxel == nullptr) {
-        return true;
-    }
+    if (voxel == nullptr) { return true; }
     return voxel->isAir();
 }

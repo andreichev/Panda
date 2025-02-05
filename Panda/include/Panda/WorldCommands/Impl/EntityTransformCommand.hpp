@@ -8,48 +8,72 @@ namespace Panda {
 
 class EntityTransformCommand : public WorldCommand {
 public:
-    EntityTransformCommand(Entity entity, TransformComponent newTransform)
-        : m_entity(entity)
-        , m_newTransform(newTransform)
-        , m_prevTransform(entity.getTransform()) {}
+    EntityTransformCommand(const std::vector<Entity> &entities)
+        : m_entities(entities)
+        , m_beforeTransforms()
+        , m_afterTransforms() {}
 
     bool undo() override {
-        if (!m_entity.isValid()) {
-            return false;
+        PND_ASSERT(!m_entities.empty(), "WRONG TRANSFORM COMMAND DATA");
+        bool selectionsUpdated = false;
+        SelectionContext &selectionContext = m_entities[0].getWorld()->getSelectionContext();
+        for (auto entity : m_entities) {
+            if (!entity.isValid()) { return false; }
+            auto &transformComponent = entity.getTransform();
+            glm::mat4 prevTransform = m_beforeTransforms[entity.getId()];
+            transformComponent.setTransform(prevTransform);
+            entity.setWorldChanged();
+            entity.physics2DPropertiesUpdated();
+            selectionsUpdated |= selectionContext.isSelected(entity);
         }
-        m_entity.setComponent(m_prevTransform);
-        m_entity.setWorldChanged();
-        m_entity.physics2DPropertiesUpdated();
+        if (selectionsUpdated) { selectionContext.updateValues(); }
         return true;
     }
 
     bool execute() override {
-        if (!m_entity.isValid()) {
-            return false;
+        PND_ASSERT(!m_entities.empty(), "WRONG TRANSFORM COMMAND DATA");
+        bool selectionsUpdated = false;
+        SelectionContext &selectionContext = m_entities[0].getWorld()->getSelectionContext();
+        for (auto entity : m_entities) {
+            if (!entity.isValid()) { return false; }
+            auto &transformComponent = entity.getTransform();
+            glm::mat4 newTransform = m_afterTransforms[entity.getId()];
+            transformComponent.setTransform(newTransform);
+            entity.setWorldChanged();
+            entity.physics2DPropertiesUpdated();
+            selectionsUpdated |= selectionContext.isSelected(entity);
         }
-        m_entity.setComponent(m_newTransform);
-        m_entity.setWorldChanged();
-        m_entity.physics2DPropertiesUpdated();
+        if (selectionsUpdated) { selectionContext.updateValues(); }
         return true;
     }
 
     bool canMerge(WorldCommand &command) override {
-        if (typeid(command) != typeid(*this)) {
-            return false;
-        }
+        if (typeid(command) != typeid(*this)) { return false; }
         EntityTransformCommand &other = static_cast<EntityTransformCommand &>(command);
-        return other.m_entity == m_entity;
+        return other.m_entities == m_entities;
     }
 
     void merge(WorldCommand &command) override {
         EntityTransformCommand &cmd = static_cast<EntityTransformCommand &>(command);
-        m_newTransform = cmd.m_newTransform;
+        m_afterTransforms = cmd.m_afterTransforms;
+    }
+
+    void saveBeforeEdit() {
+        for (auto entity : m_entities) {
+            m_beforeTransforms[entity.getId()] = entity.getTransform().getLocalTransform();
+        }
+    }
+
+    void saveAfterEdit() {
+        for (auto entity : m_entities) {
+            m_afterTransforms[entity.getId()] = entity.getTransform().getLocalTransform();
+        }
     }
 
 private:
-    Entity m_entity;
-    TransformComponent m_newTransform;
-    TransformComponent m_prevTransform;
+    std::vector<Entity> m_entities;
+    std::unordered_map<UUID, glm::mat4> m_beforeTransforms;
+    std::unordered_map<UUID, glm::mat4> m_afterTransforms;
 };
 
 } // namespace Panda

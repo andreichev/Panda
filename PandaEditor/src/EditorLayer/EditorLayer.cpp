@@ -5,7 +5,7 @@
 #include "Panels/Popups/EditorYesNoPopup.hpp"
 #include "Panels/Popups/PickScriptPopup.hpp"
 #include "Panels/Popups/EnterNamePopup.hpp"
-#include "Panda/WorldCommands/Impl/AddRemoveEntityCommand.hpp"
+#include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 
 namespace Panda {
 
@@ -55,9 +55,7 @@ void EditorLayer::onDetach() {
 
 void EditorLayer::onUpdate(double deltaTime) {
     processShortcuts();
-    if (!m_loader.hasOpenedProject()) {
-        return;
-    }
+    if (!m_loader.hasOpenedProject()) { return; }
     switch (m_sceneState) {
         case SceneState::EDIT: {
             m_cameraController.update(deltaTime);
@@ -115,9 +113,7 @@ void EditorLayer::onImGuiRender() {
 }
 
 void EditorLayer::onEvent(Event *event) {
-    if (event->type == EventType::WindowClose) {
-        closeApp();
-    }
+    if (event->type == EventType::WindowClose) { closeApp(); }
 }
 
 void EditorLayer::play() {
@@ -214,9 +210,7 @@ void EditorLayer::menuBarRedo() {
 
 void EditorLayer::menuBarOpenProject() {
     std::optional<path_t> optionalPath = SystemTools::openFolderDialog();
-    if (!optionalPath.has_value()) {
-        return;
-    }
+    if (!optionalPath.has_value()) { return; }
     path_t path = optionalPath.value();
     m_loader.openProject(path);
 }
@@ -281,54 +275,54 @@ void EditorLayer::menuBarCloseProject() {
 
 #pragma region Components draw output
 
-void EditorLayer::addScriptToEntity(Entity entity) {
+void EditorLayer::addScriptToEntities(const std::vector<Entity> &entities) {
     PickScriptPopup *popup = F_NEW(Foundation::getAllocator(), PickScriptPopup);
     popup->closeAction = [](void *data) {
         auto self = static_cast<EditorLayer *>(data);
         F_DELETE(Foundation::getAllocator(), self->m_popups.back());
         self->m_popups.pop_back();
     };
-    popup->selectAction = [](void *data, Entity entity, ScriptClassManifest clazz) {
-        auto self = static_cast<EditorLayer *>(data);
-        if (clazz.name) {
-            ScriptInstanceHandle id = ExternalCalls::instantiateScript(entity.getId(), clazz.name);
-            if (id) {
-                // Map manifest fields to internal ScriptField type
-                std::vector<ScriptField> fields;
-                for (auto manifestField : clazz.fields) {
-                    Foundation::Memory data;
-                    switch (manifestField.type) {
-                        case ScriptFieldType::INTEGER: {
-                            data = Foundation::Memory::alloc(sizeof(int));
-                            break;
+    popup->selectAction =
+        [](void *data, const std::vector<Entity> &entities, ScriptClassManifest clazz) {
+            auto self = static_cast<EditorLayer *>(data);
+            if (clazz.name) {
+                for (Entity entity : entities) {
+                    // Map manifest fields to internal ScriptField type
+                    std::vector<ScriptField> fields;
+                    for (auto manifestField : clazz.fields) {
+                        Foundation::Memory data;
+                        switch (manifestField.type) {
+                            case ScriptFieldType::INTEGER: {
+                                data = Foundation::Memory::alloc(sizeof(int));
+                                break;
+                            }
+                            case ScriptFieldType::FLOAT: {
+                                data = Foundation::Memory::alloc(sizeof(float));
+                                break;
+                            }
+                            case ScriptFieldType::TEXTURE:
+                            case ScriptFieldType::ENTITY: {
+                                data = Foundation::Memory::alloc(sizeof(UUID));
+                                break;
+                            }
+                            default: {
+                                PND_ASSERT(false, "Unknown field type");
+                            }
                         }
-                        case ScriptFieldType::FLOAT: {
-                            data = Foundation::Memory::alloc(sizeof(float));
-                            break;
-                        }
-                        case ScriptFieldType::TEXTURE:
-                        case ScriptFieldType::ENTITY: {
-                            data = Foundation::Memory::alloc(sizeof(UUID));
-                            break;
-                        }
-                        default: {
-                            PND_ASSERT(false, "Unknown field type");
-                        }
+                        ScriptField field(
+                            0, manifestField.handle, manifestField.name, manifestField.type, data
+                        );
+                        fields.emplace_back(field);
                     }
-                    ScriptField field(
-                        id, manifestField.handle, manifestField.name, manifestField.type, data
-                    );
-                    fields.emplace_back(field);
+                    // TODO: Bind previously picked values
+                    entity.addScript(Panda::ExternalScript(0, clazz.name, fields));
                 }
-                // TODO: Bind previously picked values
-                entity.addScript(Panda::ExternalScript(id, clazz.name, fields));
             }
-        }
-        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-        self->m_popups.pop_back();
-    };
+            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
+            self->m_popups.pop_back();
+        };
     popup->userData = this;
-    popup->entity = entity;
+    popup->entities = entities;
     popup->title = "Add Script";
     popup->subtitle = "Pick a script from available Script classes list.";
     m_popups.emplace_back(popup);
@@ -347,9 +341,7 @@ void EditorLayer::showCreateFolderPopup() {
     };
     popup->doneAction = [](void *data, std::string text) {
         auto self = static_cast<EditorLayer *>(data);
-        if (!text.empty()) {
-            self->m_contentBrowser.createFolder(text);
-        }
+        if (!text.empty()) { self->m_contentBrowser.createFolder(text); }
         F_DELETE(Foundation::getAllocator(), self->m_popups.back());
         self->m_popups.pop_back();
     };
@@ -443,17 +435,20 @@ SceneState EditorLayer::toolbarGetCurrentSceneState() {
 #pragma region Viewport output
 
 void EditorLayer::viewportPickEntityWithId(UUID id) {
-    if (!m_currentWorld) {
-        return;
-    }
+    if (!m_currentWorld) { return; }
+    SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
     Entity selected = m_currentWorld->getById(id);
     if (selected.isValid()) {
-        m_currentWorld->setSelectedEntity(selected);
+        if (selectionContext.isSelected(selected)) {
+            selectionContext.removeSelectedEntity(selected);
+        } else {
+            selectionContext.addSelectedEntity(selected);
+        }
     }
 }
 
-void EditorLayer::viewportUnselectEntity() {
-    m_currentWorld->setSelectedEntity(Entity());
+void EditorLayer::viewportUnselectAll() {
+    m_currentWorld->getSelectionContext().unselectAll();
 }
 
 #pragma endregion
@@ -469,30 +464,22 @@ void EditorLayer::updateWindowState() {
 }
 
 bool EditorLayer::canUndo() {
-    if (!m_currentWorld) {
-        return false;
-    }
+    if (!m_currentWorld) { return false; }
     return m_currentWorld->getCommandManger().CAN_UNDO();
 }
 
 void EditorLayer::undo() {
-    if (!m_currentWorld) {
-        return;
-    }
+    if (!m_currentWorld) { return; }
     m_currentWorld->getCommandManger().UNDO();
 }
 
 bool EditorLayer::canRedo() {
-    if (!m_currentWorld) {
-        return false;
-    }
+    if (!m_currentWorld) { return false; }
     return m_currentWorld->getCommandManger().CAN_REDO();
 }
 
 void EditorLayer::redo() {
-    if (!m_currentWorld) {
-        return;
-    }
+    if (!m_currentWorld) { return; }
     m_currentWorld->getCommandManger().REDO();
 }
 
@@ -548,9 +535,7 @@ void EditorLayer::processShortcuts() {
     bool ctrl = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
     bool shift = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
     if (ImGui::IsKeyPressed(ImGuiKey_S, false)) {
-        if (ctrl) {
-            saveWorld();
-        }
+        if (ctrl) { saveWorld(); }
     }
     if (ImGui::IsKeyPressed(ImGuiKey_Z, false)) {
         if (ctrl) {
@@ -562,9 +547,10 @@ void EditorLayer::processShortcuts() {
         } else {
             // Move to selected entity
             if (m_currentWorld) {
-                Entity selected = m_currentWorld->getSelectedEntity();
-                if (selected.isValid()) {
-                    m_cameraController.reset(selected.getTransform().getPosition());
+                SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
+                auto selected = selectionContext.getSelectedEntities();
+                if (!selected.empty()) {
+                    m_cameraController.reset(selectionContext.getMedianPosition());
                 }
             }
         }
@@ -573,12 +559,20 @@ void EditorLayer::processShortcuts() {
         m_viewportFullscreen = !m_viewportFullscreen;
     }
     if (ImGui::IsKeyPressed(ImGuiKey_D, false) && ctrl) {
+        SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
         if (m_currentWorld) {
-            Entity selected = m_currentWorld->getSelectedEntity();
-            Entity duplicate = m_currentWorld->duplicateEntity(selected);
+            std::vector<Entity> selected = selectionContext.getSelectedEntities();
+            std::vector<Entity> copies;
+            for (auto entity : selected) {
+                Entity duplicate = m_currentWorld->duplicateEntity(entity);
+                copies.push_back(duplicate);
+                selectionContext.removeSelectedEntity(entity, false);
+                selectionContext.addSelectedEntity(duplicate, false);
+            }
             WorldCommandManager &cmd = m_currentWorld->getCommandManger();
-            AddRemoveEntityCommand update(duplicate);
+            AddRemoveEntitiesCommand update(copies);
             cmd.SAVE(update, false);
+            m_currentWorld->sort();
             m_currentWorld->setChanged();
         }
     }

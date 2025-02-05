@@ -43,9 +43,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
             spriteRenderer.textureId = spriteRendererDto.texture;
         }
         // CUBE MAP COMPONENT
-        if (entityDto.cubeMapComponent.has_value()) {
-            entity.addComponent<SkyComponent>();
-        }
+        if (entityDto.cubeMapComponent.has_value()) { entity.addComponent<SkyComponent>(); }
         // PHYSICS 2D
         if (entityDto.rigidbody2dComponent.has_value()) {
             Rigidbody2DComponentDto &rigidbody2dDto = entityDto.rigidbody2dComponent.value();
@@ -84,17 +82,15 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
 WorldDto WorldMapper::toDto(const World &world) {
     WorldDto worldDto;
     World &_world = const_cast<World &>(world);
-    auto view = _world.m_registry.view<TagComponent>();
+    auto view = _world.m_registry.view<entt::entity>();
     for (auto entityId : view) {
-        if (!_world.isValidEntt(entityId)) {
-            continue;
-        }
+        if (!_world.isValidEntt(entityId)) { continue; }
         Entity entity(entityId, &_world);
         EntityDto entityDto;
         // ID COMPONENT
         { entityDto.id = entity.getId(); }
         // TAG COMPONENT
-        { entityDto.tagComponent = view.get<TagComponent>(entityId); }
+        { entityDto.tagComponent = entity.getComponent<TagComponent>(); }
         // RELATIONSHIP COMPONENT
         { entityDto.relationshipComponent = entity.getComponent<RelationshipComponent>(); }
         // TRANSFORM COMPONENT
@@ -152,9 +148,7 @@ WorldDto WorldMapper::toDto(const World &world) {
             entityDto.boxCollider2dComponent = boxCollider2dDto;
         }
         // CUBE MAP COMPONENT
-        if (entity.hasComponent<SkyComponent>()) {
-            entityDto.cubeMapComponent = CubeMapDto();
-        }
+        if (entity.hasComponent<SkyComponent>()) { entityDto.cubeMapComponent = CubeMapDto(); }
         // SCRIPT LIST COMPONENT
         {
             ScriptListComponentDto &scriptsComponentDto = entityDto.scriptListComponent;

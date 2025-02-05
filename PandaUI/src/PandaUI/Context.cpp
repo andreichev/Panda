@@ -28,9 +28,7 @@ Context::Context()
     m_renderer2d.setViewProj(m_camera.getProjection());
     m_renderer2d.setViewId(0);
     // Make background view transparent
-    if (m_rootView) {
-        m_rootView->setBackgroundColor(Color(0x00000000));
-    }
+    if (m_rootView) { m_rootView->setBackgroundColor(Color(0x00000000)); }
     // YGConfigRef config = YGConfigNew();
     // YGConfigSetUseWebDefaults(config, false);
 }

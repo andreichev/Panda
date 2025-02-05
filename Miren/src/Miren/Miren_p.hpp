@@ -246,7 +246,7 @@ struct Context {
     }
 
     void checkIfHasInitCommand() {
-        Foundation::CommandBuffer::Command *command = m_submit->getPreCommandQueue().read();
+        Foundation::CommandBuffer::Command *command = m_render->getPreCommandQueue().read();
         if (command != nullptr) {
             CMDBUF_LOG("RENDERER INIT COMMAND");
             PND_ASSERT(
@@ -264,9 +264,7 @@ struct Context {
         MIREN_LOG("RENDER FRAME BEGIN");
         m_render->getPreCommandQueue().finishWriting();
         m_render->getPostCommandQueue().finishWriting();
-        if (m_renderer == nullptr) {
-            checkIfHasInitCommand();
-        }
+        if (m_renderer == nullptr) { checkIfHasInitCommand(); }
         if (m_renderer == nullptr) {
             m_render->getPreCommandQueue().reset();
             m_render->getPostCommandQueue().reset();

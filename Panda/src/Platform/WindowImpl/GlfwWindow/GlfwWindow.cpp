@@ -127,9 +127,7 @@ bool GlfwWindow::isMaximized() {
 }
 
 void GlfwWindow::setMaximized(bool _isMaximized) {
-    if (isMaximized() == _isMaximized) {
-        return;
-    }
+    if (isMaximized() == _isMaximized) { return; }
     if (_isMaximized) {
         glfwMaximizeWindow(m_windowHandle);
     } else {
@@ -146,9 +144,7 @@ void GlfwWindow::setSize(Panda::Size size) {
     m_windowSizeBackup = size;
     int count;
     GLFWmonitor **monitorsHandle = glfwGetMonitors(&count);
-    if (count > 1) {
-        return;
-    }
+    if (count > 1) { return; }
     const GLFWvidmode *vidmode = glfwGetVideoMode(monitorsHandle[0]);
     glfwSetWindowPos(
         m_windowHandle,

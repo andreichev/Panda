@@ -141,6 +141,13 @@ struct Vec4 : public Rain::Codable {
         return q;
     }
 
+    bool operator==(const Vec4 &other) const {
+        return glm::epsilonEqual(x, other.x, FLT_EPSILON) &&
+               glm::epsilonEqual(y, other.y, FLT_EPSILON) &&
+               glm::epsilonEqual(z, other.z, FLT_EPSILON) &&
+               glm::epsilonEqual(w, other.w, FLT_EPSILON);
+    }
+
     RAIN_FIELDS_BEGIN(Vec4)
     RAIN_FIELD(x)
     RAIN_FIELD(y)

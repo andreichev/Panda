@@ -30,9 +30,7 @@ struct ConsolePanel {
     }
 
     static void loggerCallback(std::string_view message, MessageType type) {
-        if (!s_instance) {
-            return;
-        }
+        if (!s_instance) { return; }
         s_instance->addLog(message, type);
     }
 
@@ -44,17 +42,13 @@ struct ConsolePanel {
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 3.0f);
         ImGui::SetNextItemShortcut(ImGuiMod_Ctrl | ImGuiKey_O, ImGuiInputFlags_Tooltip);
-        if (ImGui::Button("Options")) {
-            ImGui::OpenPopup("Options");
-        }
+        if (ImGui::Button("Options")) { ImGui::OpenPopup("Options"); }
         ImGui::SameLine();
         if (ImGui::BeginPopup("Options")) {
             ImGui::Checkbox("Auto-scroll", &autoScroll);
             ImGui::EndPopup();
         }
-        if (ImGui::Button("Clear")) {
-            clearLog();
-        }
+        if (ImGui::Button("Clear")) { clearLog(); }
         ImGui::SameLine();
 
         std::stringstream s;
@@ -62,9 +56,7 @@ struct ConsolePanel {
         if (filterMode[0]) {
             ImGui::SetItemAllowOverlap();
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-            if (ImGui::Button(s.str().c_str())) {
-                filterMode[0] = false;
-            }
+            if (ImGui::Button(s.str().c_str())) { filterMode[0] = false; }
             ImGui::PopStyleColor();
         } else if (ImGui::Button(s.str().c_str())) {
             filterMode[0] = !filterMode[0];
@@ -75,9 +67,7 @@ struct ConsolePanel {
         if (filterMode[1]) {
             ImGui::SetItemAllowOverlap();
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-            if (ImGui::Button(s.str().c_str())) {
-                filterMode[1] = false;
-            }
+            if (ImGui::Button(s.str().c_str())) { filterMode[1] = false; }
             ImGui::PopStyleColor();
         } else if (ImGui::Button(s.str().c_str())) {
             filterMode[1] = !filterMode[1];
@@ -88,9 +78,7 @@ struct ConsolePanel {
         if (filterMode[2]) {
             ImGui::SetItemAllowOverlap();
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-            if (ImGui::Button(s.str().c_str())) {
-                filterMode[2] = false;
-            }
+            if (ImGui::Button(s.str().c_str())) { filterMode[2] = false; }
             ImGui::PopStyleColor();
         } else if (ImGui::Button(s.str().c_str())) {
             filterMode[2] = !filterMode[2];
@@ -104,8 +92,7 @@ struct ConsolePanel {
                 ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NavFlattened
             )) {
             if (ImGui::BeginPopupContextWindow()) {
-                if (ImGui::Selectable("Clear"))
-                    clearLog();
+                if (ImGui::Selectable("Clear")) clearLog();
                 ImGui::EndPopup();
             }
             int i;
@@ -129,15 +116,9 @@ struct ConsolePanel {
                         break;
                 }
                 bool canShow = !filterMode[0] && !filterMode[1] && !filterMode[2];
-                if (filterMode[0] && type == MessageType::INFO) {
-                    canShow = true;
-                }
-                if (filterMode[1] && type == MessageType::WARNING) {
-                    canShow = true;
-                }
-                if (filterMode[2] && type == MessageType::ERROR) {
-                    canShow = true;
-                }
+                if (filterMode[0] && type == MessageType::INFO) { canShow = true; }
+                if (filterMode[1] && type == MessageType::WARNING) { canShow = true; }
+                if (filterMode[2] && type == MessageType::ERROR) { canShow = true; }
                 if (!canShow) {
                     i++;
                     i %= MAX_LINES;
@@ -226,9 +207,7 @@ private:
         data[index].type = type;
         data[index].time = std::time(nullptr);
         index++;
-        if (index == MAX_LINES) {
-            loop = true;
-        }
+        if (index == MAX_LINES) { loop = true; }
         index %= MAX_LINES;
         count++;
         count = Foundation::min(count, MAX_LINES);

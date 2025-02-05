@@ -7,46 +7,56 @@ namespace Panda {
 
 class UpdateSpriteRendererCommand : public WorldCommand {
 public:
-    UpdateSpriteRendererCommand(Entity entity, SpriteRendererComponent newSprite)
-        : m_entity(entity)
-        , m_newSprite(newSprite)
-        , m_prevSprite(entity.getComponent<SpriteRendererComponent>()) {}
+    UpdateSpriteRendererCommand(const std::vector<Entity> &entities)
+        : m_entities(entities)
+        , m_newSprites()
+        , m_prevSprites() {}
 
     bool undo() override {
-        if (!m_entity.isValid()) {
-            return false;
+        for (Entity entity : m_entities) {
+            if (!entity.isValid()) { return false; }
+            entity.setComponent(m_prevSprites[entity.getId()]);
+            entity.setWorldChanged();
         }
-        m_entity.setComponent(m_prevSprite);
-        m_entity.setWorldChanged();
         return true;
     }
 
     bool execute() override {
-        if (!m_entity.isValid()) {
-            return false;
+        for (Entity entity : m_entities) {
+            if (!entity.isValid()) { return false; }
+            entity.setComponent(m_newSprites[entity.getId()]);
+            entity.setWorldChanged();
         }
-        m_entity.setComponent(m_newSprite);
-        m_entity.setWorldChanged();
         return true;
     }
 
     bool canMerge(WorldCommand &command) override {
-        if (typeid(command) != typeid(*this)) {
-            return false;
-        }
+        if (typeid(command) != typeid(*this)) { return false; }
         UpdateSpriteRendererCommand &other = static_cast<UpdateSpriteRendererCommand &>(command);
-        return other.m_entity == m_entity;
+        return other.m_entities == m_entities;
     }
 
     void merge(WorldCommand &command) override {
         UpdateSpriteRendererCommand &cmd = static_cast<UpdateSpriteRendererCommand &>(command);
-        m_newSprite = cmd.m_newSprite;
+        m_newSprites = cmd.m_newSprites;
+    }
+
+    void saveBeforeEdit() {
+        for (auto entity : m_entities) {
+            m_prevSprites[entity.getId()] = entity.getComponent<SpriteRendererComponent>();
+        }
+    }
+
+    void saveAfterEdit() {
+        for (auto entity : m_entities) {
+            m_newSprites[entity.getId()] = entity.getComponent<SpriteRendererComponent>();
+        }
     }
 
 private:
-    Entity m_entity;
-    SpriteRendererComponent m_newSprite;
-    SpriteRendererComponent m_prevSprite;
+    std::vector<Entity> m_entities;
+    std::unordered_map<UUID, SpriteRendererComponent> m_newSprites;
+    std::unordered_map<UUID, SpriteRendererComponent> m_prevSprites;
 };
 
 } // namespace Panda

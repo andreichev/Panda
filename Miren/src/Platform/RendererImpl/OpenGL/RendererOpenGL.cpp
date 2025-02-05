@@ -258,9 +258,7 @@ void RendererOpenGL::submit(Frame *frame, View *views) {
     ViewId viewId = -1;
     for (int i = 0; i < frame->getDrawCallsCount(); i++) {
         RenderDraw &draw = frame->getDrawCalls()[i];
-        if (!draw.m_isSubmitted) {
-            continue;
-        }
+        if (!draw.m_isSubmitted) { continue; }
         if (draw.m_viewId != viewId) {
             viewId = draw.m_viewId;
             viewChanged(views[viewId]);
@@ -290,9 +288,7 @@ void RendererOpenGL::viewChanged(View &view) {
     uint8_t a = rgba >> 0;
     GL_CALL(glClearColor((r) / 255.f, (g) / 255.f, (b) / 255.f, (a) / 255.f));
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-    if (!view.m_frameBuffer.isValid()) {
-        return;
-    }
+    if (!view.m_frameBuffer.isValid()) { return; }
     for (auto clear : view.m_clearAttachments) {
         // TODO: Add different clear types
         frameBuffers[view.m_frameBuffer.id].clearUIntAttachment(clear.attachmentIndex, clear.value);

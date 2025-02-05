@@ -7,12 +7,8 @@
 namespace Panda {
 
 DynamicMesh::~DynamicMesh() {
-    if (m_vertexBufferHandle.isValid()) {
-        Miren::deleteVertexBuffer(m_vertexBufferHandle);
-    }
-    if (m_indexBufferHandle.isValid()) {
-        Miren::deleteIndexBuffer(m_indexBufferHandle);
-    }
+    if (m_vertexBufferHandle.isValid()) { Miren::deleteVertexBuffer(m_vertexBufferHandle); }
+    if (m_indexBufferHandle.isValid()) { Miren::deleteIndexBuffer(m_indexBufferHandle); }
 }
 
 DynamicMesh::DynamicMesh()

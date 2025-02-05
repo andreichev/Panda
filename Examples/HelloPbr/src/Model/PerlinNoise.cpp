@@ -41,9 +41,7 @@ void PerlinNoise::generate2DCustom(
             values[x * width + y] = 0;
             for (int o = 0; o < octaves; o++) {
                 int dist = width >> o;
-                if (dist == 0) {
-                    continue;
-                }
+                if (dist == 0) { continue; }
                 int sampleX1 = (x / dist) * dist;
                 int sampleY1 = (y / dist) * dist;
 

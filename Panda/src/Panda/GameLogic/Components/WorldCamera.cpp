@@ -15,9 +15,7 @@ WorldCamera::WorldCamera()
 
 void WorldCamera::setFieldOfView(float degrees) {
     m_fieldOfView = degrees;
-    if (m_projectionType == ProjectionType::PERSPECTIVE) {
-        updateProjectionMatrix();
-    }
+    if (m_projectionType == ProjectionType::PERSPECTIVE) { updateProjectionMatrix(); }
 }
 
 void WorldCamera::updateProjectionMatrix() {
@@ -51,9 +49,7 @@ void WorldCamera::setProjectionType(WorldCamera::ProjectionType type) {
 
 void WorldCamera::setOrthoSize(float orthoSize) {
     m_orthoSize = orthoSize;
-    if (m_projectionType == ProjectionType::ORTHOGRAPHIC) {
-        updateProjectionMatrix();
-    }
+    if (m_projectionType == ProjectionType::ORTHOGRAPHIC) { updateProjectionMatrix(); }
 }
 
 float WorldCamera::getFieldOfView() {

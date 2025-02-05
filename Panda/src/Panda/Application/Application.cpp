@@ -80,9 +80,7 @@ void Application::loop() {
         uint64_t lastTime = m_timeMillis;
         m_timeMillis = getMillis();
         m_deltaTimeMillis += m_timeMillis - lastTime;
-        if (m_deltaTimeMillis < (1000 / m_maximumFps)) {
-            continue;
-        }
+        if (m_deltaTimeMillis < (1000 / m_maximumFps)) { continue; }
         m_oneSecondTimeCount += m_deltaTimeMillis;
 
         m_thisSecondFramesCount++;
@@ -93,9 +91,7 @@ void Application::loop() {
             m_oneSecondTimeCount = 0;
         }
         double deltaTime = m_deltaTimeMillis / 1000.0;
-        if (deltaTime == 0) {
-            deltaTime = 0.00000001;
-        }
+        if (deltaTime == 0) { deltaTime = 0.00000001; }
         m_deltaTimeMillis = 0;
 
         // LOG_INFO("APP UPDATE BEGIN");
@@ -129,13 +125,10 @@ void Application::processEvents() {
             windowSizeChanged(Size(ev->getWidth(), ev->getHeight()));
         }
         for (auto it = m_layerStack->rbegin(); it != m_layerStack->rend(); ++it) {
-            if (event->isHandled)
-                break;
+            if (event->isHandled) break;
             (*it)->onEvent(event);
         }
-        if (!event->isHandled) {
-            Input::onEvent(event);
-        }
+        if (!event->isHandled) { Input::onEvent(event); }
     }
     m_eventQueue.reset();
 }
@@ -160,9 +153,7 @@ void Application::windowSizeChanged(Size size) {
 
 void Application::removeWindowSizeObserver(WindowSizeObserver *listener) {
     auto it = std::find(m_windowSizeListeners.begin(), m_windowSizeListeners.end(), listener);
-    if (it != m_windowSizeListeners.end()) {
-        m_windowSizeListeners.erase(it);
-    }
+    if (it != m_windowSizeListeners.end()) { m_windowSizeListeners.erase(it); }
 }
 
 } // namespace Panda

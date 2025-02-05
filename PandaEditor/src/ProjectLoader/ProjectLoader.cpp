@@ -45,9 +45,7 @@ void ProjectLoader::loadInitialData() {
             LOG_INFO("GENERAL SETTINGS NOT FOUND");
         }
     }
-    if (m_editorSettings.hasOpenedProject) {
-        loadRecentProject();
-    }
+    if (m_editorSettings.hasOpenedProject) { loadRecentProject(); }
 }
 
 void ProjectLoader::saveAppSettings() {
@@ -62,9 +60,7 @@ void ProjectLoader::saveAppSettings() {
 }
 
 void ProjectLoader::loadRecentProject() {
-    if (m_editorSettings.recentProjects.empty()) {
-        return;
-    }
+    if (m_editorSettings.recentProjects.empty()) { return; }
     auto &recentProject = m_editorSettings.recentProjects.front();
     openProject(recentProject.path);
 }
@@ -143,9 +139,7 @@ void ProjectLoader::openCppProject() {
 }
 
 void ProjectLoader::appendRecentProject() {
-    if (m_projectPath.empty()) {
-        return;
-    }
+    if (m_projectPath.empty()) { return; }
     RecentProject recentProject;
     recentProject.path = m_projectPath.string();
     recentProject.name = m_projectPath.filename().string();
@@ -207,9 +201,7 @@ void ProjectLoader::saveWorldAs() {
     std::optional<path_t> optionalPath = SystemTools::saveFileDialog(
         "All\0*.pnd\0", (m_projectPath / "Assets").string().c_str(), "world.pnd"
     );
-    if (!optionalPath.has_value()) {
-        return;
-    }
+    if (!optionalPath.has_value()) { return; }
     m_worldPath = optionalPath.value();
     saveWorld();
 }
@@ -239,9 +231,7 @@ AssetHandlerEditor &ProjectLoader::getAssetHandler() {
 }
 
 void ProjectLoader::saveProjectSettings() {
-    if (m_projectPath.empty()) {
-        return;
-    }
+    if (m_projectPath.empty()) { return; }
     path_t pandaDirectoryPath = m_projectPath;
     pandaDirectoryPath.append(".Panda");
     if (!std::filesystem::exists(pandaDirectoryPath)) {

@@ -37,9 +37,7 @@ struct WorldCameraDto : public Rain::Codable {
     }
 
     static bool decode(const char *key, Rain::Decoder *decoder, WorldCameraDto &data) {
-        if (!decoder->beginObject(key)) {
-            return false;
-        }
+        if (!decoder->beginObject(key)) { return false; }
         int projectionType;
         decoder->decode("projectionType", projectionType);
         data.projectionType = (WorldCamera::ProjectionType)projectionType;
@@ -96,9 +94,7 @@ struct Rigidbody2DComponentDto : public Rain::Codable {
     }
 
     static bool decode(const char *key, Rain::Decoder *decoder, Rigidbody2DComponentDto &data) {
-        if (!decoder->beginObject(key)) {
-            return false;
-        }
+        if (!decoder->beginObject(key)) { return false; }
         int type;
         decoder->decode("type", type);
         data.type = (Rigidbody2DComponent::BodyType)type;
@@ -164,9 +160,7 @@ struct ScriptFieldDto : public Rain::Codable {
     }
 
     static bool decode(const char *key, Rain::Decoder *decoder, ScriptFieldDto &data) {
-        if (!decoder->beginObject(key)) {
-            return false;
-        }
+        if (!decoder->beginObject(key)) { return false; }
         decoder->decode("name", data.name);
         decoder->decode("fieldId", data.fieldId);
         int type;

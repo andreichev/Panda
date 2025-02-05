@@ -6,131 +6,80 @@
 
 namespace Panda {
 
-class WorldCommandManager {
-    inline static int TOTAL_OPERATIONS_IN_CACHE = 20;
-    inline static int WORLD_COMMAND_SIZE = 256;
-    inline static int WORLD_COMMAND_MANAGER_SIZE =
-        WORLD_COMMAND_SIZE * (TOTAL_OPERATIONS_IN_CACHE * 2 + 5);
+class WorldCommandManager final {
+    inline static int MAX_OPERATIONS_IN_CACHE = 50;
 
 public:
     WorldCommandManager()
-        : m_index(0)
-        , m_undoCount(0)
-        , m_redoCount(0)
-        , m_data(nullptr) {
-        m_data = (uint8_t *)F_ALLOC(Foundation::getAllocator(), WORLD_COMMAND_MANAGER_SIZE);
-    }
-
-    ~WorldCommandManager() {
-        F_FREE(Foundation::getAllocator(), m_data);
-    }
+        : undoStack(MAX_OPERATIONS_IN_CACHE)
+        , redoStack(MAX_OPERATIONS_IN_CACHE) {}
 
     /// Save new command to history and execute if it needs to.
     template<typename CMD>
-    void SAVE(CMD cmd, bool needToExecute = true) {
+    void SAVE(CMD &cmd, bool needToExecute = true) {
         static_assert(std::is_base_of_v<WorldCommand, CMD>, "Not inherited from WorldCommand");
-        PND_ASSERT_F(
-            sizeof(CMD) < WORLD_COMMAND_SIZE,
-            "NEED TO INCREASE COMMAND SIZE. REQUIRED {}",
-            sizeof(CMD)
-        );
-        WorldCommand *last = PREVIOUS_COMMAND();
+        auto last = PREVIOUS_COMMAND();
         if (last && last->canMerge(cmd)) {
             last->merge(cmd);
-            cmd.isValid = needToExecute ? cmd.execute() : true;
-            return;
+        } else {
+            undoStack.push_back(Foundation::makeShared<CMD>(std::move(cmd)));
         }
-        cmd.isValid = needToExecute ? cmd.execute() : true;
-        write(&cmd, sizeof(CMD), m_index);
-        m_index++;
-        m_index %= TOTAL_OPERATIONS_IN_CACHE;
-        m_undoCount++;
-        m_undoCount = Foundation::min(m_undoCount, TOTAL_OPERATIONS_IN_CACHE);
-        m_redoCount = 0;
+        if (needToExecute) {
+            last = PREVIOUS_COMMAND();
+            if (!last->execute()) {
+                LOG_ERROR("ERROR EXECUTING COMMAND");
+                CLEAR();
+            }
+        }
+        if (undoStack.size() > MAX_OPERATIONS_IN_CACHE) { undoStack.pop_front(); }
+        redoStack.clear();
     }
 
     bool CAN_UNDO() {
-        if (m_undoCount <= 0) {
-            return false;
-        }
-        int prevIndex = (m_index + TOTAL_OPERATIONS_IN_CACHE - 1) % TOTAL_OPERATIONS_IN_CACHE;
-        WorldCommand *prevCmd = (WorldCommand *)read(prevIndex);
-        return prevCmd->isValid;
+        return !undoStack.empty();
     }
 
     void UNDO() {
-        if (m_undoCount <= 0) {
+        if (!CAN_UNDO()) { return; }
+        auto command = undoStack.back();
+        undoStack.pop_back();
+        if (!command->undo()) {
+            LOG_ERROR("ERROR EXECUTING COMMAND");
+            CLEAR();
             return;
         }
-        int prevIndex = (m_index + TOTAL_OPERATIONS_IN_CACHE - 1) % TOTAL_OPERATIONS_IN_CACHE;
-        WorldCommand *prevCmd = (WorldCommand *)read(prevIndex);
-        if (prevCmd->isValid && prevCmd->undo()) {
-            m_undoCount--;
-            m_undoCount = Foundation::max(0, m_undoCount);
-            m_index = prevIndex;
-            m_redoCount++;
-            m_redoCount = Foundation::min(m_redoCount, TOTAL_OPERATIONS_IN_CACHE);
-        }
+        redoStack.push_back(command);
     }
 
     bool CAN_REDO() {
-        if (m_redoCount <= 0) {
-            return false;
-        }
-        WorldCommand *cmd = (WorldCommand *)read(m_index);
-        return cmd->isValid;
+        return !redoStack.empty();
     }
 
     void REDO() {
-        if (m_redoCount <= 0) {
+        if (!CAN_REDO()) { return; }
+        auto command = redoStack.back();
+        redoStack.pop_back();
+        if (!command->execute()) {
+            LOG_ERROR("ERROR EXECUTING COMMAND");
+            CLEAR();
             return;
         }
-        WorldCommand *cmd = (WorldCommand *)read(m_index);
-        if (cmd->isValid && cmd->execute()) {
-            m_undoCount++;
-            m_undoCount = Foundation::min(m_undoCount, TOTAL_OPERATIONS_IN_CACHE);
-            m_index++;
-            m_index %= TOTAL_OPERATIONS_IN_CACHE;
-            m_redoCount--;
-            m_redoCount = Foundation::max(0, m_redoCount);
-        } else {
-            cmd->isValid = false;
-        }
+        undoStack.push_back(command);
     }
 
-    WorldCommand *PREVIOUS_COMMAND() {
-        if (m_undoCount <= 0) {
-            return nullptr;
-        }
-        int prevIndex = (m_index + TOTAL_OPERATIONS_IN_CACHE - 1) % TOTAL_OPERATIONS_IN_CACHE;
-        WorldCommand *cmd = (WorldCommand *)read(prevIndex);
-        if (cmd->isValid) {
-            return cmd;
-        }
-        return nullptr;
+    Foundation::Shared<WorldCommand> PREVIOUS_COMMAND() {
+        if (undoStack.empty()) { return nullptr; }
+        return undoStack.back();
     }
 
     void CLEAR() {
-        m_index = 0;
-        m_undoCount = 0;
-        m_redoCount = 0;
+        undoStack.clear();
+        redoStack.clear();
     }
 
 private:
-    void write(const void *_data, uint32_t _size, int index) {
-        uint32_t pos = index * WORLD_COMMAND_SIZE;
-        memcpy(&m_data[pos], _data, _size);
-    }
-
-    void *read(uint32_t index) {
-        uint32_t pos = index * WORLD_COMMAND_SIZE;
-        return &m_data[pos];
-    }
-
-    uint8_t *m_data;
-    int m_index;
-    int m_undoCount;
-    int m_redoCount;
+    std::deque<Foundation::Shared<WorldCommand>> undoStack;
+    std::deque<Foundation::Shared<WorldCommand>> redoStack;
 };
 
 } // namespace Panda

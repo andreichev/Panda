@@ -67,7 +67,7 @@ public:
 #pragma endregion
 
 #pragma region Components draw output
-    void addScriptToEntity(Entity entity) override;
+    void addScriptToEntities(const std::vector<Entity> &entities) override;
 #pragma endregion
 
 #pragma region Content browser output
@@ -89,7 +89,7 @@ public:
 
 #pragma region Viewport output
     void viewportPickEntityWithId(UUID id) override;
-    void viewportUnselectEntity() override;
+    void viewportUnselectAll() override;
 #pragma endregion
 
 private:

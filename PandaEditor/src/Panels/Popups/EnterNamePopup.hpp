@@ -38,9 +38,7 @@ public:
             }
             ImGui::Separator();
             if (ImGui::Button("Cancel", {ImGui::GetContentRegionAvail().x, 24})) {
-                if (closeAction) {
-                    closeAction(userData);
-                }
+                if (closeAction) { closeAction(userData); }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();

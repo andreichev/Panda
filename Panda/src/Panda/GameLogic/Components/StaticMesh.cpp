@@ -7,15 +7,9 @@
 namespace Panda {
 
 StaticMesh::~StaticMesh() {
-    if (m_vertexBufferHandle.isValid()) {
-        Miren::deleteVertexBuffer(m_vertexBufferHandle);
-    }
-    if (m_indexBufferHandle.isValid()) {
-        Miren::deleteIndexBuffer(m_indexBufferHandle);
-    }
-    if (m_bufferLayoutHandle.isValid()) {
-        deleteVertexLayout(m_bufferLayoutHandle);
-    }
+    if (m_vertexBufferHandle.isValid()) { Miren::deleteVertexBuffer(m_vertexBufferHandle); }
+    if (m_indexBufferHandle.isValid()) { Miren::deleteIndexBuffer(m_indexBufferHandle); }
+    if (m_bufferLayoutHandle.isValid()) { deleteVertexLayout(m_bufferLayoutHandle); }
 }
 
 void StaticMesh::create(

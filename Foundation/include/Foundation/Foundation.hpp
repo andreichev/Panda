@@ -15,30 +15,12 @@ namespace Foundation {
 #define PND_DISCARD(x) static_cast<void>(x)
 
 template<typename T>
-using Unique = std::unique_ptr<T>;
-
-template<typename T, typename... Args>
-constexpr Unique<T> makeUnique(Args &&...args) {
-    AllocatorI *alloc = getAllocator();
-    T *ptr = F_NEW(alloc, T)(std::forward<Args>(args)...);
-    auto deleter = [alloc](T *ptr) { F_FREE(alloc, ptr); };
-    return std::unique_ptr<T>(ptr, deleter);
-}
-
-template<typename T>
-constexpr Unique<T> createUnique(T *ptr) {
-    AllocatorI *alloc = getAllocator();
-    auto deleter = [alloc](T *ptr) { FREE(alloc, ptr); };
-    return std::unique_ptr<T>(ptr, deleter);
-}
-
-template<typename T>
 using Shared = std::shared_ptr<T>;
 
 template<typename T>
 constexpr Shared<T> createShared(T *ptr) {
     AllocatorI *alloc = getAllocator();
-    auto deleter = [alloc](T *ptr) { FREE(alloc, ptr); };
+    auto deleter = [alloc](T *ptr) { F_DELETE(alloc, ptr); };
     return std::shared_ptr<T>(ptr, deleter);
 }
 
@@ -92,14 +74,10 @@ inline constexpr Ty max(const Ty &_a, const Ty &_b) {
 
 inline int32_t strCmp(const char *lhs, const char *rhs, int32_t max) {
     for (; max > 0 && *lhs == *rhs; ++lhs, ++rhs, --max) {
-        if (*lhs == '\0' || *rhs == '\0') {
-            break;
-        }
+        if (*lhs == '\0' || *rhs == '\0') { break; }
     }
 
-    if (0 == max) {
-        return 0;
-    }
+    if (0 == max) { return 0; }
 
     return *lhs - *rhs;
 }

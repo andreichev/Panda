@@ -7,7 +7,8 @@
 
 namespace Panda {
 
-using SelectScriptFunction = void (*)(void *userData, Entity entity, ScriptClassManifest clazz);
+using SelectScriptFunction =
+    void (*)(void *userData, const std::vector<Entity> &entities, ScriptClassManifest clazz);
 
 class PickScriptPopup final : public EditorPopup {
 public:
@@ -34,9 +35,7 @@ public:
                 }
             }
             if (ImGui::Button("Select", {ImGui::GetContentRegionAvail().x, 24})) {
-                if (selectAction) {
-                    selectAction(userData, entity, selectedClass);
-                }
+                if (selectAction) { selectAction(userData, entities, selectedClass); }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();
@@ -47,9 +46,7 @@ public:
             }
             ImGui::Separator();
             if (ImGui::Button("Cancel", {ImGui::GetContentRegionAvail().x, 24})) {
-                if (closeAction) {
-                    closeAction(userData);
-                }
+                if (closeAction) { closeAction(userData); }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();
@@ -70,7 +67,7 @@ public:
     SelectScriptFunction selectAction;
     PopupActionFunction closeAction;
     void *userData;
-    Entity entity;
+    std::vector<Entity> entities;
 };
 
 } // namespace Panda

@@ -24,6 +24,8 @@ public:
         initResources();
     }
 
+    SkyComponent(SkyComponent &&other) = default;
+
     SkyComponent()
         : m_sceneViewId(0) {
         initResources();
