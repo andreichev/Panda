@@ -2,7 +2,7 @@
 
 namespace Panda {
 
-using PopupActionFunction = void (*)(void *userData);
+using PopupActionFunction = std::function<void()>;
 
 class EditorPopup {
 public:

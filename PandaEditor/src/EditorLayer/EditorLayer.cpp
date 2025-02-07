@@ -216,7 +216,31 @@ void EditorLayer::menuBarOpenProject() {
 }
 
 void EditorLayer::menuBarOpenProject(const RecentProject &project) {
-    m_loader.openProject(project.path);
+    if (m_editingWorld.isChanged()) {
+        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
+        popup->yesAction = [&]() {
+            saveWorld();
+            m_loader.openProject(project.path);
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
+        };
+        popup->noAction = [&]() {
+            m_loader.openProject(project.path);
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
+        };
+        popup->closeAction = [&]() {
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
+        };
+        popup->title = "Save current world?";
+        popup->subtitle = "Do you want to save your changes?";
+        popup->yesText = "Save";
+        popup->noText = "Not save";
+        m_popups.emplace_back(popup);
+    } else {
+        m_loader.openProject(project.path);
+    }
 }
 
 const std::vector<RecentProject> &EditorLayer::menuBarGetRecentProjectsList() {
@@ -242,25 +266,21 @@ void EditorLayer::menuBarSaveWorld() {
 void EditorLayer::menuBarCloseProject() {
     if (m_editingWorld.isChanged()) {
         EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
-        popup->yesAction = [](void *data) {
-            auto self = static_cast<EditorLayer *>(data);
-            self->saveWorld();
-            self->m_loader.closeProject();
-            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-            self->m_popups.pop_back();
+        popup->yesAction = [&]() {
+            saveWorld();
+            m_loader.closeProject();
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
         };
-        popup->noAction = [](void *data) {
-            auto self = static_cast<EditorLayer *>(data);
-            self->m_loader.closeProject();
-            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-            self->m_popups.pop_back();
+        popup->noAction = [&]() {
+            m_loader.closeProject();
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
         };
-        popup->closeAction = [](void *data) {
-            auto self = static_cast<EditorLayer *>(data);
-            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-            self->m_popups.pop_back();
+        popup->closeAction = [&]() {
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
         };
-        popup->userData = this;
         popup->title = "Save current world?";
         popup->subtitle = "Do you want to save your changes?";
         popup->yesText = "Save";
@@ -277,51 +297,47 @@ void EditorLayer::menuBarCloseProject() {
 
 void EditorLayer::addScriptToEntities(const std::vector<Entity> &entities) {
     PickScriptPopup *popup = F_NEW(Foundation::getAllocator(), PickScriptPopup);
-    popup->closeAction = [](void *data) {
-        auto self = static_cast<EditorLayer *>(data);
-        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-        self->m_popups.pop_back();
+    popup->closeAction = [&]() {
+        F_DELETE(Foundation::getAllocator(), m_popups.back());
+        m_popups.pop_back();
     };
-    popup->selectAction =
-        [](void *data, const std::vector<Entity> &entities, ScriptClassManifest clazz) {
-            auto self = static_cast<EditorLayer *>(data);
-            if (clazz.name) {
-                for (Entity entity : entities) {
-                    // Map manifest fields to internal ScriptField type
-                    std::vector<ScriptField> fields;
-                    for (auto manifestField : clazz.fields) {
-                        Foundation::Memory data;
-                        switch (manifestField.type) {
-                            case ScriptFieldType::INTEGER: {
-                                data = Foundation::Memory::alloc(sizeof(int));
-                                break;
-                            }
-                            case ScriptFieldType::FLOAT: {
-                                data = Foundation::Memory::alloc(sizeof(float));
-                                break;
-                            }
-                            case ScriptFieldType::TEXTURE:
-                            case ScriptFieldType::ENTITY: {
-                                data = Foundation::Memory::alloc(sizeof(UUID));
-                                break;
-                            }
-                            default: {
-                                PND_ASSERT(false, "Unknown field type");
-                            }
+    popup->selectAction = [&](const std::vector<Entity> &entities, ScriptClassManifest clazz) {
+        if (clazz.name) {
+            for (Entity entity : entities) {
+                // Map manifest fields to internal ScriptField type
+                std::vector<ScriptField> fields;
+                for (auto manifestField : clazz.fields) {
+                    Foundation::Memory data;
+                    switch (manifestField.type) {
+                        case ScriptFieldType::INTEGER: {
+                            data = Foundation::Memory::alloc(sizeof(int));
+                            break;
                         }
-                        ScriptField field(
-                            0, manifestField.handle, manifestField.name, manifestField.type, data
-                        );
-                        fields.emplace_back(field);
+                        case ScriptFieldType::FLOAT: {
+                            data = Foundation::Memory::alloc(sizeof(float));
+                            break;
+                        }
+                        case ScriptFieldType::TEXTURE:
+                        case ScriptFieldType::ENTITY: {
+                            data = Foundation::Memory::alloc(sizeof(UUID));
+                            break;
+                        }
+                        default: {
+                            PND_ASSERT(false, "Unknown field type");
+                        }
                     }
-                    // TODO: Bind previously picked values
-                    entity.addScript(Panda::ExternalScript(0, clazz.name, fields));
+                    ScriptField field(
+                        0, manifestField.handle, manifestField.name, manifestField.type, data
+                    );
+                    fields.emplace_back(field);
                 }
+                // TODO: Bind previously picked values
+                entity.addScript(Panda::ExternalScript(0, clazz.name, fields));
             }
-            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-            self->m_popups.pop_back();
-        };
-    popup->userData = this;
+        }
+        F_DELETE(Foundation::getAllocator(), m_popups.back());
+        m_popups.pop_back();
+    };
     popup->entities = entities;
     popup->title = "Add Script";
     popup->subtitle = "Pick a script from available Script classes list.";
@@ -334,18 +350,15 @@ void EditorLayer::addScriptToEntities(const std::vector<Entity> &entities) {
 
 void EditorLayer::showCreateFolderPopup() {
     EnterNamePopup *popup = F_NEW(Foundation::getAllocator(), EnterNamePopup);
-    popup->closeAction = [](void *data) {
-        auto self = static_cast<EditorLayer *>(data);
-        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-        self->m_popups.pop_back();
+    popup->closeAction = [&]() {
+        F_DELETE(Foundation::getAllocator(), m_popups.back());
+        m_popups.pop_back();
     };
-    popup->doneAction = [](void *data, std::string text) {
-        auto self = static_cast<EditorLayer *>(data);
-        if (!text.empty()) { self->m_contentBrowser.createFolder(text); }
-        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-        self->m_popups.pop_back();
+    popup->doneAction = [&](std::string text) {
+        if (!text.empty()) { m_contentBrowser.createFolder(text); }
+        F_DELETE(Foundation::getAllocator(), m_popups.back());
+        m_popups.pop_back();
     };
-    popup->userData = this;
     popup->title = "Create folder";
     popup->subtitle = "Enter folder name:";
     m_popups.emplace_back(popup);
@@ -353,19 +366,16 @@ void EditorLayer::showCreateFolderPopup() {
 
 void EditorLayer::deleteFileShowPopup(path_t path) {
     EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
-    popup->yesAction = [](void *data) {
-        auto self = static_cast<EditorLayer *>(data);
-        self->m_contentBrowser.confirmDeletion();
-        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-        self->m_popups.pop_back();
+    popup->yesAction = [&]() {
+        m_contentBrowser.confirmDeletion();
+        F_DELETE(Foundation::getAllocator(), m_popups.back());
+        m_popups.pop_back();
     };
-    popup->noAction = [](void *data) {
-        auto self = static_cast<EditorLayer *>(data);
-        F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-        self->m_popups.pop_back();
+    popup->noAction = [&]() {
+        F_DELETE(Foundation::getAllocator(), m_popups.back());
+        m_popups.pop_back();
     };
     popup->closeAction = popup->noAction;
-    popup->userData = this;
     popup->title = "Delete";
     popup->subtitle = "Delete \"" + path.filename().string() + "\"?";
     popup->yesText = "Yes";
@@ -502,25 +512,21 @@ void EditorLayer::saveWorld() {
 void EditorLayer::closeApp() {
     if (m_editingWorld.isChanged()) {
         EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
-        popup->yesAction = [](void *data) {
-            auto self = static_cast<EditorLayer *>(data);
-            self->saveWorld();
+        popup->yesAction = [&]() {
+            saveWorld();
             Application::get()->close();
-            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-            self->m_popups.pop_back();
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
         };
-        popup->noAction = [](void *data) {
+        popup->noAction = [&]() {
             Application::get()->close();
-            auto self = static_cast<EditorLayer *>(data);
-            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-            self->m_popups.pop_back();
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
         };
-        popup->closeAction = [](void *data) {
-            auto self = static_cast<EditorLayer *>(data);
-            F_DELETE(Foundation::getAllocator(), self->m_popups.back());
-            self->m_popups.pop_back();
+        popup->closeAction = [&]() {
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
         };
-        popup->userData = this;
         popup->title = "Save current world?";
         popup->subtitle = "Do you want to save your changes?";
         popup->yesText = "Save";
