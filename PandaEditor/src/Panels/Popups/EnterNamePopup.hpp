@@ -7,7 +7,7 @@
 
 namespace Panda {
 
-using EnteringDoneFunction = void (*)(void *userData, std::string text);
+using EnteringDoneFunction = std::function<void(std::string text)>;
 
 class EnterNamePopup : public EditorPopup {
 public:
@@ -28,7 +28,7 @@ public:
             if (ImGui::Button("Done", {ImGui::GetContentRegionAvail().x, 24})) {
                 if (doneAction) {
                     std::string clearText = text.substr(0, text.find('\0'));
-                    doneAction(userData, clearText);
+                    doneAction(clearText);
                 }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
@@ -38,7 +38,7 @@ public:
             }
             ImGui::Separator();
             if (ImGui::Button("Cancel", {ImGui::GetContentRegionAvail().x, 24})) {
-                if (closeAction) { closeAction(userData); }
+                if (closeAction) { closeAction(); }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);
                 ImGui::EndPopup();
@@ -56,7 +56,6 @@ public:
     const char *subtitle;
     EnteringDoneFunction doneAction;
     PopupActionFunction closeAction;
-    void *userData;
 };
 
 } // namespace Panda
