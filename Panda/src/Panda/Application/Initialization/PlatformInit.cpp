@@ -8,8 +8,10 @@
 #include <Foundation/Allocator.hpp>
 #include <Foundation/PlatformDetection.hpp>
 
-#ifdef PLATFORM_DESKTOP
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
 #    include "Platform/WindowImpl/GlfwWindow/GlfwWindow.hpp"
+#elif defined(PLATFORM_MACOS)
+#    include "Platform/WindowImpl/CocoaWindow/CocoaWindow.hpp"
 #elif defined(PLATFORM_IOS)
 #    include "Platform/WindowImpl/UIKitWindow/PandaWindowIOSImpl.hpp"
 #endif
@@ -17,8 +19,12 @@
 namespace Panda {
 
 Window *createWindow(ApplicationStartupSettings &settings) {
-#ifdef PLATFORM_DESKTOP
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
     return F_NEW(Foundation::getAllocator(), GlfwWindow)(
+        settings.windowTitle, settings.windowSize, settings.isFullScreen, settings.isMaximized
+    );
+#elif defined(PLATFORM_MACOS)
+    return F_NEW(Foundation::getAllocator(), CocoaWindow)(
         settings.windowTitle, settings.windowSize, settings.isFullScreen, settings.isMaximized
     );
 #elif defined(PLATFORM_IOS)

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <string>
+#include "Miren/GraphicsContext.hpp"
 
 namespace Miren {
 
@@ -12,9 +12,9 @@ namespace Miren {
 class PlatformData {
 public:
     static PlatformData *get();
-    void *layer;
-    void *nativeWindowHandle;
-    void *renderingContext;
+    GraphicsContext *graphicsContext = nullptr;
+    void *layer = nullptr;
+    void *nativeWindowHandle = nullptr;
 };
 
 } // namespace Miren

@@ -13,6 +13,8 @@ namespace Miren {
 
 void initialize();
 void terminate();
+void createContext();
+void terminateContext();
 // MARK: - Command buffer
 FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification);
 uint32_t readFrameBuffer(

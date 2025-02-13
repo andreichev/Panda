@@ -25,7 +25,6 @@ class RendererI {
 public:
     virtual ~RendererI() = default;
     virtual RendererType getRendererType() const = 0;
-    virtual void flip() = 0;
     virtual void
     createFrameBuffer(FrameBufferHandle handle, FrameBufferSpecification specification) = 0;
     virtual void readFrameBuffer(

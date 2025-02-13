@@ -15,9 +15,12 @@ list(APPEND INCLUDE ${GLOB_RESULT_INCLUDE})
 list(APPEND SOURCES ${GLOB_RESULT_SOURCES})
 
 # Other platform specific realizations
-if (DESKTOP)
+if (PLATFORM_WIN32 OR PLATFORM_LINUX)
     list(APPEND INCLUDE "src/Platform/RendererImpl/Context/OpenGLContext.hpp")
     list(APPEND SOURCES "src/Platform/RendererImpl/Context/OpenGLContext.cpp")
+elseif (PLATFORM_MACOS)
+    list(APPEND INCLUDE "src/Platform/RendererImpl/Context/GLOsxContext.hpp")
+    list(APPEND SOURCES "src/Platform/RendererImpl/Context/GLOsxContext.mm")
 elseif (PLATFORM_IOS)
     list(APPEND INCLUDE "src/Platform/RendererImpl/Context/GlesContext.hpp")
     list(APPEND SOURCES "src/Platform/RendererImpl/Context/GlesContext.mm")
@@ -29,11 +32,12 @@ endif ()
 
 add_library(Miren STATIC "${SOURCES}" "${INCLUDE}")
 
+target_compile_definitions(Miren PUBLIC GL_SILENCE_DEPRECATION)
 target_compile_definitions(Miren PUBLIC GLES_SILENCE_DEPRECATION)
 target_include_directories(Miren PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(Miren PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-if (DESKTOP)
+if (PLATFORM_WIN32 OR PLATFORM_LINUX)
     # Dependencies - GLFW, only for Desktop :)
     target_link_libraries(Miren glfw)
     target_include_directories(Miren PRIVATE Vendor/glfw/include)

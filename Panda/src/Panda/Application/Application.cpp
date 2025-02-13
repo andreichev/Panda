@@ -12,6 +12,7 @@
 #include "Panda/GameLogic/Input.hpp"
 
 #include <Miren/Miren.hpp>
+#include <Miren/PlatformData.hpp>
 
 namespace Panda {
 
@@ -64,6 +65,7 @@ Application::Application(ApplicationStartupSettings &settings)
     m_layerStack = F_NEW(Foundation::getAllocator(), LayerStack);
 
 #ifdef PLATFORM_DESKTOP
+    Miren::createContext();
     Miren::initialize();
 #endif
     Random::init();
@@ -149,6 +151,9 @@ void Application::windowSizeChanged(Size size) {
     for (auto &listener : m_windowSizeListeners) {
         listener->windowSizeChanged(size);
     }
+#ifdef PLATFORM_DESKTOP
+    Miren::PlatformData::get()->graphicsContext->update();
+#endif
 }
 
 void Application::removeWindowSizeObserver(WindowSizeObserver *listener) {
