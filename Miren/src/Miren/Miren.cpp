@@ -3,19 +3,26 @@
 //
 
 #include "Miren/Miren_p.hpp"
+#include "Miren/PlatformData.hpp"
+#ifdef PLATFORM_IOS
+#    include "Platform/RendererImpl/Context/GlesContext.hpp"
+#elif defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
+#    include "Platform/RendererImpl/Context/OpenGLContext.hpp"
+#elif defined(PLATFORM_MACOS)
+#    include "Platform/RendererImpl/Context/GLOsxContext.hpp"
+#endif
 
 namespace Miren {
 
 // MARK: - PUBLIC METHODS IMPL
 
 static Context *s_context = nullptr;
-static const int CONTEXT_ALIGNMENT = 64;
 
 void initialize() {
     MIREN_LOG("MIREN INIT BEGIN");
     MIREN_LOG("ALLOCATING MIREN CONTEXT, {} BYTES", sizeof(Context));
     MIREN_LOG("FRAME DATA SIZE: {} BYTES", sizeof(Frame));
-    s_context = F_ALIGNED_NEW(Foundation::getAllocator(), Context, CONTEXT_ALIGNMENT);
+    s_context = F_NEW(Foundation::getAllocator(), Context);
     s_context->init();
     MIREN_LOG("MIREN INIT END");
 }
@@ -23,9 +30,32 @@ void initialize() {
 void terminate() {
     MIREN_LOG("MIREN SHUTDOWN BEGIN");
     s_context->shutdown();
-    F_ALIGNED_DELETE(Foundation::getAllocator(), s_context, CONTEXT_ALIGNMENT);
+    F_DELETE(Foundation::getAllocator(), s_context);
     s_context = nullptr;
     MIREN_LOG("MIREN SHUTDOWN END");
+}
+
+void createContext() {
+    PND_ASSERT(
+        PlatformData::get()->graphicsContext == nullptr, "GRAPHICS CONTEXT ALREADY INITIALIZED"
+    );
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
+    GraphicsContext *context = F_NEW(Foundation::getAllocator(), OpenGLContext);
+#elif defined(PLATFORM_MACOS)
+    GraphicsContext *context = F_NEW(Foundation::getAllocator(), GLOsxContext);
+#elif defined(PLATFORM_IOS)
+    GraphicsContext *context = F_NEW(Foundation::getAllocator(), GlesContext);
+#endif
+    context->create();
+    PlatformData::get()->graphicsContext = context;
+}
+
+void terminateContext() {
+    PND_ASSERT(
+        PlatformData::get()->graphicsContext != nullptr, "GRAPHICS CONTEXT ALREADY DESTROYED"
+    );
+    F_DELETE(Foundation::getAllocator(), PlatformData::get()->graphicsContext);
+    PlatformData::get()->graphicsContext = nullptr;
 }
 
 FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification) {

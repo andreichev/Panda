@@ -3,17 +3,12 @@
 //
 
 #include "RendererOpenGL.hpp"
+#include "Miren/PlatformData.hpp"
 #include "OpenGLBase.hpp"
 
 #include <Foundation/Assert.hpp>
 #include <Foundation/Allocator.hpp>
 #include <Foundation/Logger.hpp>
-
-#ifdef PLATFORM_IOS
-#    include "Platform/RendererImpl/Context/GlesContext.hpp"
-#elif defined(PLATFORM_DESKTOP)
-#    include "Platform/RendererImpl/Context/OpenGLContext.hpp"
-#endif
 
 namespace Miren {
 
@@ -53,12 +48,6 @@ const char *getGLErrorStr(GLenum err) {
 
 RendererOpenGL::RendererOpenGL() {
     s_instance = this;
-#ifdef PLATFORM_IOS
-    context = F_NEW(Foundation::getAllocator(), GlesContext);
-#elif defined(PLATFORM_DESKTOP)
-    context = F_NEW(Foundation::getAllocator(), OpenGLContext);
-#endif
-    context->create();
     GL_CALL(glEnable(GL_BLEND));
     GL_CALL(glDisable(GL_STENCIL_TEST));
     // GL_CALL(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
@@ -79,7 +68,6 @@ RendererOpenGL::RendererOpenGL() {
 
 RendererOpenGL::~RendererOpenGL() {
     GL_CALL(glDeleteVertexArrays(1, &m_uselessVao));
-    F_DELETE(Foundation::getAllocator(), context);
     s_instance = nullptr;
 }
 
@@ -89,10 +77,6 @@ RendererType RendererOpenGL::getRendererType() const {
 #elif defined(PLATFORM_DESKTOP)
     return RendererType::OpenGL;
 #endif
-}
-
-void RendererOpenGL::flip() {
-    context->flip();
 }
 
 void RendererOpenGL::createFrameBuffer(
@@ -271,7 +255,8 @@ void RendererOpenGL::viewChanged(View &view) {
     if (view.m_frameBuffer.isValid()) {
         frameBuffers[view.m_frameBuffer.id].bind();
     } else {
-        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, context->getDefaultFrameBufferId()));
+        GraphicsContext *graphicsContext = PlatformData::get()->graphicsContext;
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, graphicsContext->getDefaultFrameBufferId()));
     }
     if (!view.m_viewport.isZero()) {
         GL_CALL(glViewport(

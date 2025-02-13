@@ -4,7 +4,7 @@
 #include "Encoder/Frame.hpp"
 #include "Encoder/View.hpp"
 #include "Encoder/RenderDraw.hpp"
-#include "Miren/Miren.hpp"
+#include "Miren/PlatformData.hpp"
 #include "HandleAllocator.hpp"
 #include "Miren/MirenStates.hpp"
 #include "Platform/RendererImpl/OpenGL/RendererOpenGL.hpp"
@@ -253,6 +253,7 @@ struct Context {
                 command->type == RendererCommandType::RendererInit,
                 "First command should be RendererInit"
             );
+            PlatformData::get()->graphicsContext->setCurrent();
             // TODO: Add other renderers (metal, directx, vulkan, ...)
             m_renderer = F_NEW(Foundation::getAllocator(), RendererOpenGL);
             MIREN_LOG("RENDERER CREATED");
@@ -274,7 +275,7 @@ struct Context {
         rendererExecuteCommands(m_render->getPreCommandQueue());
         if (m_render->getDrawCallsCount() != 0) {
             m_renderer->submit(m_render, m_views);
-            m_renderer->flip();
+            PlatformData::get()->graphicsContext->flip();
         }
         rendererExecuteCommands(m_render->getPostCommandQueue());
         MIREN_LOG("RENDER FRAME END");

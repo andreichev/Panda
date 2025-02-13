@@ -20,7 +20,6 @@ public:
     RendererOpenGL();
     ~RendererOpenGL() override;
     RendererType getRendererType() const override;
-    void flip() override;
     void
     createFrameBuffer(FrameBufferHandle handle, FrameBufferSpecification specification) override;
     void readFrameBuffer(
@@ -87,7 +86,6 @@ private:
     void submit(RenderDraw *draw);
 
     uint32_t m_uselessVao;
-    GraphicsContext *context;
     OpenGLFrameBuffer frameBuffers[1000];
     OpenGLShader shaders[1000];
     OpenGLIndexBuffer indexBuffers[1000];
