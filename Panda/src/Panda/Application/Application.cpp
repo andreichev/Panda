@@ -2,8 +2,6 @@
 // Created by Admin on 22.01.2022.
 //
 
-#include "pndpch.hpp"
-
 #include "Panda/Application/Application.hpp"
 #include "Panda/Application/Initialization/PlatformInit.hpp"
 #include "Panda/GameLogic/BasicGameLayer.hpp"
@@ -13,6 +11,7 @@
 
 #include <Miren/Miren.hpp>
 #include <Miren/PlatformData.hpp>
+#include <Foundation/PlatformDetection.hpp>
 
 namespace Panda {
 

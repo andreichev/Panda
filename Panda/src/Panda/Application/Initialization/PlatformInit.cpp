@@ -2,7 +2,6 @@
 // Created by Admin on 22.01.2022.
 //
 
-#include "pndpch.hpp"
 #include "PlatformInit.hpp"
 
 #include <Foundation/Allocator.hpp>

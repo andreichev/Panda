@@ -35,7 +35,19 @@ static void changeToResourcesDirectory() {
 
 extern int startApp(int argc, char** argv);
 
+@interface MainHelper : NSObject
+@end
+
+@implementation MainHelper
+- (void)selectedKeyboardInputSourceChanged:(NSObject* )object {}
+- (void)doNothing:(id)object{}
+@end
+
 int main(int argc, const char * argv[]) {
+    MainHelper* helper = [[MainHelper alloc] init];
+    [NSThread detachNewThreadSelector:@selector(doNothing:)
+                             toTarget:helper
+                           withObject:nil];
     NSApplication* application = [NSApplication sharedApplication];
     AppDelegate* delegate = [[AppDelegate alloc] init];
     [application setDelegate:delegate];
@@ -43,12 +55,6 @@ int main(int argc, const char * argv[]) {
     [application activateIgnoringOtherApps:YES];
     changeToResourcesDirectory();
     [application finishLaunching];
-    [[NSNotificationCenter defaultCenter]
-        postNotificationName:NSApplicationWillFinishLaunchingNotification
-        object:NSApp];
-    [[NSNotificationCenter defaultCenter]
-        postNotificationName:NSApplicationDidFinishLaunchingNotification
-        object:NSApp];
     id quitMenuItem = [NSMenuItem new];
     [quitMenuItem
         initWithTitle:@"Quit"

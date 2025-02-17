@@ -2,7 +2,6 @@
 // Created by Admin on 11.02.2022.
 //
 
-#include "pndpch.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
 
 namespace Panda {

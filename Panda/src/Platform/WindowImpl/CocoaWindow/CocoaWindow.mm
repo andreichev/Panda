@@ -15,6 +15,10 @@ using namespace Panda;
 
 @implementation NativeWindow
 
+- (BOOL)isWindowResizable {
+    return (([self styleMask] & NSWindowStyleMaskResizable) == NSWindowStyleMaskResizable);
+}
+
 - (BOOL)isFullScreen {
     return (([self styleMask] & NSWindowStyleMaskFullScreen) == NSWindowStyleMaskFullScreen);
 }
@@ -44,15 +48,17 @@ CocoaWindow::CocoaWindow(const char *title, Panda::Size size, bool isFullscreen,
     NativeWindow* window = [[NativeWindow alloc] initWithContentRect:rect
                                                    styleMask:styleMask
                                                      backing:NSBackingStoreBuffered
-                                                       defer:NO];
+                                                       defer:YES];
+
+    pollEvents();
     [window setTitle:@(title)];
     CocoaWindowDelegate* delegate = [[CocoaWindowDelegate alloc] initWithCocoa:this];
     [window setDelegate:delegate];
     [window makeKeyAndOrderFront:nil];
-    [window setHasShadow:NO];
+    // [window setHasShadow:NO];
     [window center];
     [window setBackgroundColor:[NSColor blackColor]];
-
+    pollEvents();
     WonderView* gameView = [[WonderView alloc] init];
     [window setContentView:gameView];
     [gameView setWantsLayer:YES];
@@ -64,7 +70,7 @@ CocoaWindow::CocoaWindow(const char *title, Panda::Size size, bool isFullscreen,
     }
     Miren::PlatformData::get()->nativeWindowHandle = window;
     this->m_handle = window;
-    // pollEvents();
+    pollEvents();
 }
 
 CocoaWindow::~CocoaWindow() {}
@@ -79,10 +85,12 @@ void CocoaWindow::setFullScreen(bool isFullScreen) {
         return;
     }
     NSLog(@"TOGGLE FULL SCREEN!");
+    [m_handle setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
     [m_handle toggleFullScreen:nil];
 }
 
 void CocoaWindow::setTitle(const char *title) {
+    [m_handle setTitle:@(title)];
 }
 
 bool CocoaWindow::isMaximized() {
@@ -94,16 +102,34 @@ void CocoaWindow::setMaximized(bool isMaximized) {
 }
 
 void CocoaWindow::setResizable(bool isResizable) {
+    const NSUInteger styleMask = [m_handle styleMask];
+    if (isResizable) {
+        [m_handle setStyleMask:(styleMask | NSWindowStyleMaskResizable)];
+        const NSWindowCollectionBehavior behavior =
+            NSWindowCollectionBehaviorFullScreenPrimary |
+            NSWindowCollectionBehaviorManaged;
+        [m_handle setCollectionBehavior:behavior];
+    } else {
+        [m_handle setStyleMask:(styleMask & ~NSWindowStyleMaskResizable)];
+        const NSWindowCollectionBehavior behavior =
+            NSWindowCollectionBehaviorFullScreenNone;
+        [m_handle setCollectionBehavior:behavior];
+    }
 }
 
 void CocoaWindow::setSize(Panda::Size size) {
+    NSRect contentRect = [m_handle contentRectForFrameRect:[m_handle frame]];
+    contentRect.origin.y += contentRect.size.height - size.height;
+    contentRect.size = NSMakeSize(size.width, size.height);
+    [m_handle setFrame:[m_handle frameRectForContentRect:contentRect]
+                        display:YES];
 }
 
 void CocoaWindow::pollEvents() {
     NSApplication* application = [NSApplication sharedApplication];
     while (true) {
         NSEvent *event = [application nextEventMatchingMask:NSEventMaskAny
-                                                  untilDate:nil
+                                                  untilDate:[NSDate distantPast]
                                                      inMode:NSDefaultRunLoopMode
                                                     dequeue:YES];
         if (!event) { break; }

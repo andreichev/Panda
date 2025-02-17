@@ -44,8 +44,6 @@ endif ()
 
 add_library(Panda STATIC "${SOURCES}" "${INCLUDE}" "${RESOURCE_FOLDERS}")
 
-target_precompile_headers(Panda PRIVATE src/pndpch.hpp)
-
 target_include_directories(Panda PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(Panda PUBLIC ${PROJECT_SOURCE_DIR}/include)
 

@@ -2,6 +2,7 @@
 
 #include <Miren/Miren.hpp>
 #include <stb_image.h>
+#include <fstream>
 
 namespace Panda {
 

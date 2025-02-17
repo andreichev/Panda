@@ -30,6 +30,14 @@
     eventQueue->postSizeEvent(width, height);
 }
 
+- (void)windowDidEnterFullScreen:(NSNotification *)notification {
+    NSLog(@"ENTERED FULLSCREEN");
+}
+
+- (void)windowDidExitFullScreen:(NSNotification *)notification {
+    NSLog(@"EXITED FULLSCREEN");
+}
+
 - (void)windowDidMove:(NSNotification *)notification {
 
 }
