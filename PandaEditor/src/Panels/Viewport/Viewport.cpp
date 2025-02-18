@@ -14,6 +14,7 @@ Viewport::Viewport(ViewportOutput *output, CameraController *cameraController)
     , m_camera(nullptr)
     , m_cameraController(cameraController)
     , m_focused(false)
+    , m_hovered(false)
     , m_focusNextFrame(true)
     , m_sceneFB()
     , m_sceneFbSpecification()
@@ -104,13 +105,13 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     ImVec2 viewportSpace = ImGui::GetContentRegionAvail();
     viewportSpace = ImVec2(viewportSpace.x - 4, viewportSpace.y - 4);
     if (m_frame.size != viewportSpace) { updateViewportSize(viewportSpace); }
-    bool hovered = ImGui::IsWindowHovered();
-    if (hovered && Input::isMouseButtonPressed(MouseButton::RIGHT) || m_focusNextFrame) {
+    m_hovered = ImGui::IsWindowHovered();
+    if ((m_hovered && Input::isMouseButtonPressed(MouseButton::RIGHT)) || m_focusNextFrame) {
         ImGui::SetWindowFocus();
         m_focusNextFrame = false;
     }
     m_focused = ImGui::IsWindowFocused();
-    Application::get()->getImGuiLayer()->setBlockEvents(!hovered);
+    Application::get()->getImGuiLayer()->setBlockEvents(!m_hovered);
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 1);
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
     m_frame.origin = ImGui::GetCursorScreenPos();
@@ -164,6 +165,10 @@ void Viewport::setWorld(World *world) {
 
 bool Viewport::isFocused() {
     return m_focused;
+}
+
+bool Viewport::isHovered() {
+    return m_hovered;
 }
 
 int32_t Viewport::getHoveredId() {

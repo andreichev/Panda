@@ -62,6 +62,7 @@ CocoaWindow::CocoaWindow(const char *title, Panda::Size size, bool isFullscreen,
     WonderView* gameView = [[WonderView alloc] init];
     [window setContentView:gameView];
     [gameView setWantsLayer:YES];
+    [gameView setAcceptsTouchEvents:YES];
     [window makeFirstResponder:gameView];
     [window setAcceptsMouseMovedEvents:YES];
     [window setRestorable:NO];

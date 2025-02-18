@@ -5,6 +5,7 @@
 #include "CameraController.hpp"
 
 #include <Panda/Math/Math.hpp>
+#include <Foundation/PlatformDetection.hpp>
 
 #include <imgui.h>
 
@@ -12,14 +13,19 @@ namespace Panda {
 
 CameraController::CameraController()
     : m_transform()
+#ifdef PLATFORM_MACOS
+    , m_mouseSpeed(0.25f)
+#else
     , m_mouseSpeed(0.2f)
+#endif
     , m_moveSpeed(20.f)
     , m_front()
     , m_up()
     , m_right()
     , m_target()
     , m_cursorStarted(false)
-    , m_isActive(false)
+    , m_isMoveActive(false)
+    , m_isRotationActive(false)
     , m_lastMouseX(0)
     , m_lastMouseY(0)
     , m_animation() {
@@ -57,19 +63,26 @@ void CameraController::update(float deltaTime) {
         m_cursorStarted = false;
         return;
     }
-    if (!m_isActive) {
+    if (m_isMoveActive) {
+        float speed = m_moveSpeed * deltaTime;
+        if (ImGui::IsKeyDown(ImGuiKey_W)) { m_transform.translate(m_front * speed); }
+        if (ImGui::IsKeyDown(ImGuiKey_S)) { m_transform.translate(-m_front * speed); }
+        if (ImGui::IsKeyDown(ImGuiKey_A)) { m_transform.translate(-m_right * speed); }
+        if (ImGui::IsKeyDown(ImGuiKey_D)) { m_transform.translate(m_right * speed); }
+    }
+    if (!m_isRotationActive) {
         m_cursorStarted = false;
         return;
     }
     glm::vec3 cameraRotation = m_transform.getRotationEuler();
     glm::vec3 cameraPosition = m_transform.getPosition();
-    float speed = m_moveSpeed * deltaTime;
-    if (ImGui::IsKeyDown(ImGuiKey_W)) { m_transform.translate(m_front * speed); }
-    if (ImGui::IsKeyDown(ImGuiKey_S)) { m_transform.translate(-m_front * speed); }
-    if (ImGui::IsKeyDown(ImGuiKey_A)) { m_transform.translate(-m_right * speed); }
-    if (ImGui::IsKeyDown(ImGuiKey_D)) { m_transform.translate(m_right * speed); }
+#ifdef PLATFORM_MACOS
+    if (Input::touchCount() == 2) {
+        ImVec2 mousePos = {Input::getTouch(0).x, Input::getTouch(0).y};
+#else
     if (ImGui::IsKeyDown(ImGuiKey_MouseRight)) {
         ImVec2 mousePos = ImGui::GetMousePos();
+#endif
         double mouseX = mousePos.x;
         double mouseY = mousePos.y;
         double deltaX = mouseX - m_lastMouseX;
@@ -92,11 +105,13 @@ void CameraController::update(float deltaTime) {
         m_cursorStarted = false;
     }
 
+#ifndef PLATFORM_MACOS
     double scroll = Input::getMouseScrollY();
     if (scroll != 0) {
         float zoom = scroll * 0.5;
         m_transform.translate(zoom * m_front);
     }
+#endif
 }
 
 void CameraController::updateVectors() {
@@ -131,8 +146,12 @@ void CameraController::setRotation(glm::quat quat) {
     updateVectors();
 }
 
-void CameraController::setActive(bool flag) {
-    m_isActive = flag;
+void CameraController::setMoveActive(bool flag) {
+    m_isMoveActive = flag;
+}
+
+void CameraController::setRotationActive(bool flag) {
+    m_isRotationActive = flag;
 }
 
 void CameraController::reset(glm::vec3 pos) {

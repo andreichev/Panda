@@ -30,6 +30,7 @@ public:
     void onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen);
     void focus();
     bool isFocused();
+    bool isHovered();
     int32_t getHoveredId();
     Miren::ViewId getMirenView();
 
@@ -46,6 +47,7 @@ private:
     CameraController *m_cameraController;
     bool m_focusNextFrame;
     bool m_focused;
+    bool m_hovered;
     uint32_t m_hoveredId;
     Rect m_frame;
 };

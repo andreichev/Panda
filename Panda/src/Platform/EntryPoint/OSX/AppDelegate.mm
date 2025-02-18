@@ -6,7 +6,9 @@
 
 #import "AppDelegate.hpp"
 
-@implementation AppDelegate
+@implementation AppDelegate {
+    id keyUpMonitor;
+}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
     NSEvent* event = [NSEvent otherEventWithType:NSEventTypeApplicationDefined
@@ -20,10 +22,21 @@
                                            data2:0];
     [NSApp postEvent:event atStart:YES];
     NSLog(@"DID FINISH LAUNCHING");
+    NSEvent* (^block)(NSEvent*) = ^ NSEvent* (NSEvent* event) {
+        if ([event modifierFlags] & NSEventModifierFlagCommand) {
+            [[NSApp keyWindow] sendEvent:event];
+        }
+        return event;
+    };
+    keyUpMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskKeyUp
+                                                         handler:block];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
     NSLog(@"APP WILL TERMINATE");
+    if (keyUpMonitor) {
+        [NSEvent removeMonitor:keyUpMonitor];
+    }
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {

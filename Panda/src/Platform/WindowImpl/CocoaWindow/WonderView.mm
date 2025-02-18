@@ -11,6 +11,7 @@ using namespace Panda;
 struct WonderHelper {
     Panda::Key keycodes[256];
     Panda::Key scancodes[256];
+    bool keys[256];
 };
 
 static const NSRange kEmptyRange = { NSNotFound, 0 };
@@ -147,6 +148,26 @@ static Panda::Key cocoaKeyToPandaKey(WonderHelper& helper, unsigned int key) {
     return helper.keycodes[key];
 }
 
+static NSUInteger pandaKeyToCocoaModifierFlag(Panda::Key key) {
+    switch (key) {
+        case Panda::Key::LEFT_SHIFT:
+        case Panda::Key::RIGHT_SHIFT:
+            return NSEventModifierFlagShift;
+        case Panda::Key::LEFT_CONTROL:
+        case Panda::Key::RIGHT_CONTROL:
+            return NSEventModifierFlagControl;
+        case Panda::Key::LEFT_ALT:
+        case Panda::Key::RIGHT_ALT:
+            return NSEventModifierFlagOption;
+        case Panda::Key::LEFT_SUPER:
+        case Panda::Key::RIGHT_SUPER:
+            return NSEventModifierFlagCommand;
+        case Panda::Key::CAPS_LOCK:
+            return NSEventModifierFlagCapsLock;
+    }
+    return 0;
+}
+
 @implementation WonderView {
     WonderHelper m_helper;
 }
@@ -155,9 +176,10 @@ static Panda::Key cocoaKeyToPandaKey(WonderHelper& helper, unsigned int key) {
     self = [super init];
     if (self != nil) {
         eventQueue = nil;
+        memset(m_helper.keys, 0, sizeof(m_helper.keys));
         markedText = [[NSMutableAttributedString alloc] init];
+        fillKeyTable(m_helper);
     }
-    fillKeyTable(self->m_helper);
     NSLog(@"WonderView created");
     return self;
 }
@@ -166,10 +188,6 @@ static Panda::Key cocoaKeyToPandaKey(WonderHelper& helper, unsigned int key) {
     [super dealloc];
     [markedText release];
     NSLog(@"WonderView deallocated");
-}
-
-- (NSTouchTypeMask)allowedTouchTypes {
-    return NSTouchTypeIndirect;
 }
 
 - (void)setEventQueue:(Panda::EventQueue *)queue {
@@ -187,6 +205,43 @@ static Panda::Key cocoaKeyToPandaKey(WonderHelper& helper, unsigned int key) {
 - (BOOL)wantsUpdateLayer {
     return YES;
 }
+
+// MARK: - Touchpad
+
+- (void)touchesBeganWithEvent:(NSEvent *)event {
+    if (eventQueue == nil) { return; }
+    NSSet<NSTouch *>* touches = [event touchesMatchingPhase:NSTouchPhaseBegan inView:self];
+    for (NSTouch *touch in touches) {
+        CGPoint touchLocation = [touch normalizedPosition];
+        // LOG_INFO("TOUCH BEGAN: {}", int([touch.identity hash]));
+        float x = touchLocation.x * self.frame.size.width;
+        float y = (1.f - touchLocation.y) * self.frame.size.height;
+        eventQueue->postTouchBeganEvent(int([touch.identity hash]), x, y);
+    }
+}
+
+- (void)touchesMovedWithEvent:(NSEvent *)event {
+    if (eventQueue == nil) { return; }
+    NSSet<NSTouch *>* touches = [event touchesMatchingPhase:NSTouchPhaseMoved inView:self];
+    for (NSTouch *touch in touches) {
+        CGPoint touchLocation = [touch normalizedPosition];
+        // LOG_INFO("TOUCH MOVED: {}", int([touch.identity hash]));
+        float x = touchLocation.x * self.frame.size.width;
+        float y = (1.f - touchLocation.y) * self.frame.size.height;
+        eventQueue->postTouchMovedEvent(int([touch.identity hash]), x, y);
+    }
+}
+
+- (void)touchesEndedWithEvent:(NSEvent *)event {
+    if (eventQueue == nil) { return; }
+    NSSet<NSTouch *>* touches = [event touchesMatchingPhase:NSTouchPhaseEnded inView:self];
+    for (NSTouch *touch in touches) {
+        // LOG_INFO("TOUCH ENDED: {}", int([touch.identity hash]));
+        eventQueue->postTouchEndedEvent(int([touch.identity hash]));
+    }
+}
+
+// MARK: - Mouse
 
 - (void)mouseMoved:(NSEvent *)event {
     if (eventQueue == nil) { return; }
@@ -256,18 +311,29 @@ static Panda::Key cocoaKeyToPandaKey(WonderHelper& helper, unsigned int key) {
     eventQueue->postScrollEvent(deltaX, deltaY);
 }
 
+// MARK: - Keys
+
 - (void)keyDown:(NSEvent *)event {
     if (eventQueue == nil) { return; }
-    Panda::Key key = cocoaKeyToPandaKey(self->m_helper, [event keyCode]);
+    Panda::Key key = cocoaKeyToPandaKey(m_helper, [event keyCode]);
+    m_helper.keys[(int)key] = true;
     eventQueue->postKeyEvent(key, true);
     [self interpretKeyEvents:@[event]];
 }
 
-- (void)flagsChanged:(NSEvent *)event {}
+- (void)flagsChanged:(NSEvent *)event {
+    Panda::Key key = cocoaKeyToPandaKey(m_helper, [event keyCode]);
+    const NSUInteger keyFlag = pandaKeyToCocoaModifierFlag(key);
+    const NSUInteger modifierFlags = [event modifierFlags] & NSEventModifierFlagDeviceIndependentFlagsMask;
+    bool down = keyFlag & modifierFlags;
+    m_helper.keys[(int)key] = down;
+    eventQueue->postKeyEvent(key, down);
+}
 
 - (void)keyUp:(NSEvent *)event {
     if (eventQueue == nil) { return; }
-    Panda::Key key = cocoaKeyToPandaKey(self->m_helper, [event keyCode]);
+    Panda::Key key = cocoaKeyToPandaKey(m_helper, [event keyCode]);
+    m_helper.keys[(int)key] = false;
     eventQueue->postKeyEvent(key, false);
 }
 
