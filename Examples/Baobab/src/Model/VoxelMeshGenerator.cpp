@@ -446,8 +446,8 @@ Panda::MeshData VoxelMeshGenerator::makeOneChunkMesh(
         }
     }
     // LOG_INFO("MESH GENERATED.");
-    // LOG_INFO("VERTICES COUNT: {}", verticesCount);
-    // LOG_INFO("INDICES COUNT: {}", indicesCount);
+    // LOG_INFO("VERTICES COUNT: %d", verticesCount);
+    // LOG_INFO("INDICES COUNT: %d", indicesCount);
     Foundation::Memory verticesData = Foundation::Memory(vertices, nullptr, freeBuffer);
     Foundation::Memory indicesData = Foundation::Memory(indices, nullptr, freeBuffer);
     return MeshData(

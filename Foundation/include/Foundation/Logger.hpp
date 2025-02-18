@@ -4,20 +4,39 @@
 
 #pragma once
 
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
+#include <string_view>
+#include <memory>
 
 namespace Foundation {
 
 class Logger {
 public:
+    enum class MessageType { TRACE, INFO, WARNING, ERROR, CRITICAL };
     static void init();
-    inline static std::shared_ptr<spdlog::logger> &getLogger() {
-        return s_logger;
-    };
 
+    template<typename... Args>
+    static void log(MessageType type, const char* format, ...) {
+        static const int32_t maxSize = 256;
+        static char buffer[maxSize];
+        va_list args;
+        va_start(args, format);
+        vsnprintf(buffer, sizeof(buffer), format, args);
+        va_end(args);
+        std::string_view view = buffer;
+        log(type, view);
+    }
 private:
-    static std::shared_ptr<spdlog::logger> s_logger;
+    enum class ColorType { DEFAULT, GREEN, YELLOW, RED };
+    enum class ColorBgType { DEFAULT, RED };
+    struct TextInfo {
+        ColorType colorType = ColorType::DEFAULT;
+        ColorBgType colorBgType = ColorBgType::DEFAULT;
+        bool bold = false;
+    };
+    static void log(MessageType type, std::string_view message);
+    static void log(std::string_view message);
+    static void setTextAttrib(TextInfo textInfo);
+    static void reset();
 };
 
 class EditorLogger {
@@ -29,13 +48,15 @@ public:
     static void log(std::string_view message, MessageType type);
 
     template<typename... Args>
-    using format_string_t = fmt::format_string<Args...>;
-
-    template<typename... Args>
-    static void log(MessageType type, format_string_t<Args...> fmt, Args &&...args) {
-        fmt::basic_memory_buffer<char, 250> buf;
-        fmt::vformat_to(fmt::appender(buf), fmt, fmt::make_format_args(args...));
-        log(std::string_view(buf.data(), buf.size()), type);
+    static void log(MessageType type, const char* format, ...) {
+        static const int32_t maxSize = 256;
+        static char buffer[maxSize];
+        va_list args;
+        va_start(args, format);
+        vsnprintf(buffer, sizeof(buffer), format, args);
+        va_end(args);
+        std::string_view view = buffer;
+        log(view, type);
     }
 
 private:
@@ -44,11 +65,11 @@ private:
 
 } // namespace Foundation
 
-#define LOG_TRACE(...) ::Foundation::Logger::getLogger()->trace(__VA_ARGS__)
-#define LOG_INFO(...) ::Foundation::Logger::getLogger()->info(__VA_ARGS__)
-#define LOG_WARN(...) ::Foundation::Logger::getLogger()->warn(__VA_ARGS__)
-#define LOG_ERROR(...) ::Foundation::Logger::getLogger()->error(__VA_ARGS__)
-#define LOG_CRITICAL(...) ::Foundation::Logger::getLogger()->critical(__VA_ARGS__)
+#define LOG_TRACE(...)::Foundation::Logger::log(Foundation::Logger::MessageType::TRACE, __VA_ARGS__)
+#define LOG_INFO(...) ::Foundation::Logger::log(Foundation::Logger::MessageType::INFO, __VA_ARGS__)
+#define LOG_WARN(...) ::Foundation::Logger::log(Foundation::Logger::MessageType::WARNING, __VA_ARGS__)
+#define LOG_ERROR(...)::Foundation::Logger::log(Foundation::Logger::MessageType::ERROR, __VA_ARGS__)
+#define LOG_CRITICAL(...) ::Foundation::Logger::log(Foundation::Logger::MessageType::CRITICAL, __VA_ARGS__)
 
 #define LOG_INFO_EDITOR(...)                                                                       \
     ::Foundation::EditorLogger::log(Foundation::EditorLogger::MessageType::INFO, __VA_ARGS__)

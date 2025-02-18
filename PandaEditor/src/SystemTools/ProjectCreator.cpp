@@ -7,6 +7,7 @@
 #include <Panda/Assets/AssetLoaderEditor.hpp>
 #include <Panda/Assets/AssetHandler.hpp>
 #include <fstream>
+#include <sstream>
 
 namespace Panda {
 

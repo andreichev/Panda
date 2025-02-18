@@ -86,7 +86,7 @@ void Application::loop() {
         m_thisSecondFramesCount++;
         if (m_oneSecondTimeCount >= 1000) {
             fps = m_thisSecondFramesCount;
-            // LOG_INFO("FPS: {}", fps);
+            // LOG_INFO("FPS: %d", fps);
             m_thisSecondFramesCount = 0;
             m_oneSecondTimeCount = 0;
         }

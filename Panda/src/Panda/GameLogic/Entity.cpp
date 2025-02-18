@@ -37,7 +37,7 @@ TransformComponent Entity::calculateWorldSpaceTransform() {
 void Entity::addChildEntity(Entity entity) {
     if (entity.isAncestorOf(*this)) {
         LOG_ERROR_EDITOR(
-            "The entity {} can't be moved into one of its children.", entity.getName()
+            "The entity %s can't be moved into one of its children.", entity.getName().c_str()
         );
         return;
     }

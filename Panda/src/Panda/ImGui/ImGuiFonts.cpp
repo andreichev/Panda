@@ -9,8 +9,8 @@ static std::unordered_map<std::string, ImFont *> s_fonts;
 void Fonts::add(const FontConfiguration &config, bool isDefault) {
     PND_ASSERT_F(
         s_fonts.find(config.fontName) == s_fonts.end(),
-        "Tried to add font with name '{}' but that name is already taken!",
-        config.fontName
+        "Tried to add font with name '%s' but that name is already taken!",
+        config.fontName.c_str()
     );
     ImFontConfig imguiFontConfig;
     imguiFontConfig.MergeMode = config.mergeWithLast;

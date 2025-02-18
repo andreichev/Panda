@@ -118,7 +118,7 @@ IMGUI_IMPL_API bool ImGui_ImplMiren_CreateFontsTexture() {
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
     uint32_t textureSize = width * height * 4;
-    LOG_INFO("FONT TEXTURE SIZE: {}, {}", width, height);
+    LOG_INFO("FONT TEXTURE SIZE: %d, %d", width, height);
     void *texture = malloc(textureSize);
     memcpy(texture, pixels, textureSize);
 

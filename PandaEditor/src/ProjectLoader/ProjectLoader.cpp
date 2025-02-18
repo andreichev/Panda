@@ -67,7 +67,7 @@ void ProjectLoader::loadRecentProject() {
 
 void ProjectLoader::openProject(const path_t &path) {
     if (!std::filesystem::exists(path)) {
-        LOG_INFO("PROJECT NOT FOUND AT PATH {}", path.string());
+        LOG_INFO("PROJECT NOT FOUND AT PATH %s", path.string().c_str());
         return;
     }
     m_projectPath = path;
@@ -95,7 +95,7 @@ void ProjectLoader::openProject(const path_t &path) {
     // Load editor camera location
     { m_output->setEditorCameraSettings(m_projectSettings.editorCameraSettings); }
     m_output->loaderDidLoadProject(projectName.string(), m_projectPath);
-    LOG_INFO("LOADED PROJECT AT PATH {}", m_projectPath.string());
+    LOG_INFO("LOADED PROJECT AT PATH %s", m_projectPath.string().c_str());
     if (m_projectSettings.worldPath.empty()) {
         m_output->loaderCreateSampleWorld();
         return;
@@ -170,7 +170,7 @@ void ProjectLoader::saveWorld() {
         file.close();
         m_world->setChanged(false);
     } else {
-        LOG_ERROR("ERROR SAVING WORLD AT PATH {}", m_worldPath.string());
+        LOG_ERROR("ERROR SAVING WORLD AT PATH %s", m_worldPath.string().c_str());
     }
 }
 
@@ -186,14 +186,14 @@ void ProjectLoader::loadWorld() {
         decoder->decode(file, worldDto);
         file.close();
     } else {
-        LOG_INFO("CANNOT LOAD WORLD AT PATH {}", m_worldPath.string());
+        LOG_INFO("CANNOT LOAD WORLD AT PATH %s", m_worldPath.string().c_str());
         m_worldPath.clear();
         m_projectSettings.worldPath.clear();
         m_output->loaderCreateSampleWorld();
         return;
     }
     WorldMapper::fillWorld(*m_world, worldDto);
-    LOG_INFO("LOADED WORLD AT PATH {}", m_worldPath.string());
+    LOG_INFO("LOADED WORLD AT PATH %s", m_worldPath.string().c_str());
     m_output->loaderDidLoadWorld();
 }
 
@@ -217,7 +217,7 @@ void ProjectLoader::closeProject() {
 }
 
 void ProjectLoader::removeRecentProject(int index) {
-    LOG_INFO("REMOVE PROJECT AT INDEX {}", index);
+    LOG_INFO("REMOVE PROJECT AT INDEX %d", index);
     m_editorSettings.recentProjects.erase(std::next(m_editorSettings.recentProjects.begin(), index)
     );
 }

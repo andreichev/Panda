@@ -46,6 +46,10 @@ void EditorLayer::onAttach() {
     GameContext::s_currentWorld = m_currentWorld;
     GameContext::s_assetHandler = &m_loader.getAssetHandler();
     LOG_INFO_EDITOR("EDITOR INITIALIZED");
+    LOG_TRACE("HELLO!");
+    LOG_WARN("HELLO!");
+    LOG_ERROR("HELLO!");
+    LOG_CRITICAL("HELLO!");
 }
 
 void EditorLayer::onDetach() {

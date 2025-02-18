@@ -35,7 +35,7 @@ GlfwWindow::GlfwWindow(const char *title, Size size, bool isFullscreen, bool isM
     m_isFullScreen = isFullscreen;
     m_windowSizeBackup = size;
     m_isCursorLocked = false;
-    LOG_INFO("Hello GLFW! {}", glfwGetVersionString());
+    LOG_INFO("Hello GLFW! %s", glfwGetVersionString());
     glfwSetErrorCallback(glfwErrorCallback);
     if (glfwInit() == false) {
         LOG_CRITICAL("GLFW INITIALIZATION ERROR");

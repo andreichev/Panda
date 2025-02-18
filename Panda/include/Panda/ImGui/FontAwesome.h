@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 static inline std::string getString(const char8_t *ptr) {
     return (const char *)ptr;
 }

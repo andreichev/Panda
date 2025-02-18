@@ -13,7 +13,7 @@ void BlocksCreation::initialize() {
 }
 
 void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkIndexZ) {
-    // LOG_INFO("UPDATE CHUNK {} {} {}", chunkIndexX, chunkIndexY, chunkIndexZ);
+    // LOG_INFO("UPDATE CHUNK %d %d %d", chunkIndexX, chunkIndexY, chunkIndexZ);
     Panda::MeshData data = VoxelMeshGenerator::makeOneChunkMesh(
         m_layoutHandle, *m_chunksStorage, chunkIndexX, chunkIndexY, chunkIndexZ, true
     );
