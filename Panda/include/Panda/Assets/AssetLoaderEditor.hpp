@@ -2,6 +2,7 @@
 
 #include <Panda/Base/FileBase.hpp>
 #include <Miren/Miren.hpp>
+#include <array>
 
 namespace Panda {
 

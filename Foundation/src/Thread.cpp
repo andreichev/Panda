@@ -82,7 +82,7 @@ bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char
     pthread_attr_t attr;
     result = pthread_attr_init(&attr);
     if (result != 0) {
-        LOG_CRITICAL("pthread_attr_init failed! {}", result);
+        LOG_CRITICAL("pthread_attr_init failed! %d", result);
         return false;
     }
 
@@ -90,7 +90,7 @@ bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char
         result = pthread_attr_setstacksize(&attr, m_stackSize);
 
         if (result != 0) {
-            LOG_CRITICAL("pthread_attr_setstacksize failed! {}", result);
+            LOG_CRITICAL("pthread_attr_setstacksize failed! %d", result);
             return false;
         }
     }
@@ -98,7 +98,7 @@ bool Thread::init(ThreadFn _fn, void *_userData, uint32_t _stackSize, const char
     result = pthread_create(&ti->m_handle, &attr, &ti->threadFunc, this);
 
     if (result != 0) {
-        LOG_ERROR("pthread_attr_setschedparam failed! {}", result);
+        LOG_ERROR("pthread_attr_setschedparam failed! %d", result);
         return false;
     }
 #else

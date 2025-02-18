@@ -78,7 +78,7 @@ struct Context {
     void rendererExecuteCommands(Foundation::CommandBuffer &commandBuffer) {
         Foundation::CommandBuffer::Command *command;
         while ((command = commandBuffer.read()) != nullptr) {
-            CMDBUF_LOG("COMMAND: {}", command->type);
+            CMDBUF_LOG("COMMAND: %d", command->type);
             switch (command->type) {
                 case RendererCommandType::RendererInit: {
                     break;

@@ -6,16 +6,17 @@
 
 #include <string_view>
 #include <memory>
+#include <cstdarg>
 
 namespace Foundation {
 
 class Logger {
 public:
-    enum class MessageType { TRACE, INFO, WARNING, ERROR, CRITICAL };
+    enum class MessageType { _TRACE, _INFO, _WARNING, _ERROR, _CRITICAL };
     static void init();
 
     template<typename... Args>
-    static void log(MessageType type, const char* format, ...) {
+    static void log(MessageType type, const char *format, ...) {
         static const int32_t maxSize = 256;
         static char buffer[maxSize];
         va_list args;
@@ -23,8 +24,9 @@ public:
         vsnprintf(buffer, sizeof(buffer), format, args);
         va_end(args);
         std::string_view view = buffer;
-        log(type, view);
+        log(view, type);
     }
+
 private:
     enum class ColorType { DEFAULT, GREEN, YELLOW, RED };
     enum class ColorBgType { DEFAULT, RED };
@@ -33,7 +35,7 @@ private:
         ColorBgType colorBgType = ColorBgType::DEFAULT;
         bool bold = false;
     };
-    static void log(MessageType type, std::string_view message);
+    static void log(std::string_view message, MessageType type);
     static void log(std::string_view message);
     static void setTextAttrib(TextInfo textInfo);
     static void reset();
@@ -48,7 +50,7 @@ public:
     static void log(std::string_view message, MessageType type);
 
     template<typename... Args>
-    static void log(MessageType type, const char* format, ...) {
+    static void log(MessageType type, const char *format, ...) {
         static const int32_t maxSize = 256;
         static char buffer[maxSize];
         va_list args;
@@ -65,11 +67,15 @@ private:
 
 } // namespace Foundation
 
-#define LOG_TRACE(...)::Foundation::Logger::log(Foundation::Logger::MessageType::TRACE, __VA_ARGS__)
-#define LOG_INFO(...) ::Foundation::Logger::log(Foundation::Logger::MessageType::INFO, __VA_ARGS__)
-#define LOG_WARN(...) ::Foundation::Logger::log(Foundation::Logger::MessageType::WARNING, __VA_ARGS__)
-#define LOG_ERROR(...)::Foundation::Logger::log(Foundation::Logger::MessageType::ERROR, __VA_ARGS__)
-#define LOG_CRITICAL(...) ::Foundation::Logger::log(Foundation::Logger::MessageType::CRITICAL, __VA_ARGS__)
+#define LOG_TRACE(...)                                                                             \
+    ::Foundation::Logger::log(Foundation::Logger::MessageType::_TRACE, __VA_ARGS__)
+#define LOG_INFO(...) ::Foundation::Logger::log(Foundation::Logger::MessageType::_INFO, __VA_ARGS__)
+#define LOG_WARN(...)                                                                              \
+    ::Foundation::Logger::log(Foundation::Logger::MessageType::_WARNING, __VA_ARGS__)
+#define LOG_ERROR(...)                                                                             \
+    ::Foundation::Logger::log(Foundation::Logger::MessageType::_ERROR, __VA_ARGS__)
+#define LOG_CRITICAL(...)                                                                          \
+    ::Foundation::Logger::log(Foundation::Logger::MessageType::_CRITICAL, __VA_ARGS__)
 
 #define LOG_INFO_EDITOR(...)                                                                       \
     ::Foundation::EditorLogger::log(Foundation::EditorLogger::MessageType::INFO, __VA_ARGS__)

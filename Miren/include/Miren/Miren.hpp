@@ -7,6 +7,7 @@
 #include "Base.hpp"
 #include "MirenStates.hpp"
 #include "VertexBufferLayoutData.hpp"
+#include <vector>
 
 namespace Miren {
 

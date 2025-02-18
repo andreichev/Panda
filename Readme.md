@@ -21,4 +21,4 @@ Supports languages:
 * C++
 ---
 Features to come:
-- scripting on swift
+- Scripting on swift

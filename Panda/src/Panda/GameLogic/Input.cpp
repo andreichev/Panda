@@ -164,7 +164,7 @@ void Input::nextFrame() {
 
 Input::Touch Input::getTouch(int index) {
     if (index >= 0 && index < activeTouches.size()) { return activeTouches[index]; }
-    PND_ASSERT_F(false, "WRONG TOUCH INDEX {}", index);
+    PND_ASSERT_F(false, "WRONG TOUCH INDEX %d", index);
     return Input::Touch(0, 0, 0);
 }
 

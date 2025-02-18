@@ -23,7 +23,7 @@ namespace Panda {
 #endif
 
 void glfwErrorCallback(int error_code, const char *description) {
-    LOG_ERROR("GLFW ERROR, code: {}, description: {}", error_code, description);
+    LOG_ERROR("GLFW ERROR, code: %d, description: %s", error_code, description);
 }
 
 GlfwWindow::~GlfwWindow() {

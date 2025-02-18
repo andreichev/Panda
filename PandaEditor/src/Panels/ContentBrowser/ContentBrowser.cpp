@@ -76,12 +76,12 @@ void ContentBrowser::onImGuiRender() {
     //         for (const auto &dropPath : dropPaths) {
     //             if (std::filesystem::is_directory(dropPath)) {
     //                 SystemTools::copyFolder(dropPath, m_currentDirectory.string());
-    //                 LOG_INFO("COPY DIR THIS: {}, THERE: {}", dropPath,
+    //                 LOG_INFO("COPY DIR THIS: {}, THERE: %s", dropPath,
     //                 m_currentDirectory.string());
     //             } else {
     //                 std::filesystem::copy(dropPath, m_currentDirectory);
     //                 LOG_INFO(
-    //                     "COPY FILE THIS: {}, THERE: {}", dropPath, m_currentDirectory.string()
+    //                     "COPY FILE THIS: {}, THERE: %s", dropPath, m_currentDirectory.string()
     //                 );
     //             }
     //         }

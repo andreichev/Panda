@@ -54,7 +54,7 @@ bool ScriptEngine::reload(ScriptEngineConfig config) {
     } catch (...) {
         m_lib = nullptr;
         LOG_ERROR(
-            "SCRIPT ENGINE: Can't load script dynamic library at path {}/{}",
+            "SCRIPT ENGINE: Can't load script dynamic library at path %s/%s",
             config.dllPath.string().c_str(),
             config.dllName.c_str()
         );
