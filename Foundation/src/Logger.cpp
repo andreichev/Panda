@@ -40,22 +40,22 @@ EditorLogger::EditorLoggerCallback EditorLogger::s_callback;
 
 void Logger::init() {}
 
-void Logger::log(Logger::MessageType type, std::string_view message) {
+void Logger::log(std::string_view message, Logger::MessageType type) {
     TextInfo textInfo;
     switch (type) {
-        case MessageType::TRACE:
+        case Logger::MessageType::_TRACE:
             break;
-        case MessageType::INFO:
+        case Logger::MessageType::_INFO:
             textInfo.colorType = ColorType::GREEN;
             break;
-        case MessageType::WARNING:
+        case Logger::MessageType::_WARNING:
             textInfo.colorType = ColorType::YELLOW;
             break;
-        case MessageType::ERROR:
+        case Logger::MessageType::_ERROR:
             textInfo.bold = true;
             textInfo.colorType = ColorType::RED;
             break;
-        case MessageType::CRITICAL:
+        case Logger::MessageType::_CRITICAL:
             textInfo.bold = true;
             textInfo.colorType = ColorType::DEFAULT;
             textInfo.colorBgType = ColorBgType::RED;
@@ -77,7 +77,10 @@ void Logger::reset() {
     printf("\033[0m"); // reset
     printf("\n");
 #elif defined(PLATFORM_WINDOWS)
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+    printf("\n");
 #endif
 }
 
@@ -92,15 +95,15 @@ void Logger::setTextAttrib(TextInfo textInfo) {
     const char *yellow = "\033[33m";
     const char *res = nullptr;
     switch (colorType) {
-        case ColorType::DEFAULT:
+        case Logger::ColorType::DEFAULT:
             break;
-        case ColorType::GREEN:
+        case Logger::ColorType::GREEN:
             res = green;
             break;
-        case ColorType::YELLOW:
+        case Logger::ColorType::YELLOW:
             res = yellow;
             break;
-        case ColorType::RED:
+        case Logger::ColorType::RED:
             res = red;
             break;
     }
@@ -108,11 +111,11 @@ void Logger::setTextAttrib(TextInfo textInfo) {
 
     // bg
     res = nullptr;
-    const char *redBg = "\033[41m";;
+    const char *redBg = "\033[41m";
     switch (colorBgType) {
-        case ColorBgType::DEFAULT:
+        case Logger::ColorBgType::DEFAULT:
             break;
-        case ColorBgType::RED:
+        case Logger::ColorBgType::RED:
             res = redBg;
             break;
     }
@@ -127,24 +130,24 @@ void Logger::setTextAttrib(TextInfo textInfo) {
     auto attrib = FOREGROUND_INTENSITY;
 
     switch (colorType) {
-        case ColorType::DEFAULT:
+        case Logger::ColorType::DEFAULT:
             break;
-        case ColorType::GREEN:
+        case Logger::ColorType::GREEN:
             attrib |= FOREGROUND_GREEN;
             break;
-        case ColorType::YELLOW:
+        case Logger::ColorType::YELLOW:
             attrib |= FOREGROUND_RED | FOREGROUND_GREEN;
             break;
-        case ColorType::RED:
+        case Logger::ColorType::RED:
             attrib |= FOREGROUND_RED;
             break;
     }
 
     switch (colorBgType) {
-        case ColorBgType::DEFAULT:
-            attrib |= BACKGROUND_RED;
+        case Logger::ColorBgType::DEFAULT:
             break;
-        case ColorBgType::RED:
+        case Logger::ColorBgType::RED:
+            attrib |= BACKGROUND_RED;
             break;
     }
 

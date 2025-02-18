@@ -49,7 +49,7 @@ private:
             Extension &extension = m_extensions[i];
             extension.m_isSupported = isExtensionSupported(extension.m_name, supportedExtensions);
             MIREN_LOG(
-                "GL_EXTENSION {}: {}",
+                "GL_EXTENSION {}: %s",
                 extension.m_name,
                 extension.m_isSupported ? "(supported)" : "(not)"
             );

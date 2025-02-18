@@ -311,7 +311,7 @@ void World::initializeScriptCore() {
             ScriptInstanceHandle scriptInstanceId =
                 ExternalCalls::instantiateScript(entityId, container.getName().c_str());
             if (!scriptInstanceId) {
-                LOG_ERROR_EDITOR("CANNOT INSTANTIATE SCRIPT {}", container.getName().c_str());
+                LOG_ERROR_EDITOR("CANNOT INSTANTIATE SCRIPT %s", container.getName().c_str());
                 continue;
             }
             container.rebindId(scriptInstanceId);

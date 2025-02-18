@@ -50,7 +50,7 @@ void Context::updateViewportSize(Size size) {
 
         // m_rootView->styleSetAbsolute();
         // m_rootView->styleSetOrigin({0, 0});
-        // LOG_INFO("SIZE: {}, {}", size.width, size.height);
+        // LOG_INFO("SIZE: %d, %d", size.width, size.height);
         m_rootView->styleSetSize(size);
         m_rootView->calculateLayout();
     }

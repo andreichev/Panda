@@ -6,12 +6,13 @@
 
 #include <string_view>
 #include <memory>
+#include <cstdarg>
 
 namespace Foundation {
 
 class Logger {
 public:
-    enum class MessageType { TRACE, INFO, WARNING, ERROR, CRITICAL };
+    enum class MessageType { _TRACE, _INFO, _WARNING, _ERROR, _CRITICAL };
     static void init();
 
     template<typename... Args>
@@ -23,7 +24,7 @@ public:
         vsnprintf(buffer, sizeof(buffer), format, args);
         va_end(args);
         std::string_view view = buffer;
-        log(type, view);
+        log(view, type);
     }
 private:
     enum class ColorType { DEFAULT, GREEN, YELLOW, RED };
@@ -33,7 +34,7 @@ private:
         ColorBgType colorBgType = ColorBgType::DEFAULT;
         bool bold = false;
     };
-    static void log(MessageType type, std::string_view message);
+    static void log(std::string_view message, MessageType type);
     static void log(std::string_view message);
     static void setTextAttrib(TextInfo textInfo);
     static void reset();

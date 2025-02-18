@@ -136,7 +136,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
                 }
                 PND_ASSERT_F(
                     sizeof(UUID) * selectedIds.size() <= sizeof(DragDropItem::data),
-                    "NEED TO INCREASE DragDropItem.data SIZE. REQUIRED {}",
+                    "NEED TO INCREASE DragDropItem.data SIZE. REQUIRED %d",
                     sizeof(UUID) * selectedIds.size()
                 );
                 memcpy(item.data, selectedIds.data(), sizeof(UUID) * selectedIds.size());

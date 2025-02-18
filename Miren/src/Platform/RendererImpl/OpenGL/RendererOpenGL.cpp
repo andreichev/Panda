@@ -66,7 +66,7 @@ RendererOpenGL::RendererOpenGL() {
     // glBlendEquation(GL_FUNC_ADD);
     // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    MIREN_LOG("OPENGL VERSION {}", (const char *)glGetString(GL_VERSION));
+    MIREN_LOG("OPENGL VERSION %s", (const char *)glGetString(GL_VERSION));
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
     // glEnable(GL_DEBUG_OUTPUT);
     // glDebugMessageCallback(gpuErrorCallback, nullptr);
@@ -239,7 +239,7 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
 }
 
 void RendererOpenGL::submit(Frame *frame, View *views) {
-    MIREN_LOG("FRAME SUBMITTED. DRAW CALLS: {}", frame->getDrawCallsCount());
+    MIREN_LOG("FRAME SUBMITTED. DRAW CALLS: %d", frame->getDrawCallsCount());
     if (frame->m_transientVbSize > 0) {
         vertexBuffers[frame->m_transientVb.handle.id].update(
             frame->m_transientVb.data, frame->m_transientVbSize
