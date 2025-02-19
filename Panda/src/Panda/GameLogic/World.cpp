@@ -235,7 +235,9 @@ void World::updateScriptsAndFields() {
             if (!clazz) {
                 Entity entity = Entity(entityHandle, this);
                 LOG_ERROR_EDITOR(
-                    "SCRIPT CLASS MANIFEST {} NOT FOUND.", container.getName(), entity.getName()
+                    "SCRIPT CLASS MANIFEST %s NOT FOUND.",
+                    container.getName().c_str(),
+                    entity.getName().c_str()
                 );
                 // TODO: Remove unbound script after N times unfixed.
                 // if(container.unusedCount() > N) {
@@ -250,7 +252,9 @@ void World::updateScriptsAndFields() {
                 const ScriptFieldManifest &fieldManifest = clazz.getField(field.name.c_str());
                 if (!fieldManifest) {
                     LOG_INFO_EDITOR(
-                        "SCRIPT {} FIELD {} NOT FOUND.", container.getName(), field.name
+                        "SCRIPT %s FIELD %s NOT FOUND.",
+                        container.getName().c_str(),
+                        field.name.c_str()
                     );
                     container.removeField(field);
                     continue;
@@ -311,7 +315,7 @@ void World::initializeScriptCore() {
             ScriptInstanceHandle scriptInstanceId =
                 ExternalCalls::instantiateScript(entityId, container.getName().c_str());
             if (!scriptInstanceId) {
-                LOG_ERROR_EDITOR("CANNOT INSTANTIATE SCRIPT {}", container.getName().c_str());
+                LOG_ERROR_EDITOR("CANNOT INSTANTIATE SCRIPT %s", container.getName().c_str());
                 continue;
             }
             container.rebindId(scriptInstanceId);
@@ -665,10 +669,10 @@ void World::debugPrint() {
         for (auto entityHandle : view) {
             if (!m_registry.valid(entityHandle)) { continue; }
             auto &tagComponent = view.get<TagComponent>(entityHandle);
-            LOG_INFO("ENTITY: {}", tagComponent.tag);
+            LOG_INFO("ENTITY: %d", tagComponent.tag.c_str());
         }
     }
-    LOG_INFO("TOTAL: {} entities", m_registry.storage<entt::entity>().size());
+    LOG_INFO("TOTAL: %d entities", m_registry.storage<entt::entity>().size());
 }
 
 bool World::isChanged() {

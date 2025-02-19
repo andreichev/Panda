@@ -13,7 +13,6 @@ set(VENDOR_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Vendor)
 set(BIN_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 set(SCRIPT_HOOK_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ScriptHook)
 
-add_subdirectory(Vendor/spdlog)
 add_subdirectory(Vendor/glfw)
 add_subdirectory(Vendor/glad)
 add_subdirectory(Vendor/glm)

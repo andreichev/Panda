@@ -72,7 +72,7 @@ void StartPanel::onImGuiRender() {
             ImGui::SameLine();
             if (ImGui::Button("Next")) {
                 std::string clearName = name.substr(0, name.find('\0'));
-                LOG_INFO("CREATE PROJECT WITH NAME {}", clearName);
+                LOG_INFO("CREATE PROJECT WITH NAME %s", clearName.c_str());
                 createProject(clearName);
                 name.clear();
             }
@@ -123,7 +123,7 @@ void StartPanel::openProject() {
     auto pathOptional = SystemTools::openFolderDialog();
     if (!pathOptional.has_value()) { return; }
     std::string path = pathOptional.value().string();
-    LOG_INFO("OPEN PROJECT AT PATH {}", path);
+    LOG_INFO("OPEN PROJECT AT PATH %s", path.c_str());
     m_loader->openProject(path);
 }
 
@@ -133,7 +133,7 @@ void StartPanel::createProject(const std::string &name) {
     if (!pathOptional.has_value()) { return; }
     path_t path = pathOptional.value();
     path.append(name);
-    LOG_INFO("CREATE PROJECT AT PATH {}", path.string());
+    LOG_INFO("CREATE PROJECT AT PATH %s", path.string().c_str());
     m_loader->createProject(name, path);
 }
 

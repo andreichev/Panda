@@ -56,7 +56,7 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
         glm::value_ptr(deltaRotation),
         glm::value_ptr(deltaScale)
     );
-    LOG_INFO_EDITOR("{}, {}, {}", deltaPosition.x, deltaPosition.y, deltaPosition.z);
+    LOG_INFO_EDITOR("%d, %d, %d", deltaPosition.x, deltaPosition.y, deltaPosition.z);
     */
     auto entities = selectionContext.getManipulatingEntities();
     EntityTransformCommand move(entities);

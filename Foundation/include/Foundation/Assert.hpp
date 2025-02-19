@@ -2,6 +2,8 @@
 
 #include "Foundation/Logger.hpp"
 
+#include <cassert>
+
 namespace Foundation {
 
 #define PND_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)

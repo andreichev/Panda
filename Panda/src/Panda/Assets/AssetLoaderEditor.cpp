@@ -15,7 +15,7 @@ TextureData AssetLoaderEditor::loadTexture(const path_t &path) {
     void *image = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
 
     if (image == nullptr) {
-        LOG_ERROR("Failed to load a texture file! {}", stbi_failure_reason());
+        LOG_ERROR("Failed to load a texture file! %s", stbi_failure_reason());
         // TODO: Return "Missing" texture
         // https://ru.yougile.com/team/91006f9f80d3/#PANDA-41
         return {};
@@ -47,7 +47,7 @@ TextureData AssetLoaderEditor::loadCubeMapTexture(std::array<path_t, 6> paths) {
         int width, height, channels;
         void *image = stbi_load(texturePath.string().c_str(), &width, &height, &channels, 0);
         if (image == nullptr) {
-            LOG_ERROR("Failed to load a texture file at path {}", texturePath.string().c_str());
+            LOG_ERROR("Failed to load a texture file at path %s", texturePath.string().c_str());
             continue;
         }
         if (channels == 1) {

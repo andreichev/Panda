@@ -149,7 +149,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
             m_output->viewportPickEntityWithId(m_hoveredId);
         }
     }
-    // LOG_INFO_EDITOR("id: {}", m_hoveredId);
+    // LOG_INFO_EDITOR("id: %d", m_hoveredId);
 }
 
 void Viewport::setCamera(Camera *camera) {

@@ -10,6 +10,7 @@
 
 #include <sstream>
 #include <fstream>
+#include <string>
 
 namespace Miren {
 
@@ -61,13 +62,13 @@ void OpenGLShader::checkCompileErrors(unsigned int shader, const std::string &ty
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            PND_ASSERT_F(false, "SHADER_COMPILATION_ERROR of type: {}\n{}", type, infoLog);
+            PND_ASSERT_F(false, "SHADER_COMPILATION_ERROR of type: %s\n%s", type.c_str(), infoLog);
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            PND_ASSERT_F(false, "PROGRAM_LINKING_ERROR of type: {}\n{}", type, infoLog);
+            PND_ASSERT_F(false, "PROGRAM_LINKING_ERROR of type: %s\n%s", type.c_str(), infoLog);
         }
     }
 }
@@ -76,7 +77,7 @@ int OpenGLShader::getUniformLocation(const std::string &name) {
         return m_uniformLocationCache[name];
     }
     int location = glGetUniformLocation(m_id, name.c_str());
-    PND_ASSERT_F(location != -1, "SHADER UNIFORM {} not found", name);
+    PND_ASSERT_F(location != -1, "SHADER UNIFORM %s not found", name.c_str());
     m_uniformLocationCache[name] = location;
     return location;
 }

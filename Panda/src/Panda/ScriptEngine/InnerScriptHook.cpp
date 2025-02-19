@@ -80,7 +80,7 @@ namespace InternalCalls {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         PND_ASSERT(type != nullptr, "TYPE IS NULL");
         if (s_createComponentFuncs.find(type) == s_createComponentFuncs.end()) {
-            PND_ASSERT_F(false, "UNKNOWN TYPE {}", type);
+            PND_ASSERT_F(false, "UNKNOWN TYPE %s", type);
             return;
         }
         s_createComponentFuncs.at(type)(entity);
@@ -90,7 +90,7 @@ namespace InternalCalls {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         PND_ASSERT(type != nullptr, "TYPE IS NULL");
         if (s_hasComponentFuncs.find(type) == s_hasComponentFuncs.end()) {
-            PND_ASSERT_F(false, "UNKNOWN TYPE {}", type);
+            PND_ASSERT_F(false, "UNKNOWN TYPE %s", type);
             return false;
         }
         return s_hasComponentFuncs.at(type)(entity);
@@ -100,11 +100,11 @@ namespace InternalCalls {
         Entity entity = GameContext::s_currentWorld->getById(entityId);
         PND_ASSERT(type != nullptr, "TYPE IS NULL");
         if (s_removeComponentFuncs.find(type) == s_removeComponentFuncs.end()) {
-            PND_ASSERT_F(false, "UNKNOWN TYPE {}", type);
+            PND_ASSERT_F(false, "UNKNOWN TYPE %s", type);
             return;
         }
         if (!entity_HasComponent(entityId, type)) {
-            PND_ASSERT_F(false, "ENTITY {} DOES NOT HAVE COMPONENT {}", (uint32_t)entityId, type);
+            PND_ASSERT_F(false, "ENTITY %d DOES NOT HAVE COMPONENT %s", (uint32_t)entityId, type);
             return;
         }
         s_removeComponentFuncs.at(type)(entity);
@@ -261,12 +261,12 @@ namespace InternalCalls {
     void console_Log(int type, const char *message) {
         if (type == 0) {
             // info
-            LOG_INFO_EDITOR("{}", message);
+            LOG_INFO_EDITOR("%d", message);
         } else if (type == 1) {
             // warning
-            LOG_WARN_EDITOR("{}", message);
+            LOG_WARN_EDITOR("%d", message);
         } else if (type == 2) {
-            LOG_ERROR_EDITOR("{}", message);
+            LOG_ERROR_EDITOR("%d", message);
         }
     }
 

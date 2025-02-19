@@ -23,7 +23,7 @@ namespace Panda {
 #endif
 
 void glfwErrorCallback(int error_code, const char *description) {
-    LOG_ERROR("GLFW ERROR, code: {}, description: {}", error_code, description);
+    LOG_ERROR("GLFW ERROR, code: %d, description: %s", error_code, description);
 }
 
 GlfwWindow::~GlfwWindow() {
@@ -35,7 +35,7 @@ GlfwWindow::GlfwWindow(const char *title, Size size, bool isFullscreen, bool isM
     m_isFullScreen = isFullscreen;
     m_windowSizeBackup = size;
     m_isCursorLocked = false;
-    LOG_INFO("Hello GLFW! {}", glfwGetVersionString());
+    LOG_INFO("Hello GLFW! %s", glfwGetVersionString());
     glfwSetErrorCallback(glfwErrorCallback);
     if (glfwInit() == false) {
         LOG_CRITICAL("GLFW INITIALIZATION ERROR");

@@ -2,10 +2,12 @@
 
 #include <Foundation/Foundation.hpp>
 #include <Foundation/Logger.hpp>
+#include "Panda/ImGui/FontAwesome.h"
 #include <imgui.h>
 #include <cctype>
 #include <cstdlib>
-#include "Panda/ImGui/FontAwesome.h"
+#include <array>
+#include <sstream>
 
 namespace Panda {
 

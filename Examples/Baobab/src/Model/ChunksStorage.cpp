@@ -11,7 +11,7 @@ ChunksStorage::~ChunksStorage() {
 }
 
 ChunksStorage::ChunksStorage() {
-    LOG_INFO("NOISE GENERATION STARTED, number of chunks: {}", SIZE_X * SIZE_Y * SIZE_Z);
+    LOG_INFO("NOISE GENERATION STARTED, number of chunks: %d", SIZE_X * SIZE_Y * SIZE_Z);
     chunks = new Chunk[SIZE_X * SIZE_Y * SIZE_Z];
 
     float terrain[WORLD_SIZE_X * WORLD_SIZE_Z];
