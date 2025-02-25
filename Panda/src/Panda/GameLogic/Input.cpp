@@ -22,6 +22,7 @@ double Input::mousePositionX = 0;
 double Input::mousePositionY = 0;
 double Input::mouseScrollX = 0;
 double Input::mouseScrollY = 0;
+bool Input::_isTrackpadScroll = false;
 Rect Input::viewportFrame;
 std::vector<Input::Touch> Input::activeTouches;
 
@@ -67,7 +68,7 @@ void Input::onEvent(Event *event) {
         }
         case EventType::MouseScrolled: {
             const MouseScrolledEvent *ev = static_cast<const MouseScrolledEvent *>(event);
-            Input::postScrollEvent(ev->xoffset, ev->yoffset);
+            Input::postScrollEvent(ev->xoffset, ev->yoffset, ev->isTrackpad);
             break;
         }
         case EventType::TouchBegan: {
@@ -138,14 +139,19 @@ double Input::getMouseScrollY() {
     return mouseScrollY;
 }
 
+bool Input::isTrackpadScroll() {
+    return _isTrackpadScroll;
+}
+
 void Input::postMouseChangedPosition(double x, double y) {
     mousePositionX = x;
     mousePositionY = y;
 }
 
-void Input::postScrollEvent(double x, double y) {
+void Input::postScrollEvent(double x, double y, bool isTrackpad) {
     mouseScrollX = x;
     mouseScrollY = y;
+    _isTrackpadScroll = isTrackpad;
 }
 
 void Input::setWindowSize(Size size) {

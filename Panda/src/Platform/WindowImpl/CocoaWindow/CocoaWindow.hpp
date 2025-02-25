@@ -26,6 +26,8 @@ public:
     Panda::Size getDpi() override;
     const char *getClipboardText() override;
     void setClipboardText(const char *text) override;
+
+    Panda::Vec2 getCursorPos();
     id getNative() {
         return m_handle;
     }

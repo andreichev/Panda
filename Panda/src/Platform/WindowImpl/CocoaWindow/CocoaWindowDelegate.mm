@@ -14,10 +14,6 @@
     eventQueue = queue;
 }
 
-- (void)windowDidBecomeKey:(NSNotification *)notification {
-    NSLog(@"WINDOW IS READY!");
-}
-
 - (BOOL)windowShouldClose:(id)sender {
     eventQueue->postWindowCloseEvent();
     return NO;
@@ -30,32 +26,19 @@
     eventQueue->postSizeEvent(width, height);
 }
 
+- (void)windowDidChangeOcclusionState:(NSNotification *)notification {
+    Panda::Vec2 pos = window->getCursorPos();
+    eventQueue->postMouseEvent(pos.x, pos.y);
+}
+
 - (void)windowDidEnterFullScreen:(NSNotification *)notification {
-    NSLog(@"ENTERED FULLSCREEN");
+    Panda::Vec2 pos = window->getCursorPos();
+    eventQueue->postMouseEvent(pos.x, pos.y);
 }
 
 - (void)windowDidExitFullScreen:(NSNotification *)notification {
-    NSLog(@"EXITED FULLSCREEN");
-}
-
-- (void)windowDidMove:(NSNotification *)notification {
-
-}
-
-- (void)windowDidMiniaturize:(NSNotification *)notification {
-
-}
-
-- (void)windowDidDeminiaturize:(NSNotification *)notification {
-
-}
-
-- (void)windowDidResignKey:(NSNotification *)notification {
-
-}
-
-- (void)windowDidChangeOcclusionState:(NSNotification* )notification {
-    
+    Panda::Vec2 pos = window->getCursorPos();
+    eventQueue->postMouseEvent(pos.x, pos.y);
 }
 
 @end

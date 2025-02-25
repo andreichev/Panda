@@ -18,7 +18,6 @@ namespace Panda {
 Application *Application::s_instance = nullptr;
 
 Application *Application::get() {
-    PND_ASSERT(s_instance != nullptr, "APP USED BUT NOT INITIALISED");
     return s_instance;
 }
 
@@ -36,6 +35,7 @@ Application::~Application() {
     Miren::terminate();
 #endif
     F_DELETE(Foundation::getAllocator(), m_window);
+    s_instance = nullptr;
     LOG_INFO("APP SHUTDOWN END");
 }
 

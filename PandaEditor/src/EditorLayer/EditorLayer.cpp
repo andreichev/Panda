@@ -7,8 +7,6 @@
 #include "Panels/Popups/EnterNamePopup.hpp"
 #include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 
-#include <Foundation/PlatformDetection.hpp>
-
 namespace Panda {
 
 EditorLayer::EditorLayer()
@@ -108,21 +106,22 @@ void EditorLayer::onImGuiRender() {
             m_consolePanel.onImGuiRender();
             m_dockspace.endImGuiDockspace();
         }
-
-#ifdef PLATFORM_MACOS
-        m_cameraController.setRotationActive(m_viewport.isHovered());
-        m_cameraController.setMoveActive(m_viewport.isHovered() && !ImGui::IsAnyItemActive());
-#else
-        m_cameraController.setRotationActive(m_viewport.isFocused());
-        m_cameraController.setMoveActive(m_viewport.isFocused());
-#endif
+        m_cameraController.setRotationActive(
+            (Input::isTrackpadScroll() && m_viewport.isHovered()) || m_viewport.isFocused()
+        );
+        m_cameraController.setMoveActive(
+            (m_viewport.isHovered() && !ImGui::IsAnyItemActive()) || m_viewport.isFocused()
+        );
     } else {
         m_startPanel.onImGuiRender();
     }
 }
 
 void EditorLayer::onEvent(Event *event) {
-    if (event->type == EventType::WindowClose) { closeApp(); }
+    if (event->type == EventType::WindowClose) {
+        event->isHandled = true;
+        closeApp();
+    }
 }
 
 void EditorLayer::play() {

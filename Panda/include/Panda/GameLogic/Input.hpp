@@ -38,6 +38,7 @@ public:
     static double getMouseViewportPositionY();
     static double getMouseScrollX();
     static double getMouseScrollY();
+    static bool isTrackpadScroll();
     static Size getWindowSize();
     static void onEvent(Event *event);
     static void setViewportFrame(Rect frame);
@@ -51,7 +52,7 @@ private:
     static void setKeyPressed(Key key, bool state);
     static void setMouseButtonPressed(MouseButton mouseButton, bool state);
     static void postMouseChangedPosition(double x, double y);
-    static void postScrollEvent(double x, double y);
+    static void postScrollEvent(double x, double y, bool isTrackpad);
     static void setWindowSize(Size size);
 
     static uint32_t frame;
@@ -69,6 +70,7 @@ private:
     static double mousePositionY;
     static double mouseScrollX;
     static double mouseScrollY;
+    static bool _isTrackpadScroll;
     static std::vector<Touch> activeTouches;
 };
 

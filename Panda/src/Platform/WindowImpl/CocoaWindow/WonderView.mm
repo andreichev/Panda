@@ -164,12 +164,13 @@ static NSUInteger pandaKeyToCocoaModifierFlag(Panda::Key key) {
             return NSEventModifierFlagCommand;
         case Panda::Key::CAPS_LOCK:
             return NSEventModifierFlagCapsLock;
+        default: return 0;
     }
-    return 0;
 }
 
 @implementation WonderView {
     WonderHelper m_helper;
+    BOOL m_multiTouchScroll;
 }
 
 - (instancetype)init {
@@ -179,6 +180,7 @@ static NSUInteger pandaKeyToCocoaModifierFlag(Panda::Key key) {
         memset(m_helper.keys, 0, sizeof(m_helper.keys));
         markedText = [[NSMutableAttributedString alloc] init];
         fillKeyTable(m_helper);
+        m_multiTouchScroll = false;
     }
     NSLog(@"WonderView created");
     return self;
@@ -204,41 +206,6 @@ static NSUInteger pandaKeyToCocoaModifierFlag(Panda::Key key) {
 
 - (BOOL)wantsUpdateLayer {
     return YES;
-}
-
-// MARK: - Touchpad
-
-- (void)touchesBeganWithEvent:(NSEvent *)event {
-    if (eventQueue == nil) { return; }
-    NSSet<NSTouch *>* touches = [event touchesMatchingPhase:NSTouchPhaseBegan inView:self];
-    for (NSTouch *touch in touches) {
-        CGPoint touchLocation = [touch normalizedPosition];
-        // LOG_INFO("TOUCH BEGAN: {}", int([touch.identity hash]));
-        float x = touchLocation.x * self.frame.size.width;
-        float y = (1.f - touchLocation.y) * self.frame.size.height;
-        eventQueue->postTouchBeganEvent(int([touch.identity hash]), x, y);
-    }
-}
-
-- (void)touchesMovedWithEvent:(NSEvent *)event {
-    if (eventQueue == nil) { return; }
-    NSSet<NSTouch *>* touches = [event touchesMatchingPhase:NSTouchPhaseMoved inView:self];
-    for (NSTouch *touch in touches) {
-        CGPoint touchLocation = [touch normalizedPosition];
-        // LOG_INFO("TOUCH MOVED: {}", int([touch.identity hash]));
-        float x = touchLocation.x * self.frame.size.width;
-        float y = (1.f - touchLocation.y) * self.frame.size.height;
-        eventQueue->postTouchMovedEvent(int([touch.identity hash]), x, y);
-    }
-}
-
-- (void)touchesEndedWithEvent:(NSEvent *)event {
-    if (eventQueue == nil) { return; }
-    NSSet<NSTouch *>* touches = [event touchesMatchingPhase:NSTouchPhaseEnded inView:self];
-    for (NSTouch *touch in touches) {
-        // LOG_INFO("TOUCH ENDED: {}", int([touch.identity hash]));
-        eventQueue->postTouchEndedEvent(int([touch.identity hash]));
-    }
 }
 
 // MARK: - Mouse
@@ -302,13 +269,14 @@ static NSUInteger pandaKeyToCocoaModifierFlag(Panda::Key key) {
 
 - (void)scrollWheel:(NSEvent *)event {
     if (eventQueue == nil) { return; }
-    double deltaX = [event scrollingDeltaX];
-    double deltaY = [event scrollingDeltaY];
-    if ([event hasPreciseScrollingDeltas]) {
-        deltaX *= 0.1;
-        deltaY *= 0.1;
+    double deltaX = event.scrollingDeltaX;
+    double deltaY = event.scrollingDeltaY;
+    if (event.phase == NSEventPhaseBegan) {
+        m_multiTouchScroll = true;
+    } else if (event.phase == NSEventPhaseEnded) {
+        m_multiTouchScroll = false;
     }
-    eventQueue->postScrollEvent(deltaX, deltaY);
+    eventQueue->postScrollEvent(deltaX, deltaY, m_multiTouchScroll || event.momentumPhase != NSEventPhaseNone);
 }
 
 // MARK: - Keys

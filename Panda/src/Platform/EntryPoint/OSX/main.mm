@@ -66,8 +66,8 @@ int main(int argc, const char * argv[]) {
     [appMenuItem setSubmenu:appMenu];
     id menubar = [[NSMenu new] autorelease];
     [menubar addItem:appMenuItem];
-    [NSApp setMainMenu:menubar];
-    // [application run];
+    [application setMainMenu:menubar];
+    [application run];
     int result = startApp(0, nullptr);
     [application terminate:nil];
     return result;

@@ -5,19 +5,13 @@
 #include "CameraController.hpp"
 
 #include <Panda/Math/Math.hpp>
-#include <Foundation/PlatformDetection.hpp>
-
 #include <imgui.h>
 
 namespace Panda {
 
 CameraController::CameraController()
     : m_transform()
-#ifdef PLATFORM_MACOS
-    , m_mouseSpeed(0.25f)
-#else
     , m_mouseSpeed(0.2f)
-#endif
     , m_moveSpeed(20.f)
     , m_front()
     , m_up()
@@ -76,42 +70,42 @@ void CameraController::update(float deltaTime) {
     }
     glm::vec3 cameraRotation = m_transform.getRotationEuler();
     glm::vec3 cameraPosition = m_transform.getPosition();
-#ifdef PLATFORM_MACOS
-    if (Input::touchCount() == 2) {
-        ImVec2 mousePos = {Input::getTouch(0).x, Input::getTouch(0).y};
-#else
-    if (ImGui::IsKeyDown(ImGuiKey_MouseRight)) {
-        ImVec2 mousePos = ImGui::GetMousePos();
-#endif
-        double mouseX = mousePos.x;
-        double mouseY = mousePos.y;
-        double deltaX = mouseX - m_lastMouseX;
-        double deltaY = mouseY - m_lastMouseY;
-        if (!m_cursorStarted) {
-            m_cursorStarted = true;
-            deltaX = 0;
-            deltaY = 0;
+    if (Input::isTrackpadScroll() || ImGui::IsKeyDown(ImGuiKey_MouseRight)) {
+        double deltaX;
+        double deltaY;
+        if (Input::isTrackpadScroll()) {
+            deltaX = Input::getMouseScrollX();
+            deltaY = Input::getMouseScrollY();
+        } else {
+            ImVec2 mousePos = ImGui::GetMousePos();
+            double mouseX = mousePos.x;
+            double mouseY = mousePos.y;
+            deltaX = mouseX - m_lastMouseX;
+            deltaY = mouseY - m_lastMouseY;
+            if (!m_cursorStarted) {
+                m_cursorStarted = true;
+                deltaX = 0;
+                deltaY = 0;
+            }
+            m_lastMouseX = mouseX;
+            m_lastMouseY = mouseY;
         }
         // DeltaX - смещение мыши за реальное время, поэтому умножение на deltaTime не требуется.
         // Действия в реальном мире не нужно умножать на deltaTime, умножать нужно только действия в
         // игровом мире.
         m_transform.rotateEuler({-deltaY * m_mouseSpeed, -deltaX * m_mouseSpeed, 0.f});
         updateVectors();
-        m_lastMouseX = mouseX;
-        m_lastMouseY = mouseY;
         // ImGui::SetNextFrameWantCaptureMouse(false);
     } else {
         // ImGui::SetNextFrameWantCaptureMouse(true);
         m_cursorStarted = false;
     }
 
-#ifndef PLATFORM_MACOS
     double scroll = Input::getMouseScrollY();
-    if (scroll != 0) {
+    if (!Input::isTrackpadScroll() && scroll != 0) {
         float zoom = scroll * 0.5;
         m_transform.translate(zoom * m_front);
     }
-#endif
 }
 
 void CameraController::updateVectors() {

@@ -44,21 +44,19 @@ CocoaWindow::CocoaWindow(const char *title, Panda::Size size, bool isFullscreen,
     styleMask |= NSWindowStyleMaskTitled;
     styleMask |= NSWindowStyleMaskClosable;
     styleMask |= NSWindowStyleMaskResizable;
+    // styleMask |= NSWindowStyleMaskBorderless;
 
     NativeWindow* window = [[NativeWindow alloc] initWithContentRect:rect
                                                    styleMask:styleMask
                                                      backing:NSBackingStoreBuffered
                                                        defer:YES];
-
-    pollEvents();
+    [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
     [window setTitle:@(title)];
     CocoaWindowDelegate* delegate = [[CocoaWindowDelegate alloc] initWithCocoa:this];
     [window setDelegate:delegate];
-    [window makeKeyAndOrderFront:nil];
-    // [window setHasShadow:NO];
+    [window setHasShadow:NO];
     [window center];
     [window setBackgroundColor:[NSColor blackColor]];
-    pollEvents();
     WonderView* gameView = [[WonderView alloc] init];
     [window setContentView:gameView];
     [gameView setWantsLayer:YES];
@@ -69,12 +67,21 @@ CocoaWindow::CocoaWindow(const char *title, Panda::Size size, bool isFullscreen,
     if ([window respondsToSelector:@selector(setTabbingMode:)]) {
         [window setTabbingMode:NSWindowTabbingModeDisallowed];
     }
+    [window makeKeyAndOrderFront:nil];
     Miren::PlatformData::get()->nativeWindowHandle = window;
     this->m_handle = window;
-    pollEvents();
 }
 
-CocoaWindow::~CocoaWindow() {}
+CocoaWindow::~CocoaWindow() {
+    [m_handle orderOut:nil];
+    [m_handle setDelegate:nil];
+    [m_handle release];
+    [[m_handle contentView] release];
+    [m_handle close];
+    m_handle = nil;
+    // HACK: Allow Cocoa to catch up before returning
+    pollEvents();
+}
 
 bool CocoaWindow::isFullScreen() {
     return [m_handle isFullScreen];
@@ -85,8 +92,7 @@ void CocoaWindow::setFullScreen(bool isFullScreen) {
     if((isFullScreen && currentlyFullScreen) || (!isFullScreen && !currentlyFullScreen)) {
         return;
     }
-    NSLog(@"TOGGLE FULL SCREEN!");
-    [m_handle setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+    if(isFullScreen) { setMaximized(true); }
     [m_handle toggleFullScreen:nil];
 }
 
@@ -95,11 +101,13 @@ void CocoaWindow::setTitle(const char *title) {
 }
 
 bool CocoaWindow::isMaximized() {
-    return isFullScreen();
+    return [m_handle isZoomed];
 }
 
 void CocoaWindow::setMaximized(bool isMaximized) {
-    setFullScreen(isMaximized);
+    if (![m_handle isZoomed]) {
+        [m_handle zoom:nil];
+    }
 }
 
 void CocoaWindow::setResizable(bool isResizable) {
@@ -113,7 +121,7 @@ void CocoaWindow::setResizable(bool isResizable) {
     } else {
         [m_handle setStyleMask:(styleMask & ~NSWindowStyleMaskResizable)];
         const NSWindowCollectionBehavior behavior =
-            NSWindowCollectionBehaviorFullScreenNone;
+        NSWindowCollectionBehaviorFullScreenPrimary;
         [m_handle setCollectionBehavior:behavior];
     }
 }
@@ -171,3 +179,17 @@ Panda::Size CocoaWindow::getDpi() {
 const char * CocoaWindow::getClipboardText() {}
 
 void CocoaWindow::setClipboardText(const char *text) {}
+
+Vec2 CocoaWindow::getCursorPos() {
+    NSRect  originalFrame = [m_handle frame];
+    NSPoint location      = [m_handle mouseLocationOutsideOfEventStream];
+    NSRect  adjustFrame   = [m_handle contentRectForFrameRect: originalFrame];
+
+    int32_t x = location.x;
+    int32_t y = int32_t(adjustFrame.size.height) - int32_t(location.y);
+
+    // clamp within the range of the window
+    x = Foundation::clamp(x, 0, int32_t(adjustFrame.size.width) );
+    y = Foundation::clamp(y, 0, int32_t(adjustFrame.size.height) );
+    return Vec2(x, y);
+}

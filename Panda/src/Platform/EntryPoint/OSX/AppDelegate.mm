@@ -5,6 +5,7 @@
 //
 
 #import "AppDelegate.hpp"
+#import <Panda/Application/Application.hpp>
 
 @implementation AppDelegate {
     id keyUpMonitor;
@@ -21,7 +22,7 @@
                                            data1:0
                                            data2:0];
     [NSApp postEvent:event atStart:YES];
-    NSLog(@"DID FINISH LAUNCHING");
+    [NSApp stop:nil];
     NSEvent* (^block)(NSEvent*) = ^ NSEvent* (NSEvent* event) {
         if ([event modifierFlags] & NSEventModifierFlagCommand) {
             [[NSApp keyWindow] sendEvent:event];
@@ -33,13 +34,14 @@
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
-    NSLog(@"APP WILL TERMINATE");
     if (keyUpMonitor) {
         [NSEvent removeMonitor:keyUpMonitor];
     }
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
+    Panda::Application* app = Panda::Application::get();
+    if(app) { app->getEventQueue()->postWindowCloseEvent(); }
     return NSTerminateCancel;
 }
 

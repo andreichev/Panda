@@ -24,7 +24,7 @@ public:
     void postTouchBeganEvent(int id, float x, float y);
     void postTouchMovedEvent(int id, float x, float y);
     void postTouchEndedEvent(int id);
-    void postScrollEvent(double xoffset, double yoffset);
+    void postScrollEvent(double xoffset, double yoffset, bool isTrackpad);
     void postWindowCloseEvent();
     Event *poll();
 

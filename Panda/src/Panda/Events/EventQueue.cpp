@@ -55,8 +55,8 @@ void EventQueue::postMouseEvent(double x, double y) {
     m_events.write(event);
 }
 
-void EventQueue::postScrollEvent(double xoffset, double yoffset) {
-    MouseScrolledEvent event(xoffset, yoffset);
+void EventQueue::postScrollEvent(double xoffset, double yoffset, bool isTrackpad) {
+    MouseScrolledEvent event(xoffset, yoffset, isTrackpad);
     m_events.write(event);
 }
 

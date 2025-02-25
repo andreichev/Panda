@@ -18,13 +18,15 @@ struct MouseMovedEvent : public Event {
 };
 
 struct MouseScrolledEvent : public Event {
-    MouseScrolledEvent(double xoffset, double yoffset)
+    MouseScrolledEvent(double xoffset, double yoffset, bool isTrackpad)
         : Event(EventType::MouseScrolled)
         , xoffset(xoffset)
-        , yoffset(yoffset) {}
+        , yoffset(yoffset)
+        , isTrackpad(isTrackpad) {}
 
     double xoffset;
     double yoffset;
+    bool isTrackpad;
 };
 
 struct MouseKeyEvent : public Event {
