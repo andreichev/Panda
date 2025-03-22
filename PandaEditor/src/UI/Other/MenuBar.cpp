@@ -63,6 +63,9 @@ void MenuBar::onImGuiRender() {
             if (ImGui::MenuItem("Redo", NULL, false, m_output->menuBarCanRedo())) {
                 m_output->menuBarRedo();
             }
+            if (ImGui::MenuItem("Preferences")) {
+                m_output->menuBarPreferences();
+            }
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
