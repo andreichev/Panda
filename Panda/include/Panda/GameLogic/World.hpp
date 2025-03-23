@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Panda/GameLogic/Entity.hpp"
-#include "Panda/Window/Window.hpp"
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Renderer/Renderer3D.hpp"
 #include "Panda/WorldCommands/WorldCommandManager.hpp"

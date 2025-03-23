@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include "Panda/Events/Event.hpp"
-#include "Panda/Events/Key.hpp"
 #include "Panda/Base/Base.hpp"
+
+#include <Fern/Events/Event.hpp>
+#include <Fern/Events/Key.hpp>
+#include <Fern/Base/Base.hpp>
 
 namespace Panda {
 
@@ -26,10 +28,10 @@ public:
     };
 
     // GET INPUT DATA
-    static bool isKeyPressed(Key key);
-    static bool isKeyJustPressed(Key key);
-    static bool isMouseButtonPressed(MouseButton mouseButton);
-    static bool isMouseButtonJustPressed(MouseButton mouseButton);
+    static bool isKeyPressed(Fern::Key key);
+    static bool isKeyJustPressed(Fern::Key key);
+    static bool isMouseButtonPressed(Fern::MouseButton mouseButton);
+    static bool isMouseButtonJustPressed(Fern::MouseButton mouseButton);
     static int touchCount();
     static Touch getTouch(int index);
     static double getMousePositionX();
@@ -40,7 +42,7 @@ public:
     static double getMouseScrollY();
     static bool isTrackpadScroll();
     static Size getWindowSize();
-    static void onEvent(Event *event);
+    static void onEvent(Fern::Event *event);
     static void setViewportFrame(Rect frame);
     static void nextFrame();
 
@@ -49,8 +51,8 @@ private:
     static void postTouchBeganEvent(int id, float x, float y);
     static void postTouchMovedEvent(int id, float x, float y);
     static void postTouchEndedEvent(int id);
-    static void setKeyPressed(Key key, bool state);
-    static void setMouseButtonPressed(MouseButton mouseButton, bool state);
+    static void setKeyPressed(Fern::Key key, bool state);
+    static void setMouseButtonPressed(Fern::MouseButton mouseButton, bool state);
     static void postMouseChangedPosition(double x, double y);
     static void postScrollEvent(double x, double y, bool isTrackpad);
     static void setWindowSize(Size size);

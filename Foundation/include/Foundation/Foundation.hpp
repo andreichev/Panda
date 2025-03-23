@@ -87,4 +87,8 @@ inline int32_t strCmp(const char *lhs, const char *rhs, int32_t max) {
     return *lhs - *rhs;
 }
 
+inline bool epsilonEqual(float const &x, float const &y, float const &epsilon) {
+    return abs(x - y) < epsilon;
+}
+
 } // namespace Foundation

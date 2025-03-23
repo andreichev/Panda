@@ -21,8 +21,8 @@ Context::Context()
     : m_mirenViewId(0)
     , m_viewportSize()
     , m_rootView(nullptr) {
-    Panda::Window *window = Panda::Application::get()->getWindow();
-    m_viewportSize = window->getSize();
+    Fern::Window *window = Panda::Application::get()->getMainWindow();
+    m_viewportSize = Size(window->getSize().width, window->getSize().height);
     m_camera.setViewportSize(m_viewportSize);
     // View matrix is identity
     m_renderer2d.setViewProj(m_camera.getProjection());

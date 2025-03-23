@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Panda/Base/FileBase.hpp>
+#include <Panda/Assets/Path.hpp>
 #include <Miren/Miren.hpp>
 #include <array>
 

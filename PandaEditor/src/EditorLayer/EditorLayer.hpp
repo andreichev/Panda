@@ -36,7 +36,7 @@ public:
 
     void onUpdate(double deltaTime) override;
     void onImGuiRender() override;
-    void onEvent(Event *event) override;
+    void onEvent(Fern::Event *event) override;
 
     void play();
     void simulate();
@@ -93,6 +93,7 @@ public:
 #pragma endregion
 
 private:
+    void windowSizeChanged(Size size);
     void closeApp();
     void saveWorld();
     bool canUndo();
@@ -117,6 +118,7 @@ private:
     CameraController m_cameraController;
     std::vector<EditorPopup *> m_popups;
     SceneGrid m_grid;
+    Fern::Window *m_window;
 
     // World that is visible by default in editor but never played.
     World m_editingWorld;

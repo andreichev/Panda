@@ -15,7 +15,7 @@ void StartPanel::onImGuiRender() {
     // ImGui::ShowDemoWindow();
     ImGui::SetNextWindowPos({0, 0});
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-    auto size = Application::get()->getWindow()->getSize();
+    auto size = Application::get()->getMainWindow()->getSize();
     auto wflags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDecoration;
     ImGui::SetNextWindowSize({size.width, size.height});
     ImGui::Begin("Start panel", nullptr, wflags);

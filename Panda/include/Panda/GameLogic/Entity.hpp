@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "Panda/Window/Window.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/BaseComponents.hpp"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panda/Events/Event.hpp"
+#include "Fern/Events/Event.hpp"
 
 #include <string>
 
@@ -15,7 +15,7 @@ public:
     virtual void onDetach() {}
     virtual void onUpdate(double deltaTime) {}
     virtual void onImGuiRender() {}
-    virtual void onEvent(Event *event) {}
+    virtual void onEvent(Fern::Event *event) {}
 
     const std::string &getName() const {
         return m_debugName;

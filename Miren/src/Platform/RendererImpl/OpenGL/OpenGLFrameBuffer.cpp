@@ -27,7 +27,7 @@ OpenGLFrameBuffer::OpenGLFrameBuffer()
     : spec()
     , m_id(-1) {}
 
-void OpenGLFrameBuffer::create(FrameBufferSpecification specification) {
+void OpenGLFrameBuffer::create(RendererOpenGL *renderer, FrameBufferSpecification specification) {
     PND_ASSERT(m_id == -1, "FRAMEBUFFER ALREADY CREATED");
     spec = specification;
     // this->specification = specification;
@@ -36,7 +36,7 @@ void OpenGLFrameBuffer::create(FrameBufferSpecification specification) {
     std::vector<GLenum> colorAttachments;
     for (int i = 0; i < specification.num; i++) {
         FrameBufferAttachment &attach = specification.attachments[i];
-        OpenGLTexture &texture = RendererOpenGL::s_instance->getTexture(attach.handle);
+        OpenGLTexture &texture = renderer->getTexture(attach.handle);
         int attachmentType;
         if (isDepthFormat(texture.getFormat())) {
             attachmentType = GL_DEPTH_ATTACHMENT;
@@ -79,9 +79,11 @@ void OpenGLFrameBuffer::clearUIntAttachment(int index, uint32_t value) {
     glClearBufferuiv(GL_COLOR, index, &value);
 }
 
-void OpenGLFrameBuffer::readPixels(int index, int x, int y, int width, int height, void *data) {
+void OpenGLFrameBuffer::readPixels(
+    RendererOpenGL *renderer, int index, int x, int y, int width, int height, void *data
+) {
     bind();
-    OpenGLTexture &texture = RendererOpenGL::s_instance->getTexture(spec.attachments[index].handle);
+    OpenGLTexture &texture = renderer->getTexture(spec.attachments[index].handle);
     TextureFormat format = texture.getFormat();
     int attachmentType;
     if (isDepthFormat(format)) {

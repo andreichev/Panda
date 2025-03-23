@@ -1,12 +1,14 @@
 #include "imgui_impl_panda.hpp"
-
 #include "Panda/Application/Application.hpp"
-#include "Panda/Events/WindowEvents.hpp"
-#include "Panda/Events/KeyEvents.hpp"
-#include "Panda/Events/MouseEvents.hpp"
+
+#include <Fern/Fern.hpp>
+#include <Fern/Events/WindowEvents.hpp>
+#include <Fern/Events/KeyEvents.hpp>
+#include <Fern/Events/MouseEvents.hpp>
+#include <Fern/Window/Cursor.hpp>
 
 struct ImGui_PandaPlatformData {
-    Panda::Cursor MouseCursors[ImGuiMouseCursor_COUNT];
+    Fern::Cursor MouseCursors[ImGuiMouseCursor_COUNT];
     bool modCtrl;
     bool modShift;
     bool modAlt;
@@ -19,8 +21,8 @@ static ImGui_PandaPlatformData *ImGui_ImplGlfw_GetBackendData() {
                : nullptr;
 }
 
-static ImGuiKey ImGui_ImplPanda_KeyCodeToImGuiKey(Panda::Key key) {
-    using namespace Panda;
+static ImGuiKey ImGui_ImplPanda_KeyCodeToImGuiKey(Fern::Key key) {
+    using namespace Fern;
     // clang-format off
     switch (key) {
         case Key::SPACE: return ImGuiKey_Space;
@@ -163,8 +165,9 @@ static void ImGui_ImplPanda_UpdateKeyModifiers() {
     io.AddKeyEvent(ImGuiMod_Super, pd->modSuper);
 }
 
-IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
+IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Fern::Event *event) {
     using namespace Panda;
+    using namespace Fern;
 
     ImGuiIO &io = ImGui::GetIO();
     ImGui_PandaPlatformData *pd = ImGui_ImplGlfw_GetBackendData();
@@ -189,14 +192,14 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             const KeyPressedEvent *ev = static_cast<const KeyPressedEvent *>(event);
             ImGuiKey key = ImGui_ImplPanda_KeyCodeToImGuiKey(ev->key);
             io.AddKeyEvent(key, true);
-            pd->modShift = pd->modShift || ev->key == Panda::Key::LEFT_SHIFT ||
-                           ev->key == Panda::Key::RIGHT_SHIFT;
-            pd->modCtrl = pd->modCtrl || ev->key == Panda::Key::LEFT_CONTROL ||
-                          ev->key == Panda::Key::RIGHT_CONTROL;
+            pd->modShift = pd->modShift || ev->key == Fern::Key::LEFT_SHIFT ||
+                           ev->key == Fern::Key::RIGHT_SHIFT;
+            pd->modCtrl = pd->modCtrl || ev->key == Fern::Key::LEFT_CONTROL ||
+                          ev->key == Fern::Key::RIGHT_CONTROL;
             pd->modAlt =
-                pd->modAlt || ev->key == Panda::Key::LEFT_ALT || ev->key == Panda::Key::RIGHT_ALT;
-            pd->modSuper = pd->modSuper || ev->key == Panda::Key::LEFT_SUPER ||
-                           ev->key == Panda::Key::RIGHT_SUPER;
+                pd->modAlt || ev->key == Fern::Key::LEFT_ALT || ev->key == Fern::Key::RIGHT_ALT;
+            pd->modSuper = pd->modSuper || ev->key == Fern::Key::LEFT_SUPER ||
+                           ev->key == Fern::Key::RIGHT_SUPER;
             event->isHandled = io.WantCaptureKeyboard;
             break;
         }
@@ -210,16 +213,16 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
             ImGuiKey key = ImGui_ImplPanda_KeyCodeToImGuiKey(ev->key);
             io.AddKeyEvent(key, false);
             event->isHandled = io.WantCaptureKeyboard;
-            if (ev->key == Panda::Key::LEFT_SHIFT || ev->key == Panda::Key::RIGHT_SHIFT) {
+            if (ev->key == Fern::Key::LEFT_SHIFT || ev->key == Fern::Key::RIGHT_SHIFT) {
                 pd->modShift = false;
             }
-            if (ev->key == Panda::Key::LEFT_CONTROL || ev->key == Panda::Key::RIGHT_CONTROL) {
+            if (ev->key == Fern::Key::LEFT_CONTROL || ev->key == Fern::Key::RIGHT_CONTROL) {
                 pd->modCtrl = false;
             }
-            if (ev->key == Panda::Key::LEFT_ALT || ev->key == Panda::Key::RIGHT_ALT) {
+            if (ev->key == Fern::Key::LEFT_ALT || ev->key == Fern::Key::RIGHT_ALT) {
                 pd->modAlt = false;
             }
-            if (ev->key == Panda::Key::LEFT_SUPER || ev->key == Panda::Key::RIGHT_SUPER) {
+            if (ev->key == Fern::Key::LEFT_SUPER || ev->key == Fern::Key::RIGHT_SUPER) {
                 pd->modSuper = false;
             }
             break;
@@ -259,13 +262,11 @@ IMGUI_IMPL_API void ImGui_ImplPanda_HandleEvent(Panda::Event *event) {
 }
 
 static const char *getClipboardText(void *userData) {
-    Panda::Window *window = static_cast<Panda::Window *>(userData);
-    return window->getClipboardText();
+    return Fern::getClipboardText();
 }
 
 static void setClipboardText(void *userData, const char *text) {
-    Panda::Window *window = static_cast<Panda::Window *>(userData);
-    window->setClipboardText(text);
+    Fern::setClipboardText(text);
 }
 
 IMGUI_IMPL_API bool ImGui_ImplPanda_Init() {
@@ -275,15 +276,15 @@ IMGUI_IMPL_API bool ImGui_ImplPanda_Init() {
     ImGui_PandaPlatformData *bd = IM_NEW(ImGui_PandaPlatformData)();
     io.BackendPlatformUserData = (void *)bd;
 
-    bd->MouseCursors[ImGuiMouseCursor_Arrow] = Panda::Cursor::ARROW;
-    bd->MouseCursors[ImGuiMouseCursor_TextInput] = Panda::Cursor::IBEAM;
-    bd->MouseCursors[ImGuiMouseCursor_ResizeNS] = Panda::Cursor::RESIZE_NS;
-    bd->MouseCursors[ImGuiMouseCursor_ResizeEW] = Panda::Cursor::RESIZE_EW;
-    bd->MouseCursors[ImGuiMouseCursor_Hand] = Panda::Cursor::POINTING_HAND;
-    bd->MouseCursors[ImGuiMouseCursor_ResizeAll] = Panda::Cursor::RESIZE_ALL;
-    bd->MouseCursors[ImGuiMouseCursor_ResizeNESW] = Panda::Cursor::RESIZE_NESW;
-    bd->MouseCursors[ImGuiMouseCursor_ResizeNWSE] = Panda::Cursor::RESIZE_NWSE;
-    bd->MouseCursors[ImGuiMouseCursor_NotAllowed] = Panda::Cursor::NOT_ALLOWED;
+    bd->MouseCursors[ImGuiMouseCursor_Arrow] = Fern::Cursor::ARROW;
+    bd->MouseCursors[ImGuiMouseCursor_TextInput] = Fern::Cursor::IBEAM;
+    bd->MouseCursors[ImGuiMouseCursor_ResizeNS] = Fern::Cursor::RESIZE_NS;
+    bd->MouseCursors[ImGuiMouseCursor_ResizeEW] = Fern::Cursor::RESIZE_EW;
+    bd->MouseCursors[ImGuiMouseCursor_Hand] = Fern::Cursor::POINTING_HAND;
+    bd->MouseCursors[ImGuiMouseCursor_ResizeAll] = Fern::Cursor::RESIZE_ALL;
+    bd->MouseCursors[ImGuiMouseCursor_ResizeNESW] = Fern::Cursor::RESIZE_NESW;
+    bd->MouseCursors[ImGuiMouseCursor_ResizeNWSE] = Fern::Cursor::RESIZE_NWSE;
+    bd->MouseCursors[ImGuiMouseCursor_NotAllowed] = Fern::Cursor::NOT_ALLOWED;
 
     bd->modCtrl = false;
     bd->modAlt = false;
@@ -299,7 +300,7 @@ IMGUI_IMPL_API bool ImGui_ImplPanda_Init() {
     // io.MouseHoveredViewport correctly (optional, not easy)
     io.SetClipboardTextFn = setClipboardText;
     io.GetClipboardTextFn = getClipboardText;
-    io.ClipboardUserData = Panda::Application::get()->getWindow();
+    io.ClipboardUserData = nullptr;
 
     return true;
 }
@@ -311,15 +312,15 @@ IMGUI_IMPL_API void ImGui_ImplPanda_Shutdown() {
     io.BackendPlatformUserData = nullptr;
 }
 
-IMGUI_IMPL_API void ImGui_ImplPanda_NewFrame(double deltaTime) {
+IMGUI_IMPL_API void ImGui_ImplPanda_NewFrame(Fern::Window *window, double deltaTime) {
     ImGuiIO &io = ImGui::GetIO();
     ImGui_PandaPlatformData *bd = ImGui_ImplGlfw_GetBackendData();
     using namespace Panda;
     Application *app = Application::get();
-    Size dpi = app->getWindow()->getDpi();
+    Fern::Size dpi = window->getDpi();
     io.DisplayFramebufferScale = ImVec2(dpi.width, dpi.height);
-    io.DisplaySize = ImVec2(app->getWindow()->getSize().width, app->getWindow()->getSize().height);
+    io.DisplaySize = ImVec2(window->getSize().width, window->getSize().height);
     io.DeltaTime = (float)deltaTime;
     ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
-    app->getWindow()->setCursor(bd->MouseCursors[imgui_cursor]);
+    Fern::setCursor(bd->MouseCursors[imgui_cursor]);
 }

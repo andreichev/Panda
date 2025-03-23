@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Asset.hpp"
-#include "Panda/Base/FileBase.hpp"
+#include "Panda/Assets/Path.hpp"
 
 #include <Miren/Base.hpp>
 #include <string>

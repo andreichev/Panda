@@ -2,7 +2,6 @@
 // Created by Admin on 11.02.2022.
 //
 
-#include "Miren/PlatformData.hpp"
 #include "OpenGLTexture.hpp"
 #include "Texture/TextureFormat.hpp"
 

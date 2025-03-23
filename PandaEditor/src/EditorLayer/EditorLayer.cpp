@@ -7,6 +7,10 @@
 #include "Panels/Popups/EnterNamePopup.hpp"
 #include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 
+#include <Foundation/PlatformDetection.hpp>
+#include <Fern/Fern.hpp>
+#include <Fern/Events/WindowEvents.hpp>
+
 namespace Panda {
 
 EditorLayer::EditorLayer()
@@ -41,6 +45,17 @@ EditorLayer::EditorLayer()
 }
 
 void EditorLayer::onAttach() {
+    Fern::Rect rect = Fern::Rect(0, 0, 600, 400);
+    m_window = Fern::createWindow(
+        "Panda Editor",
+        rect,
+        Fern::WindowState::WindowStateNormal,
+        Fern::DrawingContextType::DrawingContextTypeOpenGL
+    );
+    Application::get()->setMainWindow(m_window);
+#ifdef PLATFORM_DESKTOP
+    Miren::initialize(m_window->getDrawingContext());
+#endif
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
     m_loader.loadInitialData();
     GameContext::s_currentWorld = m_currentWorld;
@@ -51,6 +66,9 @@ void EditorLayer::onAttach() {
 void EditorLayer::onDetach() {
     GameContext::s_currentWorld = nullptr;
     GameContext::s_assetHandler = nullptr;
+#ifdef PLATFORM_DESKTOP
+    Miren::terminate();
+#endif
 }
 
 void EditorLayer::onUpdate(double deltaTime) {
@@ -117,11 +135,25 @@ void EditorLayer::onImGuiRender() {
     }
 }
 
-void EditorLayer::onEvent(Event *event) {
-    if (event->type == EventType::WindowClose) {
+void EditorLayer::onEvent(Fern::Event *event) {
+    if (event->type == Fern::EventType::QuitRequest) {
         event->isHandled = true;
         closeApp();
+    } else if (event->type == Fern::EventType::WindowResize) {
+        const Fern::WindowResizeEvent *ev = static_cast<const Fern::WindowResizeEvent *>(event);
+        windowSizeChanged(Size(ev->getWidth(), ev->getHeight()));
     }
+}
+
+void EditorLayer::windowSizeChanged(Size size) {
+    Fern::Window *window = Application::get()->getMainWindow();
+    Miren::Rect viewport = Miren::Rect(
+        0, 0, size.width * window->getDpi().width, size.height * window->getDpi().height
+    );
+    Miren::setViewport(0, viewport);
+#ifdef PLATFORM_DESKTOP
+    m_window->getDrawingContext()->update();
+#endif
 }
 
 void EditorLayer::play() {
@@ -168,7 +200,7 @@ void EditorLayer::loaderDidLoadProject(const std::string &name, const path_t &pa
 }
 
 void EditorLayer::loaderDidLoadWorld() {
-    Application::get()->getWindow()->setTitle(m_loader.getProjectSettings().worldPath.c_str());
+    Application::get()->getMainWindow()->setTitle(m_loader.getProjectSettings().worldPath.c_str());
 }
 
 void EditorLayer::loaderDidLoadCloseProject() {
@@ -178,7 +210,7 @@ void EditorLayer::loaderDidLoadCloseProject() {
 }
 
 void EditorLayer::loaderCreateSampleWorld() {
-    Application::get()->getWindow()->setTitle("Untitled World");
+    Application::get()->getMainWindow()->setTitle("Untitled World");
     m_editingWorld.clear();
     m_playingWorld.clear();
     m_editingWorld.fillStartupData();
@@ -472,9 +504,13 @@ void EditorLayer::viewportUnselectAll() {
 #pragma endregion
 
 void EditorLayer::updateWindowState() {
-    auto *window = Application::get()->getWindow();
+    auto *window = Application::get()->getMainWindow();
     window->setResizable(m_loader.hasOpenedProject());
-    window->setMaximized(m_loader.hasOpenedProject());
+    if (m_loader.hasOpenedProject()) {
+        window->setState(Fern::WindowState::WindowStateMaximized);
+    } else {
+        window->setState(Fern::WindowState::WindowStateNormal);
+    }
     if (!m_loader.hasOpenedProject()) {
         window->setTitle("Welcome");
         window->setSize({600, 400});

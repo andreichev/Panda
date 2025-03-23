@@ -22,6 +22,6 @@ void BasicGameLayer::onUpdate(double deltaTime) {
 
 void BasicGameLayer::onImGuiRender() {}
 
-void BasicGameLayer::onEvent(Event *event) {}
+void BasicGameLayer::onEvent(Fern::Event *event) {}
 
 } // namespace Panda

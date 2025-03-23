@@ -4,46 +4,29 @@
 
 #pragma once
 
-#include "Panda/Application/ApplicationStartupSettings.hpp"
-#include "Panda/Window/Window.hpp"
 #include "Panda/Application/LayerStack.hpp"
-#include "Panda/Events/EventQueue.hpp"
-#include "Panda/Events/WindowSizeObserver.hpp"
 #include "Panda/ImGui/ImGuiLayer.hpp"
-#include "Panda/GameLogic/Level.hpp"
 
 namespace Panda {
 
 class Application {
 public:
     ~Application();
-    Application(ApplicationStartupSettings &settings);
+    Application();
     void loop();
-
-    void startBasicGame(Level *level);
+    void setMainWindow(Fern::Window *window);
+    void createImGuiLayer();
     void pushLayer(Layer *layer);
     void pushOverlay(Layer *layer);
-    ImGuiLayer *getImGuiLayer() {
-        return m_ImGuiLayer;
-    }
-    void processEvents();
-    Window *getWindow();
-    void addWindowSizeObserver(WindowSizeObserver *listener);
-    void removeWindowSizeObserver(WindowSizeObserver *listener);
-    inline void close() {
-        m_isApplicationShouldClose = true;
-    }
-    inline bool isRunning() {
-        return !m_isApplicationShouldClose;
-    }
-    int fps;
-    EventQueue *getEventQueue();
-
+    void processFernEvents();
+    ImGuiLayer *getImGuiLayer();
+    Fern::Window *getMainWindow();
+    void close();
     static Application *get();
 
-private:
-    void windowSizeChanged(Size size);
+    int fps;
 
+private:
     bool m_isApplicationShouldClose;
     uint64_t m_timeMillis;
     // Таймер до 1 секундны для подсчета FPS (в миллисекундах)
@@ -54,10 +37,8 @@ private:
     // Ограничение по FPS
     int m_maximumFps;
     LayerStack *m_layerStack;
-    EventQueue m_eventQueue;
-    Window *m_window;
-    std::vector<WindowSizeObserver *> m_windowSizeListeners;
     ImGuiLayer *m_ImGuiLayer;
+    Fern::Window *m_mainWindow;
 
     static Application *s_instance;
 };

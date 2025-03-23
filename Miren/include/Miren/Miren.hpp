@@ -7,14 +7,14 @@
 #include "Base.hpp"
 #include "MirenStates.hpp"
 #include "VertexBufferLayoutData.hpp"
+
+#include <Fern/GraphicsContext/GraphicsContext.hpp>
 #include <vector>
 
 namespace Miren {
 
-void initialize();
+void initialize(Fern::GraphicsContext *ctx);
 void terminate();
-void createContext();
-void terminateContext();
 // MARK: - Command buffer
 FrameBufferHandle createFrameBuffer(FrameBufferSpecification specification);
 uint32_t readFrameBuffer(

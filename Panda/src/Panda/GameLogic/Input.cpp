@@ -3,12 +3,13 @@
 //
 
 #include "Panda/GameLogic/Input.hpp"
-#include "Panda/Events/WindowEvents.hpp"
-#include "Panda/Events/TouchEvents.hpp"
-#include "Panda/Events/KeyEvents.hpp"
-#include "Panda/Events/MouseEvents.hpp"
 
+#include <Fern/Events/WindowEvents.hpp>
+#include <Fern/Events/TouchEvents.hpp>
+#include <Fern/Events/KeyEvents.hpp>
+#include <Fern/Events/MouseEvents.hpp>
 #include <Foundation/Foundation.hpp>
+#include <vector>
 
 namespace Panda {
 
@@ -26,7 +27,8 @@ bool Input::_isTrackpadScroll = false;
 Rect Input::viewportFrame;
 std::vector<Input::Touch> Input::activeTouches;
 
-void Input::onEvent(Event *event) {
+void Input::onEvent(Fern::Event *event) {
+    using namespace Fern;
     switch (event->type) {
         case EventType::None:
             break;
@@ -89,29 +91,29 @@ void Input::onEvent(Event *event) {
     }
 }
 
-void Input::setKeyPressed(Key key, bool state) {
+void Input::setKeyPressed(Fern::Key key, bool state) {
     keys[(int)key] = state;
     framesKeys[(int)key] = frame + 1;
 }
 
-void Input::setMouseButtonPressed(MouseButton mouseButton, bool state) {
+void Input::setMouseButtonPressed(Fern::MouseButton mouseButton, bool state) {
     mouseButtons[(int)mouseButton] = state;
     framesMouseButtons[(int)mouseButton] = frame + 1;
 }
 
-bool Input::isKeyPressed(Key key) {
+bool Input::isKeyPressed(Fern::Key key) {
     return keys[(int)key];
 }
 
-bool Input::isKeyJustPressed(Key key) {
+bool Input::isKeyJustPressed(Fern::Key key) {
     return keys[(int)key] && framesKeys[(int)key] == frame;
 }
 
-bool Input::isMouseButtonPressed(MouseButton mouseButton) {
+bool Input::isMouseButtonPressed(Fern::MouseButton mouseButton) {
     return mouseButtons[(int)mouseButton];
 }
 
-bool Input::isMouseButtonJustPressed(MouseButton mouseButton) {
+bool Input::isMouseButtonJustPressed(Fern::MouseButton mouseButton) {
     return mouseButtons[(int)mouseButton] && framesMouseButtons[(int)mouseButton] == frame;
 }
 

@@ -27,6 +27,7 @@ add_subdirectory(Vendor/box2d)
 include(cmake/add_app.cmake)
 
 add_subdirectory(Foundation)
+add_subdirectory(Fern)
 add_subdirectory(Rain)
 add_subdirectory(Miren)
 add_subdirectory(Panda)

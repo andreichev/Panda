@@ -2,7 +2,7 @@
 
 #include "Serialization/AssetRegistryMapper.hpp"
 
-#include <Panda/Base/FileBase.hpp>
+#include <Panda/Assets/Path.hpp>
 #include <Rain/Coders/JsonDecoder.hpp>
 #include <Rain/Coders/JsonEncoder.hpp>
 #include <Panda/Assets/AssetHandler.hpp>

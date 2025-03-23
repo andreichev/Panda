@@ -35,6 +35,12 @@ enum RendererCommandType {
     ReadFrameBuffer
 };
 
+struct RendererInitCommand : Foundation::CommandBuffer::Command {
+    Fern::GraphicsContext *defaultContext;
+    RendererInitCommand(Fern::GraphicsContext *defaultContext)
+        : Command(RendererCommandType::RendererInit) {}
+};
+
 struct CreateFrameBufferCommand : Foundation::CommandBuffer::Command {
     FrameBufferHandle handle;
     FrameBufferSpecification spec;

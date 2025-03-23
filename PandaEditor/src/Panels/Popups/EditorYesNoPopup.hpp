@@ -18,7 +18,7 @@ public:
             ImGui::Text("%s", subtitle.c_str());
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
             if (ImGui::Button(yesText.c_str(), {ImGui::GetContentRegionAvail().x, 24}) ||
-                Input::isKeyPressed(Key::ENTER)) {
+                Input::isKeyPressed(Fern::Key::ENTER)) {
                 if (yesAction) { yesAction(); }
                 ImGui::CloseCurrentPopup();
                 ImGui::PopStyleVar(2);

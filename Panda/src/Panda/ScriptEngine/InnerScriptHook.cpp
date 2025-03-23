@@ -33,21 +33,21 @@ namespace InternalCalls {
     }
 
     uint32_t application_GetWidth() {
-        return Panda::Application::get()->getWindow()->getSize().width;
+        return Panda::Application::get()->getMainWindow()->getSize().width;
     }
 
     uint32_t application_GetHeight() {
-        return Panda::Application::get()->getWindow()->getSize().height;
+        return Panda::Application::get()->getMainWindow()->getSize().height;
     }
 
     /// INPUT
 
     bool input_IsKeyPressed(int key) {
-        return Input::isKeyPressed((Key)key);
+        return Input::isKeyPressed((Fern::Key)key);
     }
 
     bool input_IsKeyJustPressed(int key) {
-        return Input::isKeyJustPressed((Key)key);
+        return Input::isKeyJustPressed((Fern::Key)key);
     }
 
     /// WORLD

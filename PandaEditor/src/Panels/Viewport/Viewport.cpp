@@ -25,8 +25,8 @@ Viewport::Viewport(ViewportOutput *output, CameraController *cameraController)
 void Viewport::initWithSize(Vec2 size) {
     m_frame.size = size;
     PandaUI::initialize();
-    Vec2 dpi = Application::get()->getWindow()->getDpi();
-    Vec2 windowSize = Application::get()->getWindow()->getSize();
+    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
+    Fern::Size windowSize = Application::get()->getMainWindow()->getSize();
     Miren::TextureCreate create;
     create.m_data = Foundation::Memory(nullptr);
     create.m_format = Miren::TextureFormat::RGBA8;
@@ -58,7 +58,7 @@ void Viewport::updateViewportSize(Size size) {
     m_frame.size = size;
     PandaUI::Context::shared().updateViewportSize({size.width, size.height});
     if (m_camera) { m_camera->setViewportSize(size); }
-    Size dpi = Application::get()->getWindow()->getDpi();
+    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     Miren::setViewport(
         m_sceneView, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
     );
@@ -106,7 +106,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     viewportSpace = ImVec2(viewportSpace.x - 4, viewportSpace.y - 4);
     if (m_frame.size != viewportSpace) { updateViewportSize(viewportSpace); }
     m_hovered = ImGui::IsWindowHovered();
-    if ((m_hovered && Input::isMouseButtonPressed(MouseButton::RIGHT)) || m_focusNextFrame) {
+    if ((m_hovered && Input::isMouseButtonPressed(Fern::MouseButton::RIGHT)) || m_focusNextFrame) {
         ImGui::SetWindowFocus();
         m_focusNextFrame = false;
     }
@@ -128,7 +128,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     ImGui::End();
     ImGui::PopStyleVar();
 
-    Size dpi = Application::get()->getWindow()->getDpi();
+    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     Miren::readFrameBuffer(
         m_sceneFB,
         1,
@@ -139,7 +139,8 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
         &m_hoveredId
     );
 
-    if (m_focused && Input::isMouseButtonJustPressed(MouseButton::LEFT) && !m_gizmos.isUsing()) {
+    if (m_focused && Input::isMouseButtonJustPressed(Fern::MouseButton::LEFT) &&
+        !m_gizmos.isUsing()) {
         if (m_hoveredId == 0) {
             m_output->viewportUnselectAll();
         } else {
