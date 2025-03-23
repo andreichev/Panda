@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Panels/Gizmos/Gizmos.hpp"
+#include "UI/Gizmos/Gizmos.hpp"
 #include "Camera/CameraController.hpp"
 
 #include <Panda/Base/Base.hpp>

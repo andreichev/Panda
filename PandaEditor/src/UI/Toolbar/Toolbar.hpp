@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panels/Common/ImGuiHelper.hpp"
+#include "UI/Common/ImGuiHelper.hpp"
 #include "EditorLayer/SceneState.hpp"
 
 #include <Panda/ImGui/FontAwesome.h>

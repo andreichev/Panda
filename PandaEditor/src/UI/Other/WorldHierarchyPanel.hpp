@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Panels/EntityComponents/ComponentsDraw.hpp"
+#include "UI/EntityComponents/ComponentsDraw.hpp"
 
 #include <Panda/GameLogic/World.hpp>
 

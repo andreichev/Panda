@@ -1,10 +1,10 @@
 #include "EditorLayer.hpp"
 
 #include "Panda/GameLogic/GameContext.hpp"
-#include "Panels/Common/ImGuiHelper.hpp"
-#include "Panels/Popups/EditorYesNoPopup.hpp"
-#include "Panels/Popups/PickScriptPopup.hpp"
-#include "Panels/Popups/EnterNamePopup.hpp"
+#include "UI/Common/ImGuiHelper.hpp"
+#include "UI/Popups/EditorYesNoPopup.hpp"
+#include "UI/Popups/PickScriptPopup.hpp"
+#include "UI/Popups/EnterNamePopup.hpp"
 #include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 
 #include <Foundation/PlatformDetection.hpp>
@@ -146,9 +146,8 @@ void EditorLayer::onEvent(Fern::Event *event) {
 }
 
 void EditorLayer::windowSizeChanged(Size size) {
-    Fern::Window *window = Application::get()->getMainWindow();
     Miren::Rect viewport = Miren::Rect(
-        0, 0, size.width * window->getDpi().width, size.height * window->getDpi().height
+        0, 0, size.width * m_window->getDpi().width, size.height * m_window->getDpi().height
     );
     Miren::setViewport(0, viewport);
 #ifdef PLATFORM_DESKTOP
@@ -200,7 +199,7 @@ void EditorLayer::loaderDidLoadProject(const std::string &name, const path_t &pa
 }
 
 void EditorLayer::loaderDidLoadWorld() {
-    Application::get()->getMainWindow()->setTitle(m_loader.getProjectSettings().worldPath.c_str());
+    m_window->setTitle(m_loader.getProjectSettings().worldPath.c_str());
 }
 
 void EditorLayer::loaderDidLoadCloseProject() {
@@ -210,7 +209,7 @@ void EditorLayer::loaderDidLoadCloseProject() {
 }
 
 void EditorLayer::loaderCreateSampleWorld() {
-    Application::get()->getMainWindow()->setTitle("Untitled World");
+    m_window->setTitle("Untitled World");
     m_editingWorld.clear();
     m_playingWorld.clear();
     m_editingWorld.fillStartupData();
@@ -504,16 +503,15 @@ void EditorLayer::viewportUnselectAll() {
 #pragma endregion
 
 void EditorLayer::updateWindowState() {
-    auto *window = Application::get()->getMainWindow();
-    window->setResizable(m_loader.hasOpenedProject());
+    m_window->setResizable(m_loader.hasOpenedProject());
     if (m_loader.hasOpenedProject()) {
-        window->setState(Fern::WindowState::WindowStateMaximized);
+        m_window->setState(Fern::WindowState::WindowStateMaximized);
     } else {
-        window->setState(Fern::WindowState::WindowStateNormal);
+        m_window->setState(Fern::WindowState::WindowStateNormal);
     }
     if (!m_loader.hasOpenedProject()) {
-        window->setTitle("Welcome");
-        window->setSize({600, 400});
+        m_window->setTitle("Welcome");
+        m_window->setSize({600, 400});
     }
 }
 

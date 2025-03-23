@@ -3,7 +3,7 @@
 //
 
 #include "WorldHierarchyPanel.hpp"
-#include "EntityComponents/ComponentsDraw.hpp"
+#include "UI/EntityComponents/ComponentsDraw.hpp"
 #include "Model/DragDropItem.hpp"
 #include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 #include "Panda/WorldCommands/Impl/HierarchyCommand.hpp"
