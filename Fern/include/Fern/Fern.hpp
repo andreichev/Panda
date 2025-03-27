@@ -7,8 +7,10 @@ namespace Fern {
 
 void initialize();
 void terminate();
+/// Never explicitly delete the window, use disposeWindow() instead.
 Window *
 createWindow(const char *title, Rect rect, WindowState state, DrawingContextType contextType);
+void disposeWindow(Window *window);
 Vec2 getCursorPosition();
 const char *getClipboardText();
 void setClipboardText(const char *text);

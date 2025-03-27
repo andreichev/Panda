@@ -18,7 +18,7 @@ EventQueue* getEventQueue();
 }
 
 - (BOOL)windowShouldClose:(id)sender {
-    getEventQueue()->postWindowCloseEvent();
+    getEventQueue()->postWindowCloseRequest(window);
     return NO;
 }
 

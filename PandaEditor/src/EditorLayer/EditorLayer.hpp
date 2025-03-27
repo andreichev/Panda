@@ -1,18 +1,11 @@
 #pragma once
 
-#include "UI/Viewport/Viewport.hpp"
-#include "UI/Other/MenuBar.hpp"
-#include "UI/Other/Dockspace.hpp"
-#include "UI/Other/WorldHierarchyPanel.hpp"
-#include "UI/Other/StatisticsPanel.hpp"
-#include "UI/Other/StartPanel.hpp"
-#include "UI/Console/ConsolePanel.hpp"
-#include "UI/Toolbar/Toolbar.hpp"
-#include "UI/ContentBrowser/ContentBrowser.hpp"
 #include "Camera/EditorCamera.hpp"
 #include "Camera/CameraController.hpp"
 #include "EditorLayer/SceneState.hpp"
 #include "UI/Popups/EditorPopup.hpp"
+#include "UI/PanelsContainer/PanelsContainer.hpp"
+#include "UI/Other/StartPanel.hpp"
 #include "ProjectLoader/ProjectLoader.hpp"
 #include "SceneGrid.hpp"
 
@@ -28,7 +21,7 @@ class EditorLayer : public Layer,
                     public ToolbarOutput,
                     public ViewportOutput {
 public:
-    EditorLayer();
+    EditorLayer(Fern::Window *window);
     ~EditorLayer() override = default;
 
     virtual void onAttach() override;
@@ -105,20 +98,13 @@ private:
 
     bool m_viewportFullscreen;
     ProjectLoader m_loader;
-    MenuBar m_menuBar;
-    Toolbar m_toolbar;
-    Dockspace m_dockspace;
-    Viewport m_viewport;
-    StatisticsPanel m_statisticsPanel;
-    ConsolePanel m_consolePanel;
     StartPanel m_startPanel;
-    WorldHierarchyPanel m_hierarchyPanel;
-    ContentBrowser m_contentBrowser;
     EditorCamera m_editorCamera;
     CameraController m_cameraController;
     std::vector<EditorPopup *> m_popups;
     SceneGrid m_grid;
     Fern::Window *m_window;
+    PanelsContainer m_panelsContainer;
 
     // World that is visible by default in editor but never played.
     World m_editingWorld;

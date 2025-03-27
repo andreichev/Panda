@@ -13,62 +13,39 @@
 
 namespace Panda {
 
-EditorLayer::EditorLayer()
+EditorLayer::EditorLayer(Fern::Window *window)
     : m_editingWorld()
     , m_playingWorld()
     , m_currentWorld(&m_editingWorld)
     , m_viewportFullscreen(false)
-    , m_toolbar(this)
-    , m_dockspace()
-    , m_viewport(this, &m_cameraController)
-    , m_hierarchyPanel(nullptr, this)
-    , m_statisticsPanel(nullptr)
-    , m_consolePanel()
+    , m_panelsContainer(this, &m_cameraController)
     , m_loader(&m_editingWorld, this)
     , m_startPanel(&m_loader)
-    , m_menuBar(this)
-    , m_contentBrowser(this)
     , m_editorCamera()
     , m_popups()
     , m_cameraController()
     , m_sceneState(SceneState::EDIT)
-    , m_grid(&m_cameraController) {
-    m_viewport.initWithSize(Size(100.f, 100.f));
-    m_editingWorld.setViewId(m_viewport.getMirenView());
-    m_playingWorld.setViewId(m_viewport.getMirenView());
-    m_grid.setViewId(m_viewport.getMirenView());
-    m_viewport.setCamera(&m_editorCamera);
-    m_viewport.setWorld(m_currentWorld);
-    m_hierarchyPanel.setWorld(m_currentWorld);
-    m_statisticsPanel.setWorld(m_currentWorld);
-    m_cameraController.setPosition({0.f, 0.f, 4.f});
-}
+    , m_grid(&m_cameraController)
+    , m_window(window) {}
 
 void EditorLayer::onAttach() {
-    Fern::Rect rect = Fern::Rect(0, 0, 600, 400);
-    m_window = Fern::createWindow(
-        "Panda Editor",
-        rect,
-        Fern::WindowState::WindowStateNormal,
-        Fern::DrawingContextType::DrawingContextTypeOpenGL
-    );
-    Application::get()->setMainWindow(m_window);
-#ifdef PLATFORM_DESKTOP
-    Miren::initialize(m_window->getDrawingContext());
-#endif
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
-    m_loader.loadInitialData();
     GameContext::s_currentWorld = m_currentWorld;
     GameContext::s_assetHandler = &m_loader.getAssetHandler();
+    m_panelsContainer.viewport.initWithSize(Size(100.f, 100.f));
+    m_editingWorld.setViewId(m_panelsContainer.viewport.getMirenView());
+    m_playingWorld.setViewId(m_panelsContainer.viewport.getMirenView());
+    m_grid.setViewId(m_panelsContainer.viewport.getMirenView());
+    m_panelsContainer.viewport.setCamera(&m_editorCamera);
+    m_panelsContainer.setCurrentWorld(m_currentWorld);
+    m_cameraController.setPosition({0.f, 0.f, 4.f});
+    m_loader.loadInitialData();
     LOG_INFO_EDITOR("EDITOR INITIALIZED");
 }
 
 void EditorLayer::onDetach() {
     GameContext::s_currentWorld = nullptr;
     GameContext::s_assetHandler = nullptr;
-#ifdef PLATFORM_DESKTOP
-    Miren::terminate();
-#endif
 }
 
 void EditorLayer::onUpdate(double deltaTime) {
@@ -86,7 +63,7 @@ void EditorLayer::onUpdate(double deltaTime) {
             break;
         }
         case SceneState::PLAY: {
-            m_viewport.setCamera(m_playingWorld.findMainCamera());
+            m_panelsContainer.viewport.setCamera(m_playingWorld.findMainCamera());
             m_playingWorld.updateRuntime(deltaTime);
             break;
         }
@@ -110,25 +87,14 @@ void EditorLayer::onImGuiRender() {
         popup->onImGuiRender();
     }
     if (m_loader.hasOpenedProject()) {
-        m_menuBar.onImGuiRender();
-        m_toolbar.onImGuiRender(m_menuBar.m_height);
-        float offsetY = m_toolbar.getHeight() + m_menuBar.m_height + 2;
-        if (m_viewportFullscreen) {
-            m_viewport.onImGuiRender(m_sceneState, offsetY, true);
-        } else {
-            m_dockspace.beginImGuiDockspace(offsetY);
-            m_statisticsPanel.onImGuiRender();
-            m_viewport.onImGuiRender(m_sceneState, 0, false);
-            m_hierarchyPanel.onImGuiRender();
-            m_contentBrowser.onImGuiRender();
-            m_consolePanel.onImGuiRender();
-            m_dockspace.endImGuiDockspace();
-        }
+        m_panelsContainer.onImGuiRender(m_viewportFullscreen, m_sceneState);
         m_cameraController.setRotationActive(
-            (Input::isTrackpadScroll() && m_viewport.isHovered()) || m_viewport.isFocused()
+            (Input::isTrackpadScroll() && m_panelsContainer.viewport.isHovered()) ||
+            m_panelsContainer.viewport.isFocused()
         );
         m_cameraController.setMoveActive(
-            (m_viewport.isHovered() && !ImGui::IsAnyItemActive()) || m_viewport.isFocused()
+            (m_panelsContainer.viewport.isHovered() && !ImGui::IsAnyItemActive()) ||
+            m_panelsContainer.viewport.isFocused()
         );
     } else {
         m_startPanel.onImGuiRender();
@@ -136,7 +102,8 @@ void EditorLayer::onImGuiRender() {
 }
 
 void EditorLayer::onEvent(Fern::Event *event) {
-    if (event->type == Fern::EventType::QuitRequest) {
+    if (event->type == Fern::EventType::QuitRequest ||
+        event->type == Fern::EventType::WindowCloseRequest) {
         event->isHandled = true;
         closeApp();
     } else if (event->type == Fern::EventType::WindowResize) {
@@ -160,11 +127,9 @@ void EditorLayer::play() {
     m_playingWorld = m_editingWorld;
     m_currentWorld = &m_playingWorld;
     GameContext::s_currentWorld = m_currentWorld;
-    m_hierarchyPanel.setWorld(m_currentWorld);
-    m_statisticsPanel.setWorld(m_currentWorld);
-    m_viewport.setWorld(m_currentWorld);
+    m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_playingWorld.startRunning();
-    m_viewport.focus();
+    m_panelsContainer.viewport.focus();
 }
 
 void EditorLayer::simulate() {
@@ -172,30 +137,26 @@ void EditorLayer::simulate() {
     m_playingWorld = m_editingWorld;
     m_currentWorld = &m_playingWorld;
     GameContext::s_currentWorld = m_currentWorld;
-    m_hierarchyPanel.setWorld(m_currentWorld);
-    m_statisticsPanel.setWorld(m_currentWorld);
-    m_viewport.setWorld(m_currentWorld);
+    m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_playingWorld.startRunning();
-    m_viewport.focus();
+    m_panelsContainer.viewport.focus();
 }
 
 void EditorLayer::stop() {
     m_sceneState = SceneState::EDIT;
-    m_viewport.setCamera(&m_editorCamera);
+    m_panelsContainer.viewport.setCamera(&m_editorCamera);
     m_currentWorld = &m_editingWorld;
     GameContext::s_currentWorld = m_currentWorld;
-    m_hierarchyPanel.setWorld(m_currentWorld);
-    m_statisticsPanel.setWorld(m_currentWorld);
-    m_viewport.setWorld(m_currentWorld);
+    m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_playingWorld.finishRunning();
-    m_viewport.focus();
+    m_panelsContainer.viewport.focus();
 }
 
 #pragma region Project loader output
 
 void EditorLayer::loaderDidLoadProject(const std::string &name, const path_t &path) {
     updateWindowState();
-    m_contentBrowser.setBaseDirectory(path / "Assets");
+    m_panelsContainer.contentBrowser.setBaseDirectory(path / "Assets");
 }
 
 void EditorLayer::loaderDidLoadWorld() {
@@ -394,7 +355,7 @@ void EditorLayer::showCreateFolderPopup() {
         m_popups.pop_back();
     };
     popup->doneAction = [&](std::string text) {
-        if (!text.empty()) { m_contentBrowser.createFolder(text); }
+        if (!text.empty()) { m_panelsContainer.contentBrowser.createFolder(text); }
         F_DELETE(Foundation::getAllocator(), m_popups.back());
         m_popups.pop_back();
     };
@@ -406,7 +367,7 @@ void EditorLayer::showCreateFolderPopup() {
 void EditorLayer::deleteFileShowPopup(path_t path) {
     EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
     popup->yesAction = [&]() {
-        m_contentBrowser.confirmDeletion();
+        m_panelsContainer.contentBrowser.confirmDeletion();
         F_DELETE(Foundation::getAllocator(), m_popups.back());
         m_popups.pop_back();
     };

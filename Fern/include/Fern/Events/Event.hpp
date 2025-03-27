@@ -11,7 +11,7 @@ namespace Fern {
 enum EventType {
     None = 0,
     WindowResize,
-    WindowClose,
+    WindowCloseRequest,
     // WindowFocus,
     // WindowLostFocus,
     QuitRequest,

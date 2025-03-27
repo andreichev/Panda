@@ -20,7 +20,6 @@ private:
     Texture m_logoImage;
     Texture m_iconProject;
     bool m_newProjectMenu;
-
     ProjectLoader *m_loader;
 };
 

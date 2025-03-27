@@ -11,6 +11,8 @@
 
 namespace Fern {
 
+class Window;
+
 class EventQueue {
 public:
     EventQueue();
@@ -25,7 +27,8 @@ public:
     void postTouchMovedEvent(int id, float x, float y);
     void postTouchEndedEvent(int id);
     void postScrollEvent(double xoffset, double yoffset, bool isTrackpad);
-    void postWindowCloseEvent();
+    void postWindowCloseRequest(Window *window);
+    void postAppQuitRequest();
     Event *poll();
 
 private:

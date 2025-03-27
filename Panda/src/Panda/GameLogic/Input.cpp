@@ -32,7 +32,9 @@ void Input::onEvent(Fern::Event *event) {
     switch (event->type) {
         case EventType::None:
             break;
-        case EventType::WindowClose:
+        case EventType::WindowCloseRequest:
+            break;
+        case EventType::QuitRequest:
             break;
         case EventType::WindowResize: {
             const WindowResizeEvent *ev = static_cast<const WindowResizeEvent *>(event);

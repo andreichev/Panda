@@ -60,8 +60,13 @@ void EventQueue::postScrollEvent(double xoffset, double yoffset, bool isTrackpad
     m_events.write(event);
 }
 
-void EventQueue::postWindowCloseEvent() {
-    WindowCloseEvent event;
+void EventQueue::postWindowCloseRequest(Window *window) {
+    WindowCloseRequestEvent event(window);
+    m_events.write(event);
+}
+
+void EventQueue::postAppQuitRequest() {
+    QuitRequestEvent event;
     m_events.write(event);
 }
 

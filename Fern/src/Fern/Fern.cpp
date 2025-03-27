@@ -40,6 +40,11 @@ createWindow(const char *title, Rect rect, WindowState state, DrawingContextType
     return s_system->createWindow(title, rect, state, contextType);
 }
 
+void disposeWindow(Window *window) {
+    PND_ASSERT(s_system != nullptr, "FERN NOT INITIALIZED");
+    s_system->disposeWindow(window);
+}
+
 void pollEvents() {
     PND_ASSERT(s_system != nullptr, "FERN NOT INITIALIZED");
     s_system->pollEvents();

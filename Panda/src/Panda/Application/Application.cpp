@@ -51,7 +51,6 @@ Application::Application()
     , m_mainWindow(nullptr) {
     s_instance = this;
     Foundation::Logger::init();
-    Fern::initialize();
     m_timeMillis = getMillis();
     m_layerStack = F_NEW(Foundation::getAllocator(), LayerStack);
     Random::init();
@@ -89,7 +88,6 @@ void Application::loop() {
         double deltaTime = m_deltaTimeMillis / 1000.0;
         if (deltaTime == 0) { deltaTime = 0.00000001; }
         m_deltaTimeMillis = 0;
-        Input::nextFrame();
         // LOG_INFO("APP UPDATE BEGIN");
         LayerStack &layerStack = *m_layerStack;
         for (Layer *layer : layerStack) {
@@ -102,6 +100,7 @@ void Application::loop() {
             }
             m_ImGuiLayer->end();
         }
+        Input::nextFrame();
         Fern::pollEvents();
         processFernEvents();
         Miren::frame();

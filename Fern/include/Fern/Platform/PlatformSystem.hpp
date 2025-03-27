@@ -11,6 +11,7 @@ public:
     virtual Window *createWindow(
         const char *title, Rect rect, WindowState state, DrawingContextType contextType
     ) = 0;
+    virtual void disposeWindow(Window *window) = 0;
     virtual Vec2 getCursorPosition() const = 0;
     virtual const char *getClipboardText() = 0;
     virtual void setClipboardText(const char *text) = 0;

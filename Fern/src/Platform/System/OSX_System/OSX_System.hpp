@@ -8,6 +8,7 @@ public:
     Window *createWindow(
         const char *title, Rect rect, WindowState state, DrawingContextType contextType
     ) override;
+    void disposeWindow(Window *window) override;
     void pollEvents() override;
     Vec2 getCursorPosition() const override;
     const char *getClipboardText() override;

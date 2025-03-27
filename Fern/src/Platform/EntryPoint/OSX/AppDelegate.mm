@@ -4,7 +4,14 @@
 //  Created by Andreichev Mikhail on 07.02.2025.
 //
 
-#import "AppDelegate.hpp"
+#import "AppDelegate.h"
+#import "Fern/Events/EventQueue.hpp"
+
+using namespace Fern;
+
+namespace Fern {
+EventQueue* getEventQueue();
+}
 
 @implementation AppDelegate {
     id keyUpMonitor;
@@ -39,8 +46,7 @@
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
-    // Panda::Application* app = Panda::Application::get();
-    // if(app) { app->getEventQueue()->postWindowCloseEvent(); }
+    getEventQueue()->postAppQuitRequest();
     return NSTerminateCancel;
 }
 

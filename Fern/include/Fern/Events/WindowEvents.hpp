@@ -25,10 +25,20 @@ private:
     uint16_t width, height;
 };
 
-class WindowCloseEvent : public Event {
+class Window;
+
+class WindowCloseRequestEvent : public Event {
 public:
-    WindowCloseEvent()
-        : Event(EventType::WindowClose) {}
+    WindowCloseRequestEvent(Window *window)
+        : Event(EventType::WindowCloseRequest)
+        , window(window) {}
+
+    Window *getWindow() {
+        return window;
+    }
+
+private:
+    Window *window;
 };
 
 class QuitRequestEvent : public Event {

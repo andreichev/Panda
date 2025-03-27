@@ -6,7 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "AppDelegate.hpp"
+#import "AppDelegate.h"
 
 static void changeToResourcesDirectory() {
     char resourcesPath[MAXPATHLEN];

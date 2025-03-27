@@ -16,6 +16,13 @@ Window *OSX_System::createWindow(
     );
 }
 
+void OSX_System::disposeWindow(Window *window) {
+    if (window->getState() == WindowState::WindowStateFullScreen) {
+        window->setState(WindowState::WindowStateNormal);
+    }
+    delete window;
+}
+
 void OSX_System::pollEvents() {
     NSApplication* application = [NSApplication sharedApplication];
     while (true) {
