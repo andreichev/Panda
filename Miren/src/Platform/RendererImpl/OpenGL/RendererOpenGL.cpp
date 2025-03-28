@@ -226,7 +226,7 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
     m_textures[handle.id].bind(slot);
 }
 
-void RendererOpenGL::submit(Frame *frame, View *views) {
+void RendererOpenGL::submit(Frame *frame) {
     MIREN_LOG("FRAME SUBMITTED. DRAW CALLS: %d", frame->getDrawCallsCount());
     if (frame->m_transientVbSize > 0) {
         m_vertexBuffers[frame->m_transientVb.handle.id].update(
@@ -238,18 +238,18 @@ void RendererOpenGL::submit(Frame *frame, View *views) {
             frame->m_transientIb.data, frame->m_transientIbSize / 2
         );
     }
-    if (!frame->getDrawCallsCount()) {
+    if (!frame->m_drawCallsCount) {
         GL_CALL(glClearColor(0, 0, 0, 1));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
         return;
     }
     ViewId viewId = -1;
-    for (int i = 0; i < frame->getDrawCallsCount(); i++) {
-        RenderDraw &draw = frame->getDrawCalls()[i];
+    for (int i = 0; i < frame->m_drawCallsCount; i++) {
+        RenderDraw &draw = frame->m_drawCalls[i];
         if (!draw.m_isSubmitted) { continue; }
         if (draw.m_viewId != viewId) {
             viewId = draw.m_viewId;
-            viewChanged(views[viewId]);
+            viewChanged(frame->m_views[viewId]);
         }
         submit(&draw);
     }

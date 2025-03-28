@@ -37,6 +37,7 @@ EventQueue* getEventQueue();
     };
     keyUpMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskKeyUp
                                                          handler:block];
+    [NSApp activateIgnoringOtherApps:YES];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {

@@ -52,7 +52,6 @@ int main(int argc, const char * argv[]) {
     AppDelegate* delegate = [[AppDelegate alloc] init];
     [application setDelegate:delegate];
     [application setActivationPolicy:NSApplicationActivationPolicyRegular];
-    [application activateIgnoringOtherApps:YES];
     changeToResourcesDirectory();
     [application finishLaunching];
     id quitMenuItem = [NSMenuItem new];

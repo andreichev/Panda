@@ -73,7 +73,7 @@ public:
     void readTexture(Miren::TextureHandle handle, void *data) override;
     void setUniform(const Uniform &uniform) override;
     void setTexture(TextureHandle handle, uint32_t slot) override;
-    void submit(Frame *frame, View *views) override;
+    void submit(Frame *frame) override;
     OpenGLTexture &getTexture(TextureHandle handle) {
         return m_textures[handle.id];
     }

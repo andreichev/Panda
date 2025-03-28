@@ -70,14 +70,6 @@ void Frame::submitCurrentDrawCall(ViewId id) {
     draw.m_isSubmitted = true;
 }
 
-uint32_t Frame::getDrawCallsCount() {
-    return m_drawCallsCount;
-}
-
-RenderDraw *Frame::getDrawCalls() {
-    return m_drawCalls;
-}
-
 void Frame::queueFree(FrameBufferHandle handle) {
     m_frameBuffersFreeHandle.queue(handle);
 }

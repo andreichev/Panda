@@ -273,8 +273,8 @@ struct Context {
             return true;
         }
         rendererExecuteCommands(m_render->getPreCommandQueue());
-        if (m_render->getDrawCallsCount() != 0) {
-            m_renderer->submit(m_render, m_views);
+        if (m_render->m_drawCallsCount != 0) {
+            m_renderer->submit(m_render);
             m_ctx->swapBuffers();
         }
         rendererExecuteCommands(m_render->getPostCommandQueue());
@@ -527,6 +527,9 @@ struct Context {
     uint32_t frame() {
         m_rendererSemaphore.wait();
         freeAllHandles(m_submit);
+        for (int i = 0; i < MAX_VIEWS; i++) {
+            m_submit->m_views[i] = m_views[i];
+        }
         swap();
         m_submit->reset();
         m_apiSemaphore.post();
