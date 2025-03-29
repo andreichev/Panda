@@ -6,17 +6,23 @@
 
 #include "Fern/GraphicsContext/GraphicsContext.hpp"
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 namespace Fern {
 
 // GLFW and GLAD based context
 class GLFW_GLContext : public GraphicsContext {
 public:
-    void create() override;
-    void flip() override;
+    GLFW_GLContext(GLFWwindow *windowHandle);
+    void setCurrent() override;
+    void releaseDrawingContext() override;
+    void swapBuffers() override;
+    void update() override;
     uint32_t getDefaultFrameBufferId() override;
 
 private:
-    void *glfwWindowHandle;
+    GLFWwindow *m_windowHandle;
 };
 
 } // namespace Fern

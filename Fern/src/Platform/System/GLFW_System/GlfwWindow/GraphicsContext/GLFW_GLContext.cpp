@@ -5,14 +5,12 @@
 #include "GLFW_GLContext.hpp"
 
 #include <Foundation/Logger.hpp>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 namespace Fern {
 
-void GLFW_GLContext::create() {
-    glfwWindowHandle = PlatformData::get()->nativeWindowHandle;
-    glfwMakeContextCurrent((GLFWwindow *)glfwWindowHandle);
+GLFW_GLContext::GLFW_GLContext(GLFWwindow *windowHandle)
+    : m_windowHandle(windowHandle) {
+    glfwMakeContextCurrent(m_windowHandle);
     if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == false) {
         LOG_CRITICAL("Failed to initialize GLAD");
     }
@@ -20,9 +18,19 @@ void GLFW_GLContext::create() {
     glfwSwapInterval(1);
 }
 
-void GLFW_GLContext::flip() {
-    glfwSwapBuffers((GLFWwindow *)glfwWindowHandle);
+void GLFW_GLContext::setCurrent() {
+    glfwMakeContextCurrent(m_windowHandle);
 }
+
+void GLFW_GLContext::releaseDrawingContext() {
+    glfwMakeContextCurrent(nullptr);
+}
+
+void GLFW_GLContext::swapBuffers() {
+    glfwSwapBuffers(m_windowHandle);
+}
+
+void GLFW_GLContext::update() {}
 
 uint32_t GLFW_GLContext::getDefaultFrameBufferId() {
     return 0;

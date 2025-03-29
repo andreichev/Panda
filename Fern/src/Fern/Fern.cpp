@@ -4,11 +4,11 @@
 #include <Foundation/PlatformDetection.hpp>
 
 #if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
-#    include "Platform/SystemImpl/GlfwWindow/GlfwWindow.hpp"
+#    include "Platform/System/GLFW_System/GLFW_System.hpp"
 #elif defined(PLATFORM_MACOS)
 #    include "Platform/System/OSX_System/OSX_System.hpp"
 #elif defined(PLATFORM_IOS)
-#    include "Platform/SystemImpl/UIKitWindow/PandaWindowIOSImpl.hpp"
+#    include "Platform/System/UIKitWindow/PandaWindowIOSImpl.hpp"
 #    include "PlatformSystem.hpp"
 #endif
 
@@ -19,7 +19,7 @@ static PlatformSystem *s_system = nullptr;
 void initialize() {
     PND_ASSERT(s_system == nullptr, "FERN ALREADY INITIALIZED");
 #if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
-    s_system = F_NEW(Foundation::getAllocator(), GlfwSystem);
+    s_system = F_NEW(Foundation::getAllocator(), GLFW_System);
 #elif defined(PLATFORM_MACOS)
     s_system = F_NEW(Foundation::getAllocator(), OSX_System);
 #elif defined(PLATFORM_IOS)
