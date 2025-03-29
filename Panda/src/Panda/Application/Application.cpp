@@ -3,7 +3,6 @@
 //
 
 #include "Panda/Application/Application.hpp"
-#include "Panda/GameLogic/BasicGameLayer.hpp"
 #include "Panda/GameLogic/Input.hpp"
 #include "Panda/Random/Random.hpp"
 
