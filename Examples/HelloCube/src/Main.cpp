@@ -5,17 +5,33 @@
 //  Created by Admin on 22.07.2021.
 //
 
-#include "CubeLevel.hpp"
+#include "CubeLayer.hpp"
+
+#include <Foundation/PlatformDetection.hpp>
+#include <Fern/Fern.hpp>
+#include <Panda.hpp>
 
 int startApp(int argc, char **argv) {
-    Panda::ApplicationStartupSettings settings;
-    settings.name = "Hello Cube";
-    settings.windowTitle = "Hello Cube";
-    settings.windowSize = {900, 600};
-    settings.isFullScreen = false;
-    auto application = new Panda::Application(settings);
-    application->startBasicGame(new CubeLevel);
+    Fern::initialize();
+    auto application = new Panda::Application();
+    Fern::Rect rect = Fern::Rect(0, 0, 900, 600);
+    Fern::Window *window = Fern::createWindow(
+        "Hello triangle",
+        rect,
+        Fern::WindowState::WindowStateNormal,
+        Fern::DrawingContextType::DrawingContextTypeOpenGL
+    );
+    Panda::Application::get()->setMainWindow(window);
+#ifdef PLATFORM_DESKTOP
+    Miren::initialize(window->getDrawingContext());
+#endif
+    application->createImGuiLayer();
+    application->pushLayer(new CubeLayer(window));
     application->loop();
+    Fern::disposeWindow(window);
     delete application;
+#ifdef PLATFORM_DESKTOP
+    Miren::terminate();
+#endif
     return 0;
 }

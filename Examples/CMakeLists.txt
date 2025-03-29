@@ -1,5 +1,5 @@
 # add_subdirectory(Baobab)
-# add_subdirectory(HelloCube)
+add_subdirectory(HelloCube)
 add_subdirectory(HelloTriangle)
 # add_subdirectory(HelloCanvas)
 # add_subdirectory(HelloUI)
