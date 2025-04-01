@@ -9,12 +9,14 @@
 namespace Fern {
 
 struct MouseMovedEvent : public Event {
-    MouseMovedEvent(double x, double y)
+    MouseMovedEvent(double x, double y, double dx, double dy)
         : Event(EventType::MouseMoved)
         , x(x)
-        , y(y) {}
+        , y(y)
+        , dx(dx)
+        , dy(dy) {}
 
-    double x, y;
+    double x, y, dx, dy;
 };
 
 struct MouseScrolledEvent : public Event {

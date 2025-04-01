@@ -11,6 +11,7 @@ using namespace Fern;
 
 namespace Fern {
 EventQueue* getEventQueue();
+bool isCursorLocked();
 }
 
 struct WonderHelper {
@@ -184,7 +185,8 @@ static NSUInteger pandaKeyToCocoaModifierFlag(Fern::Key key) {
         memset(m_helper.keys, 0, sizeof(m_helper.keys));
         markedText = [[NSMutableAttributedString alloc] init];
         fillKeyTable(m_helper);
-        m_multiTouchScroll = false;
+        m_multiTouchScroll = NO;
+        self.ignoreMouseEvents = 0;
     }
     NSLog(@"WonderView created");
     return self;
@@ -215,7 +217,15 @@ static NSUInteger pandaKeyToCocoaModifierFlag(Fern::Key key) {
     const NSPoint pos = [event locationInWindow];
     double xpos = pos.x;
     double ypos = self.frame.size.height - pos.y;
-    getEventQueue()->postMouseEvent(xpos, ypos);
+    double deltaX = [event deltaX];
+    double deltaY = [event deltaY];
+    // Если мы переместили курсор программно, нам не нужно иметь дельты
+    if (self.ignoreMouseEvents) {
+        deltaX = 0;
+        deltaY = 0;
+        self.ignoreMouseEvents--;
+    }
+    getEventQueue()->postMouseEvent(xpos, ypos, deltaX, deltaY);
 }
 
 - (void)mouseDragged:(NSEvent *)event {
@@ -267,6 +277,10 @@ static NSUInteger pandaKeyToCocoaModifierFlag(Fern::Key key) {
         m_multiTouchScroll = true;
     } else if (event.phase == NSEventPhaseEnded) {
         m_multiTouchScroll = false;
+    }
+    if ([event hasPreciseScrollingDeltas]) {
+        deltaX *= 0.025;
+        deltaY *= 0.025;
     }
     getEventQueue()->postScrollEvent(deltaX, deltaY, m_multiTouchScroll || event.momentumPhase != NSEventPhaseNone);
 }

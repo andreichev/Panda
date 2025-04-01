@@ -49,7 +49,6 @@ Application::Application()
     , m_thisSecondFramesCount(0)
     , m_mainWindow(nullptr) {
     s_instance = this;
-    Foundation::Logger::init();
     m_timeMillis = getMillis();
     m_layerStack = F_NEW(Foundation::getAllocator(), LayerStack);
     Random::init();

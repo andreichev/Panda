@@ -10,4 +10,6 @@
     NSMutableAttributedString* markedText;
 }
 
+@property (nonatomic, assign) int ignoreMouseEvents;
+
 @end

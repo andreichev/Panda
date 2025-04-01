@@ -1,10 +1,26 @@
 #import "OSX_System.hpp"
 #import "CocoaWindow/CocoaWindow.h"
+#import "CocoaWindow/WonderView.h"
 
 #import <Foundation/Allocator.hpp>
 #import <Cocoa/Cocoa.h>
 
 namespace Fern {
+
+/*
+static void updateCursorImage(_GLFWwindow* window) {
+    if (window->cursorMode == GLFW_CURSOR_NORMAL) {
+        [NSCursor unhide];
+
+        if (window->cursor)
+            [(NSCursor*) window->cursor->ns.object set];
+        else
+            [[NSCursor arrowCursor] set];
+    } else {
+        [NSCursor hide];
+    }
+}
+ */
 
 OSX_System::OSX_System() : m_isCursorLocked(false) {}
 
@@ -61,7 +77,25 @@ void OSX_System::setClipboardText(const char *text) {
 
 void OSX_System::toggleCursorLock() {
     m_isCursorLocked = !m_isCursorLocked;
-    CGAssociateMouseAndMouseCursorPosition(!m_isCursorLocked);
+    if (m_isCursorLocked) {
+        CGAssociateMouseAndMouseCursorPosition(false);
+        NSWindow* window = [NSApp keyWindow];
+        if (!window) { return; }
+        CGRect frame = window.frame;
+        CGFloat height = window.screen.frame.size.height;
+        CGPoint center = CGPointMake(frame.origin.x + frame.size.width / 2,
+                                     height - (frame.origin.y + frame.size.height / 2));
+        CGWarpMouseCursorPosition(center);
+        // Игнорируем события мыши из за программного перемещения во избежания лишних дельт
+        if ([window.contentView isKindOfClass:[WonderView class]]) {
+            WonderView *view = (WonderView *)window.contentView;
+            view.ignoreMouseEvents = 3;
+        }
+        [NSCursor hide];
+    } else {
+        CGAssociateMouseAndMouseCursorPosition(true);
+        [NSCursor unhide];
+    }
 }
 
 bool OSX_System::isCursorLocked() {

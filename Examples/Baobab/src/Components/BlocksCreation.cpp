@@ -7,8 +7,8 @@
 
 #include <imgui.h>
 
-void BlocksCreation::initialize() {
-    m_transform = &getEntity().getTransform();
+BlocksCreation::BlocksCreation(Panda::TransformComponent *transform)
+    : m_transform(transform) {
     m_selectedBlock = VoxelType::GROUND;
 }
 
@@ -21,9 +21,7 @@ void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkInde
         ->chunks
             [chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
              chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
-        .getMeshEntity()
-        .getComponent<Panda::DynamicMeshComponent>()
-        .meshes.front()
+        .getMesh()
         .update(data);
 }
 
@@ -61,12 +59,12 @@ void BlocksCreation::setVoxel(int x, int y, int z, VoxelType type) {
 void BlocksCreation::update(double deltaTime) {
     bool leftPressed;
     bool rightPressed;
-    if (Panda::Input::isKeyPressed(Panda::Key::E)) {
-        leftPressed = Panda::Input::isMouseButtonPressed(Panda::MouseButton::LEFT);
-        rightPressed = Panda::Input::isMouseButtonPressed(Panda::MouseButton::RIGHT);
+    if (Panda::Input::isKeyPressed(Fern::Key::E)) {
+        leftPressed = Panda::Input::isMouseButtonPressed(Fern::MouseButton::LEFT);
+        rightPressed = Panda::Input::isMouseButtonPressed(Fern::MouseButton::RIGHT);
     } else {
-        leftPressed = Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::LEFT);
-        rightPressed = Panda::Input::isMouseButtonJustPressed(Panda::MouseButton::RIGHT);
+        leftPressed = Panda::Input::isMouseButtonJustPressed(Fern::MouseButton::LEFT);
+        rightPressed = Panda::Input::isMouseButtonJustPressed(Fern::MouseButton::RIGHT);
     }
     if (!leftPressed && !rightPressed) { return; }
     glm::vec3 position = m_transform->getPosition();
@@ -97,7 +95,7 @@ void BlocksCreation::onImGuiRender() {
     ImGui::End();
 }
 
-void BlocksCreation::setChunksStorage(Foundation::Shared<ChunksStorage> storage) {
+void BlocksCreation::setChunksStorage(ChunksStorage *storage) {
     m_chunksStorage = storage;
 }
 

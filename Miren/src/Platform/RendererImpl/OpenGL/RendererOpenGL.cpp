@@ -227,7 +227,7 @@ void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
 }
 
 void RendererOpenGL::submit(Frame *frame) {
-    MIREN_LOG("FRAME SUBMITTED. DRAW CALLS: %d", frame->getDrawCallsCount());
+    MIREN_LOG("FRAME SUBMITTED. DRAW CALLS: %d", frame->m_drawCallsCount);
     if (frame->m_transientVbSize > 0) {
         m_vertexBuffers[frame->m_transientVb.handle.id].update(
             frame->m_transientVb.data, frame->m_transientVbSize

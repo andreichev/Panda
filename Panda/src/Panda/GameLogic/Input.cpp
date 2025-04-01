@@ -21,6 +21,8 @@ uint32_t Input::framesMouseButtons[4];
 Size Input::windowSize;
 double Input::mousePositionX = 0;
 double Input::mousePositionY = 0;
+double Input::mouseDeltaX = 0;
+double Input::mouseDeltaY = 0;
 double Input::mouseScrollX = 0;
 double Input::mouseScrollY = 0;
 bool Input::_isTrackpadScroll = false;
@@ -57,7 +59,7 @@ void Input::onEvent(Fern::Event *event) {
         }
         case EventType::MouseMoved: {
             const MouseMovedEvent *ev = static_cast<const MouseMovedEvent *>(event);
-            Input::postMouseChangedPosition(ev->x, ev->y);
+            Input::postMouseChangedPosition(ev->x, ev->y, ev->dx, ev->dy);
             break;
         }
         case EventType::MouseButtonPressed: {
@@ -127,6 +129,14 @@ double Input::getMousePositionY() {
     return mousePositionY;
 }
 
+double Input::getMouseDeltaX() {
+    return mouseDeltaX;
+}
+
+double Input::getMouseDeltaY() {
+    return mouseDeltaY;
+}
+
 double Input::getMouseViewportPositionX() {
     return Foundation::max(mousePositionX - viewportFrame.origin.x, 0.0);
 }
@@ -147,9 +157,11 @@ bool Input::isTrackpadScroll() {
     return _isTrackpadScroll;
 }
 
-void Input::postMouseChangedPosition(double x, double y) {
+void Input::postMouseChangedPosition(double x, double y, double dx, double dy) {
     mousePositionX = x;
     mousePositionY = y;
+    mouseDeltaX = dx;
+    mouseDeltaY = dy;
 }
 
 void Input::postScrollEvent(double x, double y, bool isTrackpad) {
@@ -170,6 +182,8 @@ void Input::nextFrame() {
     frame++;
     mouseScrollX = 0;
     mouseScrollY = 0;
+    mouseDeltaX = 0;
+    mouseDeltaY = 0;
 }
 
 Input::Touch Input::getTouch(int index) {

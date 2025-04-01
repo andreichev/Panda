@@ -13,7 +13,6 @@ namespace Foundation {
 class Logger {
 public:
     enum class MessageType { _TRACE, _INFO, _WARNING, _ERROR, _CRITICAL };
-    static void init();
 
     template<typename... Args>
     static void log(MessageType type, const char *format, ...) {

@@ -34,7 +34,6 @@ list(FILTER RESOURCE_FOLDERS EXCLUDE REGEX "\\.DS_Store")
 
 add_app(Baobab "${SOURCES}" "${INCLUDE}" "${RESOURCE_FOLDERS}")
 
-target_precompile_headers(Baobab PRIVATE src/pch.hpp)
 target_include_directories(Baobab PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 # set output directories for all builds (Debug, Release, etc.)

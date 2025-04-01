@@ -38,8 +38,6 @@ namespace Foundation {
 
 EditorLogger::EditorLoggerCallback EditorLogger::s_callback;
 
-void Logger::init() {}
-
 void Logger::log(std::string_view message, Logger::MessageType type) {
     TextInfo textInfo;
     switch (type) {

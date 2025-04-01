@@ -6,9 +6,11 @@
 
 #include <Panda.hpp>
 
-class FullScreenToggle : public Panda::NativeScript {
-    void initialize() override;
-    void update(double deltaTime) override;
+class FullScreenToggle final {
+public:
+    FullScreenToggle();
+    void update(double deltaTime);
 
-    Panda::Window *m_window;
+private:
+    Fern::Window *m_window;
 };

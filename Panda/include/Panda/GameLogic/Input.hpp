@@ -12,8 +12,6 @@
 
 namespace Panda {
 
-class Window;
-
 class Input {
 public:
     struct Touch {
@@ -36,6 +34,8 @@ public:
     static Touch getTouch(int index);
     static double getMousePositionX();
     static double getMousePositionY();
+    static double getMouseDeltaX();
+    static double getMouseDeltaY();
     static double getMouseViewportPositionX();
     static double getMouseViewportPositionY();
     static double getMouseScrollX();
@@ -53,7 +53,7 @@ private:
     static void postTouchEndedEvent(int id);
     static void setKeyPressed(Fern::Key key, bool state);
     static void setMouseButtonPressed(Fern::MouseButton mouseButton, bool state);
-    static void postMouseChangedPosition(double x, double y);
+    static void postMouseChangedPosition(double x, double y, double dx, double dy);
     static void postScrollEvent(double x, double y, bool isTrackpad);
     static void setWindowSize(Size size);
 
@@ -70,6 +70,8 @@ private:
     static Rect viewportFrame;
     static double mousePositionX;
     static double mousePositionY;
+    static double mouseDeltaX;
+    static double mouseDeltaY;
     static double mouseScrollX;
     static double mouseScrollY;
     static bool _isTrackpadScroll;

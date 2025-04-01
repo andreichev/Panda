@@ -74,8 +74,8 @@ void CameraController::update(float deltaTime) {
         double deltaX;
         double deltaY;
         if (Input::isTrackpadScroll()) {
-            deltaX = Input::getMouseScrollX();
-            deltaY = Input::getMouseScrollY();
+            deltaX = Input::getMouseScrollX() * 40;
+            deltaY = Input::getMouseScrollY() * 40;
         } else {
             ImVec2 mousePos = ImGui::GetMousePos();
             double mouseX = mousePos.x;

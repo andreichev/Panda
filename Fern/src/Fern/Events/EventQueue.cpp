@@ -50,8 +50,8 @@ void EventQueue::postCharEvent(uint32_t c) {
     m_events.write(event);
 }
 
-void EventQueue::postMouseEvent(double x, double y) {
-    MouseMovedEvent event(x, y);
+void EventQueue::postMouseEvent(double x, double y, double dx, double dy) {
+    MouseMovedEvent event(x, y, dx, dy);
     m_events.write(event);
 }
 

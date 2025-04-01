@@ -2,7 +2,6 @@
 // Created by Admin on 12.02.2022.
 //
 
-#include "pch.hpp"
 #include "PerlinNoise.hpp"
 #include <random>
 

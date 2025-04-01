@@ -5,7 +5,7 @@
 namespace Panda {
 
 struct TextureBinding {
-    std::string name;
+    const char *name;
     Miren::TextureHandle texture;
 };
 

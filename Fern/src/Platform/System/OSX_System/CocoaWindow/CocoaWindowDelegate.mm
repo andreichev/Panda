@@ -31,17 +31,17 @@ EventQueue* getEventQueue();
 
 - (void)windowDidChangeOcclusionState:(NSNotification *)notification {
     Fern::Vec2 pos = window->getCursorPosition();
-    getEventQueue()->postMouseEvent(pos.x, pos.y);
+    getEventQueue()->postMouseEvent(pos.x, pos.y, 0, 0);
 }
 
 - (void)windowDidEnterFullScreen:(NSNotification *)notification {
     Fern::Vec2 pos = window->getCursorPosition();
-    getEventQueue()->postMouseEvent(pos.x, pos.y);
+    getEventQueue()->postMouseEvent(pos.x, pos.y, 0, 0);
 }
 
 - (void)windowDidExitFullScreen:(NSNotification *)notification {
     Fern::Vec2 pos = window->getCursorPosition();
-    getEventQueue()->postMouseEvent(pos.x, pos.y);
+    getEventQueue()->postMouseEvent(pos.x, pos.y, 0, 0);
 }
 
 @end
