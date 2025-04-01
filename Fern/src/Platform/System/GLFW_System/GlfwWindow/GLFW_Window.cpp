@@ -163,9 +163,14 @@ Vec2 GLFW_Window::getCursorPosition() {
     return {static_cast<float>(x), static_cast<float>(y)};
 }
 
-bool GLFW_Window::setProgressBar(float progress) {}
+bool GLFW_Window::setProgressBar(float progress) {
+    // NOT SUPPORTED IN GLFW
+    return false;
+}
 
-bool GLFW_Window::endProgressBar() {}
+bool GLFW_Window::endProgressBar() {
+    return false;
+}
 
 bool GLFW_Window::isFocused() {
     return glfwGetWindowAttrib(m_windowHandle, GLFW_FOCUSED) == GLFW_TRUE;

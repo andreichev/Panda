@@ -2,6 +2,8 @@
 #include "Panda/Assets/AssetHandler.hpp"
 #include "Panda/Assets/AssetLoaderEditor.hpp"
 
+#include <unordered_map>
+
 namespace Panda {
 
 static std::unordered_map<std::string, ImFont *> s_fonts;

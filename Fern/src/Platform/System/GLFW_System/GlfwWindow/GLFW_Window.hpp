@@ -7,7 +7,8 @@
 #include "Fern/Window/Window.hpp"
 
 #include <Foundation/Foundation.hpp>
-#include <GLFW/glfw3.h>
+
+class GLFWwindow;
 
 namespace Fern {
 

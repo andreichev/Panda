@@ -8,6 +8,7 @@
 
 #include <Miren/Miren.hpp>
 #include <Fern/Fern.hpp>
+#include <chrono>
 
 namespace Panda {
 
@@ -47,7 +48,8 @@ Application::Application()
     , m_oneSecondTimeCount(0)
     , m_deltaTimeMillis(0)
     , m_thisSecondFramesCount(0)
-    , m_mainWindow(nullptr) {
+    , m_mainWindow(nullptr)
+    , m_ImGuiLayer(nullptr) {
     s_instance = this;
     m_timeMillis = getMillis();
     m_layerStack = F_NEW(Foundation::getAllocator(), LayerStack);

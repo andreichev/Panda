@@ -11,7 +11,9 @@ namespace Miren {
 Frame::Frame()
     : m_drawCallsCount(0)
     , m_preCommandQueue(300000)
-    , m_postCommandQueue(300000) {}
+    , m_postCommandQueue(300000)
+    , m_transientVbSize(0)
+    , m_transientIbSize(0) {}
 
 void Frame::beginDrawCall() {
     m_drawCallsCount++;
