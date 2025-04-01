@@ -8,6 +8,7 @@ class CocoaWindow;
 }
 
 - (instancetype)initWithCocoa:(CocoaWindow *)initWindow;
+- (void)postWindowSize;
 
 @end
 

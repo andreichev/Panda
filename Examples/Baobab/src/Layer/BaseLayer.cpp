@@ -60,6 +60,8 @@ void BaseLayer::onAttach() {
     }
 
     m_camera.setFieldOfView(60.f);
+    auto windowSize = m_window->getSize();
+    m_camera.setViewportSize({windowSize.width, windowSize.height});
     m_transform.translate(
         {ChunksStorage::WORLD_SIZE_X / 2,
          ChunksStorage::WORLD_SIZE_Y / 4,
@@ -74,6 +76,7 @@ void BaseLayer::onAttach() {
     PandaUI::initialize();
     Foundation::Shared<RootView> view = PandaUI::makeView<RootView>();
     PandaUI::Context::shared().setRootView(view);
+    PandaUI::Context::shared().updateViewportSize({windowSize.width, windowSize.height});
 
     LOG_INFO("GAME INITIALIZED!");
 }
@@ -96,6 +99,7 @@ void BaseLayer::onUpdate(double deltaTime) {
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
 
+    m_skyComponent.update(skyViewProjMtx);
     m_blocksCreation.update(deltaTime);
     m_cameraMove.update(deltaTime);
 
@@ -112,7 +116,6 @@ void BaseLayer::onUpdate(double deltaTime) {
             }
         }
     }
-    // m_skyComponent.update();
 
     m_renderer2d.end();
     m_renderer3d.end();

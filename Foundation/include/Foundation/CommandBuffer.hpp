@@ -94,9 +94,10 @@ private:
     }
 
     void align(uint32_t _alignment) {
-        const uint32_t mask = _alignment - 1;
-        const uint32_t pos = (m_pos + mask) & (~mask);
-        m_pos = pos;
+        // TODO: Implement correct alignment like below or remove completely this func
+        // const uint32_t mask = _alignment - 1;
+        // const uint32_t pos = (m_pos + mask) & (~mask);
+        // m_pos = pos;
     }
 
     uint32_t m_size;

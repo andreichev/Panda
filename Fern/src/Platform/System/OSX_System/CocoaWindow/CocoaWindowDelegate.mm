@@ -17,31 +17,32 @@ EventQueue* getEventQueue();
     return self;
 }
 
-- (BOOL)windowShouldClose:(id)sender {
-    getEventQueue()->postWindowCloseRequest(window);
-    return NO;
-}
-
-- (void)windowDidResize:(NSNotification *)notification {
+- (void)postWindowSize {
     CGRect frame = [[window->getNative() contentView] frame];
     uint32_t width = frame.size.width;
     uint32_t height = frame.size.height;
     getEventQueue()->postSizeEvent(width, height);
 }
 
+- (BOOL)windowShouldClose:(id)sender {
+    getEventQueue()->postWindowCloseRequest(window);
+    return NO;
+}
+
+- (void)windowDidResize:(NSNotification *)notification {
+    [self postWindowSize];
+}
+
 - (void)windowDidChangeOcclusionState:(NSNotification *)notification {
-    Fern::Vec2 pos = window->getCursorPosition();
-    getEventQueue()->postMouseEvent(pos.x, pos.y, 0, 0);
+    [self postWindowSize];
 }
 
 - (void)windowDidEnterFullScreen:(NSNotification *)notification {
-    Fern::Vec2 pos = window->getCursorPosition();
-    getEventQueue()->postMouseEvent(pos.x, pos.y, 0, 0);
+    [self postWindowSize];
 }
 
 - (void)windowDidExitFullScreen:(NSNotification *)notification {
-    Fern::Vec2 pos = window->getCursorPosition();
-    getEventQueue()->postMouseEvent(pos.x, pos.y, 0, 0);
+    [self postWindowSize];
 }
 
 @end
