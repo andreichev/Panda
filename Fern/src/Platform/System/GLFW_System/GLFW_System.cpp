@@ -134,7 +134,8 @@ void GLFW_System::resetCursorPos() {
     int x = size.width / 2;
     int y = size.height / 2;
     glfwSetCursorPos(window->getHandle(), x, y);
-    getEventQueue()->postMouseEvent(x, y);
+    window->ignoreNextMouseEvents();
+    getEventQueue()->postMouseEvent(x, y, 0, 0);
 }
 
 } // namespace Fern

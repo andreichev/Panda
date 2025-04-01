@@ -4,13 +4,7 @@
 
 #pragma once
 
-#include <Panda.hpp>
-
 class FullScreenToggle final {
 public:
-    FullScreenToggle();
     void update(double deltaTime);
-
-private:
-    Fern::Window *m_window;
 };

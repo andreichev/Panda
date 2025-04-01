@@ -26,6 +26,7 @@ GLFW_Window::GLFW_Window(
 ) {
     m_windowSizeBackup = rect.size;
     m_isCursorLocked = false;
+    m_ignoreMouseEvents = 0;
     glfwDefaultWindowHints();
 #ifdef PLATFORM_MACOS
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -79,35 +80,45 @@ WindowState GLFW_Window::getState() {
 void GLFW_Window::setState(WindowState state) {
     GLFWmonitor *monitorHandle = glfwGetPrimaryMonitor();
     bool isFullScreen = glfwGetWindowMonitor(m_windowHandle) == monitorHandle;
-    const GLFWvidmode *vidmode = glfwGetVideoMode(monitorHandle);
-    if (state == WindowState::WindowStateFullScreen && !isFullScreen) {
-        glfwSetWindowMonitor(
-            m_windowHandle, monitorHandle, 0, 0, vidmode->width, vidmode->height, GLFW_DONT_CARE
-        );
-    } else if (state != WindowState::WindowStateFullScreen && isFullScreen) {
-        glfwSetWindowMonitor(
-            m_windowHandle,
-            nullptr,
-            0,
-            0,
-            m_windowSizeBackup.width,
-            m_windowSizeBackup.height,
-            GLFW_DONT_CARE
-        );
-        // Center the window
-        glfwSetWindowPos(
-            m_windowHandle,
-            (vidmode->width - m_windowSizeBackup.width) / 2,
-            (vidmode->height - m_windowSizeBackup.height) / 2
-        );
-    } else if (state == WindowState::WindowStateMinimized) {
-        glfwIconifyWindow(m_windowHandle);
-    } else if (state == WindowState::WindowStateMaximized) {
-        glfwMaximizeWindow(m_windowHandle);
-    } else if (state == WindowState::WindowStateNormal &&
-               glfwGetWindowAttrib(m_windowHandle, GLFW_ICONIFIED) == GLFW_TRUE) {
-        glfwRestoreWindow(m_windowHandle);
+    // Fullscreen handling
+    {
+        if (state == WindowState::WindowStateFullScreen) {
+            const GLFWvidmode *vidmode = glfwGetVideoMode(monitorHandle);
+            m_windowSizeBackup = getSize();
+            glfwSetWindowMonitor(
+                m_windowHandle, monitorHandle, 0, 0, vidmode->width, vidmode->height, GLFW_DONT_CARE
+            );
+        } else {
+            glfwSetWindowMonitor(
+                m_windowHandle,
+                nullptr,
+                0,
+                0,
+                m_windowSizeBackup.width,
+                m_windowSizeBackup.height,
+                GLFW_DONT_CARE
+            );
+            // Center the window
+            const GLFWvidmode *vidmode = glfwGetVideoMode(monitorHandle);
+            glfwSetWindowPos(
+                m_windowHandle,
+                (vidmode->width - m_windowSizeBackup.width) / 2,
+                (vidmode->height - m_windowSizeBackup.height) / 2
+            );
+        }
     }
+    // Other states handling
+    {
+        if (state == WindowState::WindowStateMinimized) {
+            glfwIconifyWindow(m_windowHandle);
+        } else if (state == WindowState::WindowStateMaximized) {
+            glfwMaximizeWindow(m_windowHandle);
+        } else if (state == WindowState::WindowStateNormal &&
+                   glfwGetWindowAttrib(m_windowHandle, GLFW_ICONIFIED) == GLFW_TRUE) {
+            glfwRestoreWindow(m_windowHandle);
+        }
+    }
+    ignoreNextMouseEvents();
 }
 
 void GLFW_Window::setModifiedState(bool isUnsavedChanges) {
@@ -124,21 +135,20 @@ void GLFW_Window::setResizable(bool isResizable) {
 }
 
 void GLFW_Window::setSize(Size size) {
-    glfwSetWindowSize(m_windowHandle, size.width, size.height);
-    m_windowSizeBackup = size;
     int count;
     GLFWmonitor **monitorsHandle = glfwGetMonitors(&count);
     if (count > 1) { return; }
     const GLFWvidmode *vidmode = glfwGetVideoMode(monitorsHandle[0]);
+    glfwSetWindowSize(m_windowHandle, size.width, size.height);
     glfwSetWindowPos(
-        m_windowHandle,
-        (vidmode->width - m_windowSizeBackup.width) / 2,
-        (vidmode->height - m_windowSizeBackup.height) / 2
+        m_windowHandle, (vidmode->width - size.width) / 2, (vidmode->height - size.height) / 2
     );
 }
 
 Size GLFW_Window::getSize() {
-    return m_windowSizeBackup;
+    int width, height;
+    glfwGetWindowSize(m_windowHandle, &width, &height);
+    return {static_cast<float>(width), static_cast<float>(height)};
 }
 
 Size GLFW_Window::getDpi() {
@@ -174,7 +184,6 @@ void GLFW_Window::addEventHandlers() {
     glfwSetWindowUserPointer(m_windowHandle, this);
     glfwSetWindowSizeCallback(m_windowHandle, [](GLFWwindow *windowHandle, int width, int height) {
         GLFW_Window *self = static_cast<GLFW_Window *>(glfwGetWindowUserPointer(windowHandle));
-        self->m_windowSizeBackup = Size(width, height);
         getEventQueue()->postSizeEvent(width, height);
     });
     glfwSetKeyCallback(
@@ -189,7 +198,19 @@ void GLFW_Window::addEventHandlers() {
         getEventQueue()->postCharEvent(c);
     });
     glfwSetCursorPosCallback(m_windowHandle, [](GLFWwindow *windowHandle, double x, double y) {
-        getEventQueue()->postMouseEvent(x, y);
+        GLFW_Window *self = static_cast<GLFW_Window *>(glfwGetWindowUserPointer(windowHandle));
+        static double prevX = x;
+        static double prevY = y;
+        double dx = x - prevX;
+        double dy = y - prevY;
+        prevX = x;
+        prevY = y;
+        if (self->m_ignoreMouseEvents) {
+            self->m_ignoreMouseEvents--;
+            dx = 0;
+            dy = 0;
+        }
+        getEventQueue()->postMouseEvent(x, y, dx, dy);
     });
     glfwSetScrollCallback(
         m_windowHandle,
@@ -211,8 +232,11 @@ void GLFW_Window::addEventHandlers() {
     });
     int width, height;
     glfwGetWindowSize(m_windowHandle, &width, &height);
-    m_windowSizeBackup = Size(width, height);
     getEventQueue()->postSizeEvent(width, height);
+}
+
+void GLFW_Window::ignoreNextMouseEvents() {
+    m_ignoreMouseEvents = 3;
 }
 
 } // namespace Fern
