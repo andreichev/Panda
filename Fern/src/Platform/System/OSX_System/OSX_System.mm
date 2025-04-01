@@ -7,22 +7,33 @@
 
 namespace Fern {
 
-/*
-static void updateCursorImage(_GLFWwindow* window) {
-    if (window->cursorMode == GLFW_CURSOR_NORMAL) {
-        [NSCursor unhide];
+static NSCursor *s_cursors[Cursor::COUNT];
 
-        if (window->cursor)
-            [(NSCursor*) window->cursor->ns.object set];
-        else
-            [[NSCursor arrowCursor] set];
+OSX_System::OSX_System() : m_isCursorLocked(false) {
+    s_cursors[Cursor::ARROW] = [NSCursor arrowCursor];
+    s_cursors[Cursor::IBEAM] = [NSCursor IBeamCursor];
+    s_cursors[Cursor::CROSSHAIR] = [NSCursor crosshairCursor];
+    s_cursors[Cursor::POINTING_HAND] = [NSCursor pointingHandCursor];
+    s_cursors[Cursor::RESIZE_EW] = [NSCursor resizeLeftRightCursor];
+    s_cursors[Cursor::RESIZE_NS] = [NSCursor resizeUpDownCursor];
+    s_cursors[Cursor::RESIZE_NESW] = nil;
+    s_cursors[Cursor::RESIZE_NWSE] = nil;
+    s_cursors[Cursor::RESIZE_ALL] = [NSCursor closedHandCursor];
+    s_cursors[Cursor::NOT_ALLOWED] = [NSCursor operationNotAllowedCursor];
+    
+    SEL cursorNWSESelector = NSSelectorFromString(@"_windowResizeNorthWestSouthEastCursor");
+    SEL cursorNESWSelector = NSSelectorFromString(@"_windowResizeNorthEastSouthWestCursor");
+    if (cursorNWSESelector && [NSCursor respondsToSelector:cursorNWSESelector]) {
+        s_cursors[Cursor::RESIZE_NWSE] = [NSCursor performSelector:cursorNWSESelector];
     } else {
-        [NSCursor hide];
+        s_cursors[Cursor::RESIZE_NWSE] = [NSCursor crosshairCursor];
+    }
+    if (cursorNESWSelector && [NSCursor respondsToSelector:cursorNESWSelector]) {
+        s_cursors[Cursor::RESIZE_NESW] = [NSCursor performSelector:cursorNESWSelector];
+    } else {
+        s_cursors[Cursor::RESIZE_NESW] = [NSCursor crosshairCursor];
     }
 }
- */
-
-OSX_System::OSX_System() : m_isCursorLocked(false) {}
 
 Window *OSX_System::createWindow(
     const char *title, Rect rect, WindowState state, DrawingContextType contextType
@@ -102,7 +113,11 @@ bool OSX_System::isCursorLocked() {
     return m_isCursorLocked;
 }
 
-void OSX_System::setCursor(Cursor cursor) {}
+void OSX_System::setCursor(Cursor cursor) {
+    NSCursor *nsCursor = s_cursors[cursor];
+    if (!nsCursor) { return; }
+    [nsCursor set];
+}
 
 uint64_t OSX_System::getMilliSeconds() const {
     return (uint64_t)([[NSProcessInfo processInfo] systemUptime] * 1000);
