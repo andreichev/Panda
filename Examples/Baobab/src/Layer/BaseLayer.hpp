@@ -19,7 +19,6 @@ public:
 
     void onAttach() override;
     void onDetach() override;
-
     void onUpdate(double deltaTime) override;
     void onImGuiRender() override;
     void onEvent(Fern::Event *event) override;

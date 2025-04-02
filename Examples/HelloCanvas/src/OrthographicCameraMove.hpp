@@ -6,11 +6,11 @@
 
 #include <Panda.hpp>
 
-class OrthographicCameraMove : public Panda::NativeScript {
+class OrthographicCameraMove final {
 public:
-    void initialize() override;
-    void update(double deltaTime) override;
-    void onImGuiRender() override;
+    OrthographicCameraMove(Panda::TransformComponent *transform);
+    void update(double deltaTime);
+    void onImGuiRender();
 
 private:
     void updateVectors();

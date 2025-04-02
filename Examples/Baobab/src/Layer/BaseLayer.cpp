@@ -137,7 +137,7 @@ void BaseLayer::onEvent(Fern::Event *event) {
         };
         m_camera.setViewportSize(size);
         PandaUI::Context::shared().updateViewportSize({size.width, size.height});
-        Panda::Application::get()->getMainWindow()->getDrawingContext()->update();
+        m_window->getDrawingContext()->update();
     } else if (event->type == Fern::EventType::KeyReleased) {
         const Fern::KeyReleasedEvent *ev = static_cast<const Fern::KeyReleasedEvent *>(event);
         if (ev->key == Fern::Key::F) {

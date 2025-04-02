@@ -16,7 +16,7 @@ int startApp(int argc, char **argv) {
     auto application = new Panda::Application();
     Fern::Rect rect = Fern::Rect(0, 0, 900, 600);
     Fern::Window *window = Fern::createWindow(
-        "Hello triangle",
+        "Baobab",
         rect,
         Fern::WindowState::WindowStateNormal,
         Fern::DrawingContextType::DrawingContextTypeOpenGL
