@@ -153,7 +153,17 @@ Size GLFW_Window::getSize() {
 
 Size GLFW_Window::getDpi() {
     float xscale, yscale;
-    glfwGetMonitorContentScale(glfwGetPrimaryMonitor(), &xscale, &yscale);
+    GLFWmonitor *monitor = glfwGetWindowMonitor(m_windowHandle);
+    if (monitor) { 
+        glfwGetMonitorContentScale(monitor, &xscale, &yscale); 
+    } else {
+        int fbw, fbh;
+        glfwGetFramebufferSize(m_windowHandle, &fbw, &fbh);
+        int width, height;
+        glfwGetWindowSize(m_windowHandle, &width, &height);
+        xscale = width / fbw;
+        yscale = height / fbh;
+    }
     return Size(xscale, yscale);
 }
 

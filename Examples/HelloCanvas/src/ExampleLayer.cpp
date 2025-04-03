@@ -57,6 +57,10 @@ void ExampleLayer::onEvent(Fern::Event *event) {
         };
         m_camera.setViewportSize(size);
         m_window->getDrawingContext()->update();
+        Miren::Rect viewport = Miren::Rect(
+            0, 0, size.width * m_window->getDpi().width, size.height * m_window->getDpi().height
+        );
+        Miren::setViewport(0, viewport);
     } else if (event->type == Fern::EventType::KeyReleased) {
         const Fern::KeyReleasedEvent *ev = static_cast<const Fern::KeyReleasedEvent *>(event);
         if (ev->key == Fern::Key::F) {

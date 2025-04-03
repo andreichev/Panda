@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 namespace Panda {
 
 using PopupActionFunction = std::function<void()>;

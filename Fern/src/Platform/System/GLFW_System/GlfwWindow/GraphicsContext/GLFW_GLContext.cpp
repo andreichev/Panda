@@ -16,6 +16,7 @@ GLFW_GLContext::GLFW_GLContext(GLFWwindow *windowHandle)
     }
     // Enable v-sync
     glfwSwapInterval(1);
+    glfwMakeContextCurrent(nullptr);
 }
 
 void GLFW_GLContext::setCurrent() {

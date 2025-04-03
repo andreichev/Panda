@@ -5,6 +5,7 @@
 #include "TriangleLayer.hpp"
 
 #include <Fern/Events/KeyEvents.hpp>
+#include <Fern/Events/WindowEvents.hpp>
 
 TriangleLayer::~TriangleLayer() {}
 
@@ -48,6 +49,17 @@ void TriangleLayer::onEvent(Fern::Event *event) {
     } else if (event->type == Fern::EventType::KeyReleased) {
         const Fern::KeyReleasedEvent *ev = static_cast<const Fern::KeyReleasedEvent *>(event);
         if (ev->key == Fern::Key::ESCAPE) { Panda::Application::get()->close(); }
+    } else if (event->type == Fern::EventType::WindowResize) {
+        Fern::Window *window = Panda::Application::get()->getMainWindow();
+        window->getDrawingContext()->update();
+        const Fern::WindowResizeEvent *ev = static_cast<const Fern::WindowResizeEvent *>(event);
+        Panda::Size size = {
+            static_cast<float>(ev->getWidth()), static_cast<float>(ev->getHeight())
+        };
+        Miren::Rect viewport = Miren::Rect(
+            0, 0, size.width * window->getDpi().width, size.height * window->getDpi().height
+        );
+        Miren::setViewport(0, viewport);
     }
 }
 

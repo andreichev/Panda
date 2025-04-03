@@ -5,6 +5,7 @@
 #include "CubeLayer.hpp"
 
 #include <Fern/Events/KeyEvents.hpp>
+#include <Fern/Events/WindowEvents.hpp>
 #include <imgui.h>
 
 struct Vertex {
@@ -131,6 +132,14 @@ void CubeLayer::onEvent(Fern::Event *event) {
         if (ev->key == Fern::Key::ESCAPE) { Panda::Application::get()->close(); }
     } else if (event->type == Fern::EventType::WindowResize) {
         m_window->getDrawingContext()->update();
+        const Fern::WindowResizeEvent *ev = static_cast<const Fern::WindowResizeEvent *>(event);
+        Panda::Size size = {
+            static_cast<float>(ev->getWidth()), static_cast<float>(ev->getHeight())
+        };
+        Miren::Rect viewport = Miren::Rect(
+            0, 0, size.width * m_window->getDpi().width, size.height * m_window->getDpi().height
+        );
+        Miren::setViewport(0, viewport);
     }
 }
 
