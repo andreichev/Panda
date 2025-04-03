@@ -164,8 +164,11 @@ void View::applyCalculatedLayout() {
 }
 
 void View::render(float offsetX, float offsetY) {
-    Panda::Renderer2D::RectData rect;
     Point origin = getFrame().origin;
+    for (auto view : m_subviews) {
+        view->render(origin.x + offsetX, origin.y + offsetY);
+    }
+    Panda::Renderer2D::RectData rect;
     origin.x += offsetX;
     origin.y += offsetY;
     Size size = getFrame().size;
@@ -175,9 +178,6 @@ void View::render(float offsetX, float offsetY) {
     rect.color = {color.r, color.g, color.b, color.a};
     rect.transform = m_transform;
     Context::shared().getRenderer().drawRect(rect);
-    for (auto view : m_subviews) {
-        view->render(origin.x + offsetX, origin.y + offsetY);
-    }
 }
 
 } // namespace PandaUI

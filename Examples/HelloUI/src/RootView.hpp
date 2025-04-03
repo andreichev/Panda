@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PandaUI/View.hpp"
+#include <PandaUI/View.hpp>
 
 class RootView final : public PandaUI::View {
 public:

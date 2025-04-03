@@ -58,5 +58,5 @@ set_target_properties(HelloUI
 # Dependencies - Panda
 target_link_libraries(HelloUI Panda)
 
-# Dependencies - Panda
+# Dependencies - PandaUI
 target_link_libraries(HelloUI PandaUI)
