@@ -6,8 +6,6 @@
 #include <string>
 
 #define COMMAND_BUFFER_ALIGNMENT 64
-// Do you remember what game this cheat is from?
-#define COMMAND_BUFFER_FINISH_KEY 787898
 
 namespace Foundation {
 
@@ -34,7 +32,8 @@ public:
 
     CommandBuffer(uint32_t size)
         : m_size(size)
-        , m_pos(0) {
+        , m_readPos(0)
+        , m_writePos(0) {
         m_data = (uint8_t *)F_ALLOC(getAllocator(), size);
     }
 
@@ -47,61 +46,55 @@ public:
         static_assert(std::is_base_of_v<Command, CMD>, "Not inherited from Command");
         Header header(sizeof(CMD), __alignof(CMD));
         writeHeader(header);
-        align(__alignof(CMD));
+        align(m_writePos, __alignof(CMD));
         write(&cmd, sizeof(CMD));
     }
 
     Command *read() {
+        if (m_readPos >= m_writePos) { return nullptr; }
         Header &header = readHeader();
-        if (m_pos == 0 || header.size == COMMAND_BUFFER_FINISH_KEY) { return nullptr; }
-        align(header.align);
+        align(m_readPos, header.align);
         Command *cmd = (Command *)read(header.size);
         return cmd;
     }
 
-    // Finish writing commands. Start reading
-    void finishWriting() {
-        Header header(COMMAND_BUFFER_FINISH_KEY, 0);
-        writeHeader(header);
-        m_pos = 0;
-    }
-
     void reset() {
-        m_pos = 0;
+        m_readPos = 0;
+        m_writePos = 0;
     }
 
 private:
     void writeHeader(Header &header) {
-        align(__alignof(Header));
+        align(m_writePos, __alignof(Header));
         write(&header, sizeof(Header));
     }
 
     Header &readHeader() {
-        align(__alignof(Header));
+        align(m_readPos, __alignof(Header));
         return *(Header *)read(sizeof(Header));
     }
 
     void write(const void *_data, uint32_t _size) {
-        memcpy(&m_data[m_pos], _data, _size);
-        m_pos += _size;
-        PND_ASSERT(m_pos < m_size, "NEED MORE SPACE FOR BUFFER");
+        memcpy(&m_data[m_writePos], _data, _size);
+        m_writePos += _size;
+        PND_ASSERT(m_writePos < m_size, "NEED MORE SPACE FOR BUFFER");
     }
 
     void *read(uint32_t _size) {
-        uint32_t pos = m_pos;
-        m_pos += _size;
+        uint32_t pos = m_readPos;
+        m_readPos += _size;
         return &m_data[pos];
     }
 
-    void align(uint32_t _alignment) {
-        // TODO: Implement correct alignment like below or remove completely this func
-        // const uint32_t mask = _alignment - 1;
-        // const uint32_t pos = (m_pos + mask) & (~mask);
-        // m_pos = pos;
+    void align(uint32_t &_pos, uint32_t _alignment) {
+        const uint32_t mask = _alignment - 1;
+        const uint32_t pos = (_pos + mask) & (~mask);
+        _pos = pos;
     }
 
     uint32_t m_size;
-    uint32_t m_pos;
+    uint32_t m_readPos;
+    uint32_t m_writePos;
     uint8_t *m_data;
 };
 

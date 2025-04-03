@@ -16,7 +16,6 @@ class Window;
 class EventQueue {
 public:
     EventQueue();
-    void finishWriting();
     void reset();
     void postMouseButtonEvent(MouseButton button, bool pressed);
     void postSizeEvent(uint32_t width, uint32_t height);

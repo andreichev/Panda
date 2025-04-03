@@ -114,7 +114,6 @@ ImGuiLayer *Application::getImGuiLayer() {
 
 void Application::processFernEvents() {
     Fern::EventQueue *eventQueue = Fern::getEventQueue();
-    eventQueue->finishWriting();
     Fern::Event *event;
     while ((event = eventQueue->poll()) != nullptr) {
         for (auto it = m_layerStack->rbegin(); it != m_layerStack->rend(); ++it) {

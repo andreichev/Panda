@@ -13,10 +13,6 @@ namespace Fern {
 EventQueue::EventQueue()
     : m_events(30000) {}
 
-void EventQueue::finishWriting() {
-    m_events.finishWriting();
-}
-
 void EventQueue::reset() {
     m_events.reset();
 }
