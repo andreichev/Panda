@@ -1,6 +1,7 @@
 #include "Panda/Assets/AssetLoaderEditor.hpp"
 
 #include <Miren/Miren.hpp>
+#include <Fern/Fern.hpp>
 #include <stb_image.h>
 #include <fstream>
 #include <sstream>
@@ -14,7 +15,9 @@ void releaseImage(void *data, void *userInfo) {
 TextureData AssetLoaderEditor::loadTexture(const path_t &path) {
     // stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
-    void *image = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
+    void *image = stbi_load(
+        (Fern::getResourcesPath() / path).string().c_str(), &width, &height, &channels, 0
+    );
 
     if (image == nullptr) {
         LOG_ERROR("Failed to load a texture file! %s", stbi_failure_reason());
@@ -45,7 +48,7 @@ TextureData AssetLoaderEditor::loadCubeMapTexture(std::array<path_t, 6> paths) {
     std::array<void *, 6> images;
     int bytesPerColor;
     for (uint16_t side = 0; side < 6; ++side) {
-        const path_t &texturePath = paths[side];
+        const path_t &texturePath = Fern::getResourcesPath() / paths[side];
         int width, height, channels;
         void *image = stbi_load(texturePath.string().c_str(), &width, &height, &channels, 0);
         if (image == nullptr) {
@@ -87,8 +90,8 @@ ProgramData AssetLoaderEditor::loadProgram(const path_t &vertexPath, const path_
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         // open files
-        vShaderFile.open(vertexPath);
-        fShaderFile.open(fragmentPath);
+        vShaderFile.open(Fern::getResourcesPath() / vertexPath);
+        fShaderFile.open(Fern::getResourcesPath() / fragmentPath);
         std::stringstream vShaderStream, fShaderStream;
         // read file's buffer contents into streams
         vShaderStream << vShaderFile.rdbuf();

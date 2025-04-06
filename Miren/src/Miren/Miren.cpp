@@ -148,7 +148,8 @@ void allocTransientIndexBuffer(
 }
 
 bool renderFrame() {
-    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    // PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    if (!s_context) { return false; }
     return s_context->renderFrame();
 }
 

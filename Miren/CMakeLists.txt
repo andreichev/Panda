@@ -53,7 +53,7 @@ target_include_directories(Miren PRIVATE ${VENDOR_DIRECTORY}/glm)
 if (DESKTOP)
     # Dependencies - GLAD
     target_link_libraries(Miren glad)
-    target_include_directories(Miren PRIVATE ${VENDOR_DIRECTORY}/glad/include)
+    target_include_directories(Miren PUBLIC ${VENDOR_DIRECTORY}/glad/include)
 endif ()
 
 # Dependencies - stb_image

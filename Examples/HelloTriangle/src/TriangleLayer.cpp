@@ -37,6 +37,13 @@ void TriangleLayer::onAttach() {
     VertexLayoutHandle vertexLayout = createVertexLayout(layoutData);
     m_vertexBuffer = createVertexBuffer(data, sizeof(float) * 8, vertexLayout);
     m_indexBuffer = createIndexBuffer(indices, BufferElementType::UnsignedInt, 6);
+
+    Fern::Window *window = Panda::Application::get()->getMainWindow();
+    auto size = window->getSize();
+    Miren::Rect viewport = Miren::Rect(
+        0, 0, size.width * window->getDpi().width, size.height * window->getDpi().height
+    );
+    Miren::setViewport(0, viewport);
 }
 
 void TriangleLayer::onDetach() {}

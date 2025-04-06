@@ -154,8 +154,8 @@ Size GLFW_Window::getSize() {
 Size GLFW_Window::getDpi() {
     float xscale, yscale;
     GLFWmonitor *monitor = glfwGetWindowMonitor(m_windowHandle);
-    if (monitor) { 
-        glfwGetMonitorContentScale(monitor, &xscale, &yscale); 
+    if (monitor) {
+        glfwGetMonitorContentScale(monitor, &xscale, &yscale);
     } else {
         int fbw, fbh;
         glfwGetFramebufferSize(m_windowHandle, &fbw, &fbh);

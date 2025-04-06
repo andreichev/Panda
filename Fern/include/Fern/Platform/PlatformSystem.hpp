@@ -3,6 +3,8 @@
 #include "Fern/Events/EventQueue.hpp"
 #include "Fern/Window/Window.hpp"
 
+#include <filesystem>
+
 namespace Fern {
 
 class PlatformSystem {
@@ -23,6 +25,7 @@ public:
     EventQueue *getEventQueue() {
         return &m_eventQueue;
     }
+    virtual const std::filesystem::path &getResourcesPath() = 0;
 
 protected:
     EventQueue m_eventQueue;

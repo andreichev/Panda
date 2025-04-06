@@ -13,7 +13,6 @@
 
 int startApp(int argc, char **argv) {
     Fern::initialize();
-    auto application = new Panda::Application();
     Fern::Rect rect = Fern::Rect(0, 0, 900, 600);
     Fern::Window *window = Fern::createWindow(
         "Panda UI Sandbox",
@@ -21,17 +20,14 @@ int startApp(int argc, char **argv) {
         Fern::WindowState::WindowStateNormal,
         Fern::DrawingContextType::DrawingContextTypeOpenGL
     );
-    Panda::Application::get()->setMainWindow(window);
-#ifdef PLATFORM_DESKTOP
     Miren::initialize(window->getDrawingContext());
-#endif
+    auto application = new Panda::Application();
+    Panda::Application::get()->setMainWindow(window);
     // application->createImGuiLayer();
     application->pushLayer(new ExampleLayer());
     application->loop();
-    Fern::disposeWindow(window);
     delete application;
-#ifdef PLATFORM_DESKTOP
     Miren::terminate();
-#endif
+    Fern::disposeWindow(window);
     return 0;
 }

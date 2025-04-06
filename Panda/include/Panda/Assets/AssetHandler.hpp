@@ -12,8 +12,6 @@ class AssetHandler {
 public:
     virtual ~AssetHandler() = default;
     virtual Foundation::Shared<Asset> load(AssetId id) = 0;
-
-    static path_t s_defaultResourcesPath;
 };
 
 } // namespace Panda

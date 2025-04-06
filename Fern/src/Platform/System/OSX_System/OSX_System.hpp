@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Fern/Platform/PlatformSystem.hpp"
 
 namespace Fern {
@@ -17,6 +19,7 @@ public:
     bool isCursorLocked() override;
     void setCursor(Cursor cursor) override;
     uint64_t getMilliSeconds() const override;
+    const std::filesystem::path &getResourcesPath() override;
 
 private:
     bool m_isCursorLocked;

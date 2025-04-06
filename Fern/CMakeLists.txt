@@ -13,8 +13,6 @@ file(GLOB_RECURSE INCLUDE src/Fern/*.hpp include/Fern/*.hpp)
 if (PLATFORM_WIN32 OR PLATFORM_LINUX)
     list(APPEND SOURCES "src/Platform/EntryPoint/Desktop/main.cpp")
 elseif (PLATFORM_MACOS)
-    list(APPEND INCLUDE "src/Platform/EntryPoint/OSX/AppDelegate.h")
-    list(APPEND SOURCES "src/Platform/EntryPoint/OSX/AppDelegate.mm")
     list(APPEND SOURCES "src/Platform/EntryPoint/OSX/main.mm")
 elseif (PLATFORM_IOS)
     list(APPEND SOURCES "src/Platform/EntryPoint/iOS/main.mm")
@@ -83,8 +81,5 @@ endif ()
 # Dependencies - Foundation
 target_link_libraries(Fern Foundation)
 
-if (DESKTOP)
-    # Dependencies - GLAD
-    target_link_libraries(Fern glad)
-    target_include_directories(Fern PRIVATE ${VENDOR_DIRECTORY}/glad/include)
-endif ()
+# Dependencies - Miren
+target_link_libraries(Fern Miren)

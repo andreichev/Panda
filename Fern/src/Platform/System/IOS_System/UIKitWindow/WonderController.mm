@@ -5,8 +5,8 @@
 //  Created by Admin on 02.08.2021.
 //
 
-#import "WonderController.hpp"
-#import "View/WonderView.hpp"
+#import "WonderController.h"
+#import "WonderView.h"
 
 @implementation WonderController {
     WonderView* customView;

@@ -47,7 +47,7 @@ void OSX_System::disposeWindow(Window *window) {
     if (window->getState() == WindowState::WindowStateFullScreen) {
         window->setState(WindowState::WindowStateNormal);
     }
-    delete window;
+    F_DELETE(Foundation::getAllocator(), window);
 }
 
 void OSX_System::pollEvents() {
@@ -121,6 +121,10 @@ void OSX_System::setCursor(Cursor cursor) {
 
 uint64_t OSX_System::getMilliSeconds() const {
     return (uint64_t)([[NSProcessInfo processInfo] systemUptime] * 1000);
+}
+
+const std::filesystem::path& OSX_System::getResourcesPath() {
+    return "";
 }
     
 } // namespace Fern

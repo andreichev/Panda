@@ -57,13 +57,14 @@ OSX_GLContext::OSX_GLContext(NSView* view) {
     // Enable v-sync
     int interval = 1;
     [m_context setValues:&interval forParameter:NSOpenGLContextParameterSwapInterval];
-}
-
-void OSX_GLContext::setCurrent() {
     [m_context makeCurrentContext];
     if (gladLoadGLLoader((GLADloadproc)getProcAddress) == false) {
         LOG_CRITICAL("Failed to initialize GLAD");
     }
+}
+
+void OSX_GLContext::setCurrent() {
+    [m_context makeCurrentContext];
 }
 
 void OSX_GLContext::releaseDrawingContext() {

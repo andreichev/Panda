@@ -75,8 +75,10 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
             }
         }
     }
+#ifdef PND_EDITOR
     world.setChanged(false);
     world.sort();
+#endif
 }
 
 WorldDto WorldMapper::toDto(const World &world) {

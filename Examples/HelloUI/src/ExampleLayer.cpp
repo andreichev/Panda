@@ -16,6 +16,14 @@ void ExampleLayer::onAttach() {
     PandaUI::initialize();
     Foundation::Shared<RootView> view = PandaUI::makeView<RootView>();
     PandaUI::Context::shared().setRootView(view);
+
+    Fern::Window *window = Panda::Application::get()->getMainWindow();
+    auto windowSize = window->getSize();
+    Miren::Rect viewport = Miren::Rect(
+        0, 0, windowSize.width * window->getDpi().width, windowSize.height * window->getDpi().height
+    );
+    Miren::setViewport(0, viewport);
+    PandaUI::Context::shared().updateViewportSize({windowSize.width, windowSize.height});
 }
 
 void ExampleLayer::onDetach() {}

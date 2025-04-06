@@ -66,9 +66,20 @@ void BaseLayer::onAttach() {
         meshData, {{"texture1", m_colorTexture}, {"iSky", m_skyComponent.getSkyTexture()}}, m_shader
     );
 
+    auto windowSize = m_window->getSize();
+    m_camera.setViewportSize({windowSize.width, windowSize.height});
+    Miren::Rect viewport = Miren::Rect(
+        0,
+        0,
+        windowSize.width * m_window->getDpi().width,
+        windowSize.height * m_window->getDpi().height
+    );
+    Miren::setViewport(0, viewport);
+
     PandaUI::initialize();
     Foundation::Shared<RootView> view = PandaUI::makeView<RootView>();
     PandaUI::Context::shared().setRootView(view);
+    PandaUI::Context::shared().updateViewportSize({windowSize.width, windowSize.height});
 
     LOG_INFO("GAME INITIALIZED!");
 }

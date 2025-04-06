@@ -76,8 +76,8 @@ public:
     bool isDeleted(entt::entity handle);
     void setChanged(bool changed = true);
     void sort();
-    Entity duplicateEntity(Entity entity);
 #endif
+    Entity duplicateEntity(Entity entity);
     bool isValidEntt(entt::entity handle);
     bool isValid(UUID entityId);
 

@@ -10,7 +10,7 @@ namespace Fern {
 void pollEvents();
 }
 
-@interface NativeWindow : NSWindow {}
+@interface NativeWindow : NSWindow
 - (BOOL)isFullScreen;
 @end
 

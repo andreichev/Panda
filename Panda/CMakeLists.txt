@@ -22,9 +22,6 @@ target_link_libraries(Panda Foundation)
 # Dependencies - Rain
 target_link_libraries(Panda Rain)
 
-# Dependencies - Miren
-target_link_libraries(Panda Miren)
-
 # Dependencies - Fern
 target_link_libraries(Panda Fern)
 

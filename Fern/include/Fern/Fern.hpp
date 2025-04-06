@@ -1,5 +1,7 @@
 #pragma once
 
+#include <filesystem>
+
 #include "Fern/Window/Window.hpp"
 #include "Fern/Events/EventQueue.hpp"
 
@@ -19,5 +21,6 @@ bool isCursorLocked();
 void setCursor(Cursor cursor);
 void pollEvents();
 EventQueue *getEventQueue();
+const std::filesystem::path &getResourcesPath();
 
 } // namespace Fern

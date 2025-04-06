@@ -70,24 +70,31 @@ void CubeLayer::onAttach() {
     };
     // clang-format on
 
-    Miren::VertexBufferLayoutData layoutData;
+    VertexBufferLayoutData layoutData;
     layoutData.pushVec3();
     layoutData.pushVec2();
     layoutData.pushFloat(1);
-    Miren::VertexLayoutHandle layoutHandle = Miren::createVertexLayout(layoutData);
-    vertexBuffer = Miren::createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
-    indexBuffer = Miren::createIndexBuffer(indices, Miren::BufferElementType::UnsignedInt, 36);
+    VertexLayoutHandle layoutHandle = createVertexLayout(layoutData);
+    vertexBuffer = createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
+    indexBuffer = createIndexBuffer(indices, BufferElementType::UnsignedInt, 36);
 
     Panda::TextureData textureAsset = Panda::AssetLoaderEditor::loadTexture("textures/arbuz1.png");
-    texture = Miren::createTexture(textureAsset.getMirenTextureCreate());
+    texture = createTexture(textureAsset.getMirenTextureCreate());
     Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
         "default-shaders/renderer3d/base_vertex.glsl",
         "default-shaders/renderer3d/base_fragment.glsl"
     );
-    shader = Miren::createProgram(programAsset.getMirenProgramCreate());
-    Miren::setShader(shader);
+    shader = createProgram(programAsset.getMirenProgramCreate());
+    setShader(shader);
 
-    glm::vec2 windowSize = {m_window->getSize().x, m_window->getSize().y};
+    Fern::Size windowSize = m_window->getSize();
+    Miren::Rect viewport = Miren::Rect(
+        0,
+        0,
+        windowSize.width * m_window->getDpi().width,
+        windowSize.height * m_window->getDpi().height
+    );
+    Miren::setViewport(0, viewport);
     view = glm::lookAt(
         glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)
     );
@@ -98,7 +105,7 @@ void CubeLayer::onAttach() {
     translate = glm::vec3(0.f, 0.f, 0.f);
     viewProjection = projection * view;
 
-    Miren::setUniform(shader, "projViewMtx", &viewProjection[0][0], Miren::UniformType::Mat4);
+    setUniform(shader, "projViewMtx", &viewProjection[0][0], UniformType::Mat4);
     time = 0;
 }
 

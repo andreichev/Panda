@@ -11,6 +11,7 @@
 #include <Fern/Events/WindowEvents.hpp>
 #include <PandaUI/PandaUI.hpp>
 #include <Miren/Miren.hpp>
+#include <imgui.h>
 
 ExampleLayer::ExampleLayer(Fern::Window *window)
     : m_window(window)
@@ -18,10 +19,16 @@ ExampleLayer::ExampleLayer(Fern::Window *window)
     , m_emitter(&m_cameraTransform, &m_camera, &m_renderer2d) {}
 
 void ExampleLayer::onAttach() {
+    Miren::setViewClear(0, 0x000000FF);
     PandaUI::initialize();
     m_cameraTransform.translate({0.f, 0.f, 10.f});
     auto size = m_window->getSize();
     m_camera.setViewportSize({size.width, size.height});
+    Miren::Rect viewport = Miren::Rect(
+        0, 0, size.width * m_window->getDpi().width, size.height * m_window->getDpi().height
+    );
+    Miren::setViewport(0, viewport);
+    PandaUI::Context::shared().updateViewportSize({size.width, size.height});
 }
 
 void ExampleLayer::onDetach() {}

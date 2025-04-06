@@ -8,8 +8,7 @@
 #elif defined(PLATFORM_MACOS)
 #    include "Platform/System/OSX_System/OSX_System.hpp"
 #elif defined(PLATFORM_IOS)
-#    include "Platform/System/UIKitWindow/PandaWindowIOSImpl.hpp"
-#    include "PlatformSystem.hpp"
+#    include "Platform/System/IOS_System/IOS_System.hpp"
 #endif
 
 namespace Fern {
@@ -23,7 +22,7 @@ void initialize() {
 #elif defined(PLATFORM_MACOS)
     s_system = F_NEW(Foundation::getAllocator(), OSX_System);
 #elif defined(PLATFORM_IOS)
-    s_system = F_NEW(Foundation::getAllocator(), IosSystem);
+    s_system = F_NEW(Foundation::getAllocator(), IOS_System);
 #else
 #    error "Unknown platform"
 #endif
@@ -83,6 +82,11 @@ void setCursor(Cursor cursor) {
 EventQueue *getEventQueue() {
     PND_ASSERT(s_system != nullptr, "FERN NOT INITIALIZED");
     return s_system->getEventQueue();
+}
+
+const std::filesystem::path &getResourcesPath() {
+    PND_ASSERT(s_system != nullptr, "FERN NOT INITIALIZED");
+    return s_system->getResourcesPath();
 }
 
 } // namespace Fern

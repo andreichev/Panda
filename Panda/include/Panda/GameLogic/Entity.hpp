@@ -22,13 +22,17 @@ public:
 
     void addScript(ExternalScript script) {
         ScriptListComponent &component = getComponent<ScriptListComponent>();
+#ifdef PND_EDITOR
         setWorldChanged();
+#endif
         return component.add(script);
     }
 
     void removeScript(ExternalScript script) {
         ScriptListComponent &component = getComponent<ScriptListComponent>();
+#ifdef PND_EDITOR
         setWorldChanged();
+#endif
         return component.remove(script);
     }
 
@@ -37,7 +41,9 @@ public:
         PND_ASSERT(!hasComponent<T>(), "Entity already has component!");
         entt::registry &registry = worldGetRegistry();
         T &component = registry.emplace<T>(m_handle, std::forward<Args>(args)...);
+#ifdef PND_EDITOR
         setWorldChanged();
+#endif
         if constexpr (std::is_same_v<T, Rigidbody2DComponent> ||
                       std::is_same_v<T, BoxCollider2DComponent>) {
             physics2DComponentsUpdated();
@@ -49,7 +55,9 @@ public:
     void removeComponent() {
         entt::registry &registry = worldGetRegistry();
         registry.remove<T>(m_handle);
+#ifdef PND_EDITOR
         setWorldChanged();
+#endif
         if constexpr (std::is_same_v<T, Rigidbody2DComponent> ||
                       std::is_same_v<T, BoxCollider2DComponent>) {
             physics2DComponentsUpdated();
@@ -115,7 +123,9 @@ public:
         auto &tagComponent = getComponent<TagComponent>();
         if (tagComponent.tag == name) { return; }
         tagComponent.tag = name;
+#ifdef PND_EDITOR
         setWorldChanged();
+#endif
     }
 
     World *getWorld() {
@@ -125,8 +135,6 @@ public:
     friend bool operator==(const Entity &lhs, const Entity &rhs) {
         return lhs.m_handle == rhs.m_handle;
     }
-
-    void setWorldChanged(bool changed = true);
 
     operator entt::entity() const {
         return m_handle;
@@ -141,6 +149,7 @@ public:
     void physics2DPropertiesUpdated();
 
 #ifdef PND_EDITOR
+    void setWorldChanged(bool changed = true);
     bool needToDestroy() const;
     bool isDeleted() const;
     void sortWorld() const;

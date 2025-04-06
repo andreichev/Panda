@@ -19,10 +19,6 @@ entt::registry &Entity::worldGetRegistry() const {
     return m_world->m_registry;
 }
 
-void Entity::setWorldChanged(bool changed) {
-    m_world->setChanged(changed);
-}
-
 TransformComponent &Entity::getTransform() {
     return getComponent<TransformComponent>();
 }
@@ -48,7 +44,9 @@ void Entity::addChildEntity(Entity entity) {
     otherRelationship.parent = getId();
     thisRelationship.children.push_back(entity.getId());
     m_world->convertToLocalSpace(entity);
+#ifdef PND_EDITOR
     setWorldChanged();
+#endif
 }
 
 void Entity::removeChildEntity(Entity entity) {
@@ -58,7 +56,9 @@ void Entity::removeChildEntity(Entity entity) {
     children.erase(std::remove(children.begin(), children.end(), entity.getId()), children.end());
     m_world->convertToWorldSpace(entity);
     otherRelationship.parent = 0;
+#ifdef PND_EDITOR
     setWorldChanged();
+#endif
 }
 
 void Entity::removeFromParent() {
@@ -139,6 +139,10 @@ void Entity::physics2DPropertiesUpdated() {
 }
 
 #ifdef PND_EDITOR
+void Entity::setWorldChanged(bool changed) {
+    m_world->setChanged(changed);
+}
+
 bool Entity::needToDestroy() const {
     return m_world->needToDestroy(*this);
 }

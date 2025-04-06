@@ -62,6 +62,13 @@ void BaseLayer::onAttach() {
     m_camera.setFieldOfView(60.f);
     auto windowSize = m_window->getSize();
     m_camera.setViewportSize({windowSize.width, windowSize.height});
+    Miren::Rect viewport = Miren::Rect(
+        0,
+        0,
+        windowSize.width * m_window->getDpi().width,
+        windowSize.height * m_window->getDpi().height
+    );
+    Miren::setViewport(0, viewport);
     m_transform.translate(
         {ChunksStorage::WORLD_SIZE_X / 2,
          ChunksStorage::WORLD_SIZE_Y / 4,

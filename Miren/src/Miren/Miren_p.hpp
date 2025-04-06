@@ -263,6 +263,7 @@ struct Context {
     bool renderFrame() {
         m_apiSemaphore.wait();
         MIREN_LOG("RENDER FRAME BEGIN");
+        m_ctx->setCurrent();
         if (m_renderer == nullptr) { checkIfHasInitCommand(); }
         if (m_renderer == nullptr) {
             m_render->getPreCommandQueue().reset();
