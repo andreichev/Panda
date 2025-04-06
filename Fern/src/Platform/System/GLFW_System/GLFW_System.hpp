@@ -22,6 +22,7 @@ public:
     bool isCursorLocked() override;
     void setCursor(Cursor cursor) override;
     uint64_t getMilliSeconds() const override;
+    const std::filesystem::path &getResourcesPath() override;
 
 private:
     GLFW_Window *getFocusedWindow() const;

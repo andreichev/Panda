@@ -119,6 +119,11 @@ uint64_t GLFW_System::getMilliSeconds() const {
     return glfwGetTime() * 1000;
 }
 
+const std::filesystem::path &GLFW_System::getResourcesPath() {
+    static std::filesystem::path path;
+    return path;
+}
+
 GLFW_Window *GLFW_System::getFocusedWindow() const {
     if (m_windows.empty()) { return nullptr; }
     for (auto window : m_windows) {
