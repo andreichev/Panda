@@ -4,8 +4,7 @@
 
 #include "ProjectCreator.hpp"
 
-#include <Panda/Assets/AssetLoaderEditor.hpp>
-#include <Panda/Assets/AssetHandler.hpp>
+#include <Fern/Fern.hpp>
 #include <fstream>
 #include <sstream>
 
@@ -60,7 +59,7 @@ void ProjectCreator::createProject(const std::string &name, const Panda::path_t 
     std::filesystem::create_directory(scriptingProjectPath);
 
     copyAndReplace(
-        AssetHandler::s_defaultResourcesPath / "Templates" / "NewCppProject",
+        Fern::getResourcesPath() / "Templates" / "NewCppProject",
         scriptingProjectPath,
         "___PROJECTNAME___",
         name

@@ -4,13 +4,19 @@
 
 #include "FullScreenToggle.hpp"
 
-void FullScreenToggle::initialize() {
-    m_window = Panda::Application::get()->getWindow();
-}
+#include <Panda.hpp>
 
 void FullScreenToggle::update(double deltaTime) {
-    if (Panda::Input::isKeyJustPressed(Panda::Key::ESCAPE)) { Panda::Application::get()->close(); }
-    if (Panda::Input::isKeyJustPressed(Panda::Key::F)) {
-        m_window->setFullScreen(!m_window->isFullScreen());
+    Fern::Window *window = Panda::Application::get()->getMainWindow();
+    if (!window) { return; }
+    if (Panda::Input::isKeyJustPressed(Fern::Key::ESCAPE)) { Panda::Application::get()->close(); }
+    if (Panda::Input::isKeyJustPressed(Fern::Key::F)) {
+        bool currentlyIsInFullScreen =
+            window->getState() == Fern::WindowState::WindowStateFullScreen;
+        window->setState(
+            currentlyIsInFullScreen ? Fern::WindowState::WindowStateNormal
+                                    : Fern::WindowState::WindowStateFullScreen
+        );
+        if (currentlyIsInFullScreen) { window->setSize({900, 600}); }
     }
 }

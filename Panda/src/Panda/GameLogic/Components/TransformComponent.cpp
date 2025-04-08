@@ -6,6 +6,7 @@
 #include "Panda/Math/Math.hpp"
 
 #include <ImGuizmo.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Panda {
 

@@ -11,7 +11,9 @@ namespace Miren {
 Frame::Frame()
     : m_drawCallsCount(0)
     , m_preCommandQueue(300000)
-    , m_postCommandQueue(300000) {}
+    , m_postCommandQueue(300000)
+    , m_transientVbSize(0)
+    , m_transientIbSize(0) {}
 
 void Frame::beginDrawCall() {
     m_drawCallsCount++;
@@ -68,14 +70,6 @@ void Frame::submitCurrentDrawCall(ViewId id) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.m_viewId = id;
     draw.m_isSubmitted = true;
-}
-
-uint32_t Frame::getDrawCallsCount() {
-    return m_drawCallsCount;
-}
-
-RenderDraw *Frame::getDrawCalls() {
-    return m_drawCalls;
 }
 
 void Frame::queueFree(FrameBufferHandle handle) {

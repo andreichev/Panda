@@ -72,6 +72,11 @@ inline constexpr Ty max(const Ty &_a, const Ty &_b) {
     return _a > _b ? _a : _b;
 }
 
+template<typename Ty>
+inline constexpr Ty clamp(const Ty &_a, const Ty &_min, const Ty &_max) {
+    return max(min(_a, _max), _min);
+}
+
 inline int32_t strCmp(const char *lhs, const char *rhs, int32_t max) {
     for (; max > 0 && *lhs == *rhs; ++lhs, ++rhs, --max) {
         if (*lhs == '\0' || *rhs == '\0') { break; }
@@ -80,6 +85,10 @@ inline int32_t strCmp(const char *lhs, const char *rhs, int32_t max) {
     if (0 == max) { return 0; }
 
     return *lhs - *rhs;
+}
+
+inline bool epsilonEqual(float const &x, float const &y, float const &epsilon) {
+    return abs(x - y) < epsilon;
 }
 
 } // namespace Foundation

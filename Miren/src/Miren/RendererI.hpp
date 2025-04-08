@@ -25,7 +25,6 @@ class RendererI {
 public:
     virtual ~RendererI() = default;
     virtual RendererType getRendererType() const = 0;
-    virtual void flip() = 0;
     virtual void
     createFrameBuffer(FrameBufferHandle handle, FrameBufferSpecification specification) = 0;
     virtual void readFrameBuffer(
@@ -74,7 +73,7 @@ public:
     virtual void readTexture(TextureHandle handle, void *data) = 0;
     virtual void setUniform(const Uniform &uniform) = 0;
     virtual void setTexture(TextureHandle handle, uint32_t slot) = 0;
-    virtual void submit(Frame *frame, View *views) = 0;
+    virtual void submit(Frame *frame) = 0;
 };
 
 } // namespace Miren

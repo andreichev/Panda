@@ -2,6 +2,8 @@
 
 #include "Panda/Application/Layer.hpp"
 
+#include <vector>
+
 namespace Panda {
 
 class LayerStack {

@@ -2,23 +2,19 @@
 // Created by Admin on 22.01.2022.
 //
 
-#include "pndpch.hpp"
-
 #include "Panda/Application/Application.hpp"
-#include "Panda/Application/Initialization/PlatformInit.hpp"
-#include "Panda/GameLogic/BasicGameLayer.hpp"
-#include "Panda/Events/WindowEvents.hpp"
-#include "Panda/Base/Random.hpp"
 #include "Panda/GameLogic/Input.hpp"
+#include "Panda/Random/Random.hpp"
 
 #include <Miren/Miren.hpp>
+#include <Fern/Fern.hpp>
+#include <chrono>
 
 namespace Panda {
 
 Application *Application::s_instance = nullptr;
 
 Application *Application::get() {
-    PND_ASSERT(s_instance != nullptr, "APP USED BUT NOT INITIALISED");
     return s_instance;
 }
 
@@ -32,10 +28,7 @@ uint64_t getMillis() {
 Application::~Application() {
     LOG_INFO("APP SHUTDOWN BEGIN");
     F_DELETE(Foundation::getAllocator(), m_layerStack);
-#ifdef PLATFORM_DESKTOP
-    Miren::terminate();
-#endif
-    F_DELETE(Foundation::getAllocator(), m_window);
+    s_instance = nullptr;
     LOG_INFO("APP SHUTDOWN END");
 }
 
@@ -49,30 +42,32 @@ void Application::pushOverlay(Layer *layer) {
     layer->onAttach();
 }
 
-Application::Application(ApplicationStartupSettings &settings)
+Application::Application()
     : m_isApplicationShouldClose(false)
     , m_maximumFps(120)
     , m_oneSecondTimeCount(0)
     , m_deltaTimeMillis(0)
-    , m_thisSecondFramesCount(0) {
+    , m_thisSecondFramesCount(0)
+    , m_mainWindow(nullptr)
+    , m_ImGuiLayer(nullptr) {
     s_instance = this;
-    Foundation::Logger::init();
-
-    m_window = createWindow(settings);
-    m_window->setEventQueue(&m_eventQueue);
     m_timeMillis = getMillis();
     m_layerStack = F_NEW(Foundation::getAllocator(), LayerStack);
-
-#ifdef PLATFORM_DESKTOP
-    Miren::initialize();
-#endif
     Random::init();
-    m_ImGuiLayer = F_NEW(Foundation::getAllocator(), ImGuiLayer);
-    pushOverlay(m_ImGuiLayer);
 }
 
-void Application::startBasicGame(Level *level) {
-    pushLayer(F_NEW(Foundation::getAllocator(), BasicGameLayer)(level));
+void Application::setMainWindow(Fern::Window *window) {
+    m_mainWindow = window;
+}
+
+Fern::Window *Application::getMainWindow() {
+    return m_mainWindow;
+}
+
+void Application::createImGuiLayer() {
+    PND_ASSERT(m_mainWindow != nullptr, "MAIN WINDOW IS REQUIRED TO CREATE IMGUI LAYER");
+    m_ImGuiLayer = F_NEW(Foundation::getAllocator(), ImGuiLayer)(m_mainWindow);
+    pushOverlay(m_ImGuiLayer);
 }
 
 void Application::loop() {
@@ -93,67 +88,45 @@ void Application::loop() {
         double deltaTime = m_deltaTimeMillis / 1000.0;
         if (deltaTime == 0) { deltaTime = 0.00000001; }
         m_deltaTimeMillis = 0;
-
         // LOG_INFO("APP UPDATE BEGIN");
         LayerStack &layerStack = *m_layerStack;
         for (Layer *layer : layerStack) {
             layer->onUpdate(deltaTime);
         }
-        m_ImGuiLayer->begin(deltaTime);
-        for (Layer *layer : layerStack) {
-            layer->onImGuiRender();
+        if (m_ImGuiLayer) {
+            m_ImGuiLayer->begin(deltaTime);
+            for (Layer *layer : layerStack) {
+                layer->onImGuiRender();
+            }
+            m_ImGuiLayer->end();
         }
-        m_ImGuiLayer->end();
-        m_window->pollEvents();
         Input::nextFrame();
-        processEvents();
+        Fern::pollEvents();
+        processFernEvents();
         Miren::frame();
         // LOG_INFO("APP UPDATE END");
     }
 }
 
-Window *Application::getWindow() {
-    return m_window;
+ImGuiLayer *Application::getImGuiLayer() {
+    return m_ImGuiLayer;
 }
 
-void Application::processEvents() {
-    m_eventQueue.finishWriting();
-    Event *event;
-    while ((event = m_eventQueue.poll()) != nullptr) {
-        if (event->type == EventType::WindowResize) {
-            const WindowResizeEvent *ev = static_cast<const WindowResizeEvent *>(event);
-            windowSizeChanged(Size(ev->getWidth(), ev->getHeight()));
-        }
+void Application::processFernEvents() {
+    Fern::EventQueue *eventQueue = Fern::getEventQueue();
+    Fern::Event *event;
+    while ((event = eventQueue->poll()) != nullptr) {
         for (auto it = m_layerStack->rbegin(); it != m_layerStack->rend(); ++it) {
             if (event->isHandled) break;
             (*it)->onEvent(event);
         }
         if (!event->isHandled) { Input::onEvent(event); }
     }
-    m_eventQueue.reset();
+    eventQueue->reset();
 }
 
-EventQueue *Application::getEventQueue() {
-    return &m_eventQueue;
-}
-
-void Application::addWindowSizeObserver(WindowSizeObserver *listener) {
-    m_windowSizeListeners.push_back(listener);
-}
-
-void Application::windowSizeChanged(Size size) {
-    Miren::Rect viewport = Miren::Rect(
-        0, 0, size.width * m_window->getDpi().width, size.height * m_window->getDpi().height
-    );
-    Miren::setViewport(0, viewport);
-    for (auto &listener : m_windowSizeListeners) {
-        listener->windowSizeChanged(size);
-    }
-}
-
-void Application::removeWindowSizeObserver(WindowSizeObserver *listener) {
-    auto it = std::find(m_windowSizeListeners.begin(), m_windowSizeListeners.end(), listener);
-    if (it != m_windowSizeListeners.end()) { m_windowSizeListeners.erase(it); }
+void Application::close() {
+    m_isApplicationShouldClose = true;
 }
 
 } // namespace Panda

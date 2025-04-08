@@ -9,21 +9,20 @@ namespace Miren {
 // MARK: - PUBLIC METHODS IMPL
 
 static Context *s_context = nullptr;
-static const int CONTEXT_ALIGNMENT = 64;
 
-void initialize() {
+void initialize(Fern::GraphicsContext *ctx) {
     MIREN_LOG("MIREN INIT BEGIN");
     MIREN_LOG("ALLOCATING MIREN CONTEXT, {} BYTES", sizeof(Context));
     MIREN_LOG("FRAME DATA SIZE: {} BYTES", sizeof(Frame));
-    s_context = F_ALIGNED_NEW(Foundation::getAllocator(), Context, CONTEXT_ALIGNMENT);
-    s_context->init();
+    s_context = F_NEW(Foundation::getAllocator(), Context);
+    s_context->init(ctx);
     MIREN_LOG("MIREN INIT END");
 }
 
 void terminate() {
     MIREN_LOG("MIREN SHUTDOWN BEGIN");
     s_context->shutdown();
-    F_ALIGNED_DELETE(Foundation::getAllocator(), s_context, CONTEXT_ALIGNMENT);
+    F_DELETE(Foundation::getAllocator(), s_context);
     s_context = nullptr;
     MIREN_LOG("MIREN SHUTDOWN END");
 }
@@ -149,7 +148,8 @@ void allocTransientIndexBuffer(
 }
 
 bool renderFrame() {
-    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    // PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    if (!s_context) { return false; }
     return s_context->renderFrame();
 }
 

@@ -34,7 +34,6 @@ list(FILTER RESOURCE_FOLDERS EXCLUDE REGEX "\\.DS_Store")
 
 add_app(HelloPbr "${SOURCES}" "${INCLUDE}" "${RESOURCE_FOLDERS}")
 
-target_precompile_headers(HelloPbr PRIVATE src/pch.hpp)
 target_include_directories(HelloPbr PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 # set output directories for all builds (Debug, Release, etc.)

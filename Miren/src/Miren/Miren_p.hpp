@@ -4,7 +4,6 @@
 #include "Encoder/Frame.hpp"
 #include "Encoder/View.hpp"
 #include "Encoder/RenderDraw.hpp"
-#include "Miren/Miren.hpp"
 #include "HandleAllocator.hpp"
 #include "Miren/MirenStates.hpp"
 #include "Platform/RendererImpl/OpenGL/RendererOpenGL.hpp"
@@ -36,12 +35,13 @@ struct Context {
     }
 
     // Main thread
-    void init() {
+    void init(Fern::GraphicsContext *ctx) {
+        m_ctx = ctx;
         // Вызвано из главного потока: можно стартовать поток отрисовки.
 #ifdef PLATFORM_DESKTOP
-        m_thread.init(renderThread, nullptr, 0, "Render thread");
+        m_thread.init(renderThreadFunc, nullptr, 0, "Render thread");
 #endif
-        Foundation::CommandBuffer::Command cmd(RendererCommandType::RendererInit);
+        RendererInitCommand cmd(ctx);
         m_render->getPreCommandQueue().write(cmd);
         m_apiSemaphore.post();
         frame();
@@ -67,7 +67,7 @@ struct Context {
         m_thread.shutdown();
     }
 
-    static int32_t renderThread(Foundation::Thread *_thread, void *_userData) {
+    static int32_t renderThreadFunc(Foundation::Thread *_thread, void *_userData) {
         MIREN_LOG("RENDER THREAD BEGIN");
         while (Miren::renderFrame())
             ;
@@ -253,8 +253,9 @@ struct Context {
                 command->type == RendererCommandType::RendererInit,
                 "First command should be RendererInit"
             );
+            m_ctx->setCurrent();
             // TODO: Add other renderers (metal, directx, vulkan, ...)
-            m_renderer = F_NEW(Foundation::getAllocator(), RendererOpenGL);
+            m_renderer = F_NEW(Foundation::getAllocator(), RendererOpenGL)(m_ctx);
             MIREN_LOG("RENDERER CREATED");
         }
     }
@@ -262,8 +263,7 @@ struct Context {
     bool renderFrame() {
         m_apiSemaphore.wait();
         MIREN_LOG("RENDER FRAME BEGIN");
-        m_render->getPreCommandQueue().finishWriting();
-        m_render->getPostCommandQueue().finishWriting();
+        m_ctx->setCurrent();
         if (m_renderer == nullptr) { checkIfHasInitCommand(); }
         if (m_renderer == nullptr) {
             m_render->getPreCommandQueue().reset();
@@ -272,9 +272,9 @@ struct Context {
             return true;
         }
         rendererExecuteCommands(m_render->getPreCommandQueue());
-        if (m_render->getDrawCallsCount() != 0) {
-            m_renderer->submit(m_render, m_views);
-            m_renderer->flip();
+        if (m_render->m_drawCallsCount != 0) {
+            m_renderer->submit(m_render);
+            m_ctx->swapBuffers();
         }
         rendererExecuteCommands(m_render->getPostCommandQueue());
         MIREN_LOG("RENDER FRAME END");
@@ -526,6 +526,9 @@ struct Context {
     uint32_t frame() {
         m_rendererSemaphore.wait();
         freeAllHandles(m_submit);
+        for (int i = 0; i < MAX_VIEWS; i++) {
+            m_submit->m_views[i] = m_views[i];
+        }
         swap();
         m_submit->reset();
         m_apiSemaphore.post();
@@ -562,6 +565,7 @@ private:
     // DynamicIndexBuffer m_dynamicIndexBuffers[MAX_DYNAMIC_INDEX_BUFFERS];
     // DynamicVertexBuffer m_dynamicVertexBuffers[MAX_DYNAMIC_VERTEX_BUFFERS];
 
+    Fern::GraphicsContext *m_ctx;
     HandleAllocator<FrameBufferHandle> m_frameBuffersHandleAlloc;
     HandleAllocator<ProgramHandle> m_shadersHandleAlloc;
     HandleAllocator<TextureHandle> m_texturesHandleAlloc;

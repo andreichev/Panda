@@ -12,8 +12,7 @@ DynamicMesh::~DynamicMesh() {
 }
 
 DynamicMesh::DynamicMesh()
-    : m_model(1.f)
-    , m_bufferLayoutHandle(MIREN_INVALID_HANDLE)
+    : m_bufferLayoutHandle(MIREN_INVALID_HANDLE)
     , m_indexBufferHandle(MIREN_INVALID_HANDLE)
     , m_vertexBufferHandle(MIREN_INVALID_HANDLE)
     , m_indicesCount(0)

@@ -4,11 +4,7 @@
 
 #pragma once
 
-#include <Panda.hpp>
-
-class FullScreenToggle : public Panda::NativeScript {
-    void initialize() override;
-    void update(double deltaTime) override;
-
-    Panda::Window *m_window;
+class FullScreenToggle final {
+public:
+    void update(double deltaTime);
 };

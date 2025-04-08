@@ -26,7 +26,6 @@ private:
     Miren::VertexLayoutHandle m_bufferLayoutHandle;
     Miren::IndexBufferHandle m_indexBufferHandle;
     Miren::VertexBufferHandle m_vertexBufferHandle;
-    glm::mat4 m_model;
     uint32_t m_indicesCount;
 
     friend class Renderer3D;

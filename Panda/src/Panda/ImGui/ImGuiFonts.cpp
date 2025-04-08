@@ -2,6 +2,9 @@
 #include "Panda/Assets/AssetHandler.hpp"
 #include "Panda/Assets/AssetLoaderEditor.hpp"
 
+#include <unordered_map>
+#include <Fern/Fern.hpp>
+
 namespace Panda {
 
 static std::unordered_map<std::string, ImFont *> s_fonts;
@@ -17,7 +20,7 @@ void Fonts::add(const FontConfiguration &config, bool isDefault) {
     imguiFontConfig.OversampleH = 4;
     imguiFontConfig.OversampleV = 4;
     auto &io = ImGui::GetIO();
-    path_t fontPath = AssetHandler::s_defaultResourcesPath / "default-fonts" / config.fileName;
+    path_t fontPath = Fern::getResourcesPath() / "default-fonts" / config.fileName;
     ImFont *font = io.Fonts->AddFontFromFileTTF(
         fontPath.string().c_str(),
         config.size,

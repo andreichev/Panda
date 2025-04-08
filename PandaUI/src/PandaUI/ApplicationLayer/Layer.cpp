@@ -5,7 +5,7 @@
 #include "PandaUI/ApplicationLayer/Layer.hpp"
 #include "PandaUI/Config.hpp"
 
-#include <Panda/Events/WindowEvents.hpp>
+#include <Fern/Events/WindowEvents.hpp>
 
 namespace PandaUI {
 
@@ -27,12 +27,12 @@ void Layer::onUpdate(double deltaTime) {
 
 void Layer::onImGuiRender() {}
 
-void Layer::onEvent(Panda::Event *event) {
+void Layer::onEvent(Fern::Event *event) {
     using namespace Panda;
     switch (event->type) {
-        case EventType::WindowResize: {
+        case Fern::EventType::WindowResize: {
 #ifdef AUTO_RESIZE_ROOT
-            const WindowResizeEvent *ev = static_cast<const WindowResizeEvent *>(event);
+            const Fern::WindowResizeEvent *ev = static_cast<const Fern::WindowResizeEvent *>(event);
             m_context.updateViewportSize(Size(ev->getWidth(), ev->getHeight()));
 #endif
             break;

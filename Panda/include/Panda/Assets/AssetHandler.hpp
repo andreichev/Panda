@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Asset.hpp"
-#include "Panda/Base/FileBase.hpp"
+#include "Panda/Assets/Path.hpp"
 
 #include <Miren/Base.hpp>
 #include <string>
@@ -12,8 +12,6 @@ class AssetHandler {
 public:
     virtual ~AssetHandler() = default;
     virtual Foundation::Shared<Asset> load(AssetId id) = 0;
-
-    static path_t s_defaultResourcesPath;
 };
 
 } // namespace Panda

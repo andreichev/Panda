@@ -14,26 +14,16 @@ file(GLOB_RECURSE GLOB_RESULT_SOURCES src/Platform/RendererImpl/OpenGL/*.cpp)
 list(APPEND INCLUDE ${GLOB_RESULT_INCLUDE})
 list(APPEND SOURCES ${GLOB_RESULT_SOURCES})
 
-# Other platform specific realizations
-if (DESKTOP)
-    list(APPEND INCLUDE "src/Platform/RendererImpl/Context/OpenGLContext.hpp")
-    list(APPEND SOURCES "src/Platform/RendererImpl/Context/OpenGLContext.cpp")
-elseif (PLATFORM_IOS)
-    list(APPEND INCLUDE "src/Platform/RendererImpl/Context/GlesContext.hpp")
-    list(APPEND SOURCES "src/Platform/RendererImpl/Context/GlesContext.mm")
-else ()
-    message(FATAL_ERROR "Unknown platform")
-endif ()
-
 # Miren target
 
 add_library(Miren STATIC "${SOURCES}" "${INCLUDE}")
 
+target_compile_definitions(Miren PUBLIC GL_SILENCE_DEPRECATION)
 target_compile_definitions(Miren PUBLIC GLES_SILENCE_DEPRECATION)
 target_include_directories(Miren PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(Miren PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-if (DESKTOP)
+if (PLATFORM_WIN32 OR PLATFORM_LINUX)
     # Dependencies - GLFW, only for Desktop :)
     target_link_libraries(Miren glfw)
     target_include_directories(Miren PRIVATE Vendor/glfw/include)
@@ -49,21 +39,22 @@ elseif (PLATFORM_IOS)
     find_library(SYSTEMCONFIGURATION SystemConfiguration)
 
     target_link_libraries(Miren
-            ${UIKIT} ${METALKIT_LIBRARY} ${FOUNDATION} ${CFNETWORK} ${SYSTEMCONFIGURATION} ${QUARTZ_CORE} ${OPENGLES}
+        ${UIKIT} ${METALKIT_LIBRARY} ${FOUNDATION} ${CFNETWORK} ${SYSTEMCONFIGURATION} ${QUARTZ_CORE} ${OPENGLES}
     )
 endif ()
 
-# Dependencies - Foundation
-target_link_libraries(Miren Foundation)
-target_include_directories(Miren PUBLIC ${FOUNDATION_DIRECTORY}/include)
+# Dependencies - Fern
+target_link_libraries(Miren Fern)
 
 # Dependencies - GLM
 target_link_libraries(Miren glm)
 target_include_directories(Miren PRIVATE ${VENDOR_DIRECTORY}/glm)
 
-# Dependencies - GLAD
-target_link_libraries(Miren glad)
-target_include_directories(Miren PRIVATE ${VENDOR_DIRECTORY}/glad/include)
+if (DESKTOP)
+    # Dependencies - GLAD
+    target_link_libraries(Miren glad)
+    target_include_directories(Miren PUBLIC ${VENDOR_DIRECTORY}/glad/include)
+endif ()
 
 # Dependencies - stb_image
 target_link_libraries(Miren stb_image)

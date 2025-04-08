@@ -2,16 +2,18 @@
 
 #include "Panda/Application/Layer.hpp"
 
+#include <Fern/Window/Window.hpp>
+
 namespace Panda {
 
 class ImGuiLayer : public Layer {
 public:
-    ImGuiLayer();
+    ImGuiLayer(Fern::Window *mainWindow);
     ~ImGuiLayer() = default;
 
     void onAttach() override;
     void onDetach() override;
-    void onEvent(Event *event) override;
+    void onEvent(Fern::Event *event) override;
 
     void setBlockEvents(bool block) {
         m_blockEvents = block;
@@ -23,6 +25,7 @@ public:
     void setDarkThemeColors();
 
 private:
+    Fern::Window *m_window;
     bool m_blockEvents = true;
 };
 

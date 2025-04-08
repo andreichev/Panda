@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <Panda/GameLogic/Components/TransformComponent.hpp>
 #include <Panda.hpp>
 
-class CameraMove : public Panda::NativeScript {
+class CameraMove final {
 public:
-    void initialize() override;
-    void update(double deltaTime) override;
+    CameraMove(Panda::TransformComponent *transform);
+    void update(double deltaTime);
     glm::vec4 getFront() {
         return m_front;
     }
@@ -25,5 +26,5 @@ private:
     glm::vec4 m_up;
     glm::vec4 m_right;
     glm::vec3 m_target;
-    Panda::Window *m_window;
+    Fern::Window *m_window;
 };

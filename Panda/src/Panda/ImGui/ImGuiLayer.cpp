@@ -1,10 +1,5 @@
 #include "Panda/ImGui/ImGuiLayer.hpp"
-
-#include <imgui.h>
-#include <ImGuizmo.h>
-
 #include "Panda/Application/Application.hpp"
-
 #include "Panda/ImGui/FontAwesome.h"
 #include "Panda/ImGui/Colors.hpp"
 #include "Panda/ImGui/ImGuiFonts.hpp"
@@ -13,10 +8,14 @@
 // ImGui renderer impl
 #include "imgui_impl_miren.hpp"
 
+#include <imgui.h>
+#include <ImGuizmo.h>
+
 namespace Panda {
 
-ImGuiLayer::ImGuiLayer()
-    : Layer("ImGuiLayer") {}
+ImGuiLayer::ImGuiLayer(Fern::Window *mainWindow)
+    : Layer("ImGuiLayer")
+    , m_window(mainWindow) {}
 
 void ImGuiLayer::onAttach() {
     ImGui::CreateContext();
@@ -82,13 +81,13 @@ void ImGuiLayer::onDetach() {
     ImGuizmo::SetImGuiContext(nullptr);
 }
 
-void ImGuiLayer::onEvent(Event *event) {
+void ImGuiLayer::onEvent(Fern::Event *event) {
     ImGui_ImplPanda_HandleEvent(event);
     if (!m_blockEvents) { event->isHandled = false; }
 }
 
 void ImGuiLayer::begin(double deltaTime) {
-    ImGui_ImplPanda_NewFrame(deltaTime);
+    ImGui_ImplPanda_NewFrame(m_window, deltaTime);
     ImGui_ImplMiren_NewFrame();
     ImGui::NewFrame();
     ImGuizmo::BeginFrame();

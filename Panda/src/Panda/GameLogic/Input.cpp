@@ -3,12 +3,13 @@
 //
 
 #include "Panda/GameLogic/Input.hpp"
-#include "Panda/Events/WindowEvents.hpp"
-#include "Panda/Events/TouchEvents.hpp"
-#include "Panda/Events/KeyEvents.hpp"
-#include "Panda/Events/MouseEvents.hpp"
 
+#include <Fern/Events/WindowEvents.hpp>
+#include <Fern/Events/TouchEvents.hpp>
+#include <Fern/Events/KeyEvents.hpp>
+#include <Fern/Events/MouseEvents.hpp>
 #include <Foundation/Foundation.hpp>
+#include <vector>
 
 namespace Panda {
 
@@ -20,16 +21,22 @@ uint32_t Input::framesMouseButtons[4];
 Size Input::windowSize;
 double Input::mousePositionX = 0;
 double Input::mousePositionY = 0;
+double Input::mouseDeltaX = 0;
+double Input::mouseDeltaY = 0;
 double Input::mouseScrollX = 0;
 double Input::mouseScrollY = 0;
+bool Input::_isTrackpadScroll = false;
 Rect Input::viewportFrame;
 std::vector<Input::Touch> Input::activeTouches;
 
-void Input::onEvent(Event *event) {
+void Input::onEvent(Fern::Event *event) {
+    using namespace Fern;
     switch (event->type) {
         case EventType::None:
             break;
-        case EventType::WindowClose:
+        case EventType::WindowCloseRequest:
+            break;
+        case EventType::QuitRequest:
             break;
         case EventType::WindowResize: {
             const WindowResizeEvent *ev = static_cast<const WindowResizeEvent *>(event);
@@ -52,7 +59,7 @@ void Input::onEvent(Event *event) {
         }
         case EventType::MouseMoved: {
             const MouseMovedEvent *ev = static_cast<const MouseMovedEvent *>(event);
-            Input::postMouseChangedPosition(ev->x, ev->y);
+            Input::postMouseChangedPosition(ev->x, ev->y, ev->dx, ev->dy);
             break;
         }
         case EventType::MouseButtonPressed: {
@@ -67,7 +74,7 @@ void Input::onEvent(Event *event) {
         }
         case EventType::MouseScrolled: {
             const MouseScrolledEvent *ev = static_cast<const MouseScrolledEvent *>(event);
-            Input::postScrollEvent(ev->xoffset, ev->yoffset);
+            Input::postScrollEvent(ev->xoffset, ev->yoffset, ev->isTrackpad);
             break;
         }
         case EventType::TouchBegan: {
@@ -88,29 +95,29 @@ void Input::onEvent(Event *event) {
     }
 }
 
-void Input::setKeyPressed(Key key, bool state) {
+void Input::setKeyPressed(Fern::Key key, bool state) {
     keys[(int)key] = state;
     framesKeys[(int)key] = frame + 1;
 }
 
-void Input::setMouseButtonPressed(MouseButton mouseButton, bool state) {
+void Input::setMouseButtonPressed(Fern::MouseButton mouseButton, bool state) {
     mouseButtons[(int)mouseButton] = state;
     framesMouseButtons[(int)mouseButton] = frame + 1;
 }
 
-bool Input::isKeyPressed(Key key) {
+bool Input::isKeyPressed(Fern::Key key) {
     return keys[(int)key];
 }
 
-bool Input::isKeyJustPressed(Key key) {
+bool Input::isKeyJustPressed(Fern::Key key) {
     return keys[(int)key] && framesKeys[(int)key] == frame;
 }
 
-bool Input::isMouseButtonPressed(MouseButton mouseButton) {
+bool Input::isMouseButtonPressed(Fern::MouseButton mouseButton) {
     return mouseButtons[(int)mouseButton];
 }
 
-bool Input::isMouseButtonJustPressed(MouseButton mouseButton) {
+bool Input::isMouseButtonJustPressed(Fern::MouseButton mouseButton) {
     return mouseButtons[(int)mouseButton] && framesMouseButtons[(int)mouseButton] == frame;
 }
 
@@ -120,6 +127,14 @@ double Input::getMousePositionX() {
 
 double Input::getMousePositionY() {
     return mousePositionY;
+}
+
+double Input::getMouseDeltaX() {
+    return mouseDeltaX;
+}
+
+double Input::getMouseDeltaY() {
+    return mouseDeltaY;
 }
 
 double Input::getMouseViewportPositionX() {
@@ -138,14 +153,21 @@ double Input::getMouseScrollY() {
     return mouseScrollY;
 }
 
-void Input::postMouseChangedPosition(double x, double y) {
-    mousePositionX = x;
-    mousePositionY = y;
+bool Input::isTrackpadScroll() {
+    return _isTrackpadScroll;
 }
 
-void Input::postScrollEvent(double x, double y) {
+void Input::postMouseChangedPosition(double x, double y, double dx, double dy) {
+    mousePositionX = x;
+    mousePositionY = y;
+    mouseDeltaX = dx;
+    mouseDeltaY = dy;
+}
+
+void Input::postScrollEvent(double x, double y, bool isTrackpad) {
     mouseScrollX = x;
     mouseScrollY = y;
+    _isTrackpadScroll = isTrackpad;
 }
 
 void Input::setWindowSize(Size size) {
@@ -160,6 +182,8 @@ void Input::nextFrame() {
     frame++;
     mouseScrollX = 0;
     mouseScrollY = 0;
+    mouseDeltaX = 0;
+    mouseDeltaY = 0;
 }
 
 Input::Touch Input::getTouch(int index) {
@@ -169,7 +193,7 @@ Input::Touch Input::getTouch(int index) {
 }
 
 int Input::touchCount() {
-    return activeTouches.size();
+    return (int)activeTouches.size();
 }
 
 void Input::postTouchBeganEvent(int id, float x, float y) {
@@ -180,7 +204,7 @@ void Input::postTouchMovedEvent(int id, float x, float y) {
     auto touch = std::find_if(activeTouches.begin(), activeTouches.end(), [id](auto touch) {
         return touch.id == id;
     });
-    PND_ASSERT(touch != activeTouches.end(), "TOUCH NOT FOUND");
+    // PND_ASSERT(touch != activeTouches.end(), "TOUCH NOT FOUND");
     if (touch != activeTouches.end()) {
         touch->x = x;
         touch->y = y;
@@ -191,7 +215,7 @@ void Input::postTouchEndedEvent(int id) {
     auto touch = std::find_if(activeTouches.begin(), activeTouches.end(), [id](auto touch) {
         return touch.id == id;
     });
-    PND_ASSERT(touch != activeTouches.end(), "TOUCH NOT FOUND");
+    // PND_ASSERT(touch != activeTouches.end(), "TOUCH NOT FOUND");
     if (touch != activeTouches.end()) { activeTouches.erase(touch); }
 }
 

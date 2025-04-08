@@ -206,7 +206,9 @@ Entity World::instantiateEntity() {
     Entity entity = {entityHandle, this};
     fillEntity(entity, {});
     m_entityIdMap[entity.getId()] = entity;
+#ifdef PND_EDITOR
     m_isChanged = true;
+#endif
     return entity;
 }
 
@@ -215,7 +217,9 @@ Entity World::instantiateEntity(UUID id) {
     Entity entity = {entityHandle, this};
     fillEntity(entity, id);
     m_entityIdMap[entity.getId()] = entity;
+#ifdef PND_EDITOR
     m_isChanged = true;
+#endif
     return entity;
 }
 
@@ -374,15 +378,19 @@ void World::destroy(Entity entity) {
     }
     m_entityIdMap.erase(entity.getId());
     m_registry.destroy(entity.m_handle);
+#ifdef PND_EDITOR
     m_isChanged = true;
     if (m_selectionContext.isSelected(entity)) { m_selectionContext.removeSelectedEntity(entity); }
+#endif
 }
 
 void World::clear() {
-    m_commandManager.CLEAR();
     releaseAllScriptingFields();
+#ifdef PND_EDITOR
+    m_commandManager.CLEAR();
     m_isChanged = false;
     m_selectionContext.unselectAll();
+#endif
     for (auto id : m_registry.storage<entt::entity>()) {
         m_registry.destroy(id);
     }
@@ -433,8 +441,8 @@ void World::fillStartupData() {
     Entity skyEntity = instantiateEntity();
     skyEntity.setName("Sky");
     skyEntity.addComponent<SkyComponent>();
-    m_isChanged = true;
 #ifdef PND_EDITOR
+    m_isChanged = true;
     sort();
 #endif
 }
@@ -580,7 +588,9 @@ Entity World::duplicateEntity(Entity entity) {
         }
     }
     m_entityIdMap[newEntity.getId()] = newEntity;
+#ifdef PND_EDITOR
     m_isChanged = true;
+#endif
     return newEntity;
 }
 

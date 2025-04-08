@@ -2,7 +2,6 @@
 // Created by Admin on 11.02.2022.
 //
 
-#include "Miren/PlatformData.hpp"
 #include "OpenGLTexture.hpp"
 #include "Texture/TextureFormat.hpp"
 
@@ -98,7 +97,11 @@ void OpenGLTexture::unbind() {
 
 void OpenGLTexture::readPixels(void *data) {
     GL_CALL(glBindTexture(m_target, m_id));
+#ifdef PLATFORM_DESKTOP
     GL_CALL(glGetTexImage(m_target, 0, m_format, m_type, data));
+#else
+    LOG_ERROR("READ TEXTURE NOT SUPPORTED IN GLES");
+#endif
 }
 
 } // namespace Miren

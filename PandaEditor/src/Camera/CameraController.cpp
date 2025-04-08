@@ -5,7 +5,6 @@
 #include "CameraController.hpp"
 
 #include <Panda/Math/Math.hpp>
-
 #include <imgui.h>
 
 namespace Panda {
@@ -19,7 +18,8 @@ CameraController::CameraController()
     , m_right()
     , m_target()
     , m_cursorStarted(false)
-    , m_isActive(false)
+    , m_isMoveActive(false)
+    , m_isRotationActive(false)
     , m_lastMouseX(0)
     , m_lastMouseY(0)
     , m_animation() {
@@ -57,35 +57,44 @@ void CameraController::update(float deltaTime) {
         m_cursorStarted = false;
         return;
     }
-    if (!m_isActive) {
+    if (m_isMoveActive) {
+        float speed = m_moveSpeed * deltaTime;
+        if (ImGui::IsKeyDown(ImGuiKey_W)) { m_transform.translate(m_front * speed); }
+        if (ImGui::IsKeyDown(ImGuiKey_S)) { m_transform.translate(-m_front * speed); }
+        if (ImGui::IsKeyDown(ImGuiKey_A)) { m_transform.translate(-m_right * speed); }
+        if (ImGui::IsKeyDown(ImGuiKey_D)) { m_transform.translate(m_right * speed); }
+    }
+    if (!m_isRotationActive) {
         m_cursorStarted = false;
         return;
     }
     glm::vec3 cameraRotation = m_transform.getRotationEuler();
     glm::vec3 cameraPosition = m_transform.getPosition();
-    float speed = m_moveSpeed * deltaTime;
-    if (ImGui::IsKeyDown(ImGuiKey_W)) { m_transform.translate(m_front * speed); }
-    if (ImGui::IsKeyDown(ImGuiKey_S)) { m_transform.translate(-m_front * speed); }
-    if (ImGui::IsKeyDown(ImGuiKey_A)) { m_transform.translate(-m_right * speed); }
-    if (ImGui::IsKeyDown(ImGuiKey_D)) { m_transform.translate(m_right * speed); }
-    if (ImGui::IsKeyDown(ImGuiKey_MouseRight)) {
-        ImVec2 mousePos = ImGui::GetMousePos();
-        double mouseX = mousePos.x;
-        double mouseY = mousePos.y;
-        double deltaX = mouseX - m_lastMouseX;
-        double deltaY = mouseY - m_lastMouseY;
-        if (!m_cursorStarted) {
-            m_cursorStarted = true;
-            deltaX = 0;
-            deltaY = 0;
+    if (Input::isTrackpadScroll() || ImGui::IsKeyDown(ImGuiKey_MouseRight)) {
+        double deltaX;
+        double deltaY;
+        if (Input::isTrackpadScroll()) {
+            deltaX = Input::getMouseScrollX() * 40;
+            deltaY = Input::getMouseScrollY() * 40;
+        } else {
+            ImVec2 mousePos = ImGui::GetMousePos();
+            double mouseX = mousePos.x;
+            double mouseY = mousePos.y;
+            deltaX = mouseX - m_lastMouseX;
+            deltaY = mouseY - m_lastMouseY;
+            if (!m_cursorStarted) {
+                m_cursorStarted = true;
+                deltaX = 0;
+                deltaY = 0;
+            }
+            m_lastMouseX = mouseX;
+            m_lastMouseY = mouseY;
         }
         // DeltaX - смещение мыши за реальное время, поэтому умножение на deltaTime не требуется.
         // Действия в реальном мире не нужно умножать на deltaTime, умножать нужно только действия в
         // игровом мире.
         m_transform.rotateEuler({-deltaY * m_mouseSpeed, -deltaX * m_mouseSpeed, 0.f});
         updateVectors();
-        m_lastMouseX = mouseX;
-        m_lastMouseY = mouseY;
         // ImGui::SetNextFrameWantCaptureMouse(false);
     } else {
         // ImGui::SetNextFrameWantCaptureMouse(true);
@@ -93,7 +102,7 @@ void CameraController::update(float deltaTime) {
     }
 
     double scroll = Input::getMouseScrollY();
-    if (scroll != 0) {
+    if (!Input::isTrackpadScroll() && scroll != 0) {
         float zoom = scroll * 0.5;
         m_transform.translate(zoom * m_front);
     }
@@ -131,8 +140,12 @@ void CameraController::setRotation(glm::quat quat) {
     updateVectors();
 }
 
-void CameraController::setActive(bool flag) {
-    m_isActive = flag;
+void CameraController::setMoveActive(bool flag) {
+    m_isMoveActive = flag;
+}
+
+void CameraController::setRotationActive(bool flag) {
+    m_isRotationActive = flag;
 }
 
 void CameraController::reset(glm::vec3 pos) {

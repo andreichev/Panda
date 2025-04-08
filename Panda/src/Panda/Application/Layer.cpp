@@ -1,4 +1,3 @@
-#include "pndpch.hpp"
 #include "Panda/Application/Layer.hpp"
 
 namespace Panda {

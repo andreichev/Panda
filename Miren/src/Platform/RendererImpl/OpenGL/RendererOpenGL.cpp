@@ -9,15 +9,7 @@
 #include <Foundation/Allocator.hpp>
 #include <Foundation/Logger.hpp>
 
-#ifdef PLATFORM_IOS
-#    include "Platform/RendererImpl/Context/GlesContext.hpp"
-#elif defined(PLATFORM_DESKTOP)
-#    include "Platform/RendererImpl/Context/OpenGLContext.hpp"
-#endif
-
 namespace Miren {
-
-RendererOpenGL *RendererOpenGL::s_instance;
 
 void gpuErrorCallback(
     GLenum source,
@@ -51,14 +43,15 @@ const char *getGLErrorStr(GLenum err) {
     }
 }
 
-RendererOpenGL::RendererOpenGL() {
-    s_instance = this;
-#ifdef PLATFORM_IOS
-    context = F_NEW(Foundation::getAllocator(), GlesContext);
-#elif defined(PLATFORM_DESKTOP)
-    context = F_NEW(Foundation::getAllocator(), OpenGLContext);
-#endif
-    context->create();
+RendererOpenGL::RendererOpenGL(Fern::GraphicsContext *ctx)
+    : m_uselessVao(0)
+    , m_frameBuffers()
+    , m_shaders()
+    , m_indexBuffers()
+    , m_vertexLayouts()
+    , m_vertexBuffers()
+    , m_textures()
+    , m_ctx(ctx) {
     GL_CALL(glEnable(GL_BLEND));
     GL_CALL(glDisable(GL_STENCIL_TEST));
     // GL_CALL(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
@@ -66,6 +59,7 @@ RendererOpenGL::RendererOpenGL() {
     // glBlendEquation(GL_FUNC_ADD);
     // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glLineWidth(2.0f);
     MIREN_LOG("OPENGL VERSION %s", (const char *)glGetString(GL_VERSION));
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
     // glEnable(GL_DEBUG_OUTPUT);
@@ -79,8 +73,6 @@ RendererOpenGL::RendererOpenGL() {
 
 RendererOpenGL::~RendererOpenGL() {
     GL_CALL(glDeleteVertexArrays(1, &m_uselessVao));
-    F_DELETE(Foundation::getAllocator(), context);
-    s_instance = nullptr;
 }
 
 RendererType RendererOpenGL::getRendererType() const {
@@ -91,44 +83,40 @@ RendererType RendererOpenGL::getRendererType() const {
 #endif
 }
 
-void RendererOpenGL::flip() {
-    context->flip();
-}
-
 void RendererOpenGL::createFrameBuffer(
     FrameBufferHandle handle, FrameBufferSpecification specification
 ) {
-    frameBuffers[handle.id].create(specification);
+    m_frameBuffers[handle.id].create(this, specification);
 }
 
 void RendererOpenGL::readFrameBuffer(
     FrameBufferHandle handle, int attachIndex, int x, int y, int width, int height, void *data
 ) {
-    frameBuffers[handle.id].readPixels(attachIndex, x, y, width, height, data);
+    m_frameBuffers[handle.id].readPixels(this, attachIndex, x, y, width, height, data);
 }
 
 void RendererOpenGL::deleteFrameBuffer(FrameBufferHandle handle) {
-    frameBuffers[handle.id].terminate();
+    m_frameBuffers[handle.id].terminate();
 }
 
 void RendererOpenGL::createProgram(ProgramHandle handle, ProgramCreate create) {
-    shaders[handle.id].create(create);
+    m_shaders[handle.id].create(create);
 }
 
 void RendererOpenGL::deleteShader(ProgramHandle handle) {
-    shaders[handle.id].terminate();
+    m_shaders[handle.id].terminate();
 }
 
 void RendererOpenGL::createTexture(TextureHandle handle, TextureCreate create) {
-    textures[handle.id].create(create);
+    m_textures[handle.id].create(create);
 }
 
 void RendererOpenGL::resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) {
-    textures[handle.id].resize(width, height);
+    m_textures[handle.id].resize(width, height);
 }
 
 void RendererOpenGL::deleteTexture(TextureHandle handle) {
-    textures[handle.id].terminate();
+    m_textures[handle.id].terminate();
 }
 
 void RendererOpenGL::createIndexBuffer(
@@ -137,7 +125,7 @@ void RendererOpenGL::createIndexBuffer(
     BufferElementType elementType,
     size_t count
 ) {
-    indexBuffers[handle.id].create(indices.data, elementType, count, false);
+    m_indexBuffers[handle.id].create(indices.data, elementType, count, false);
     indices.release();
 }
 
@@ -147,19 +135,19 @@ void RendererOpenGL::createDynamicIndexBuffer(
     BufferElementType elementType,
     size_t count
 ) {
-    indexBuffers[handle.id].create(indices.data, elementType, count, true);
+    m_indexBuffers[handle.id].create(indices.data, elementType, count, true);
     indices.release();
 }
 
 void RendererOpenGL::updateDynamicIndexBuffer(
     IndexBufferHandle handle, Foundation::Memory indices, size_t count
 ) {
-    indexBuffers[handle.id].update(indices.data, count);
+    m_indexBuffers[handle.id].update(indices.data, count);
     indices.release();
 }
 
 void RendererOpenGL::deleteIndexBuffer(IndexBufferHandle handle) {
-    indexBuffers[handle.id].terminate();
+    m_indexBuffers[handle.id].terminate();
 }
 
 void RendererOpenGL::createVertexBuffer(
@@ -168,8 +156,8 @@ void RendererOpenGL::createVertexBuffer(
     uint32_t size,
     VertexLayoutHandle layoutHandle
 ) {
-    vertexBuffers[handle.id].create(data.data, size, false);
-    vertexBuffers[handle.id].setLayoutHandle(layoutHandle);
+    m_vertexBuffers[handle.id].create(data.data, size, false);
+    m_vertexBuffers[handle.id].setLayoutHandle(layoutHandle);
     data.release();
 }
 
@@ -179,52 +167,52 @@ void RendererOpenGL::createDynamicVertexBuffer(
     uint32_t size,
     VertexLayoutHandle layoutHandle
 ) {
-    vertexBuffers[handle.id].create(data.data, size, true);
-    vertexBuffers[handle.id].setLayoutHandle(layoutHandle);
+    m_vertexBuffers[handle.id].create(data.data, size, true);
+    m_vertexBuffers[handle.id].setLayoutHandle(layoutHandle);
     data.release();
 }
 
 void RendererOpenGL::updateDynamicVertexBuffer(
     VertexBufferHandle handle, Foundation::Memory data, uint32_t size
 ) {
-    vertexBuffers[handle.id].update(data.data, size);
+    m_vertexBuffers[handle.id].update(data.data, size);
     data.release();
 }
 
 void RendererOpenGL::deleteVertexBuffer(VertexBufferHandle handle) {
-    vertexBuffers[handle.id].terminate();
+    m_vertexBuffers[handle.id].terminate();
 }
 
 void RendererOpenGL::createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) {
-    vertexLayouts[handle.id] = layout;
+    m_vertexLayouts[handle.id] = layout;
 }
 
 void RendererOpenGL::deleteVertexLayout(VertexLayoutHandle handle) {}
 
 void RendererOpenGL::readTexture(Miren::TextureHandle handle, void *data) {
-    textures[handle.id].readPixels(data);
+    m_textures[handle.id].readPixels(data);
 }
 
 void RendererOpenGL::setUniform(const Uniform &uniform) {
-    shaders[uniform.handle.id].bind();
+    m_shaders[uniform.handle.id].bind();
     switch (uniform.type) {
         case UniformType::Sampler:
-            shaders[uniform.handle.id].setUniformInt(
+            m_shaders[uniform.handle.id].setUniformInt(
                 uniform.name, static_cast<int *>(uniform.data), uniform.count
             );
             return;
         case UniformType::Mat3:
-            shaders[uniform.handle.id].setUniformMat3(
+            m_shaders[uniform.handle.id].setUniformMat3(
                 uniform.name, static_cast<float *>(uniform.data), uniform.count
             );
             return;
         case UniformType::Mat4:
-            shaders[uniform.handle.id].setUniformMat4(
+            m_shaders[uniform.handle.id].setUniformMat4(
                 uniform.name, static_cast<float *>(uniform.data), uniform.count
             );
             return;
         case UniformType::Vec4:
-            shaders[uniform.handle.id].setUniformVec4(
+            m_shaders[uniform.handle.id].setUniformVec4(
                 uniform.name, static_cast<float *>(uniform.data), uniform.count
             );
             return;
@@ -235,33 +223,33 @@ void RendererOpenGL::setUniform(const Uniform &uniform) {
 }
 
 void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
-    textures[handle.id].bind(slot);
+    m_textures[handle.id].bind(slot);
 }
 
-void RendererOpenGL::submit(Frame *frame, View *views) {
-    MIREN_LOG("FRAME SUBMITTED. DRAW CALLS: %d", frame->getDrawCallsCount());
+void RendererOpenGL::submit(Frame *frame) {
+    MIREN_LOG("FRAME SUBMITTED. DRAW CALLS: %d", frame->m_drawCallsCount);
     if (frame->m_transientVbSize > 0) {
-        vertexBuffers[frame->m_transientVb.handle.id].update(
+        m_vertexBuffers[frame->m_transientVb.handle.id].update(
             frame->m_transientVb.data, frame->m_transientVbSize
         );
     }
     if (frame->m_transientIbSize > 0) {
-        indexBuffers[frame->m_transientIb.handle.id].update(
+        m_indexBuffers[frame->m_transientIb.handle.id].update(
             frame->m_transientIb.data, frame->m_transientIbSize / 2
         );
     }
-    if (!frame->getDrawCallsCount()) {
+    if (!frame->m_drawCallsCount) {
         GL_CALL(glClearColor(0, 0, 0, 1));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
         return;
     }
     ViewId viewId = -1;
-    for (int i = 0; i < frame->getDrawCallsCount(); i++) {
-        RenderDraw &draw = frame->getDrawCalls()[i];
+    for (int i = 0; i < frame->m_drawCallsCount; i++) {
+        RenderDraw &draw = frame->m_drawCalls[i];
         if (!draw.m_isSubmitted) { continue; }
         if (draw.m_viewId != viewId) {
             viewId = draw.m_viewId;
-            viewChanged(views[viewId]);
+            viewChanged(frame->m_views[viewId]);
         }
         submit(&draw);
     }
@@ -269,9 +257,9 @@ void RendererOpenGL::submit(Frame *frame, View *views) {
 
 void RendererOpenGL::viewChanged(View &view) {
     if (view.m_frameBuffer.isValid()) {
-        frameBuffers[view.m_frameBuffer.id].bind();
+        m_frameBuffers[view.m_frameBuffer.id].bind();
     } else {
-        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, context->getDefaultFrameBufferId()));
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, m_ctx->getDefaultFrameBufferId()));
     }
     if (!view.m_viewport.isZero()) {
         GL_CALL(glViewport(
@@ -291,13 +279,15 @@ void RendererOpenGL::viewChanged(View &view) {
     if (!view.m_frameBuffer.isValid()) { return; }
     for (auto clear : view.m_clearAttachments) {
         // TODO: Add different clear types
-        frameBuffers[view.m_frameBuffer.id].clearUIntAttachment(clear.attachmentIndex, clear.value);
+        m_frameBuffers[view.m_frameBuffer.id].clearUIntAttachment(
+            clear.attachmentIndex, clear.value
+        );
     }
 }
 
 void RendererOpenGL::submit(RenderDraw *draw) {
     // TODO: Capture time
-    shaders[draw->m_shader.id].bind();
+    m_shaders[draw->m_shader.id].bind();
     draw->m_uniformBuffer.finishWriting();
     Uniform *uniform;
     while ((uniform = draw->m_uniformBuffer.readUniform()) != nullptr) {
@@ -328,25 +318,25 @@ void RendererOpenGL::submit(RenderDraw *draw) {
     } else {
         GL_CALL(glDisable(GL_SCISSOR_TEST));
     }
-    vertexBuffers[draw->m_vertexBuffer.id].bind();
+    m_vertexBuffers[draw->m_vertexBuffer.id].bind();
     VertexLayoutHandle layoutHandle =
         draw->m_vertexLayout.id != MIREN_INVALID_HANDLE
             ? draw->m_vertexLayout
-            : vertexBuffers[draw->m_vertexBuffer.id].getLayoutHandle();
+            : m_vertexBuffers[draw->m_vertexBuffer.id].getLayoutHandle();
     PND_ASSERT(layoutHandle.id != MIREN_INVALID_HANDLE, "Invalid handle");
-    VertexBufferLayoutData &layout = vertexLayouts[layoutHandle.id];
+    VertexBufferLayoutData &layout = m_vertexLayouts[layoutHandle.id];
     GL_CALL(glBindVertexArray(m_uselessVao));
-    shaders[draw->m_shader.id].bindAttributes(layout, draw->m_verticesOffset);
-    indexBuffers[draw->m_indexBuffer.id].bind();
+    m_shaders[draw->m_shader.id].bindAttributes(layout, draw->m_verticesOffset);
+    m_indexBuffers[draw->m_indexBuffer.id].bind();
     GL_CALL(glDrawElements(
         GL_TRIANGLES,
         draw->m_numIndices,
-        indexBuffers[draw->m_indexBuffer.id].getElementType(),
+        m_indexBuffers[draw->m_indexBuffer.id].getElementType(),
         (void *)draw->m_indicesOffset
     ));
-    indexBuffers[draw->m_indexBuffer.id].unbind();
-    shaders[draw->m_shader.id].unbind();
-    vertexBuffers[draw->m_vertexBuffer.id].unbind();
+    m_indexBuffers[draw->m_indexBuffer.id].unbind();
+    m_shaders[draw->m_shader.id].unbind();
+    m_vertexBuffers[draw->m_vertexBuffer.id].unbind();
     GL_CALL(glDisable(GL_SCISSOR_TEST));
     GL_CALL(glBindVertexArray(0));
 }

@@ -4,7 +4,6 @@
 
 #include "OpenGLShader.hpp"
 #include "Miren/Base.hpp"
-#include "Miren/PlatformData.hpp"
 
 #include "OpenGLBase.hpp"
 

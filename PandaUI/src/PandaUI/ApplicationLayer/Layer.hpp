@@ -18,7 +18,7 @@ public:
     void onDetach() override;
     void onUpdate(double deltaTime) override;
     void onImGuiRender() override;
-    void onEvent(Panda::Event *event) override;
+    void onEvent(Fern::Event *event) override;
 
 private:
     Context m_context;

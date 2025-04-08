@@ -15,8 +15,7 @@ struct MeshData;
 class StaticMesh {
 public:
     StaticMesh()
-        : m_model(1.f)
-        , m_bufferLayoutHandle(MIREN_INVALID_HANDLE)
+        : m_bufferLayoutHandle(MIREN_INVALID_HANDLE)
         , m_indexBufferHandle(MIREN_INVALID_HANDLE)
         , m_vertexBufferHandle(MIREN_INVALID_HANDLE)
         , m_indicesCount(0)
@@ -32,7 +31,6 @@ private:
     Miren::VertexLayoutHandle m_bufferLayoutHandle;
     Miren::IndexBufferHandle m_indexBufferHandle;
     Miren::VertexBufferHandle m_vertexBufferHandle;
-    glm::mat4 m_model;
     uint32_t m_indicesCount;
 
     friend class Renderer3D;

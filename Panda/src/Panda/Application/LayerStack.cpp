@@ -1,4 +1,3 @@
-#include "pndpch.hpp"
 #include "Panda/Application/LayerStack.hpp"
 
 namespace Panda {

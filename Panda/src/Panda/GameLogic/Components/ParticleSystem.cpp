@@ -1,7 +1,7 @@
 #include "Panda/GameLogic/Components/ParticleSystem.hpp"
 
 #include "Panda/Application/Application.hpp"
-#include "Panda/Base/Random.hpp"
+#include "Panda/Random/Random.hpp"
 
 #include <glm/gtx/compatibility.hpp>
 

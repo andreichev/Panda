@@ -8,13 +8,22 @@ in vec4 Color;
 out vec4 FragColor;
 
 uniform sampler2D texture1;
-uniform samplerCube iSky;
+uniform sampler2D iSky;
 uniform vec4 cameraPos;
 
-void main()
-{
+const vec2 invAtan = vec2(0.1591, 0.3183);
+vec2 sampleSphericalMap(vec3 v)  {
+	vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
+	uv *= invAtan;
+	uv += 0.5;
+	return uv;
+}
+
+void main() {
 	vec3 I = normalize(Pos - cameraPos.xyz);
 	vec3 R = reflect(I, normalize(Normal));
-	vec4 sky = texture(iSky, R);
+
+	vec2 uv = sampleSphericalMap(R);
+	vec4 sky = texture(iSky, uv);
 	FragColor = mix(sky, texture(texture1, TexCoord), 0.4) * 1.2;
 }

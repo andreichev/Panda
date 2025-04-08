@@ -8,6 +8,7 @@
 #include "Miren/HandleAllocator.hpp"
 #include "Miren/VertexBufferLayoutData.hpp"
 #include "Miren/Encoder/RenderDraw.hpp"
+#include "Miren/Encoder/View.hpp"
 
 #include <Foundation/CommandBuffer.hpp>
 
@@ -41,8 +42,6 @@ public:
     void free(HandleAllocator<VertexBufferHandle> *allocator);
     void free(HandleAllocator<VertexLayoutHandle> *allocator);
     void free(HandleAllocator<IndexBufferHandle> *allocator);
-    uint32_t getDrawCallsCount();
-    RenderDraw *getDrawCalls();
     void reset();
     Foundation::CommandBuffer &getPreCommandQueue();
     Foundation::CommandBuffer &getPostCommandQueue();
@@ -51,10 +50,11 @@ public:
     TransientVertexBuffer m_transientVb;
     uint32_t m_transientVbSize;
     uint32_t m_transientIbSize;
-
-private:
     int m_drawCallsCount;
     RenderDraw m_drawCalls[MAX_DRAW_CALLS];
+    View m_views[MAX_VIEWS];
+
+private:
     FreeHandleQueue<FrameBufferHandle, MAX_FRAME_BUFFERS> m_frameBuffersFreeHandle;
     FreeHandleQueue<ProgramHandle, MAX_SHADERS> m_shadersFreeHandle;
     FreeHandleQueue<TextureHandle, MAX_TEXTURES> m_texturesFreeHandle;

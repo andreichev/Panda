@@ -1,18 +1,11 @@
 #pragma once
 
-#include "Panels/Viewport/Viewport.hpp"
-#include "Panels/MenuBar.hpp"
-#include "Panels/Dockspace.hpp"
-#include "Panels/WorldHierarchyPanel.hpp"
-#include "Panels/StatisticsPanel.hpp"
-#include "Panels/Console/ConsolePanel.hpp"
-#include "Panels/Toolbar/Toolbar.hpp"
-#include "Panels/StartPanel.hpp"
-#include "Panels/ContentBrowser/ContentBrowser.hpp"
 #include "Camera/EditorCamera.hpp"
 #include "Camera/CameraController.hpp"
 #include "EditorLayer/SceneState.hpp"
-#include "Panels/Popups/EditorPopup.hpp"
+#include "UI/Popups/EditorPopup.hpp"
+#include "UI/PanelsContainer/PanelsContainer.hpp"
+#include "UI/Other/StartPanel.hpp"
 #include "ProjectLoader/ProjectLoader.hpp"
 #include "SceneGrid.hpp"
 
@@ -28,7 +21,7 @@ class EditorLayer : public Layer,
                     public ToolbarOutput,
                     public ViewportOutput {
 public:
-    EditorLayer();
+    EditorLayer(Fern::Window *window);
     ~EditorLayer() override = default;
 
     virtual void onAttach() override;
@@ -36,7 +29,7 @@ public:
 
     void onUpdate(double deltaTime) override;
     void onImGuiRender() override;
-    void onEvent(Event *event) override;
+    void onEvent(Fern::Event *event) override;
 
     void play();
     void simulate();
@@ -93,6 +86,7 @@ public:
 #pragma endregion
 
 private:
+    void windowSizeChanged(Size size);
     void closeApp();
     void saveWorld();
     bool canUndo();
@@ -104,19 +98,13 @@ private:
 
     bool m_viewportFullscreen;
     ProjectLoader m_loader;
-    MenuBar m_menuBar;
-    Toolbar m_toolbar;
-    Dockspace m_dockspace;
-    Viewport m_viewport;
-    StatisticsPanel m_statisticsPanel;
-    ConsolePanel m_consolePanel;
     StartPanel m_startPanel;
-    WorldHierarchyPanel m_hierarchyPanel;
-    ContentBrowser m_contentBrowser;
     EditorCamera m_editorCamera;
     CameraController m_cameraController;
     std::vector<EditorPopup *> m_popups;
     SceneGrid m_grid;
+    Fern::Window *m_window;
+    PanelsContainer m_panelsContainer;
 
     // World that is visible by default in editor but never played.
     World m_editingWorld;

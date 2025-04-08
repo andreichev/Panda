@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Miren/RendererI.hpp"
-#include "Miren/GraphicsContext.hpp"
 #include "Platform/RendererImpl/OpenGL/Extensions/OpenGLExtensions.hpp"
 #include "OpenGLFrameBuffer.hpp"
 #include "OpenGLShader.hpp"
@@ -17,10 +16,9 @@ namespace Miren {
 
 class RendererOpenGL : public RendererI {
 public:
-    RendererOpenGL();
+    RendererOpenGL(Fern::GraphicsContext *ctx);
     ~RendererOpenGL() override;
     RendererType getRendererType() const override;
-    void flip() override;
     void
     createFrameBuffer(FrameBufferHandle handle, FrameBufferSpecification specification) override;
     void readFrameBuffer(
@@ -75,25 +73,23 @@ public:
     void readTexture(Miren::TextureHandle handle, void *data) override;
     void setUniform(const Uniform &uniform) override;
     void setTexture(TextureHandle handle, uint32_t slot) override;
-    void submit(Frame *frame, View *views) override;
-
-    static RendererOpenGL *s_instance;
+    void submit(Frame *frame) override;
     OpenGLTexture &getTexture(TextureHandle handle) {
-        return textures[handle.id];
+        return m_textures[handle.id];
     }
 
 private:
     void viewChanged(View &view);
     void submit(RenderDraw *draw);
 
+    Fern::GraphicsContext *m_ctx;
     uint32_t m_uselessVao;
-    GraphicsContext *context;
-    OpenGLFrameBuffer frameBuffers[1000];
-    OpenGLShader shaders[1000];
-    OpenGLIndexBuffer indexBuffers[1000];
-    VertexBufferLayoutData vertexLayouts[1000];
-    OpenGLVertexBuffer vertexBuffers[1000];
-    OpenGLTexture textures[1000];
+    OpenGLFrameBuffer m_frameBuffers[1000];
+    OpenGLShader m_shaders[1000];
+    OpenGLIndexBuffer m_indexBuffers[1000];
+    VertexBufferLayoutData m_vertexLayouts[1000];
+    OpenGLVertexBuffer m_vertexBuffers[1000];
+    OpenGLTexture m_textures[1000];
 };
 
 } // namespace Miren

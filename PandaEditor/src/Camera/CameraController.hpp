@@ -26,14 +26,16 @@ public:
     void setPosition(glm::vec3 position);
     glm::quat getRotation();
     void setRotation(glm::quat quat);
-    void setActive(bool flag);
+    void setMoveActive(bool flag);
+    void setRotationActive(bool flag);
     void reset(glm::vec3 pos);
     void animateTo(TransformComponent transform);
 
 private:
     void updateVectors();
 
-    bool m_isActive;
+    bool m_isMoveActive;
+    bool m_isRotationActive;
     bool m_cursorStarted;
     double m_lastMouseX;
     double m_lastMouseY;

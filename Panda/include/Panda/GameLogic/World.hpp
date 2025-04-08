@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Panda/GameLogic/Entity.hpp"
-#include "Panda/Window/Window.hpp"
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Renderer/Renderer3D.hpp"
 #include "Panda/WorldCommands/WorldCommandManager.hpp"
@@ -77,8 +76,8 @@ public:
     bool isDeleted(entt::entity handle);
     void setChanged(bool changed = true);
     void sort();
-    Entity duplicateEntity(Entity entity);
 #endif
+    Entity duplicateEntity(Entity entity);
     bool isValidEntt(entt::entity handle);
     bool isValid(UUID entityId);
 

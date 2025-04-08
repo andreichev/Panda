@@ -15,12 +15,11 @@ public:
 
     Chunk();
     ~Chunk();
-    Panda::Entity getMeshEntity();
-    void setMeshEntity(Panda::Entity entity);
+    Panda::DynamicMesh &getMesh();
     void set(int x, int y, int z, VoxelType type);
     Voxel *get(int x, int y, int z);
     Voxel *m_data;
 
 private:
-    Panda::Entity m_meshEntity;
+    Panda::DynamicMesh m_mesh;
 };
