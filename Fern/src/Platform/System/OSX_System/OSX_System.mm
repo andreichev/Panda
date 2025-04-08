@@ -3,6 +3,7 @@
 #import "CocoaWindow/WonderView.h"
 
 #import <Foundation/Allocator.hpp>
+#import <Foundation/IO/FileStreamReader.hpp>
 #import <Cocoa/Cocoa.h>
 
 namespace Fern {
@@ -123,8 +124,17 @@ uint64_t OSX_System::getMilliSeconds() const {
     return (uint64_t)([[NSProcessInfo processInfo] systemUptime] * 1000);
 }
 
-const std::filesystem::path& OSX_System::getResourcesPath() {
-    return "";
+const std::filesystem::path& OSX_System::getStaticResourcesPath() {
+    static std::filesystem::path path;
+    return path;
+}
+
+Foundation::StreamReaderI* OSX_System::createStaticResourceReader(const std::filesystem::path& path) {
+    return F_NEW(Foundation::getAllocator(), Foundation::FileStreamReader)(path);
+}
+
+void OSX_System::disposeResourceReader(Foundation::StreamReaderI* reader) {
+    F_DELETE(Foundation::getAllocator(), reader);
 }
     
 } // namespace Fern

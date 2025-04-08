@@ -84,9 +84,19 @@ EventQueue *getEventQueue() {
     return s_system->getEventQueue();
 }
 
-const std::filesystem::path &getResourcesPath() {
+const std::filesystem::path &getStaticResourcesPath() {
     PND_ASSERT(s_system != nullptr, "FERN NOT INITIALIZED");
-    return s_system->getResourcesPath();
+    return s_system->getStaticResourcesPath();
+}
+
+Foundation::StreamReaderI *createStaticResourceReader(const std::filesystem::path &path) {
+    PND_ASSERT(s_system != nullptr, "FERN NOT INITIALIZED");
+    return s_system->createStaticResourceReader(path);
+}
+
+void disposeResourceReader(Foundation::StreamReaderI *reader) {
+    PND_ASSERT(s_system != nullptr, "FERN NOT INITIALIZED");
+    s_system->disposeResourceReader(reader);
 }
 
 } // namespace Fern

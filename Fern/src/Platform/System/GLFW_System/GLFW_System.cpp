@@ -1,6 +1,8 @@
 #include "GLFW_System.hpp"
 #include "GlfwWindow/GLFW_Window.hpp"
 
+#include <Foundation/IO/FileStreamReader.hpp>
+
 // We gather version tests as define in order to easily see which features are version-dependent.
 #define GLFW_VERSION_COMBINED                                                                      \
     (GLFW_VERSION_MAJOR * 1000 + GLFW_VERSION_MINOR * 100 + GLFW_VERSION_REVISION)
@@ -119,9 +121,18 @@ uint64_t GLFW_System::getMilliSeconds() const {
     return glfwGetTime() * 1000;
 }
 
-const std::filesystem::path &GLFW_System::getResourcesPath() {
+const std::filesystem::path &GLFW_System::getStaticResourcesPath() {
     static std::filesystem::path path;
     return path;
+}
+
+Foundation::StreamReaderI *GLFW_System::createStaticResourceReader(const std::filesystem::path &path
+) {
+    return F_NEW(Foundation::getAllocator(), Foundation::FileStreamReader)(path);
+}
+
+void GLFW_System::disposeResourceReader(Foundation::StreamReaderI *reader) {
+    F_DELETE(Foundation::getAllocator(), reader);
 }
 
 GLFW_Window *GLFW_System::getFocusedWindow() const {

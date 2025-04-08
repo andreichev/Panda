@@ -3,6 +3,7 @@
 #include "Fern/Events/EventQueue.hpp"
 #include "Fern/Window/Window.hpp"
 
+#include <Foundation/IO/StreamReaderI.hpp>
 #include <filesystem>
 
 namespace Fern {
@@ -25,7 +26,10 @@ public:
     EventQueue *getEventQueue() {
         return &m_eventQueue;
     }
-    virtual const std::filesystem::path &getResourcesPath() = 0;
+    virtual const std::filesystem::path &getStaticResourcesPath() = 0;
+    virtual Foundation::StreamReaderI *createStaticResourceReader(const std::filesystem::path &path
+    ) = 0;
+    virtual void disposeResourceReader(Foundation::StreamReaderI *reader) = 0;
 
 protected:
     EventQueue m_eventQueue;

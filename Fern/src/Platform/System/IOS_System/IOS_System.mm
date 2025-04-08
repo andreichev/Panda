@@ -3,7 +3,7 @@
 #import "UIKitWindow/WonderView.h"
 #import "UIKitWindow/WonderController.h"
 
-#import <Foundation/Allocator.hpp>
+#import <Foundation/IO/FileStreamReader.hpp>
 
 extern std::filesystem::path g_ios_resources_path;
 
@@ -39,8 +39,18 @@ uint64_t IOS_System::getMilliSeconds() const {
     return (uint64_t)([[NSProcessInfo processInfo] systemUptime] * 1000);
 }
 
-const std::filesystem::path& IOS_System::getResourcesPath() {
+const std::filesystem::path& IOS_System::getStaticResourcesPath() {
     return g_ios_resources_path;
+}
+
+Foundation::StreamReaderI* IOS_System::createStaticResourceReader(
+    const std::filesystem::path &path
+) {
+    return F_NEW(Foundation::getAllocator(), Foundation::FileStreamReader)(path);
+}
+
+void IOS_System::disposeResourceReader(Foundation::StreamReaderI *reader) {
+    F_DELETE(Foundation::getAllocator(), reader);
 }
 
 } // namespace Fern

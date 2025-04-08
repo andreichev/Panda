@@ -59,7 +59,7 @@ void ProjectCreator::createProject(const std::string &name, const Panda::path_t 
     std::filesystem::create_directory(scriptingProjectPath);
 
     copyAndReplace(
-        Fern::getResourcesPath() / "Templates" / "NewCppProject",
+        Fern::getStaticResourcesPath() / "Templates" / "NewCppProject",
         scriptingProjectPath,
         "___PROJECTNAME___",
         name

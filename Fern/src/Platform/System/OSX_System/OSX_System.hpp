@@ -19,7 +19,10 @@ public:
     bool isCursorLocked() override;
     void setCursor(Cursor cursor) override;
     uint64_t getMilliSeconds() const override;
-    const std::filesystem::path &getResourcesPath() override;
+    const std::filesystem::path &getStaticResourcesPath() override;
+    Foundation::StreamReaderI *createStaticResourceReader(const std::filesystem::path &path
+    ) override;
+    void disposeResourceReader(Foundation::StreamReaderI *reader) override;
 
 private:
     bool m_isCursorLocked;
