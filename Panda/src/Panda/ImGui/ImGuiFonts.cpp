@@ -2,6 +2,7 @@
 #include "Panda/Assets/AssetHandler.hpp"
 #include "Panda/Assets/AssetLoaderEditor.hpp"
 
+#include <Foundation/PlatformDetection.hpp>
 #include <unordered_map>
 #include <Fern/Fern.hpp>
 
@@ -20,13 +21,30 @@ void Fonts::add(const FontConfiguration &config, bool isDefault) {
     imguiFontConfig.OversampleH = 4;
     imguiFontConfig.OversampleV = 4;
     auto &io = ImGui::GetIO();
-    path_t fontPath = Fern::getResourcesPath() / "default-fonts" / config.fileName;
+#ifdef PLATFORM_ANDROID
+    path_t fontPath = path_t("default-fonts") / config.fileName;
+    auto inputStream = Fern::createStaticResourceReader(fontPath);
+    size_t fileSize = inputStream->totalSize();
+    PND_ASSERT(fileSize != 0, "UNKNOWN ASSET SIZE");
+    void *fontMem = malloc(fileSize);
+    inputStream->readData(fontMem, fileSize);
+    ImFont *font = io.Fonts->AddFontFromMemoryTTF(
+        fontMem,
+        fileSize,
+        config.size,
+        &imguiFontConfig,
+        config.glyphRanges == nullptr ? io.Fonts->GetGlyphRangesDefault() : config.glyphRanges
+    );
+    Fern::disposeResourceReader(inputStream);
+#else
+    path_t fontPath = Fern::getStaticResourcesPath() / "default-fonts" / config.fileName;
     ImFont *font = io.Fonts->AddFontFromFileTTF(
         fontPath.string().c_str(),
         config.size,
         &imguiFontConfig,
         config.glyphRanges == nullptr ? io.Fonts->GetGlyphRangesDefault() : config.glyphRanges
     );
+#endif
     PND_ASSERT(font != nullptr, "Failed to load font file!");
     s_fonts[config.fontName] = font;
     if (isDefault) { io.FontDefault = font; }

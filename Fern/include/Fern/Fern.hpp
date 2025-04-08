@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Foundation/IO/StreamReaderI.hpp>
 #include <filesystem>
 
 #include "Fern/Window/Window.hpp"
@@ -21,6 +22,8 @@ bool isCursorLocked();
 void setCursor(Cursor cursor);
 void pollEvents();
 EventQueue *getEventQueue();
-const std::filesystem::path &getResourcesPath();
+const std::filesystem::path &getStaticResourcesPath();
+Foundation::StreamReaderI *createStaticResourceReader(const std::filesystem::path &path);
+void disposeResourceReader(Foundation::StreamReaderI *reader);
 
 } // namespace Fern
