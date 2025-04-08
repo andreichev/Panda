@@ -7,6 +7,7 @@
 #include "HandleAllocator.hpp"
 #include "Miren/MirenStates.hpp"
 #include "Platform/RendererImpl/OpenGL/RendererOpenGL.hpp"
+#include "Platform/RendererImpl/Vulkan/RendererVulkan.hpp"
 #include "RendererI.hpp"
 
 #include <Foundation/PlatformDetection.hpp>
@@ -255,7 +256,8 @@ struct Context {
             );
             m_ctx->setCurrent();
             // TODO: Add other renderers (metal, directx, vulkan, ...)
-            m_renderer = F_NEW(Foundation::getAllocator(), RendererOpenGL)(m_ctx);
+//            m_renderer = F_NEW(Foundation::getAllocator(), RendererOpenGL)(m_ctx);
+            m_renderer = F_NEW(Foundation::getAllocator(), RendererVulkan)(m_ctx);
             MIREN_LOG("RENDERER CREATED");
         }
     }

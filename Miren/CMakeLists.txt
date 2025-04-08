@@ -9,8 +9,8 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB_RECURSE SOURCES src/Miren/*.cpp)
 file(GLOB_RECURSE INCLUDE src/Miren/*.hpp include/Miren/*.hpp)
 
-file(GLOB_RECURSE GLOB_RESULT_INCLUDE src/Platform/RendererImpl/OpenGL/*.hpp)
-file(GLOB_RECURSE GLOB_RESULT_SOURCES src/Platform/RendererImpl/OpenGL/*.cpp)
+file(GLOB_RECURSE GLOB_RESULT_INCLUDE src/Platform/RendererImpl/*.hpp)
+file(GLOB_RECURSE GLOB_RESULT_SOURCES src/Platform/RendererImpl/*.cpp)
 list(APPEND INCLUDE ${GLOB_RESULT_INCLUDE})
 list(APPEND SOURCES ${GLOB_RESULT_SOURCES})
 
