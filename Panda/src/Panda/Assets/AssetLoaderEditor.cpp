@@ -115,17 +115,17 @@ TextureData AssetLoaderEditor::loadCubeMapTexture(std::array<path_t, 6> paths) {
 }
 
 ProgramData AssetLoaderEditor::loadProgram(const path_t &vertexPath, const path_t &fragmentPath) {
+    const path_t fullVertexPath = Fern::getStaticResourcesPath() / vertexPath;
+    const path_t fullFragmentPath = Fern::getStaticResourcesPath() / fragmentPath;
 #ifndef PLATFORM_ANDROID
     // TODO: Добавить пустой рабочий шейдер в случае отсутствия файла или ошибки компиляции
-    if (!std::filesystem::exists(vertexPath)) {
+    if (!std::filesystem::exists(fullVertexPath)) {
         LOG_ERROR("FILE %s DOESN'T EXISTS", vertexPath.string().c_str());
     }
-    if (!std::filesystem::exists(fragmentPath)) {
+    if (!std::filesystem::exists(fullFragmentPath)) {
         LOG_ERROR("FILE %s DOESN'T EXISTS", vertexPath.string().c_str());
     }
 #endif
-    const path_t fullVertexPath = Fern::getStaticResourcesPath() / vertexPath;
-    const path_t fullFragmentPath = Fern::getStaticResourcesPath() / fragmentPath;
     // ----------READ VERTEX SHADER ----------
     size_t fileSize;
     auto inputStream = Fern::createStaticResourceReader(fullVertexPath);

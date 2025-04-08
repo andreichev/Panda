@@ -13,16 +13,16 @@ public:
     size_t totalSize() const override {
         return m_size;
     }
-    bool isStreamGood() const {
+    bool isStreamGood() const override {
         return m_readPos < m_size;
     }
-    uint64_t getStreamPosition() {
+    uint64_t getStreamPosition() override {
         return m_readPos;
     }
-    void setStreamPosition(uint64_t position) {
+    void setStreamPosition(uint64_t position) override {
         m_readPos = position;
     }
-    bool readData(void *destination, size_t size);
+    bool readData(void *destination, size_t size) override;
 
 private:
     const void *m_data;

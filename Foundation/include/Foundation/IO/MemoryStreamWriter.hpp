@@ -10,16 +10,16 @@ public:
     MemoryStreamWriter(const MemoryStreamWriter &) = delete;
     ~MemoryStreamWriter();
 
-    bool isStreamGood() const {
+    bool isStreamGood() const override {
         return m_writePos < m_size;
     }
-    uint64_t getStreamPosition() {
+    uint64_t getStreamPosition() override {
         return m_writePos;
     }
-    void setStreamPosition(uint64_t position) {
+    void setStreamPosition(uint64_t position) override {
         m_writePos = position;
     }
-    bool writeData(const char *data, size_t size);
+    bool writeData(const char *data, size_t size) override;
 
 private:
     void *m_data;

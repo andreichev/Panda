@@ -12,6 +12,7 @@ public:
     FileStreamReader(const std::filesystem::path &path);
     FileStreamReader(const FileStreamReader &) = delete;
     ~FileStreamReader();
+
     size_t totalSize() const override {
         return m_totalSize;
     }
