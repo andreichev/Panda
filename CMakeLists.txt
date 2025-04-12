@@ -4,6 +4,14 @@ set(CMAKE_CXX_STANDARD 20)
 
 project("Panda")
 
+find_package(Vulkan REQUIRED)
+
+if (${Vulkan_VERSION} VERSION_LESS "1.1.000" )
+    message( FATAL_ERROR "Minimum required Vulkan version for C++ modules is 1.1.000. "
+            "Found ${Vulkan_VERSION}."
+    )
+endif()
+
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
 
 set(FOUNDATION_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Foundation)

@@ -5,12 +5,12 @@
 #pragma once
 
 #include "Miren/RendererI.hpp"
-#include "Platform/RendererImpl/OpenGL/Extensions/OpenGLExtensions.hpp"
 #include "VulkanFrameBuffer.hpp"
 #include "VulkanShader.hpp"
 #include "VulkanTexture.hpp"
 #include "VulkanIndexBuffer.hpp"
 #include "VulkanVertexBuffer.hpp"
+#include <vulkan/vulkan.h>
 
 namespace Miren {
 
@@ -90,6 +90,8 @@ private:
     VertexBufferLayoutData m_vertexLayouts[1000];
     VulkanVertexBuffer m_vertexBuffers[1000];
     VulkanTexture m_textures[1000];
+
+    VkInstance m_instance;
 };
 
 } // namespace Miren

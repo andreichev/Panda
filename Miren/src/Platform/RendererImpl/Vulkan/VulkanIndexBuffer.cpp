@@ -4,7 +4,6 @@
 
 #include "VulkanIndexBuffer.hpp"
 
-
 namespace Miren {
 
 VulkanIndexBuffer::VulkanIndexBuffer()
@@ -27,25 +26,19 @@ void VulkanIndexBuffer::create(
 
     } else {
     }
-
 }
 
-void VulkanIndexBuffer::terminate() {
-}
+void VulkanIndexBuffer::terminate() {}
 
-void VulkanIndexBuffer::bind() const {
-}
+void VulkanIndexBuffer::bind() const {}
 
-void VulkanIndexBuffer::unbind() const {
-}
+void VulkanIndexBuffer::unbind() const {}
 
 uint32_t VulkanIndexBuffer::getCount() const {
     PND_ASSERT(m_id != -1, "INDEX BUFFER NOT VALID");
     return m_count;
 }
 
-void VulkanIndexBuffer::update(void *indices, size_t count) {
-
-}
+void VulkanIndexBuffer::update(void *indices, size_t count) {}
 
 } // namespace Miren

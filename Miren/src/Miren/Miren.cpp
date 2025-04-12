@@ -12,8 +12,8 @@ static Context *s_context = nullptr;
 
 void initialize(Fern::GraphicsContext *ctx) {
     MIREN_LOG("MIREN INIT BEGIN");
-    MIREN_LOG("ALLOCATING MIREN CONTEXT, {} BYTES", sizeof(Context));
-    MIREN_LOG("FRAME DATA SIZE: {} BYTES", sizeof(Frame));
+    MIREN_LOG("ALLOCATING MIREN CONTEXT, %d BYTES", sizeof(Context));
+    MIREN_LOG("FRAME DATA SIZE: %d BYTES", sizeof(Frame));
     s_context = F_NEW(Foundation::getAllocator(), Context);
     s_context->init(ctx);
     MIREN_LOG("MIREN INIT END");

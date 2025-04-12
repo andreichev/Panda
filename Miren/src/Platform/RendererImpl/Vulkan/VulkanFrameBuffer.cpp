@@ -12,39 +12,26 @@ static inline bool isDepthFormat(TextureFormat format) {
     }
 }
 
-void VulkanFrameBuffer::checkStatus() {
-}
+void VulkanFrameBuffer::checkStatus() {}
 
 VulkanFrameBuffer::VulkanFrameBuffer()
     : spec()
     , m_id(-1) {}
 
-void VulkanFrameBuffer::create(RendererOpenGL *renderer, FrameBufferSpecification specification) {
+void VulkanFrameBuffer::create(RendererOpenGL *renderer, FrameBufferSpecification specification) {}
 
-}
+void VulkanFrameBuffer::bind() {}
 
-void VulkanFrameBuffer::bind() {
-}
+void VulkanFrameBuffer::unbind() {}
 
-void VulkanFrameBuffer::unbind() {
-}
+void VulkanFrameBuffer::terminate() {}
 
-void VulkanFrameBuffer::terminate() {
+void VulkanFrameBuffer::clearIntAttachment(int index, int value) {}
 
-}
-
-void VulkanFrameBuffer::clearIntAttachment(int index, int value) {
-
-}
-
-void VulkanFrameBuffer::clearUIntAttachment(int index, uint32_t value) {
-
-}
+void VulkanFrameBuffer::clearUIntAttachment(int index, uint32_t value) {}
 
 void VulkanFrameBuffer::readPixels(
     RendererOpenGL *renderer, int index, int x, int y, int width, int height, void *data
-) {
-
-}
+) {}
 
 } // namespace Miren

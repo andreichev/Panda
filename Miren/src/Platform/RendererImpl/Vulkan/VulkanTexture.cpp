@@ -4,7 +4,6 @@
 
 #include "VulkanTexture.hpp"
 
-
 namespace Miren {
 
 VulkanTexture::VulkanTexture()
@@ -13,27 +12,16 @@ VulkanTexture::VulkanTexture()
     , m_format(0)
     , m_type(0) {}
 
-void VulkanTexture::create(TextureCreate &create) {
+void VulkanTexture::create(TextureCreate &create) {}
 
-}
+void VulkanTexture::resize(uint32_t width, uint32_t height) {}
 
-void VulkanTexture::resize(uint32_t width, uint32_t height) {
+void VulkanTexture::terminate() {}
 
-}
+void VulkanTexture::bind(unsigned int slot) {}
 
-void VulkanTexture::terminate() {
+void VulkanTexture::unbind() {}
 
-}
-
-void VulkanTexture::bind(unsigned int slot) {
-
-}
-
-void VulkanTexture::unbind() {
-}
-
-void VulkanTexture::readPixels(void *data) {
-
-}
+void VulkanTexture::readPixels(void *data) {}
 
 } // namespace Miren

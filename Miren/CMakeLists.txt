@@ -20,6 +20,7 @@ add_library(Miren STATIC "${SOURCES}" "${INCLUDE}")
 
 target_compile_definitions(Miren PUBLIC GL_SILENCE_DEPRECATION)
 target_compile_definitions(Miren PUBLIC GLES_SILENCE_DEPRECATION)
+target_compile_definitions(Miren PRIVATE VK_ENABLE_BETA_EXTENSIONS)
 target_include_directories(Miren PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(Miren PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
@@ -51,6 +52,8 @@ target_link_libraries(Miren glm)
 target_include_directories(Miren PRIVATE ${VENDOR_DIRECTORY}/glm)
 
 if (DESKTOP)
+    # vulkan
+    target_link_libraries(Miren Vulkan::Vulkan)
     # Dependencies - GLAD
     target_link_libraries(Miren glad)
     target_include_directories(Miren PUBLIC ${VENDOR_DIRECTORY}/glad/include)

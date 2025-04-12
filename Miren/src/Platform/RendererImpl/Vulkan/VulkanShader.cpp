@@ -15,43 +15,27 @@ VulkanShader::VulkanShader()
     : m_id(-1)
     , m_uniformLocationCache() {}
 
-void VulkanShader::create(ProgramCreate create) {
+void VulkanShader::create(ProgramCreate create) {}
 
-}
+void VulkanShader::terminate() {}
 
-void VulkanShader::terminate() {
-}
+void VulkanShader::checkCompileErrors(unsigned int shader, const std::string &type) {}
+int VulkanShader::getUniformLocation(const std::string &name) {}
 
-void VulkanShader::checkCompileErrors(unsigned int shader, const std::string &type) {
+void VulkanShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseVertex) {}
 
-}
-int VulkanShader::getUniformLocation(const std::string &name) {
+void VulkanShader::bind() {}
 
-}
+void VulkanShader::unbind() {}
 
-void VulkanShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseVertex) {
+void VulkanShader::setUniformFloat(const char *name, float *value, int count) {}
 
-}
+void VulkanShader::setUniformVec4(const char *name, float *value, int count) {}
 
-void VulkanShader::bind() {
-}
+void VulkanShader::setUniformMat3(const char *name, float *value, int count) {}
 
-void VulkanShader::unbind() {
-}
+void VulkanShader::setUniformMat4(const char *name, float *value, int count) {}
 
-void VulkanShader::setUniformFloat(const char *name, float *value, int count) {
-}
-
-void VulkanShader::setUniformVec4(const char *name, float *value, int count) {
-}
-
-void VulkanShader::setUniformMat3(const char *name, float *value, int count) {
-}
-
-void VulkanShader::setUniformMat4(const char *name, float *value, int count) {
-}
-
-void VulkanShader::setUniformInt(const char *name, int *value, int count) {
-}
+void VulkanShader::setUniformInt(const char *name, int *value, int count) {}
 
 } // namespace Miren

@@ -4,7 +4,6 @@
 
 #include "VulkanVertexBuffer.hpp"
 
-
 namespace Miren {
 
 VulkanVertexBuffer::VulkanVertexBuffer()
@@ -12,21 +11,15 @@ VulkanVertexBuffer::VulkanVertexBuffer()
     , m_id(-1)
     , m_layoutHandle(MIREN_INVALID_HANDLE) {}
 
-void VulkanVertexBuffer::terminate() {
+void VulkanVertexBuffer::terminate() {}
 
-}
+void VulkanVertexBuffer::create(void *data, uint32_t size, bool isDynamic) {}
 
-void VulkanVertexBuffer::create(void *data, uint32_t size, bool isDynamic) {
-}
+void VulkanVertexBuffer::update(void *data, uint32_t size) {}
 
-void VulkanVertexBuffer::update(void *data, uint32_t size) {
-}
+void VulkanVertexBuffer::bind() {}
 
-void VulkanVertexBuffer::bind() {
-}
-
-void VulkanVertexBuffer::unbind() {
-}
+void VulkanVertexBuffer::unbind() {}
 
 void VulkanVertexBuffer::setLayoutHandle(VertexLayoutHandle layoutHandle) {
     m_layoutHandle = layoutHandle;
