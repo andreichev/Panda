@@ -6,7 +6,8 @@
 #if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
 #    include "Platform/System/GLFW_System/GLFW_System.hpp"
 #elif defined(PLATFORM_MACOS)
-#    include "Platform/System/OSX_System/OSX_System.hpp"
+#    include "Platform/System/GLFW_System/GLFW_System.hpp"
+//#    include "Platform/System/OSX_System/OSX_System.hpp"
 #elif defined(PLATFORM_IOS)
 #    include "Platform/System/IOS_System/IOS_System.hpp"
 #endif
@@ -20,7 +21,8 @@ void initialize() {
 #if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX)
     s_system = F_NEW(Foundation::getAllocator(), GLFW_System);
 #elif defined(PLATFORM_MACOS)
-    s_system = F_NEW(Foundation::getAllocator(), OSX_System);
+    s_system = F_NEW(Foundation::getAllocator(), GLFW_System);
+//    s_system = F_NEW(Foundation::getAllocator(), OSX_System);
 #elif defined(PLATFORM_IOS)
     s_system = F_NEW(Foundation::getAllocator(), IOS_System);
 #else

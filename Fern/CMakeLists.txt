@@ -10,7 +10,7 @@ file(GLOB_RECURSE SOURCES src/Fern/*.cpp)
 file(GLOB_RECURSE INCLUDE src/Fern/*.hpp include/Fern/*.hpp)
 
 # Entry point realization binding
-if (PLATFORM_WIN32 OR PLATFORM_LINUX)
+if (PLATFORM_WIN32 OR PLATFORM_LINUX OR PLATFORM_MACOS)
     list(APPEND SOURCES "src/Platform/EntryPoint/Desktop/main.cpp")
 elseif (PLATFORM_MACOS)
     list(APPEND SOURCES "src/Platform/EntryPoint/OSX/main.mm")
@@ -21,7 +21,7 @@ else ()
 endif ()
 
 # Other platform specific realizations
-if (PLATFORM_WIN32 OR PLATFORM_LINUX)
+if (PLATFORM_WIN32 OR PLATFORM_LINUX OR PLATFORM_MACOS)
     file(GLOB_RECURSE GLOB_RESULT_INCLUDE src/Platform/System/GLFW_System/*.hpp src/Platform/System/GLFW_System/*.h)
     file(GLOB_RECURSE GLOB_RESULT_SOURCES src/Platform/System/GLFW_System/*.cpp src/Platform/System/GLFW_System/*.mm)
     list(APPEND INCLUDE ${GLOB_RESULT_INCLUDE})
@@ -49,7 +49,7 @@ target_compile_definitions(Fern PUBLIC GLES_SILENCE_DEPRECATION)
 target_include_directories(Fern PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(Fern PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-if (PLATFORM_WIN32 OR PLATFORM_LINUX)
+if (PLATFORM_WIN32 OR PLATFORM_LINUX OR PLATFORM_MACOS)
     # Dependencies - GLFW, only for Desktop :)
     target_link_libraries(Fern glfw)
     target_include_directories(Fern PRIVATE ${VENDOR_DIRECTORY}/glfw/include)

@@ -256,7 +256,7 @@ struct Context {
             );
             m_ctx->setCurrent();
             // TODO: Add other renderers (metal, directx, vulkan, ...)
-//            m_renderer = F_NEW(Foundation::getAllocator(), RendererOpenGL)(m_ctx);
+            //            m_renderer = F_NEW(Foundation::getAllocator(), RendererOpenGL)(m_ctx);
             m_renderer = F_NEW(Foundation::getAllocator(), RendererVulkan)(m_ctx);
             MIREN_LOG("RENDERER CREATED");
         }

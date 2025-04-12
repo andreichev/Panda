@@ -82,6 +82,9 @@ private:
     void viewChanged(View &view);
     void submit(RenderDraw *draw);
 
+    void makeInstance();
+    void makeDevice();
+
     Fern::GraphicsContext *m_ctx;
     uint32_t m_uselessVao;
     VulkanFrameBuffer m_frameBuffers[MAX_FRAME_BUFFERS];
@@ -92,6 +95,7 @@ private:
     VulkanTexture m_textures[MAX_TEXTURES];
 
     VkInstance m_instance;
+    VkPhysicalDevice m_physicalDevice;
 };
 
 } // namespace Miren
