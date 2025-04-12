@@ -33,7 +33,7 @@ static void changeToResourcesDirectory() {
     chdir(resourcesPath);
 }
 
-extern int startApp(int argc, char** argv);
+extern int startApp(int argc, const char** argv);
 
 @interface MainHelper : NSObject
 @end
@@ -67,7 +67,7 @@ int main(int argc, const char * argv[]) {
     [menubar addItem:appMenuItem];
     [application setMainMenu:menubar];
     [application run];
-    int result = startApp(0, nullptr);
+    int result = startApp(argc, argv);
     [application terminate:nil];
     [helper release];
     return result;
