@@ -8,6 +8,9 @@
 #include <Foundation/Allocator.hpp>
 #include <Foundation/Logger.hpp>
 #include <vulkan/vulkan.h>
+#include <sstream>
+#include <Foundation/PlatformDetection.hpp>
+#include <Foundation/Assert.hpp>
 
 const char *getResultToString(VkResult result) {
     switch (result) {
@@ -121,6 +124,132 @@ const char *getResultToString(VkResult result) {
         if (result != VK_SUCCESS) { assert(false); }
 #endif
 
+#include <vector>
+#include <cstring>
+
+const char** getRequiredInstanceExtensions(uint32_t* extensionCount, bool enableDebug = false) {
+    static std::vector<const char*> extensions;
+
+    // 1. Платформо-зависимые расширения поверхности
+#if defined(PLATFORM_WINDOWS)
+    extensions = {
+        VK_KHR_SURFACE_EXTENSION_NAME,
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+    };
+#elif defined(PLATFORM_ANDROID)
+    extensions = {
+        VK_KHR_SURFACE_EXTENSION_NAME,
+        VK_KHR_ANDROID_SURFACE_EXTENSION_NAME
+    };
+#elif defined(PLATFORM_LINUX)
+    // Проверяем Wayland (новые системы) или X11 (старые)
+    if (std::getenv("WAYLAND_DISPLAY")) {
+        extensions = {
+            VK_KHR_SURFACE_EXTENSION_NAME,
+            VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME
+        };
+    } else {
+        extensions = {
+            VK_KHR_SURFACE_EXTENSION_NAME,
+            VK_KHR_XLIB_SURFACE_EXTENSION_NAME
+        };
+    }
+#elif defined(PLATFORM_MACOS)
+    extensions = {
+        "VK_EXT_metal_surface",
+        VK_KHR_SURFACE_EXTENSION_NAME
+    };
+#endif
+    extensions.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+    *extensionCount = static_cast<uint32_t>(extensions.size());
+    return extensions.data();
+}
+
+
+bool supported(const std::vector<const char *> &needExtensions, const std::vector<const char *> &layers) {
+    uint32_t extensionCount = 0;
+    VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr));
+    VkExtensionProperties extensionsProperties[extensionCount];
+    VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensionsProperties));
+    bool debug = MIREN_DEBUG_MODE;
+    if (debug) {
+        // functions that Vulkan supports
+        std::ostringstream message;
+        message << "Device can support the following extensions:";
+        for (int i = 0; i < extensionCount; i++) {
+            VkExtensionProperties supportedExtension = extensionsProperties[i];
+            message << "\n\t" << static_cast<std::string>(supportedExtension.extensionName);
+        }
+        LOG_INFO("%s", message.str().c_str());
+    }
+
+    std::ostringstream message;
+    for (const auto &extension: needExtensions) {
+        bool canSupport = false;
+        for (int i = 0; i < extensionCount; i++) {
+            VkExtensionProperties supportedExtension = extensionsProperties[i];
+            if (strcmp(extension, supportedExtension.extensionName) == 0) {
+                canSupport = true;
+                if (debug) {
+                    message << "\n\tExtension \"" << extension << "\" is supported";
+                }
+                break;
+            }
+        }
+        if (!canSupport) {
+            if (debug) {
+                message << "\n\tExtension \"" << extension << "\" is not supported";
+                LOG_INFO("%s", message.str().c_str());
+            }
+            return false;
+        }
+    }
+    if (debug) {
+        LOG_INFO("%s", message.str().c_str());
+    }
+
+    message.str("");
+
+
+    // check device can support layers
+    uint32_t layerCount = 0;
+    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, nullptr));
+    std::vector<VkLayerProperties> supportedLayers(layerCount);
+    VK_CHECK(vkEnumerateInstanceLayerProperties(&layerCount, supportedLayers.data()));
+    if (debug) {
+        message << "\n\tDevice can support the following layers:";
+        for (const auto &supportedLayer: supportedLayers) {
+            message << "\n\t" << static_cast<std::string>(supportedLayer.layerName);
+        }
+        LOG_INFO("%s", message.str().c_str());
+    }
+    message.str("");
+    for (const auto &layer: layers) {
+        bool canSupport = false;
+        for (const auto &supportedLayer: supportedLayers) {
+            if (strcmp(layer, supportedLayer.layerName) == 0) {
+                canSupport = true;
+                if (debug) {
+                    message << "\n\tLayer \"" << static_cast<std::string>(supportedLayer.layerName)
+                            << "\" is supported";
+                }
+                break;
+            }
+        }
+        if (!canSupport) {
+            if (debug) {
+                message << "\n\tLayer \"" << static_cast<std::string>(layer) << "\" is not supported";
+                LOG_INFO("%s", message.str().c_str());
+            }
+            return false;
+        }
+    }
+    if (debug) {
+        LOG_INFO("%s", message.str().c_str());
+    }
+    return true;
+}
+
 namespace Miren {
 
 RendererVulkan::RendererVulkan(Fern::GraphicsContext *ctx)
@@ -155,23 +284,40 @@ RendererVulkan::RendererVulkan(Fern::GraphicsContext *ctx)
     appInfo.apiVersion = version;
     //    appInfo.apiVersion = VK_MAKE_VERSION(1, 0, 0);
 
+    uint32_t extensionCount = 0;
+    const char **deviceExtensions = getRequiredInstanceExtensions(&extensionCount);
+    std::vector<const char *> extensions(deviceExtensions, deviceExtensions + extensionCount);
+    if (MIREN_DEBUG_MODE) {
+        // add extension utils for debug
+        extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    }
+    if (MIREN_DEBUG_MODE) {
+        std::ostringstream message;
+        message << "Extension to be requested:\n";
+
+        for (int i = 0; i < extensions.size() - 1; ++i) {
+            message << "\t" << extensions[i] << "\n";
+        }
+        message << "\t" << extensions.back();
+
+        LOG_INFO("%s", message.str().c_str());
+    }
+
+    std::vector<const char *> layers;
+    if (MIREN_DEBUG_MODE) {
+        layers.push_back("VK_LAYER_KHRONOS_validation");
+    }
+    PND_ASSERT(supported(extensions, layers), "This device not support Vulkan");
+
+
     VkInstanceCreateInfo instanceCreateInfo;
-
     instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    instanceCreateInfo.pApplicationInfo = &appInfo;
-
-
-    // На macOS MoltenVK требует определенных расширений
-    const char* extensions[] = {
-        VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME, // Обязательно для MoltenVK
-        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME // Часто требуется
-    };
-
-    instanceCreateInfo.enabledExtensionCount = sizeof(extensions) / sizeof(extensions[0]);
-    instanceCreateInfo.ppEnabledExtensionNames = extensions;
-
-    // Устанавливаем флаг только если поддерживается
     instanceCreateInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+    instanceCreateInfo.pApplicationInfo = &appInfo;
+    instanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    instanceCreateInfo.ppEnabledExtensionNames = extensions.data();
+    instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
+    instanceCreateInfo.ppEnabledLayerNames = layers.data();
     result = vkCreateInstance(&instanceCreateInfo, nullptr, &m_instance);
     VK_CHECK(result);
 }

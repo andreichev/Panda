@@ -84,12 +84,12 @@ private:
 
     Fern::GraphicsContext *m_ctx;
     uint32_t m_uselessVao;
-    VulkanFrameBuffer m_frameBuffers[1000];
-    VulkanShader m_shaders[1000];
-    VulkanIndexBuffer m_indexBuffers[1000];
-    VertexBufferLayoutData m_vertexLayouts[1000];
-    VulkanVertexBuffer m_vertexBuffers[1000];
-    VulkanTexture m_textures[1000];
+    VulkanFrameBuffer m_frameBuffers[MAX_FRAME_BUFFERS];
+    VulkanShader m_shaders[MAX_SHADERS];
+    VulkanIndexBuffer m_indexBuffers[MAX_INDEX_BUFFERS];
+    VertexBufferLayoutData m_vertexLayouts[MAX_BUFFER_LAYOUTS];
+    VulkanVertexBuffer m_vertexBuffers[MAX_VERTEX_BUFFERS];
+    VulkanTexture m_textures[MAX_TEXTURES];
 
     VkInstance m_instance;
 };

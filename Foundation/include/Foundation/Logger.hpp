@@ -16,7 +16,7 @@ public:
 
     template<typename... Args>
     static void log(MessageType type, const char *format, ...) {
-        static const int32_t maxSize = 256;
+        static const int32_t maxSize = 10000;
         static char buffer[maxSize];
         va_list args;
         va_start(args, format);

@@ -84,12 +84,12 @@ private:
 
     Fern::GraphicsContext *m_ctx;
     uint32_t m_uselessVao;
-    OpenGLFrameBuffer m_frameBuffers[1000];
-    OpenGLShader m_shaders[1000];
-    OpenGLIndexBuffer m_indexBuffers[1000];
-    VertexBufferLayoutData m_vertexLayouts[1000];
-    OpenGLVertexBuffer m_vertexBuffers[1000];
-    OpenGLTexture m_textures[1000];
+    OpenGLFrameBuffer m_frameBuffers[MAX_FRAME_BUFFERS];
+    OpenGLShader m_shaders[MAX_SHADERS];
+    OpenGLIndexBuffer m_indexBuffers[MAX_INDEX_BUFFERS];
+    VertexBufferLayoutData m_vertexLayouts[MAX_BUFFER_LAYOUTS];
+    OpenGLVertexBuffer m_vertexBuffers[MAX_VERTEX_BUFFERS];
+    OpenGLTexture m_textures[MAX_TEXTURES];
 };
 
 } // namespace Miren
