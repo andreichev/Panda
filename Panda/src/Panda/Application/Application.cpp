@@ -44,7 +44,7 @@ void Application::pushOverlay(Layer *layer) {
 
 Application::Application()
     : m_isApplicationShouldClose(false)
-    , m_maximumFps(120)
+    , m_maximumFps(60)
     , m_oneSecondTimeCount(0)
     , m_deltaTimeMillis(0)
     , m_thisSecondFramesCount(0)

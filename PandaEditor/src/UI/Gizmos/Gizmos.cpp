@@ -38,15 +38,18 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
             glm::value_ptr(view),
             glm::value_ptr(projection),
             ImGuizmo::OPERATION::TRANSLATE,
-            ImGuizmo::LOCAL,
+            ImGuizmo::LOCAL
+
+
+            ,
             glm::value_ptr(transform),
             glm::value_ptr(delta)
         )) {
         return;
     }
-    /*
-     * IF NEED TO DECOMPOSE (TO APPLY ROTATION TO INDIVIDUAL ORIGINS)
-     *
+
+//     * IF NEED TO DECOMPOSE (TO APPLY ROTATION TO INDIVIDUAL ORIGINS)
+//     *
     glm::vec3 deltaPosition;
     glm::vec3 deltaRotation;
     glm::vec3 deltaScale;
@@ -56,8 +59,8 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
         glm::value_ptr(deltaRotation),
         glm::value_ptr(deltaScale)
     );
-    LOG_INFO_EDITOR("%d, %d, %d", deltaPosition.x, deltaPosition.y, deltaPosition.z);
-    */
+    LOG_INFO_EDITOR("%.3f, %.3f, %.3f", deltaPosition.x, deltaPosition.y, deltaPosition.z);
+
     auto entities = selectionContext.getManipulatingEntities();
     EntityTransformCommand move(entities);
     move.saveBeforeEdit();
