@@ -112,7 +112,9 @@ void CocoaWindow::setState(Fern::WindowState state) {
             [m_handle miniaturize:nil];
             break;
         case WindowState::WindowStateMaximized:
-            [m_handle zoom:nil];
+            if (![m_handle isZoomed]) {
+                [m_handle zoom:nil];
+            }
             break;
         case WindowState::WindowStateFullScreen: {
             const NSUInteger masks = m_handle.styleMask;

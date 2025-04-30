@@ -16,7 +16,7 @@ enum class VoxelType {
     STONE_BRICKS = 6,
     SAND_STONE = 7,
     SAND = 8,
-    COUNT = 0
+    COUNT = 9
 };
 
 struct Voxel {
