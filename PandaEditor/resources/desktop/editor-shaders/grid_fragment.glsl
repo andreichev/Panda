@@ -3,6 +3,7 @@
 in vec3 WorldPos;
 
 layout(location = 0) out vec4 outColor;
+layout(location = 1) out uint outId;
 
 uniform vec4 gCameraWorldPos;
 uniform float gGridSize = 100.0;
@@ -82,4 +83,5 @@ void main() {
 	float OpacityFalloff = (1.0 - satf(length(WorldPos.xz - gCameraWorldPos.xz) / gGridSize));
 	Color.a *= OpacityFalloff;
 	outColor = Color;
+	outId = 0u;
 }
