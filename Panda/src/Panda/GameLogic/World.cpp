@@ -459,7 +459,7 @@ Entity World::findByTag(const char *tag) {
 
 Entity World::getById(UUID id) {
     PND_ASSERT_F(
-        m_entityIdMap.find(id) != m_entityIdMap.end(), "ENTITY {} DOES NOT EXISTS", (uint32_t)id
+        m_entityIdMap.find(id) != m_entityIdMap.end(), "ENTITY %u DOES NOT EXISTS", (uint32_t)id
     );
     return m_entityIdMap.at(id);
 }
