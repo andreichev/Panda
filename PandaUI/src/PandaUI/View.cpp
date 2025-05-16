@@ -158,23 +158,23 @@ void View::applyCalculatedLayout() {
     m_frame.origin.y = YGNodeLayoutGetTop(thisYogaView);
     m_frame.size.width = YGNodeLayoutGetWidth(thisYogaView);
     m_frame.size.height = YGNodeLayoutGetHeight(thisYogaView);
-    for (auto &subview : m_subviews) {
+    for (auto subview : m_subviews) {
         subview->applyCalculatedLayout();
     }
 }
 
 void View::render(float offsetX, float offsetY) {
-    Point origin = getFrame().origin;
-    for (auto view : m_subviews) {
-        view->render(origin.x + offsetX, origin.y + offsetY);
+    Point origin = m_frame.origin;
+    for (auto subview : m_subviews) {
+        subview->render(origin.x + offsetX, origin.y + offsetY);
     }
     Panda::Renderer2D::RectData rect;
     origin.x += offsetX;
     origin.y += offsetY;
-    Size size = getFrame().size;
+    Size size = m_frame.size;
     rect.center = Panda::Vec3(origin.x + size.width / 2, origin.y + size.height / 2, 0.f);
     rect.size = Panda::Size(size.width, size.height);
-    Color color = getBackgroundColor();
+    Color color = m_backgroundColor;
     rect.color = {color.r, color.g, color.b, color.a};
     rect.transform = m_transform;
     Context::shared().getRenderer().drawRect(rect);

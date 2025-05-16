@@ -66,8 +66,9 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
     move.saveBeforeEdit();
     for (auto entity : entities) {
         TransformComponent &transformComponent = entity.getTransform();
-        glm::mat4 newTransform = delta * transformComponent.getLocalTransform();
-        transformComponent.setTransform(newTransform);
+        glm::mat4 newWorldTransform = delta * m_world->getWorldSpaceTransformMatrix(entity);
+        transformComponent.setTransform(newWorldTransform);
+        m_world->convertToLocalSpace(entity);
         if (entity.hasComponent<Rigidbody2DComponent>()) { entity.physics2DPropertiesUpdated(); }
     }
     move.saveAfterEdit();

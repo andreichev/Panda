@@ -9,7 +9,7 @@
 #include <Fern/Fern.hpp>
 #include <Panda.hpp>
 
-int startApp(int argc, char **argv) {
+int startApp(int argc, const char **argv) {
     Fern::initialize();
     Fern::Rect rect = Fern::Rect(0, 0, 600, 400);
     Fern::Window *window = Fern::createWindow(
