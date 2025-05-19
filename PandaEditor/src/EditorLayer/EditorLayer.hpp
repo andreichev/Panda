@@ -51,12 +51,14 @@ public:
     void menuBarUndo() override;
     bool menuBarCanRedo() override;
     void menuBarRedo() override;
+    void menuBarPreferences() override;
     const std::vector<RecentProject> &menuBarGetRecentProjectsList() override;
     const path_t &menuBarGetOpenedProjectPath() override;
     void menuBarCloseApp() override;
     void menuBarOpenCppProject() override;
     void menuBarSaveWorld() override;
     void menuBarCloseProject() override;
+    void menuBarAbout() override;
 #pragma endregion
 
 #pragma region Components draw output
