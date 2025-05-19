@@ -26,6 +26,7 @@ public:
     virtual bool menuBarCanRedo() = 0;
     virtual void menuBarRedo() = 0;
     virtual void menuBarPreferences() = 0;
+    virtual void menuBarAbout() = 0;
     virtual const path_t &menuBarGetOpenedProjectPath() = 0;
     virtual const std::vector<RecentProject> &menuBarGetRecentProjectsList() = 0;
 };

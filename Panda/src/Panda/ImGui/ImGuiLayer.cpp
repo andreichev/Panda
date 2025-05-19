@@ -32,6 +32,12 @@ void ImGuiLayer::onAttach() {
     fontBold.size = 17.0f;
     Fonts::add(fontBold);
 
+    FontConfiguration fontBigBold;
+    fontBigBold.fontName = "BigBold";
+    fontBigBold.fileName = "SF-Compact/SF-Compact-Display-Bold.otf";
+    fontBigBold.size = 40.0f;
+    Fonts::add(fontBigBold);
+
     FontConfiguration fontLarge;
     fontLarge.fontName = "Large";
     fontLarge.fileName = "SF-Compact/SF-Compact-Display-Regular.otf";
