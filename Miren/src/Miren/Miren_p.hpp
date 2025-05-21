@@ -319,6 +319,10 @@ struct Context {
         return handle;
     }
 
+    ProgramCreate compileProgram(ProgramCompile compile) {
+        return m_renderer->compileProgram(compile);
+    }
+
     void deleteProgram(ProgramHandle handle) {
         m_submit->queueFree(handle);
         DeleteProgramCommand cmd(handle);

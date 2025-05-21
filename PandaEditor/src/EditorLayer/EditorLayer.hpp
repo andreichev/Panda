@@ -111,7 +111,7 @@ private:
     // World that is visible only when state is PLAY.
     World m_playingWorld;
     World *m_currentWorld;
-    SceneState m_sceneState = SceneState::EDIT;
+    SceneState m_sceneState;
 };
 
 } // namespace Panda

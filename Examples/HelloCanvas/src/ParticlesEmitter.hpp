@@ -24,7 +24,7 @@ private:
     Panda::ParticleSystem m_particleSystem;
     Panda::WorldCamera *m_camera;
     Panda::TransformComponent *m_cameraTransform;
-    Foundation::Shared<Panda::Texture> m_texture;
+    Foundation::Shared<Panda::TextureAsset> m_texture;
     float degree = 0.f;
     float colorFactor = 0.f;
 };

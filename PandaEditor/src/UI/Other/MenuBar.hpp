@@ -6,7 +6,7 @@
 
 #include "Serialization/RecentProject.hpp"
 #include "SystemTools/SystemTools.hpp"
-#include "Panda/Assets/Texture.hpp"
+#include "Panda/Assets/TextureAsset.hpp"
 
 #include <imgui.h>
 

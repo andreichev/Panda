@@ -15,7 +15,7 @@ class JsonEncoder final : public Encoder {
     };
 
 public:
-    explicit JsonEncoder(bool pretty);
+    explicit JsonEncoder(bool pretty = false);
     ~JsonEncoder() override = default;
 
     void encode(std::ostream &, void *data, TypeInfo info) override;
@@ -30,7 +30,7 @@ public:
     void encode(const char *key, const double &data) override;
     void encode(const char *key, const std::string &data) override;
     void encode(const char *key, const char *&data) override;
-    void encode(const char *key, UUID &data) override;
+    void encode(const char *key, const UUID &data) override;
     void endObject() override;
     void beginArray(const char *key) override;
     void endArray() override;

@@ -1,7 +1,7 @@
 #include <fstream>
 
 #include "Panda/Base/Base.hpp"
-#include "Panda/Assets/Path.hpp"
+#include "Panda/Assets/Base/Path.hpp"
 
 namespace Panda {
 

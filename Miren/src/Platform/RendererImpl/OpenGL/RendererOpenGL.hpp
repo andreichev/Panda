@@ -21,6 +21,7 @@ public:
     RendererType getRendererType() const override;
     void
     createFrameBuffer(FrameBufferHandle handle, FrameBufferSpecification specification) override;
+    ProgramCreate compileProgram(ProgramCompile compile) override;
     void readFrameBuffer(
         Miren::FrameBufferHandle handle,
         int attachIndex,

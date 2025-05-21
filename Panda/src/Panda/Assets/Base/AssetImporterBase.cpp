@@ -1,4 +1,4 @@
-#include "Panda/Assets/AssetLoaderEditor.hpp"
+#include "Panda/Assets/Base/AssetImporterBase.hpp"
 
 #include <Foundation/PlatformDetection.hpp>
 #include <Miren/Miren.hpp>
@@ -13,7 +13,7 @@ void releaseImage(void *data, void *userInfo) {
     stbi_image_free(data);
 }
 
-TextureData AssetLoaderEditor::loadTexture(const path_t &path) {
+Miren::TextureCreate AssetImporterBase::load2DTexture(const path_t &path) {
     // stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
 #ifdef PLATFORM_ANDROID
@@ -39,7 +39,7 @@ TextureData AssetLoaderEditor::loadTexture(const path_t &path) {
         return {};
     }
 
-    TextureData texture;
+    Miren::TextureCreate texture;
     if (channels == 1) {
         texture.m_format = Miren::TextureFormat::R32I;
     } else if (channels == 3) {
@@ -56,8 +56,8 @@ TextureData AssetLoaderEditor::loadTexture(const path_t &path) {
     return texture;
 }
 
-TextureData AssetLoaderEditor::loadCubeMapTexture(std::array<path_t, 6> paths) {
-    TextureData texture;
+Miren::TextureCreate AssetImporterBase::loadCubeMapTexture(std::array<path_t, 6> paths) {
+    Miren::TextureCreate texture;
     std::array<void *, 6> images;
     int bytesPerColor;
     for (uint16_t side = 0; side < 6; ++side) {
@@ -114,37 +114,21 @@ TextureData AssetLoaderEditor::loadCubeMapTexture(std::array<path_t, 6> paths) {
     return texture;
 }
 
-ProgramData AssetLoaderEditor::loadProgram(const path_t &vertexPath, const path_t &fragmentPath) {
-    const path_t fullVertexPath = Fern::getStaticResourcesPath() / vertexPath;
-    const path_t fullFragmentPath = Fern::getStaticResourcesPath() / fragmentPath;
+Foundation::Memory AssetImporterBase::loadData(const path_t &path) {
+    const path_t fullPath = Fern::getStaticResourcesPath() / path;
 #ifndef PLATFORM_ANDROID
-    // TODO: Добавить пустой рабочий шейдер в случае отсутствия файла или ошибки компиляции
-    if (!std::filesystem::exists(fullVertexPath)) {
-        LOG_ERROR("FILE %s DOESN'T EXISTS", vertexPath.string().c_str());
-    }
-    if (!std::filesystem::exists(fullFragmentPath)) {
-        LOG_ERROR("FILE %s DOESN'T EXISTS", vertexPath.string().c_str());
+    if (!std::filesystem::exists(fullPath)) {
+        LOG_ERROR("FILE %s DOESN'T EXISTS", path.string().c_str());
     }
 #endif
-    // ----------READ VERTEX SHADER ----------
-    size_t fileSize;
-    auto inputStream = Fern::createStaticResourceReader(fullVertexPath);
-    fileSize = inputStream->totalSize() + 1;
+    auto inputStream = Fern::createStaticResourceReader(fullPath);
+    size_t fileSize = inputStream->totalSize() + 1;
     PND_ASSERT(fileSize != 0, "UNKNOWN ASSET SIZE");
-    Foundation::Memory vertexData = Foundation::Memory::alloc(fileSize);
-    ((uint8_t *)vertexData.data)[fileSize - 1] = 0;
-    inputStream->readData(vertexData.data, fileSize);
+    Foundation::Memory data = Foundation::Memory::alloc(fileSize);
+    ((uint8_t *)data.data)[fileSize - 1] = 0;
+    inputStream->readData(data.data, fileSize);
     Fern::disposeResourceReader(inputStream);
-    // ----------READ FRAGMENT SHADER ---------
-    inputStream = Fern::createStaticResourceReader(fullFragmentPath);
-    fileSize = inputStream->totalSize() + 1;
-    PND_ASSERT(fileSize != 0, "UNKNOWN ASSET SIZE");
-    Foundation::Memory fragmentData = Foundation::Memory::alloc(fileSize);
-    inputStream->readData(fragmentData.data, fileSize);
-    ((uint8_t *)fragmentData.data)[fileSize - 1] = 0;
-    Fern::disposeResourceReader(inputStream);
-    // ----------------------------------------
-    return {vertexData, fragmentData};
+    return data;
 }
 
 } // namespace Panda

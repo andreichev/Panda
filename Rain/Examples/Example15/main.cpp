@@ -38,15 +38,33 @@ Time stringToTime(std::string time) {
     }
 }
 
+struct C : public Rain::Codable {
+    std::string test = "TEST STRING";
+    int x = 10;
+
+    C() = default;
+
+    C(const std::string &test, int x)
+        : test(test)
+        , x(x) {}
+
+    RAIN_FIELDS_BEGIN(C)
+    RAIN_FIELD(test)
+    RAIN_FIELD(x)
+    RAIN_FIELDS_END
+};
+
 struct B : public Rain::Codable {
     std::string message;
     Time time;
+    C object;
 
-    static void encode(const char *key, Rain::Encoder *encoder, B &data) {
+    static void encode(const char *key, Rain::Encoder *encoder, const B &data) {
         encoder->beginObject(key);
         encoder->encode("message", data.message);
         const char *strTime = timeToString(data.time);
         encoder->encode("time", strTime);
+        encoder->encode("object", data.object);
         encoder->endObject();
     }
 
@@ -59,13 +77,15 @@ struct B : public Rain::Codable {
         // Rain can't decode const char.
         decoder->decode("time", strTime);
         data.time = stringToTime(strTime);
+        decoder->decode("object", data.object);
         decoder->endObject();
         return true;
     }
 
-    B(const char *message, Time time)
+    B(const char *message, Time time, const C &object)
         : message(message)
-        , time(time) {}
+        , time(time)
+        , object(object) {}
 
     B()
         : message() {}
@@ -142,7 +162,8 @@ struct Person : public Rain::Codable {
 };
 
 int main() {
-    B b("Test test testtt", Time::MORNING);
+    C c("!@#$$%(", 123);
+    B b("Test test testtt", Time::MORNING, c);
     A a("Hello world!", b);
     Car car1("Lamborgini", 2020, a);
     Car car2("Lada", 2014, a);
@@ -159,6 +180,8 @@ int main() {
     decoder->decode(stream, p2);
 
     std::cout << (p1.cars[0].a.b.value().time == p2.cars[0].a.b.value().time) << std::endl;
+    std::cout << (p1.cars[0].a.b.value().object.test == p2.cars[0].a.b.value().object.test)
+              << std::endl;
 
     delete encoder;
     return 0;

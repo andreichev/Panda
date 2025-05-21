@@ -2,17 +2,17 @@
 // Created by Admin on 12.02.2022.
 //
 
-#include "Panda/GameLogic/Components/StaticMesh.hpp"
+#include "Panda/Assets/StaticMeshAsset.hpp"
 
 namespace Panda {
 
-StaticMesh::~StaticMesh() {
+StaticMeshAsset::~StaticMeshAsset() {
     if (m_vertexBufferHandle.isValid()) { Miren::deleteVertexBuffer(m_vertexBufferHandle); }
     if (m_indexBufferHandle.isValid()) { Miren::deleteIndexBuffer(m_indexBufferHandle); }
     if (m_bufferLayoutHandle.isValid()) { deleteVertexLayout(m_bufferLayoutHandle); }
 }
 
-void StaticMesh::create(
+void StaticMeshAsset::create(
     const Panda::MeshData &data, Miren::TextureHandle texture, Miren::ProgramHandle shader
 ) {
     m_shaderHandle = shader;

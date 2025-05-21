@@ -12,7 +12,7 @@ ParticlesEmitter::ParticlesEmitter(
     : m_cameraTransform(transform)
     , m_camera(camera)
     , m_renderer2D(renderer2D) {
-    m_texture = Foundation::makeShared<Panda::Texture>("textures/arbuz1.png");
+    m_texture = Foundation::makeShared<Panda::TextureAsset>("textures/arbuz1.png");
 }
 
 void ParticlesEmitter::update(double deltaTime) {

@@ -16,8 +16,9 @@ bool JsonDecoder::decode(std::istream &istream, void *data, TypeInfo info) {
     m_document.ParseStream(streamWrapper);
     if (m_document.HasParseError()) {
         // std::cout << "PARSE ERRORS" << std::endl;
+        return false;
     }
-    info.decoderFunc(nullptr, this, info, data);
+    bool result = info.decoderFunc(nullptr, this, info, data);
     m_objectStack.clear();
     m_arrayIteratorStack.clear();
     m_arrayStack.clear();
@@ -27,7 +28,7 @@ bool JsonDecoder::decode(std::istream &istream, void *data, TypeInfo info) {
     } else {
         m_document.RemoveAllMembers();
     }
-    return true;
+    return result;
 }
 
 bool JsonDecoder::beginObject(const char *key) {
