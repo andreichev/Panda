@@ -29,13 +29,13 @@ BaseLayer::BaseLayer(Fern::Window *window)
 
 void BaseLayer::onAttach() {
     Miren::setViewClear(0, 0x3D75C9FF);
-    Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
-        "shaders/ground/ground_vertex.glsl", "shaders/ground/ground_fragment.glsl"
-    );
-    m_groundShader = Miren::createProgram(programAsset.getMirenProgramCreate());
-    Panda::TextureData textureAsset =
-        Panda::AssetLoaderEditor::loadTexture("textures/BlocksTile.png");
-    Miren::TextureCreate textureCreate = textureAsset.getMirenTextureCreate();
+    Foundation::Memory vertexMem =
+        Panda::AssetImporterBase::loadData("shaders/ground/ground_vertex.glsl");
+    Foundation::Memory fragmentMem =
+        Panda::AssetImporterBase::loadData("shaders/ground/ground_fragment.glsl");
+    m_groundShader = Miren::createProgram({vertexMem, fragmentMem});
+    Miren::TextureCreate textureCreate =
+        Panda::AssetImporterBase::load2DTexture("textures/BlocksTile.png");
     textureCreate.m_numMips = 4;
     textureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
     textureCreate.m_magFiltering = Miren::NEAREST;
@@ -48,7 +48,7 @@ void BaseLayer::onAttach() {
                 Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(
                     layoutHandle, m_chunksStorage, indexX, indexY, indexZ, true
                 );
-                Panda::DynamicMesh &dynamicMesh =
+                Panda::DynamicMeshAsset &dynamicMesh =
                     m_chunksStorage
                         .chunks
                             [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +

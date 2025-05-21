@@ -8,7 +8,7 @@
 
 class B : public Rain::Codable {
 public:
-    std::string b;
+    std::filesystem::path b;
 
     RAIN_FIELDS_BEGIN(B)
     RAIN_FIELD(b)

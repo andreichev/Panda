@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Panda/Assets/AssetHandler.hpp"
+#include "Panda/Assets/Base/AssetHandler.hpp"
+#include "Panda/Assets/Base/AssetImporterBase.hpp"
 #include "Panda/Application/Application.hpp"
 
 #include <glm/glm.hpp>
@@ -110,15 +111,14 @@ public:
         m_indexBuffer =
             Miren::createIndexBuffer(indicesMemory, Miren::BufferElementType::UnsignedInt, 36);
 
-        Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
-            "default-shaders/sky/sky_vertex_hdr.glsl", "default-shaders/sky/sky_fragment_hdr.glsl"
-        );
-        m_shader = Miren::createProgram(programAsset.getMirenProgramCreate());
+        Foundation::Memory vertexMem =
+            AssetImporterBase::loadData("default-shaders/sky/sky_vertex_hdr.glsl");
+        Foundation::Memory fragmentMem =
+            AssetImporterBase::loadData("default-shaders/sky/sky_fragment_hdr.glsl");
+        m_shader = Miren::createProgram({vertexMem, fragmentMem});
 
-        Panda::TextureData m_skyDefaultTextureAsset =
-            AssetLoaderEditor::loadTexture("default-textures/skybox/hdr/clouds.png");
         Miren::TextureCreate m_skyHdrTextureConfig =
-            m_skyDefaultTextureAsset.getMirenTextureCreate();
+            AssetImporterBase::load2DTexture("default-textures/skybox/hdr/clouds.png");
         m_skyHdrTextureConfig.m_minFiltering = NEAREST;
         m_skyHdrTextureConfig.m_magFiltering = NEAREST;
         m_skyHdrTextureConfig.m_wrap = CLAMP;

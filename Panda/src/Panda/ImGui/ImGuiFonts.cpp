@@ -1,6 +1,6 @@
 #include "Panda/ImGui/ImGuiFonts.hpp"
-#include "Panda/Assets/AssetHandler.hpp"
-#include "Panda/Assets/AssetLoaderEditor.hpp"
+#include "Panda/Assets/Base/AssetHandler.hpp"
+#include "Panda/Assets/Base/AssetImporterBase.hpp"
 
 #include <Foundation/PlatformDetection.hpp>
 #include <unordered_map>

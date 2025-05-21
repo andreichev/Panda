@@ -15,25 +15,25 @@ ContentBrowser::ContentBrowser(ContentBrowserOutput *output)
     , m_directoryIcon("ui/icons/DirectoryIcon.png")
     , m_importedIcon("ui/icons/ImportedAssetIcon.png")
     , m_fileIcons() {
-    m_fileIcons.emplace(".avi", Texture("ui/icons/avi.png"));
-    m_fileIcons.emplace(".bmp", Texture("ui/icons/bmp.png"));
-    m_fileIcons.emplace(".c", Texture("ui/icons/c.png"));
-    m_fileIcons.emplace(".cpp", Texture("ui/icons/cpp.png"));
-    m_fileIcons.emplace(".gif", Texture("ui/icons/gif.png"));
-    m_fileIcons.emplace(".h", Texture("ui/icons/h.png"));
-    m_fileIcons.emplace(".hpp", Texture("ui/icons/hpp.png"));
-    m_fileIcons.emplace(".html", Texture("ui/icons/html.png"));
-    m_fileIcons.emplace(".jpg", Texture("ui/icons/jpg.png"));
-    m_fileIcons.emplace(".mp3", Texture("ui/icons/mp3.png"));
-    m_fileIcons.emplace(".mp4", Texture("ui/icons/mp4.png"));
-    m_fileIcons.emplace(".png", Texture("ui/icons/png.png"));
-    m_fileIcons.emplace(".tga", Texture("ui/icons/tga.png"));
-    m_fileIcons.emplace(".tiff", Texture("ui/icons/tiff.png"));
-    m_fileIcons.emplace(".txt", Texture("ui/icons/txt.png"));
-    m_fileIcons.emplace(".wav", Texture("ui/icons/wav.png"));
-    m_fileIcons.emplace(".xml", Texture("ui/icons/xml.png"));
-    m_fileIcons.emplace(".yml", Texture("ui/icons/yml.png"));
-    m_fileIcons.emplace(".zip", Texture("ui/icons/zip.png"));
+    m_fileIcons.emplace(".avi", TextureAsset("ui/icons/avi.png"));
+    m_fileIcons.emplace(".bmp", TextureAsset("ui/icons/bmp.png"));
+    m_fileIcons.emplace(".c", TextureAsset("ui/icons/c.png"));
+    m_fileIcons.emplace(".cpp", TextureAsset("ui/icons/cpp.png"));
+    m_fileIcons.emplace(".gif", TextureAsset("ui/icons/gif.png"));
+    m_fileIcons.emplace(".h", TextureAsset("ui/icons/h.png"));
+    m_fileIcons.emplace(".hpp", TextureAsset("ui/icons/hpp.png"));
+    m_fileIcons.emplace(".html", TextureAsset("ui/icons/html.png"));
+    m_fileIcons.emplace(".jpg", TextureAsset("ui/icons/jpg.png"));
+    m_fileIcons.emplace(".mp3", TextureAsset("ui/icons/mp3.png"));
+    m_fileIcons.emplace(".mp4", TextureAsset("ui/icons/mp4.png"));
+    m_fileIcons.emplace(".png", TextureAsset("ui/icons/png.png"));
+    m_fileIcons.emplace(".tga", TextureAsset("ui/icons/tga.png"));
+    m_fileIcons.emplace(".tiff", TextureAsset("ui/icons/tiff.png"));
+    m_fileIcons.emplace(".txt", TextureAsset("ui/icons/txt.png"));
+    m_fileIcons.emplace(".wav", TextureAsset("ui/icons/wav.png"));
+    m_fileIcons.emplace(".xml", TextureAsset("ui/icons/xml.png"));
+    m_fileIcons.emplace(".yml", TextureAsset("ui/icons/yml.png"));
+    m_fileIcons.emplace(".zip", TextureAsset("ui/icons/zip.png"));
 }
 
 bool isMouseInsideWindow(ImVec2 windowPos, ImVec2 windowSize) {
@@ -97,7 +97,7 @@ void ContentBrowser::onImGuiRender() {
         if (!showHiddenFiles && filenameString[0] == '.') { continue; }
 
         ImGui::PushID(filenameString.c_str());
-        Texture *icon;
+        TextureAsset *icon;
         if (directoryEntry.is_directory()) {
             icon = &m_directoryIcon;
         } else {

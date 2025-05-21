@@ -78,13 +78,14 @@ void CubeLayer::onAttach() {
     vertexBuffer = createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
     indexBuffer = createIndexBuffer(indices, BufferElementType::UnsignedInt, 36);
 
-    Panda::TextureData textureAsset = Panda::AssetLoaderEditor::loadTexture("textures/arbuz1.png");
-    texture = createTexture(textureAsset.getMirenTextureCreate());
-    Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
-        "default-shaders/renderer3d/base_vertex.glsl",
-        "default-shaders/renderer3d/base_fragment.glsl"
-    );
-    shader = createProgram(programAsset.getMirenProgramCreate());
+    Miren::TextureCreate textureCreate =
+        Panda::AssetImporterBase::load2DTexture("textures/arbuz1.png");
+    texture = createTexture(textureCreate);
+    Foundation::Memory vertexMem =
+        Panda::AssetImporterBase::loadData("default-shaders/renderer3d/base_vertex.glsl");
+    Foundation::Memory fragmentMem =
+        Panda::AssetImporterBase::loadData("default-shaders/renderer3d/base_fragment.glsl");
+    shader = createProgram({vertexMem, fragmentMem});
     setShader(shader);
 
     Fern::Size windowSize = m_window->getSize();

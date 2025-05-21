@@ -4,7 +4,7 @@
 
 #include "Chunk.hpp"
 
-#include "Panda/GameLogic/Components/DynamicMesh.hpp"
+#include <Panda/Assets/DynamicMeshAsset.hpp>
 
 Chunk::~Chunk() {
     delete[] m_data;
@@ -24,6 +24,6 @@ Voxel *Chunk::get(int x, int y, int z) {
     return &m_data[y * Chunk::SIZE_X * Chunk::SIZE_Z + x * Chunk::SIZE_X + z];
 }
 
-Panda::DynamicMesh &Chunk::getMesh() {
+Panda::DynamicMeshAsset &Chunk::getMesh() {
     return m_mesh;
 }

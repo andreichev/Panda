@@ -63,9 +63,14 @@ enum TextureFiltering {
     LINEAR_MIPMAP_LINEAR
 };
 
+struct ProgramCompile {
+    Foundation::Memory m_vertexCode;
+    Foundation::Memory m_fragmentCode;
+};
+
 struct ProgramCreate {
-    Foundation::Memory m_vertex;
-    Foundation::Memory m_fragment;
+    Foundation::Memory m_vertexBinary;
+    Foundation::Memory m_fragmentBinary;
 };
 
 struct TextureCreate {

@@ -82,8 +82,8 @@ struct TypeInfo final {
     uint32_t size;
     uint32_t align;
     std::vector<FieldInfo> fields;
-    void (*encoderFunc)(const char *key, Encoder *, const TypeInfo &info, void *data);
-    void (*decoderFunc)(const char *key, Decoder *, const TypeInfo &info, void *data);
+    void (*encoderFunc)(const char *key, Encoder *, const TypeInfo &info, const void *data);
+    bool (*decoderFunc)(const char *key, Decoder *, const TypeInfo &info, void *data);
 
     TypeInfo(TypeId id, const std::string &name)
         : id(id)

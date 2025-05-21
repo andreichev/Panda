@@ -2,7 +2,7 @@
 
 #include <Foundation/Memory.hpp>
 #include <Panda/ScriptEngine/InnerScriptHook.hpp>
-#include <Panda/Assets/Asset.hpp>
+#include <Panda/Assets/Base/Asset.hpp>
 
 namespace Panda {
 

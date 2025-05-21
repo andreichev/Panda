@@ -237,21 +237,11 @@ static NSUInteger pandaKeyToCocoaModifierFlag(Fern::Key key) {
 }
 
 - (void)mouseDown:(NSEvent *)event {
-    // Command + Left Mouse Button acts as middle! This just a temporary solution!
-    // This is because the average OSX user doesn't have middle mouse click.
-    MouseButton mb = ([event modifierFlags] & NSEventModifierFlagCommand)
-    ? MouseButton::MIDDLE
-    : MouseButton::LEFT
-    ;
-    getEventQueue()->postMouseButtonEvent(mb, true);
+    getEventQueue()->postMouseButtonEvent(MouseButton::LEFT, true);
 }
 
 - (void)mouseUp:(NSEvent *)event {
-    MouseButton mb = ([event modifierFlags] & NSEventModifierFlagCommand)
-    ? MouseButton::MIDDLE
-    : MouseButton::LEFT
-    ;
-    getEventQueue()->postMouseButtonEvent(mb, false);
+    getEventQueue()->postMouseButtonEvent(MouseButton::LEFT, false);
 }
 
 - (void)rightMouseDown:(NSEvent *)event {

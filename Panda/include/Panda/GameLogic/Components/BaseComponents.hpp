@@ -6,11 +6,10 @@
 
 #include "Panda/Base/Base.hpp"
 
-#include "Panda/GameLogic/Components/StaticMesh.hpp"
+#include "Panda/Assets/StaticMeshAsset.hpp"
+#include "Panda/Assets/DynamicMeshAsset.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
-#include "Panda/GameLogic/Components/DynamicMesh.hpp"
 #include "Panda/ScriptEngine/ExternalScript.hpp"
-#include "Panda/Assets/Asset.hpp"
 
 #include <Foundation/Foundation.hpp>
 #include <Rain/Rain.hpp>
@@ -90,11 +89,11 @@ struct SpriteRendererComponent final {
 };
 
 struct StaticMeshComponent final {
-    std::vector<StaticMesh> meshes;
+    std::vector<StaticMeshAsset> meshes;
 };
 
 struct DynamicMeshComponent final {
-    std::vector<DynamicMesh> meshes;
+    std::vector<DynamicMeshAsset> meshes;
 
     DynamicMeshComponent() = default;
     DynamicMeshComponent(const DynamicMeshComponent &other) = default;
@@ -127,7 +126,7 @@ struct ScriptListComponent final {
 };
 
 struct Rigidbody2DComponent final {
-    enum class BodyType { STATIC = 0, DYNAMIC, KINEMATIC };
+    enum class BodyType : uint32_t { STATIC = 0, DYNAMIC, KINEMATIC };
     BodyType type = BodyType::STATIC;
     bool fixedRotation = false;
 };

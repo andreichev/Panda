@@ -1,6 +1,5 @@
 #include "ImGuiHelper.hpp"
 #include "Model/DragDropItem.hpp"
-#include "ProjectLoader/AssetHandlerEditor.hpp"
 
 #include <Panda/GameLogic/GameContext.hpp>
 #include <Panda/ImGui/FontAwesome.h>
@@ -505,7 +504,7 @@ bool propertyTexture(
     ImGui::NextColumn();
     if (textureId) {
         if (asset) {
-            auto texture = Foundation::SharedCast<Texture>(asset);
+            auto texture = Foundation::SharedCast<TextureAsset>(asset);
             float height = 55;
             float aspect = texture->getSize().width / texture->getSize().height;
             aspect = Foundation::min(aspect, 4.f);
