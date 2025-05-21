@@ -9,9 +9,9 @@
 namespace Panda {
 
 struct TextureAssetMeta : public Rain::Codable {
-    Miren::TextureFiltering minFiltering;
-    Miren::TextureFiltering magFiltering;
-    uint32_t numMips;
+    Miren::TextureFiltering minFiltering = Miren::NEAREST;
+    Miren::TextureFiltering magFiltering = Miren::NEAREST;
+    uint32_t numMips = 0;
     path_t path;
 
     RAIN_FIELDS_BEGIN(TextureAssetMeta)

@@ -21,6 +21,13 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
         PND_ASSERT(false, "UNKNOWN ASSET ID");
         return nullptr;
     }
+    if (m_cache.find(id) != m_cache.end()) {
+        auto asset = m_cache.at(id).lock();
+        if (asset) {
+            LOG_INFO("LOADED ASSET %u FROM CACHE", id);
+            return asset;
+        }
+    }
     auto assetInfo = m_registry.at(id);
     Foundation::Shared<Asset> asset;
     switch (assetInfo.type) {
@@ -33,7 +40,7 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
                 create.m_magFiltering = meta.magFiltering;
                 create.m_numMips = meta.numMips;
                 asset = Foundation::makeShared<TextureAsset>(create);
-                LOG_INFO("CREATED TEXTURE: %s", meta.path.string().c_str());
+                LOG_INFO("CREATED TEXTURE: %u", id);
             } else {
                 Foundation::Memory violetTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
                 *(uint32_t *)violetTextureData.data = 0xFFFF008F;
@@ -48,11 +55,7 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
             asset = Foundation::makeShared<GpuProgramAsset>(
                 m_projectPath / meta.vertexCodePath, m_projectPath / meta.fragmentCodePath
             );
-            LOG_INFO(
-                "CREATED GPU PROGRAM: %s, %s",
-                meta.vertexCodePath.string().c_str(),
-                meta.fragmentCodePath.string().c_str()
-            );
+            LOG_INFO("CREATED GPU PROGRAM: %u", id);
             break;
         }
         case AssetType::CUBE_MAP: {
@@ -64,6 +67,7 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
             break;
         }
     }
+    m_cache[id] = asset;
     return asset;
 }
 

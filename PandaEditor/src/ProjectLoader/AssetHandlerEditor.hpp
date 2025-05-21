@@ -20,12 +20,12 @@ public:
 private:
     void loadAssetRegistry();
     void saveAssetRegistry();
-    void unloadAllAssets();
 
     path_t m_projectPath;
     path_t m_assetRegistryPath;
     Rain::JsonEncoder m_jsonEncoder;
     Rain::JsonDecoder m_jsonDecoder;
+    std::unordered_map<AssetId, Foundation::Weak<Asset>> m_cache;
     std::unordered_map<AssetId, AssetInfo> m_registry;
     std::unordered_map<path_t, AssetId> m_registeredAssets;
 };
