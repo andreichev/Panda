@@ -32,7 +32,6 @@ EditorLayer::EditorLayer(Fern::Window *window)
 void EditorLayer::onAttach() {
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
     GameContext::s_currentWorld = m_currentWorld;
-    GameContext::s_assetHandler = &m_loader.getAssetHandler();
     m_panelsContainer.viewport.initWithSize(Size(100.f, 100.f));
     m_editingWorld.setViewId(m_panelsContainer.viewport.getMirenView());
     m_playingWorld.setViewId(m_panelsContainer.viewport.getMirenView());
@@ -46,7 +45,6 @@ void EditorLayer::onAttach() {
 
 void EditorLayer::onDetach() {
     GameContext::s_currentWorld = nullptr;
-    GameContext::s_assetHandler = nullptr;
 }
 
 void EditorLayer::onUpdate(double deltaTime) {
@@ -395,7 +393,8 @@ void EditorLayer::deleteFileShowPopup(path_t path) {
 }
 
 void EditorLayer::importAsset(const path_t &path) {
-    m_loader.getAssetHandler().importAsset(path);
+    auto &assetHandler = m_loader.getAssetHandler();
+    assetHandler.registerTextureAsset(path);
 }
 
 UUID EditorLayer::getAssetId(const path_t &path) {

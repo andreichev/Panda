@@ -19,7 +19,7 @@ void Renderer3D::begin() {
     m_drawData.stats.drawCalls = 0;
 }
 
-void Renderer3D::submit(glm::mat4 &transform, StaticMesh *mesh) {
+void Renderer3D::submit(glm::mat4 &transform, StaticMeshAsset *mesh) {
     PND_ASSERT(mesh->m_shaderHandle.isValid(), "Invalid shader for mesh");
     Miren::setShader(mesh->m_shaderHandle);
     Miren::setUniform(
@@ -37,7 +37,7 @@ void Renderer3D::submit(glm::mat4 &transform, StaticMesh *mesh) {
     m_drawData.stats.drawCalls += 1;
 }
 
-void Renderer3D::submit(glm::mat4 &transform, DynamicMesh *mesh) {
+void Renderer3D::submit(glm::mat4 &transform, DynamicMeshAsset *mesh) {
     PND_ASSERT(mesh->m_shaderHandle.isValid(), "Invalid shader for mesh");
     Miren::setShader(mesh->m_shaderHandle);
     Miren::setUniform(

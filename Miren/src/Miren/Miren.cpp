@@ -44,6 +44,11 @@ void deleteFrameBuffer(FrameBufferHandle handle) {
     s_context->deleteFrameBuffer(handle);
 }
 
+ProgramCreate compileProgram(ProgramCompile compile) {
+    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    return s_context->compileProgram(compile);
+}
+
 ProgramHandle createProgram(ProgramCreate create) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     return s_context->createProgram(create);

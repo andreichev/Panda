@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panda/Assets/Texture.hpp"
+#include "Panda/Assets/TextureAsset.hpp"
 #include "SystemTools/SystemTools.hpp"
 
 #include <filesystem>
@@ -29,11 +29,11 @@ private:
     path_t m_baseDirectory;
     path_t m_currentDirectory;
     path_t m_deletingDirectory;
-    Texture m_directoryIcon;
-    Texture m_defaultFileIcon;
-    Texture m_importedIcon;
+    TextureAsset m_directoryIcon;
+    TextureAsset m_defaultFileIcon;
+    TextureAsset m_importedIcon;
     ContentBrowserOutput *m_output;
-    std::map<std::string, Texture> m_fileIcons;
+    std::map<std::string, TextureAsset> m_fileIcons;
 };
 
 } // namespace Panda

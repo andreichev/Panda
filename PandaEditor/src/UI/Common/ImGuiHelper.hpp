@@ -7,7 +7,7 @@
 #include <Panda/ImGui/Colors.hpp>
 #include <Panda/ScriptEngine/ExternalScript.hpp>
 #include <Panda/Base/Base.hpp>
-#include <Panda/Assets/Texture.hpp>
+#include <Panda/Assets/TextureAsset.hpp>
 #include <imgui_internal.h>
 #include <imgui.h>
 #include <glm/glm.hpp>

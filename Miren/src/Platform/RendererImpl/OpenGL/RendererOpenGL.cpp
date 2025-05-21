@@ -89,6 +89,12 @@ void RendererOpenGL::createFrameBuffer(
     m_frameBuffers[handle.id].create(this, specification);
 }
 
+ProgramCreate RendererOpenGL::compileProgram(ProgramCompile compile) {
+    // OpenGL has no shader compilation in version 3 which we support.
+    // So we just return source code.
+    return {compile.m_vertexCode, compile.m_fragmentCode};
+}
+
 void RendererOpenGL::readFrameBuffer(
     FrameBufferHandle handle, int attachIndex, int x, int y, int width, int height, void *data
 ) {

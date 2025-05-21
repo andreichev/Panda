@@ -21,6 +21,7 @@ uint32_t readFrameBuffer(
     FrameBufferHandle handle, int attachIndex, int x, int y, int width, int height, void *data
 );
 void deleteFrameBuffer(FrameBufferHandle handle);
+ProgramCreate compileProgram(ProgramCompile compile);
 ProgramHandle createProgram(ProgramCreate create);
 void deleteProgram(ProgramHandle handle);
 TextureHandle createTexture(TextureCreate create);

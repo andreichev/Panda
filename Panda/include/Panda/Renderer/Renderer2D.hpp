@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-#include "Panda/Assets/Texture.hpp"
+#include "Panda/Assets/TextureAsset.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -79,9 +79,9 @@ public:
         Renderer2D::Statistics stats;
         glm::mat4 projMat;
         Miren::ProgramHandle shader;
-        Foundation::Shared<Texture> whiteTexture;
+        Foundation::Shared<TextureAsset> whiteTexture;
         Miren::VertexLayoutHandle layout;
-        Foundation::Shared<Texture> textures[MAX_TEXTURE_SLOTS];
+        Foundation::Shared<TextureAsset> textures[MAX_TEXTURE_SLOTS];
         int samplers[MAX_TEXTURE_SLOTS];
         uint32_t textureSlotIndex;
         Vertex2D *vertices;

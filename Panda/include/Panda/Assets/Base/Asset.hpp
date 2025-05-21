@@ -7,7 +7,7 @@
 
 namespace Panda {
 
-enum class AssetType : uint16_t {
+enum class AssetType {
     NONE = 0,
     TEXTURE,
     CUBE_MAP,
@@ -16,6 +16,7 @@ enum class AssetType : uint16_t {
 
 using AssetId = UUID;
 
+/// Asset отвечает за хранение в памяти и некоторую работу ассета.
 class Asset {
 public:
     virtual ~Asset() = default;
@@ -30,7 +31,7 @@ public:
 
 protected:
     AssetId m_handle = 0;
-    AssetType m_type;
+    AssetType m_type = AssetType::NONE;
 };
 
 } // namespace Panda

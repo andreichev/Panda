@@ -5,9 +5,11 @@
 #pragma once
 
 #include "Panda/GameLogic/Components/TransformComponent.hpp"
-#include "Panda/GameLogic/Components/StaticMesh.hpp"
-#include "Panda/GameLogic/Components/DynamicMesh.hpp"
+#include "Panda/Assets/StaticMeshAsset.hpp"
+#include "Panda/Assets/DynamicMeshAsset.hpp"
 #include "Panda/GameLogic/Camera.hpp"
+
+#include <Miren/Miren.hpp>
 
 namespace Panda {
 
@@ -28,8 +30,8 @@ public:
     Renderer3D(Renderer3D &&other);
     ~Renderer3D() = default;
     void begin();
-    void submit(glm::mat4 &transform, StaticMesh *mesh);
-    void submit(glm::mat4 &transform, DynamicMesh *mesh);
+    void submit(glm::mat4 &transform, StaticMeshAsset *mesh);
+    void submit(glm::mat4 &transform, DynamicMeshAsset *mesh);
     void end();
     Statistics getStats();
     void setViewProj(glm::mat4 viewProj);

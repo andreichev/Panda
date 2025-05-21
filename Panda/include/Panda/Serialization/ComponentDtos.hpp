@@ -25,7 +25,7 @@ struct WorldCameraDto : public Rain::Codable {
     float zNear;
     float zFar;
 
-    static void encode(const char *key, Rain::Encoder *encoder, WorldCameraDto &data) {
+    static void encode(const char *key, Rain::Encoder *encoder, const WorldCameraDto &data) {
         encoder->beginObject(key);
         int projectionType = (int)data.projectionType;
         encoder->encode("projectionType", projectionType);
@@ -85,19 +85,17 @@ struct Rigidbody2DComponentDto : public Rain::Codable {
     Rigidbody2DComponent::BodyType type;
     bool fixedRotation;
 
-    static void encode(const char *key, Rain::Encoder *encoder, Rigidbody2DComponentDto &data) {
+    static void
+    encode(const char *key, Rain::Encoder *encoder, const Rigidbody2DComponentDto &data) {
         encoder->beginObject(key);
-        int type = (int)data.type;
-        encoder->encode("type", type);
+        encoder->encode("type", data.type);
         encoder->encode("fixedRotation", data.fixedRotation);
         encoder->endObject();
     }
 
     static bool decode(const char *key, Rain::Decoder *decoder, Rigidbody2DComponentDto &data) {
         if (!decoder->beginObject(key)) { return false; }
-        int type;
-        decoder->decode("type", type);
-        data.type = (Rigidbody2DComponent::BodyType)type;
+        decoder->decode("type", data.type);
         decoder->decode("fixedRotation", data.fixedRotation);
         decoder->endObject();
         return true;
@@ -128,12 +126,11 @@ struct ScriptFieldDto : public Rain::Codable {
     ScriptFieldType type;
     Foundation::Memory value;
 
-    static void encode(const char *key, Rain::Encoder *encoder, ScriptFieldDto &data) {
+    static void encode(const char *key, Rain::Encoder *encoder, const ScriptFieldDto &data) {
         encoder->beginObject(key);
         encoder->encode("name", data.name);
         encoder->encode("fieldId", data.fieldId);
-        int type = (int)data.type;
-        encoder->encode("type", type);
+        encoder->encode("type", data.type);
         switch (data.type) {
             case ScriptFieldType::INTEGER: {
                 int *value = (int *)data.value.data;
@@ -163,9 +160,7 @@ struct ScriptFieldDto : public Rain::Codable {
         if (!decoder->beginObject(key)) { return false; }
         decoder->decode("name", data.name);
         decoder->decode("fieldId", data.fieldId);
-        int type;
-        decoder->decode("type", type);
-        data.type = (ScriptFieldType)type;
+        decoder->decode("type", data.type);
         data.value.release();
         switch (data.type) {
             case ScriptFieldType::INTEGER: {

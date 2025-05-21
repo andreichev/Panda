@@ -5,15 +5,26 @@
 
 #include <istream>
 #include <ostream>
+#include <filesystem>
 
 namespace Rain {
+
+class Codable;
 
 class Encoder {
 public:
     virtual ~Encoder() = default;
 
     template<typename T>
-    void encode(std::ostream &stream, T &data);
+    void encode(std::ostream &stream, const T &data);
+
+    template<typename T>
+        requires std::derived_from<T, Codable>
+    void encode(const char *key, const T &data);
+
+    template<typename T>
+        requires std::is_enum_v<T>
+    void encode(const char *key, const T &data);
 
     /// General encode
     virtual void encode(std::ostream &, void *data, TypeInfo info) = 0;
@@ -40,7 +51,7 @@ public:
     /// Encode const char*
     virtual void encode(const char *key, const char *&data) = 0;
     /// Encode uuid
-    virtual void encode(const char *key, UUID &data) = 0;
+    virtual void encode(const char *key, const UUID &data) = 0;
     /// End encoding object
     virtual void endObject() = 0;
     /// Begin encoding array
@@ -55,6 +66,14 @@ public:
 
     template<typename T>
     bool decode(std::istream &stream, T &data);
+
+    template<typename T>
+        requires std::derived_from<T, Codable>
+    bool decode(const char *key, T &data);
+
+    template<typename T>
+        requires std::is_enum_v<T>
+    bool decode(const char *key, T &data);
 
     /// General decode
     virtual bool decode(std::istream &, void *data, TypeInfo info) = 0;

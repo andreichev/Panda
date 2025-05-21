@@ -24,16 +24,16 @@ BaseLayer::BaseLayer(Fern::Window *window)
 
 void BaseLayer::onAttach() {
     Miren::setViewClear(0, 0x3D75C9FF);
-    Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
-        "shaders/ground/ground_vertex.glsl", "shaders/ground/ground_fragment.glsl"
-    );
-    m_shader = Miren::createProgram(programAsset.getMirenProgramCreate());
+    Foundation::Memory vertexMem =
+        Panda::AssetImporterBase::loadData("shaders/ground/ground_vertex.glsl");
+    Foundation::Memory fragmentMem =
+        Panda::AssetImporterBase::loadData("shaders/ground/ground_fragment.glsl");
+    m_shader = Miren::createProgram({vertexMem, fragmentMem});
     m_cameraMove.setShader(m_shader);
     LOG_INFO("MESH GENERATION STARTED");
 
-    Panda::TextureData colorTextureAsset =
-        Panda::AssetLoaderEditor::loadTexture("textures/grass1.png");
-    Miren::TextureCreate colorTextureCreate = colorTextureAsset.getMirenTextureCreate();
+    Miren::TextureCreate colorTextureCreate =
+        Panda::AssetImporterBase::load2DTexture("textures/grass1.png");
     colorTextureCreate.m_numMips = 4;
     colorTextureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
     m_colorTexture = Miren::createTexture(colorTextureCreate);

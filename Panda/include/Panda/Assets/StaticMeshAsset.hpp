@@ -12,16 +12,16 @@ namespace Panda {
 
 struct MeshData;
 
-class StaticMesh {
+class StaticMeshAsset {
 public:
-    StaticMesh()
+    StaticMeshAsset()
         : m_bufferLayoutHandle(MIREN_INVALID_HANDLE)
         , m_indexBufferHandle(MIREN_INVALID_HANDLE)
         , m_vertexBufferHandle(MIREN_INVALID_HANDLE)
         , m_indicesCount(0)
         , m_textureHandle(MIREN_INVALID_HANDLE)
         , m_shaderHandle(MIREN_INVALID_HANDLE) {}
-    ~StaticMesh();
+    ~StaticMeshAsset();
 
     void create(const MeshData &data, Miren::TextureHandle texture, Miren::ProgramHandle shader);
 
