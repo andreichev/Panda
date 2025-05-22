@@ -19,19 +19,19 @@ using AssetId = UUID;
 /// Asset отвечает за хранение в памяти и некоторую работу ассета.
 class Asset {
 public:
+    Asset(AssetType type)
+        : m_type(type) {}
+    Asset()
+        : m_type(AssetType::NONE) {}
+
     virtual ~Asset() = default;
 
-    virtual bool operator==(const Asset &other) const {
-        return m_handle == other.m_handle;
-    }
-
-    virtual bool operator!=(const Asset &other) const {
-        return !(*this == other);
+    AssetType getType() {
+        return m_type;
     }
 
 protected:
-    AssetId m_handle = 0;
-    AssetType m_type = AssetType::NONE;
+    AssetType m_type;
 };
 
 } // namespace Panda

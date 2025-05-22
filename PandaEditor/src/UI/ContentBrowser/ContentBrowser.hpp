@@ -2,6 +2,7 @@
 
 #include "Panda/Assets/TextureAsset.hpp"
 #include "SystemTools/SystemTools.hpp"
+#include "ThumbnailProvider.hpp"
 
 #include <filesystem>
 #include <map>
@@ -34,6 +35,7 @@ private:
     TextureAsset m_importedIcon;
     ContentBrowserOutput *m_output;
     std::map<std::string, TextureAsset> m_fileIcons;
+    ThumbnailProvider m_thumbnailProvider;
 };
 
 } // namespace Panda
