@@ -14,7 +14,8 @@ ContentBrowser::ContentBrowser(ContentBrowserOutput *output)
     , m_defaultFileIcon("ui/icons/_plain.png")
     , m_directoryIcon("ui/icons/DirectoryIcon.png")
     , m_importedIcon("ui/icons/ImportedAssetIcon.png")
-    , m_fileIcons() {
+    , m_fileIcons()
+    , m_thumbnailProvider() {
     m_fileIcons.emplace(".avi", TextureAsset("ui/icons/avi.png"));
     m_fileIcons.emplace(".bmp", TextureAsset("ui/icons/bmp.png"));
     m_fileIcons.emplace(".c", TextureAsset("ui/icons/c.png"));
@@ -98,21 +99,25 @@ void ContentBrowser::onImGuiRender() {
 
         ImGui::PushID(filenameString.c_str());
         TextureAsset *icon;
+        Foundation::Shared<TextureAsset> thumbnail;
         if (directoryEntry.is_directory()) {
             icon = &m_directoryIcon;
         } else {
-            if (m_fileIcons.find(path.extension().string()) != m_fileIcons.end()) {
-                icon = &m_fileIcons[path.extension().string()];
-            } else {
-                icon = &m_defaultFileIcon;
+            if (assetId) { thumbnail = m_thumbnailProvider.getThumbnailOrNull(assetId); }
+            if (!thumbnail) {
+                if (m_fileIcons.find(path.extension().string()) != m_fileIcons.end()) {
+                    icon = &m_fileIcons[path.extension().string()];
+                } else {
+                    icon = &m_defaultFileIcon;
+                }
             }
         }
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         ImVec2 thumbnailPos = ImGui::GetCursorPos();
+        Miren::TextureHandle handle =
+            thumbnail ? thumbnail->getMirenHandle() : icon->getMirenHandle();
         ImGui::ImageButton(
-            filenameString.c_str(),
-            (ImTextureID)(intptr_t)icon->getMirenHandle().id,
-            {thumbnailSize, thumbnailSize}
+            filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {thumbnailSize, thumbnailSize}
         );
         if (assetId) {
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {

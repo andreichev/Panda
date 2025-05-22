@@ -23,10 +23,7 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
     }
     if (m_cache.find(id) != m_cache.end()) {
         auto asset = m_cache.at(id).lock();
-        if (asset) {
-            LOG_INFO("LOADED ASSET %u FROM CACHE", id);
-            return asset;
-        }
+        if (asset) { return asset; }
     }
     auto assetInfo = m_registry.at(id);
     Foundation::Shared<Asset> asset;

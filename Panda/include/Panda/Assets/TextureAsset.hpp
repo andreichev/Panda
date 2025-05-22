@@ -12,9 +12,11 @@ namespace Panda {
 class TextureAsset : public Asset {
 public:
     TextureAsset()
-        : m_mirenHandle(MIREN_INVALID_HANDLE) {}
+        : m_mirenHandle(MIREN_INVALID_HANDLE)
+        , Asset(AssetType::TEXTURE) {}
 
-    explicit TextureAsset(const path_t &path) {
+    explicit TextureAsset(const path_t &path)
+        : Asset(AssetType::TEXTURE) {
         auto textureCreate = AssetImporterBase::load2DTexture(path);
         m_size = {(float)textureCreate.m_width, (float)textureCreate.m_height};
         textureCreate.m_wrap = Miren::CLAMP;
@@ -24,14 +26,16 @@ public:
         m_mirenHandle = Miren::createTexture(textureCreate);
     }
 
-    TextureAsset(Miren::TextureCreate create) {
+    TextureAsset(Miren::TextureCreate create)
+        : Asset(AssetType::TEXTURE) {
         m_mirenHandle = Miren::createTexture(create);
         m_size = Size(create.m_width, create.m_height);
     }
 
     TextureAsset(TextureAsset &&other) {
-        m_handle = other.m_handle;
         m_mirenHandle = other.m_mirenHandle;
+        m_type = other.m_type;
+        m_size = other.m_size;
         other.m_mirenHandle = MIREN_INVALID_HANDLE;
     }
 
