@@ -111,20 +111,27 @@ void AssetHandlerEditor::loadAssetRegistry() {
         decoder->decode(file, registryDto);
         file.close();
         for (auto &info : registryDto.assets) {
-            m_registry[info.id] = info;
             switch (info.type) {
                 case AssetType::TEXTURE: {
                     auto meta = std::get<TextureAssetMeta>(info.meta);
+                    if (meta.path.empty()) {
+                        LOG_ERROR_EDITOR(
+                            "Empty asset path. Skipping broken asset", meta.path.string().c_str()
+                        );
+                        break;
+                    }
                     if (!std::filesystem::exists(m_projectPath / meta.path)) {
                         LOG_ERROR_EDITOR("Texture asset %s not found.", meta.path.string().c_str());
                     }
                     m_registeredAssets[meta.path] = info.id;
+                    m_registry[info.id] = info;
                     break;
                 }
                 case AssetType::PROGRAM: {
                     auto meta = std::get<GpuProgramAssetMeta>(info.meta);
                     m_registeredAssets[meta.vertexCodePath] = info.id;
                     m_registeredAssets[meta.fragmentCodePath] = info.id;
+                    m_registry[info.id] = info;
                     break;
                 }
                 default:

@@ -47,9 +47,10 @@ bool isMouseInsideWindow(ImVec2 windowPos, ImVec2 windowSize) {
 void ContentBrowser::onImGuiRender() {
     if (m_currentDirectory.empty()) { return; }
     ImGui::Begin("Content Browser");
-    if (m_currentDirectory != path_t(m_baseDirectory)) {
+    if (m_currentDirectory != m_baseDirectory) {
         if (ImGui::Button(getString(ICON_ARROW_LEFT).c_str())) {
             m_currentDirectory = m_currentDirectory.parent_path();
+            m_thumbnailProvider.resetCache();
         }
     }
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
@@ -68,8 +69,8 @@ void ContentBrowser::onImGuiRender() {
     static float thumbnailSize = 90.0f;
     float cellSize = thumbnailSize + padding;
 
-    float ContentBrowserWidth = ImGui::GetContentRegionAvail().x;
-    int columnCount = (int)(ContentBrowserWidth / cellSize);
+    float contentBrowserWidth = ImGui::GetContentRegionAvail().x;
+    int columnCount = (int)(contentBrowserWidth / cellSize);
     columnCount = std::max(columnCount, 1);
     // if (!Events::getDropPaths().empty()) {
     //     if (isMouseInsideWindow(ImGui::GetWindowPos(), ImGui::GetWindowSize())) {
@@ -103,7 +104,10 @@ void ContentBrowser::onImGuiRender() {
         if (directoryEntry.is_directory()) {
             icon = &m_directoryIcon;
         } else {
-            if (assetId) { thumbnail = m_thumbnailProvider.getThumbnailOrNull(assetId); }
+            if (assetId) {
+                thumbnail =
+                    m_thumbnailProvider.getThumbnailOrNull(assetId, {thumbnailSize, thumbnailSize});
+            }
             if (!thumbnail) {
                 if (m_fileIcons.find(path.extension().string()) != m_fileIcons.end()) {
                     icon = &m_fileIcons[path.extension().string()];
@@ -116,8 +120,12 @@ void ContentBrowser::onImGuiRender() {
         ImVec2 thumbnailPos = ImGui::GetCursorPos();
         Miren::TextureHandle handle =
             thumbnail ? thumbnail->getMirenHandle() : icon->getMirenHandle();
+        float height = thumbnailSize;
+        float aspect = 1.f;
+        if (thumbnail) { aspect = thumbnail->getSize().width / thumbnail->getSize().height; }
+        float width = height * aspect;
         ImGui::ImageButton(
-            filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {thumbnailSize, thumbnailSize}
+            filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {width, height}
         );
         if (assetId) {
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
@@ -140,7 +148,10 @@ void ContentBrowser::onImGuiRender() {
         }
         ImGui::PopStyleColor();
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            if (directoryEntry.is_directory()) { m_currentDirectory /= path.filename(); }
+            if (directoryEntry.is_directory()) {
+                m_currentDirectory /= path.filename();
+                m_thumbnailProvider.resetCache();
+            }
         }
         if (ImGui::BeginPopupContextItem(filenameString.c_str())) {
             if (ImGui::MenuItem("Show in Finder")) { SystemTools::show(path.c_str()); }

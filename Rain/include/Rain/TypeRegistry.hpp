@@ -475,11 +475,7 @@ struct TypeEncoder<std::filesystem::path> {
     static void encode(
         const char *key, Encoder *encoder, const TypeInfo &info, const std::filesystem::path &data
     ) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdangling-gsl"
-        const char *path = data.string().c_str();
-#pragma clang diagnostic pop
-        encoder->encode(key, path);
+        encoder->encode(key, data.string());
     }
 };
 
