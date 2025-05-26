@@ -27,14 +27,16 @@ public:
             Panda::Fonts::popFont();
 
             ImGui::Image((ImTextureID)(intptr_t)pandaIcon.getMirenHandle().id, {90, 90});
-            ImGui::Text("Open source 2D and 3D cross-platform game Environment. Developing by company Toyship.");
+            ImGui::Text("Open source 2D and 3D cross-platform game Environment. Developing by "
+                        "company Toyship.");
             ImGui::Text(" ");
             ImGui::Text("Developers: Mikhail Andreichev, Bogdan Mikhailov");
 
-            ImGui::TextLinkOpenURL("Git, ", "https://github.com/andreichev/Panda");
+            ImGui::TextLinkOpenURL("Git ", "https://github.com/andreichev/Panda");
             ImGui::SameLine();
-            ImGui::TextLinkOpenURL("License", "https://github.com/andreichev/Panda/blob/main/LICENSE.txt");
-
+            ImGui::TextLinkOpenURL(
+                "License", "https://github.com/andreichev/Panda/blob/main/LICENSE.txt"
+            );
 
             if (!open) {
                 if (closeAction) { closeAction(); }
@@ -50,10 +52,10 @@ public:
         ImGui::PopStyleVar();
     }
     PopupActionFunction closeAction;
+
 private:
     bool open = true;
-    Panda::Texture pandaIcon = Panda::Texture("textures/logo.png");
+    Panda::Texture pandaIcon = Panda::Texture("ui/icons/Panda.png");
 };
 
-}
-
+} // namespace Panda

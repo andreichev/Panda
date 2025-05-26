@@ -51,7 +51,6 @@ public:
     void menuBarUndo() override;
     bool menuBarCanRedo() override;
     void menuBarRedo() override;
-    void menuBarPreferences() override;
     const std::vector<RecentProject> &menuBarGetRecentProjectsList() override;
     const path_t &menuBarGetOpenedProjectPath() override;
     void menuBarCloseApp() override;
