@@ -5,6 +5,7 @@
 #include "UI/Popups/EditorYesNoPopup.hpp"
 #include "UI/Popups/PickScriptPopup.hpp"
 #include "UI/Popups/EnterNamePopup.hpp"
+#include "UI/Popups/EditorAboutPopup.hpp"
 #include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 
 #include <Foundation/PlatformDetection.hpp>
@@ -289,6 +290,16 @@ void EditorLayer::menuBarCloseProject() {
     } else {
         m_loader.closeProject();
     }
+}
+
+void EditorLayer::menuBarAbout() {
+    EditorAboutPopup *popup = F_NEW(Foundation::getAllocator(), EditorAboutPopup);
+    popup->closeAction = [&]() {
+        F_DELETE(Foundation::getAllocator(), m_popups.back());
+        m_popups.pop_back();
+    };
+    popup->title = "About";
+    m_popups.emplace_back(popup);
 }
 
 #pragma endregion

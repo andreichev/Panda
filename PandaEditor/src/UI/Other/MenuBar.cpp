@@ -65,6 +65,10 @@ void MenuBar::onImGuiRender() {
             }
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Help")) {
+            if (ImGui::MenuItem("About")) { m_output->menuBarAbout(); }
+            ImGui::EndMenu();
+        }
         ImGui::EndMenuBar();
     }
     ImGui::PopStyleVar(3);

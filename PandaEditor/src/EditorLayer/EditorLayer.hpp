@@ -57,6 +57,7 @@ public:
     void menuBarOpenCppProject() override;
     void menuBarSaveWorld() override;
     void menuBarCloseProject() override;
+    void menuBarAbout() override;
 #pragma endregion
 
 #pragma region Components draw output
