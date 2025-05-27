@@ -45,8 +45,9 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
         return;
     }
 
-    //     * IF NEED TO DECOMPOSE (TO APPLY ROTATION TO INDIVIDUAL ORIGINS)
-    //     *
+    /*
+     * IF NEED TO DECOMPOSE (TO APPLY ROTATION TO INDIVIDUAL ORIGINS)
+     *
     glm::vec3 deltaPosition;
     glm::vec3 deltaRotation;
     glm::vec3 deltaScale;
@@ -57,6 +58,7 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
         glm::value_ptr(deltaScale)
     );
     LOG_INFO_EDITOR("%.3f, %.3f, %.3f", deltaPosition.x, deltaPosition.y, deltaPosition.z);
+     */
 
     auto entities = selectionContext.getManipulatingEntities();
     EntityTransformCommand move(entities);

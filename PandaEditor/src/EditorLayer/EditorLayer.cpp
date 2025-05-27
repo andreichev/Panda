@@ -208,6 +208,7 @@ bool EditorLayer::menuBarCanRedo() {
 void EditorLayer::menuBarRedo() {
     redo();
 }
+
 void EditorLayer::menuBarOpenProject() {
     std::optional<path_t> optionalPath = SystemTools::openFolderDialog();
     if (!optionalPath.has_value()) { return; }
