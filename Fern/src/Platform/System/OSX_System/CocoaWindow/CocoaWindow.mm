@@ -42,7 +42,9 @@ CocoaWindow::CocoaWindow(
     Fern::DrawingContextType contextType
 )
     : m_isCursorLocked(false)
-    , m_handle(nil) {
+    , m_handle(nil)
+    , m_isReady(false)
+    , m_nextState(WindowState::WindowStateNone) {
     NSRect rect = CGRectMake(_rect.origin.x, _rect.origin.y, _rect.size.width, _rect.size.height);
 
     NSUInteger styleMask = NSWindowStyleMaskMiniaturizable;
@@ -107,7 +109,13 @@ WindowState CocoaWindow::getState() {
 }
 
 void CocoaWindow::setState(Fern::WindowState state) {
+    if (!m_isReady) {
+        m_nextState = state;
+        return;
+    }
     switch (state) {
+        case WindowState::WindowStateNone:
+            break;
         case WindowState::WindowStateMinimized:
             [m_handle miniaturize:nil];
             break;
@@ -120,6 +128,7 @@ void CocoaWindow::setState(Fern::WindowState state) {
             const NSUInteger masks = m_handle.styleMask;
             if (!(masks & NSWindowStyleMaskFullScreen)) {
                 [m_handle toggleFullScreen:nil];
+                [m_handle makeKeyAndOrderFront:nil];
             }
             break;
         }
@@ -136,6 +145,7 @@ void CocoaWindow::setState(Fern::WindowState state) {
         }
         break;
     }
+    m_nextState = WindowState::WindowStateNone;
 }
 
 bool CocoaWindow::getModifiedState() {
@@ -168,6 +178,7 @@ void CocoaWindow::setSize(Fern::Size size) {
     contentRect.size = NSMakeSize(size.width, size.height);
     [m_handle setFrame:[m_handle frameRectForContentRect:contentRect]
                         display:YES];
+    [m_handle center];
 }
 
 Fern::Size CocoaWindow::getSize() {
@@ -211,4 +222,13 @@ GraphicsContext* CocoaWindow::getDrawingContext() {
 
 NativeWindow* CocoaWindow::getNative() {
     return m_handle;
+}
+
+void CocoaWindow::didBecomeKey() {
+    m_isReady = true;
+    setState(m_nextState);
+}
+
+void CocoaWindow::didResignKey() {
+    m_isReady = false;
 }

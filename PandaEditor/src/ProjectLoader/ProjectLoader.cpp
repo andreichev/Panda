@@ -61,6 +61,10 @@ void ProjectLoader::saveAppSettings() {
     }
 }
 
+void ProjectLoader::saveWindowState(LastOpenedProjectWindowState state) {
+    m_editorSettings.windowState = state;
+}
+
 void ProjectLoader::loadRecentProject() {
     if (m_editorSettings.recentProjects.empty()) { return; }
     auto &recentProject = m_editorSettings.recentProjects.front();
@@ -226,6 +230,10 @@ void ProjectLoader::removeRecentProject(int index) {
 
 const ProjectSettings &ProjectLoader::getProjectSettings() {
     return m_projectSettings;
+}
+
+LastOpenedProjectWindowState ProjectLoader::getLastWindowState() {
+    return m_editorSettings.windowState;
 }
 
 AssetHandlerEditor &ProjectLoader::getAssetHandler() {

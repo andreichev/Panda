@@ -28,7 +28,11 @@ public:
     bool endProgressBar() override;
     Fern::GraphicsContext *getDrawingContext() override;
     NativeWindow* getNative();
+    void didBecomeKey();
+    void didResignKey();
 private:
+    Fern::WindowState m_nextState;
+    bool m_isReady;
     bool m_isCursorLocked;
     NativeWindow* m_handle;
     Fern::GraphicsContext *m_graphicsContext;

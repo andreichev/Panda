@@ -88,6 +88,7 @@ public:
 
 private:
     void windowSizeChanged(Size size);
+    void closeProject();
     void closeApp();
     void saveWorld();
     bool canUndo();

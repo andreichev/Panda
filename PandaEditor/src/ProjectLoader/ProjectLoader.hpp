@@ -29,6 +29,7 @@ public:
     ~ProjectLoader();
     void loadInitialData();
     void saveAppSettings();
+    void saveWindowState(LastOpenedProjectWindowState state);
     void saveProjectSettings();
     void openProject(const path_t &path);
     void openCppProject();
@@ -42,6 +43,7 @@ public:
     const path_t &getOpenedProjectPath();
     void removeRecentProject(int index);
     const ProjectSettings &getProjectSettings();
+    LastOpenedProjectWindowState getLastWindowState();
     AssetHandlerEditor &getAssetHandler();
 
 private:

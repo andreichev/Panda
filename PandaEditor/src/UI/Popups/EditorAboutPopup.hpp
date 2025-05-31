@@ -7,7 +7,7 @@
 #include "EditorPopup.hpp"
 
 #include <Panda/GameLogic/Input.hpp>
-#include <Panda/Assets/Texture.hpp>
+#include <Panda/Assets/TextureAsset.hpp>
 #include "Panda/ImGui/ImGuiFonts.hpp"
 #include <imgui.h>
 
@@ -55,7 +55,7 @@ public:
 
 private:
     bool open = true;
-    Panda::Texture pandaIcon = Panda::Texture("ui/icons/Panda.png");
+    Panda::TextureAsset pandaIcon = Panda::TextureAsset("ui/icons/Panda.png");
 };
 
 } // namespace Panda

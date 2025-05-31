@@ -102,10 +102,11 @@ struct Rect {
 };
 
 enum class WindowState {
-    WindowStateNormal = 0,
-    WindowStateMaximized = 1,
-    WindowStateMinimized = 2,
-    WindowStateFullScreen = 3,
+    WindowStateNone = 0,
+    WindowStateNormal,
+    WindowStateMaximized,
+    WindowStateMinimized,
+    WindowStateFullScreen
 };
 
 enum class DrawingContextType {
