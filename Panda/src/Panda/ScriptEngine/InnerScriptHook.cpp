@@ -261,12 +261,12 @@ namespace InternalCalls {
     void console_Log(int type, const char *message) {
         if (type == 0) {
             // info
-            LOG_INFO_EDITOR("%d", message);
+            LOG_INFO_EDITOR(message);
         } else if (type == 1) {
             // warning
-            LOG_WARN_EDITOR("%d", message);
+            LOG_WARN_EDITOR(message);
         } else if (type == 2) {
-            LOG_ERROR_EDITOR("%d", message);
+            LOG_ERROR_EDITOR(message);
         }
     }
 

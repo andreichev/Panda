@@ -24,6 +24,7 @@ ProjectLoader::ProjectLoader(World *world, ProjectLoaderOutput *output)
     , m_worldPath()
     , m_assetHandler() {
     GameContext::s_scriptEngine = &m_scriptEngine;
+    GameContext::s_assetHandler = &m_assetHandler;
 }
 
 ProjectLoader::~ProjectLoader() {
@@ -31,6 +32,7 @@ ProjectLoader::~ProjectLoader() {
     saveProjectSettings();
     m_assetHandler.closeProject();
     GameContext::s_scriptEngine = nullptr;
+    GameContext::s_assetHandler = nullptr;
 }
 
 void ProjectLoader::loadInitialData() {
@@ -57,6 +59,10 @@ void ProjectLoader::saveAppSettings() {
         encoder->encode(file, m_editorSettings);
         file.close();
     }
+}
+
+void ProjectLoader::saveWindowState(LastOpenedProjectWindowState state) {
+    m_editorSettings.windowState = state;
 }
 
 void ProjectLoader::loadRecentProject() {
@@ -224,6 +230,10 @@ void ProjectLoader::removeRecentProject(int index) {
 
 const ProjectSettings &ProjectLoader::getProjectSettings() {
     return m_projectSettings;
+}
+
+LastOpenedProjectWindowState ProjectLoader::getLastWindowState() {
+    return m_editorSettings.windowState;
 }
 
 AssetHandlerEditor &ProjectLoader::getAssetHandler() {

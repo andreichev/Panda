@@ -11,10 +11,10 @@
 
 namespace Panda {
 
-class DynamicMesh {
+class DynamicMeshAsset {
 public:
-    ~DynamicMesh();
-    DynamicMesh();
+    ~DynamicMeshAsset();
+    DynamicMeshAsset();
 
     void
     create(const MeshData &data, std::vector<TextureBinding> bindings, Miren::ProgramHandle shader);

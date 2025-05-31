@@ -24,6 +24,14 @@ EventQueue* getEventQueue();
     getEventQueue()->postSizeEvent(width, height);
 }
 
+- (void)windowDidBecomeKey:(NSNotification *)notification {
+    window->didBecomeKey();
+}
+
+- (void)windowDidResignKey:(NSNotification *)notification {
+    window->didResignKey();
+}
+
 - (BOOL)windowShouldClose:(id)sender {
     getEventQueue()->postWindowCloseRequest(window);
     return NO;

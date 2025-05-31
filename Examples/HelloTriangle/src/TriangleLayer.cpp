@@ -17,11 +17,11 @@ TriangleLayer::TriangleLayer()
 void TriangleLayer::onAttach() {
     using namespace Miren;
 
-    Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
-        "default-shaders/checker/checker_vertex.glsl",
-        "default-shaders/checker/checker_fragment.glsl"
-    );
-    m_shader = createProgram(programAsset.getMirenProgramCreate());
+    Foundation::Memory vertexMem =
+        Panda::AssetImporterBase::loadData("default-shaders/checker/checker_vertex.glsl");
+    Foundation::Memory fragmentMem =
+        Panda::AssetImporterBase::loadData("default-shaders/checker/checker_fragment.glsl");
+    m_shader = Miren::createProgram({vertexMem, fragmentMem});
 
     float rightEdge = 0.5f;
     float topEdge = 0.5f;

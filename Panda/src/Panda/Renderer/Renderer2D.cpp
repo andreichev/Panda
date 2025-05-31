@@ -1,4 +1,5 @@
 #include "Panda/Renderer/Renderer2D.hpp"
+#include "Panda/Assets/Base/AssetImporterBase.hpp"
 
 namespace Panda {
 
@@ -12,11 +13,11 @@ Renderer2D::Renderer2D()
         (Vertex2D *)F_ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
     m_drawData.indices =
         (uint16_t *)F_ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
-    Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
-        "default-shaders/renderer2d/renderer2d_vertex.glsl",
-        "default-shaders/renderer2d/renderer2d_fragment.glsl"
-    );
-    m_drawData.shader = Miren::createProgram(programAsset.getMirenProgramCreate());
+    Foundation::Memory vertexMem =
+        AssetImporterBase::loadData("default-shaders/renderer2d/renderer2d_vertex.glsl");
+    Foundation::Memory fragmentMem =
+        Panda::AssetImporterBase::loadData("default-shaders/renderer2d/renderer2d_fragment.glsl");
+    m_drawData.shader = Miren::createProgram({vertexMem, fragmentMem});
     Miren::VertexBufferLayoutData layoutData;
     // Position
     layoutData.pushVec3();
@@ -32,7 +33,9 @@ Renderer2D::Renderer2D()
     m_drawData.textureSlotIndex = 1;
     Foundation::Memory whiteTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
     *(uint32_t *)whiteTextureData.data = 0xffffffff;
-    m_drawData.whiteTexture = Foundation::makeShared<Texture>(whiteTextureData, 1, 1);
+    Miren::TextureCreate whiteTextureCreate;
+    whiteTextureCreate.m_data = whiteTextureData;
+    m_drawData.whiteTexture = Foundation::makeShared<TextureAsset>(whiteTextureCreate);
     m_drawData.textures[0] = m_drawData.whiteTexture;
     for (uint32_t i = 0; i < MAX_TEXTURE_SLOTS; i++) {
         m_drawData.samplers[i] = i;
@@ -77,7 +80,7 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     int textureIndex = -1;
     if (rect.texture != nullptr) {
         for (uint32_t i = 1; i < m_drawData.textureSlotIndex; i++) {
-            auto texture = Foundation::SharedCast<Texture>(rect.texture);
+            auto texture = Foundation::SharedCast<TextureAsset>(rect.texture);
             if (texture->getMirenHandle().id == (*m_drawData.textures[i]).getMirenHandle().id) {
                 textureIndex = i;
                 break;
@@ -90,7 +93,7 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
                 textureIndex = m_drawData.textureSlotIndex;
             }
             m_drawData.textures[m_drawData.textureSlotIndex] =
-                Foundation::SharedCast<Texture>(rect.texture);
+                Foundation::SharedCast<TextureAsset>(rect.texture);
             m_drawData.textureSlotIndex++;
         }
     }

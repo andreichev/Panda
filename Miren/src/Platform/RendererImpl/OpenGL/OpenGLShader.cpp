@@ -24,13 +24,13 @@ void OpenGLShader::create(ProgramCreate create) {
     vertex = glCreateShader(GL_VERTEX_SHADER);
     // LOG_INFO("\n\nVERTEX CODE: {}\n\n", vertexCode);
     // LOG_INFO("\n\nFRAGMENT CODE: {}\n\n", fragmentCode);
-    const char *vertexSource = reinterpret_cast<const char *>(create.m_vertex.data);
+    const char *vertexSource = reinterpret_cast<const char *>(create.m_vertexBinary.data);
     GL_CALL(glShaderSource(vertex, 1, &vertexSource, nullptr));
     GL_CALL(glCompileShader(vertex));
     checkCompileErrors(vertex, "VERTEX");
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    const char *fragmentSource = reinterpret_cast<const char *>(create.m_fragment.data);
+    const char *fragmentSource = reinterpret_cast<const char *>(create.m_fragmentBinary.data);
     GL_CALL(glShaderSource(fragment, 1, &fragmentSource, nullptr));
     GL_CALL(glCompileShader(fragment));
     checkCompileErrors(fragment, "FRAGMENT");
@@ -44,8 +44,8 @@ void OpenGLShader::create(ProgramCreate create) {
     GL_CALL(glDeleteShader(vertex));
     GL_CALL(glDeleteShader(fragment));
 
-    create.m_vertex.release();
-    create.m_fragment.release();
+    create.m_vertexBinary.release();
+    create.m_fragmentBinary.release();
 }
 
 void OpenGLShader::terminate() {

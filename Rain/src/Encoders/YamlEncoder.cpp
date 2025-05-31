@@ -97,7 +97,7 @@ void YamlEncoder::encode(const char *key, const char *&data) {
     *out << YAML::Value << data;
 }
 
-void YamlEncoder::encode(const char *key, UUID &data) {
+void YamlEncoder::encode(const char *key, const UUID &data) {
     if (key) {
         *out << YAML::Key << key;
     }

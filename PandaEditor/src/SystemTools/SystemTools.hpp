@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Panda/Assets/Path.hpp>
+#include <Panda/Assets/Base/Path.hpp>
 #include <optional>
 
 namespace Panda {

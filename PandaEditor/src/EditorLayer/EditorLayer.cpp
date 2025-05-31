@@ -32,7 +32,6 @@ EditorLayer::EditorLayer(Fern::Window *window)
 void EditorLayer::onAttach() {
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
     GameContext::s_currentWorld = m_currentWorld;
-    GameContext::s_assetHandler = &m_loader.getAssetHandler();
     m_panelsContainer.viewport.initWithSize(Size(100.f, 100.f));
     m_editingWorld.setViewId(m_panelsContainer.viewport.getMirenView());
     m_playingWorld.setViewId(m_panelsContainer.viewport.getMirenView());
@@ -46,7 +45,6 @@ void EditorLayer::onAttach() {
 
 void EditorLayer::onDetach() {
     GameContext::s_currentWorld = nullptr;
-    GameContext::s_assetHandler = nullptr;
 }
 
 void EditorLayer::onUpdate(double deltaTime) {
@@ -253,7 +251,31 @@ const path_t &EditorLayer::menuBarGetOpenedProjectPath() {
 }
 
 void EditorLayer::menuBarCloseApp() {
-    closeApp();
+    if (m_editingWorld.isChanged()) {
+        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
+        popup->yesAction = [&]() {
+            saveWorld();
+            closeApp();
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
+        };
+        popup->noAction = [&]() {
+            closeApp();
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
+        };
+        popup->closeAction = [&]() {
+            F_DELETE(Foundation::getAllocator(), m_popups.back());
+            m_popups.pop_back();
+        };
+        popup->title = "Save current world?";
+        popup->subtitle = "Do you want to save your changes?";
+        popup->yesText = "Save";
+        popup->noText = "Not save";
+        m_popups.emplace_back(popup);
+    } else {
+        closeApp();
+    }
 }
 
 void EditorLayer::menuBarOpenCppProject() {
@@ -269,12 +291,12 @@ void EditorLayer::menuBarCloseProject() {
         EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
         popup->yesAction = [&]() {
             saveWorld();
-            m_loader.closeProject();
+            closeProject();
             F_DELETE(Foundation::getAllocator(), m_popups.back());
             m_popups.pop_back();
         };
         popup->noAction = [&]() {
-            m_loader.closeProject();
+            closeProject();
             F_DELETE(Foundation::getAllocator(), m_popups.back());
             m_popups.pop_back();
         };
@@ -288,7 +310,7 @@ void EditorLayer::menuBarCloseProject() {
         popup->noText = "Not save";
         m_popups.emplace_back(popup);
     } else {
-        m_loader.closeProject();
+        closeProject();
     }
 }
 
@@ -395,7 +417,8 @@ void EditorLayer::deleteFileShowPopup(path_t path) {
 }
 
 void EditorLayer::importAsset(const path_t &path) {
-    m_loader.getAssetHandler().importAsset(path);
+    auto &assetHandler = m_loader.getAssetHandler();
+    assetHandler.registerTextureAsset(path);
 }
 
 UUID EditorLayer::getAssetId(const path_t &path) {
@@ -477,12 +500,20 @@ void EditorLayer::viewportUnselectAll() {
 void EditorLayer::updateWindowState() {
     m_window->setResizable(m_loader.hasOpenedProject());
     if (m_loader.hasOpenedProject()) {
-        m_window->setState(Fern::WindowState::WindowStateMaximized);
+        auto windowState = m_loader.getLastWindowState();
+        if (windowState.isFullScreen) {
+            m_window->setState(Fern::WindowState::WindowStateFullScreen);
+        } else {
+            if (windowState.isSizeValid()) {
+                m_window->setState(Fern::WindowState::WindowStateNormal);
+                m_window->setSize({(float)windowState.width, (float)windowState.height});
+            } else {
+                m_window->setState(Fern::WindowState::WindowStateMaximized);
+            }
+        }
     } else {
-        m_window->setState(Fern::WindowState::WindowStateNormal);
-    }
-    if (!m_loader.hasOpenedProject()) {
         m_window->setTitle("Welcome");
+        m_window->setState(Fern::WindowState::WindowStateNormal);
         m_window->setSize({600, 400});
     }
 }
@@ -523,32 +554,24 @@ void EditorLayer::saveWorld() {
     LOG_INFO_EDITOR("World saved.");
 }
 
+void EditorLayer::closeProject() {
+    Fern::WindowState windowState = m_window->getState();
+    LastOpenedProjectWindowState savingState;
+    savingState.isFullScreen = windowState == Fern::WindowState::WindowStateFullScreen;
+    savingState.width = m_window->getSize().width;
+    savingState.height = m_window->getSize().height;
+    m_loader.saveWindowState(savingState);
+    m_loader.closeProject();
+}
+
 void EditorLayer::closeApp() {
-    if (m_editingWorld.isChanged()) {
-        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
-        popup->yesAction = [&]() {
-            saveWorld();
-            Application::get()->close();
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
-        };
-        popup->noAction = [&]() {
-            Application::get()->close();
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
-        };
-        popup->closeAction = [&]() {
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
-        };
-        popup->title = "Save current world?";
-        popup->subtitle = "Do you want to save your changes?";
-        popup->yesText = "Save";
-        popup->noText = "Not save";
-        m_popups.emplace_back(popup);
-    } else {
-        Application::get()->close();
-    }
+    Fern::WindowState windowState = m_window->getState();
+    LastOpenedProjectWindowState savingState;
+    savingState.isFullScreen = windowState == Fern::WindowState::WindowStateFullScreen;
+    savingState.width = m_window->getSize().width;
+    savingState.height = m_window->getSize().height;
+    m_loader.saveWindowState(savingState);
+    Application::get()->close();
 }
 
 void EditorLayer::processShortcuts() {

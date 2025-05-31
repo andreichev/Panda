@@ -51,6 +51,10 @@ constexpr std::size_t offsetOf(U T::*member) {
     return reinterpret_cast<std::size_t>(&(reinterpret_cast<T const volatile *>(0)->*member));
 }
 
+inline const void *addOffset(const void *data, size_t offset) {
+    return static_cast<const uint8_t *>(data) + offset;
+}
+
 inline void *addOffset(void *data, size_t offset) {
     return static_cast<uint8_t *>(data) + offset;
 }

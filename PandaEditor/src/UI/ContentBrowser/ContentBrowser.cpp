@@ -14,26 +14,27 @@ ContentBrowser::ContentBrowser(ContentBrowserOutput *output)
     , m_defaultFileIcon("ui/icons/_plain.png")
     , m_directoryIcon("ui/icons/DirectoryIcon.png")
     , m_importedIcon("ui/icons/ImportedAssetIcon.png")
-    , m_fileIcons() {
-    m_fileIcons.emplace(".avi", Texture("ui/icons/avi.png"));
-    m_fileIcons.emplace(".bmp", Texture("ui/icons/bmp.png"));
-    m_fileIcons.emplace(".c", Texture("ui/icons/c.png"));
-    m_fileIcons.emplace(".cpp", Texture("ui/icons/cpp.png"));
-    m_fileIcons.emplace(".gif", Texture("ui/icons/gif.png"));
-    m_fileIcons.emplace(".h", Texture("ui/icons/h.png"));
-    m_fileIcons.emplace(".hpp", Texture("ui/icons/hpp.png"));
-    m_fileIcons.emplace(".html", Texture("ui/icons/html.png"));
-    m_fileIcons.emplace(".jpg", Texture("ui/icons/jpg.png"));
-    m_fileIcons.emplace(".mp3", Texture("ui/icons/mp3.png"));
-    m_fileIcons.emplace(".mp4", Texture("ui/icons/mp4.png"));
-    m_fileIcons.emplace(".png", Texture("ui/icons/png.png"));
-    m_fileIcons.emplace(".tga", Texture("ui/icons/tga.png"));
-    m_fileIcons.emplace(".tiff", Texture("ui/icons/tiff.png"));
-    m_fileIcons.emplace(".txt", Texture("ui/icons/txt.png"));
-    m_fileIcons.emplace(".wav", Texture("ui/icons/wav.png"));
-    m_fileIcons.emplace(".xml", Texture("ui/icons/xml.png"));
-    m_fileIcons.emplace(".yml", Texture("ui/icons/yml.png"));
-    m_fileIcons.emplace(".zip", Texture("ui/icons/zip.png"));
+    , m_fileIcons()
+    , m_thumbnailProvider() {
+    m_fileIcons.emplace(".avi", TextureAsset("ui/icons/avi.png"));
+    m_fileIcons.emplace(".bmp", TextureAsset("ui/icons/bmp.png"));
+    m_fileIcons.emplace(".c", TextureAsset("ui/icons/c.png"));
+    m_fileIcons.emplace(".cpp", TextureAsset("ui/icons/cpp.png"));
+    m_fileIcons.emplace(".gif", TextureAsset("ui/icons/gif.png"));
+    m_fileIcons.emplace(".h", TextureAsset("ui/icons/h.png"));
+    m_fileIcons.emplace(".hpp", TextureAsset("ui/icons/hpp.png"));
+    m_fileIcons.emplace(".html", TextureAsset("ui/icons/html.png"));
+    m_fileIcons.emplace(".jpg", TextureAsset("ui/icons/jpg.png"));
+    m_fileIcons.emplace(".mp3", TextureAsset("ui/icons/mp3.png"));
+    m_fileIcons.emplace(".mp4", TextureAsset("ui/icons/mp4.png"));
+    m_fileIcons.emplace(".png", TextureAsset("ui/icons/png.png"));
+    m_fileIcons.emplace(".tga", TextureAsset("ui/icons/tga.png"));
+    m_fileIcons.emplace(".tiff", TextureAsset("ui/icons/tiff.png"));
+    m_fileIcons.emplace(".txt", TextureAsset("ui/icons/txt.png"));
+    m_fileIcons.emplace(".wav", TextureAsset("ui/icons/wav.png"));
+    m_fileIcons.emplace(".xml", TextureAsset("ui/icons/xml.png"));
+    m_fileIcons.emplace(".yml", TextureAsset("ui/icons/yml.png"));
+    m_fileIcons.emplace(".zip", TextureAsset("ui/icons/zip.png"));
 }
 
 bool isMouseInsideWindow(ImVec2 windowPos, ImVec2 windowSize) {
@@ -46,9 +47,10 @@ bool isMouseInsideWindow(ImVec2 windowPos, ImVec2 windowSize) {
 void ContentBrowser::onImGuiRender() {
     if (m_currentDirectory.empty()) { return; }
     ImGui::Begin("Content Browser");
-    if (m_currentDirectory != path_t(m_baseDirectory)) {
+    if (m_currentDirectory != m_baseDirectory) {
         if (ImGui::Button(getString(ICON_ARROW_LEFT).c_str())) {
             m_currentDirectory = m_currentDirectory.parent_path();
+            m_thumbnailProvider.resetCache();
         }
     }
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
@@ -67,8 +69,8 @@ void ContentBrowser::onImGuiRender() {
     static float thumbnailSize = 90.0f;
     float cellSize = thumbnailSize + padding;
 
-    float ContentBrowserWidth = ImGui::GetContentRegionAvail().x;
-    int columnCount = (int)(ContentBrowserWidth / cellSize);
+    float contentBrowserWidth = ImGui::GetContentRegionAvail().x;
+    int columnCount = (int)(contentBrowserWidth / cellSize);
     columnCount = std::max(columnCount, 1);
     // if (!Events::getDropPaths().empty()) {
     //     if (isMouseInsideWindow(ImGui::GetWindowPos(), ImGui::GetWindowSize())) {
@@ -97,22 +99,33 @@ void ContentBrowser::onImGuiRender() {
         if (!showHiddenFiles && filenameString[0] == '.') { continue; }
 
         ImGui::PushID(filenameString.c_str());
-        Texture *icon;
+        TextureAsset *icon;
+        Foundation::Shared<TextureAsset> thumbnail;
         if (directoryEntry.is_directory()) {
             icon = &m_directoryIcon;
         } else {
-            if (m_fileIcons.find(path.extension().string()) != m_fileIcons.end()) {
-                icon = &m_fileIcons[path.extension().string()];
-            } else {
-                icon = &m_defaultFileIcon;
+            if (assetId) {
+                thumbnail =
+                    m_thumbnailProvider.getThumbnailOrNull(assetId, {thumbnailSize, thumbnailSize});
+            }
+            if (!thumbnail) {
+                if (m_fileIcons.find(path.extension().string()) != m_fileIcons.end()) {
+                    icon = &m_fileIcons[path.extension().string()];
+                } else {
+                    icon = &m_defaultFileIcon;
+                }
             }
         }
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         ImVec2 thumbnailPos = ImGui::GetCursorPos();
+        Miren::TextureHandle handle =
+            thumbnail ? thumbnail->getMirenHandle() : icon->getMirenHandle();
+        float height = thumbnailSize;
+        float aspect = 1.f;
+        if (thumbnail) { aspect = thumbnail->getSize().width / thumbnail->getSize().height; }
+        float width = height * aspect;
         ImGui::ImageButton(
-            filenameString.c_str(),
-            (ImTextureID)(intptr_t)icon->getMirenHandle().id,
-            {thumbnailSize, thumbnailSize}
+            filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {width, height}
         );
         if (assetId) {
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
@@ -135,7 +148,10 @@ void ContentBrowser::onImGuiRender() {
         }
         ImGui::PopStyleColor();
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            if (directoryEntry.is_directory()) { m_currentDirectory /= path.filename(); }
+            if (directoryEntry.is_directory()) {
+                m_currentDirectory /= path.filename();
+                m_thumbnailProvider.resetCache();
+            }
         }
         if (ImGui::BeginPopupContextItem(filenameString.c_str())) {
             if (ImGui::MenuItem("Show in Finder")) { SystemTools::show(path.c_str()); }

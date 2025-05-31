@@ -7,7 +7,7 @@
 #include "Rain/Codable.hpp"
 
 struct B : public Rain::Codable {
-    const char *b;
+    const char b[40];
 
     RAIN_FIELDS_BEGIN(B)
     RAIN_FIELD(b)
@@ -18,7 +18,7 @@ struct B : public Rain::Codable {
 };
 
 struct A : public Rain::Codable {
-    const char *a;
+    const char a[40];
     B b;
 
     RAIN_FIELDS_BEGIN(A)
@@ -32,7 +32,7 @@ struct A : public Rain::Codable {
 };
 
 struct Car : public Rain::Codable {
-    const char *mark;
+    const char mark[40];
     int year;
     A a;
 

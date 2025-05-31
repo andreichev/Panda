@@ -2,7 +2,7 @@
 
 #include "Camera/CameraController.hpp"
 
-#include <Panda/Assets/AssetHandler.hpp>
+#include <Panda/Assets/Base/AssetHandler.hpp>
 #include <glm/glm.hpp>
 #include <Miren/Miren.hpp>
 
@@ -59,11 +59,11 @@ public:
         m_vertexBuffer = Miren::createVertexBuffer(verticesMemory, 8 * sizeof(float), layoutHandle);
         m_indexBuffer =
             Miren::createIndexBuffer(indicesMemory, Miren::BufferElementType::UnsignedInt, 6);
-
-        Panda::ProgramData programAsset = Panda::AssetLoaderEditor::loadProgram(
-            "editor-shaders/grid_vertex.glsl", "editor-shaders/grid_fragment.glsl"
-        );
-        m_shader = Miren::createProgram(programAsset.getMirenProgramCreate());
+        Foundation::Memory vertexMem =
+            Panda::AssetImporterBase::loadData("editor-shaders/grid_vertex.glsl");
+        Foundation::Memory fragmentMem =
+            Panda::AssetImporterBase::loadData("editor-shaders/grid_fragment.glsl");
+        m_shader = Miren::createProgram({vertexMem, fragmentMem});
     }
 
     void update(glm::mat4 &viewProjection) {

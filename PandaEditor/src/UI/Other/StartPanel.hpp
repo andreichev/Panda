@@ -17,8 +17,8 @@ private:
     void createProject(const std::string &name);
     void openProject();
 
-    Texture m_logoImage;
-    Texture m_iconProject;
+    TextureAsset m_logoImage;
+    TextureAsset m_iconProject;
     bool m_newProjectMenu;
     ProjectLoader *m_loader;
 };

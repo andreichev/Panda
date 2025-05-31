@@ -11,7 +11,7 @@
 
 int startApp(int argc, const char **argv) {
     Fern::initialize();
-    Fern::Rect rect = Fern::Rect(0, 0, 600, 400);
+    Fern::Rect rect = Fern::Rect(0, 0, 1400, 800);
     Fern::Window *window = Fern::createWindow(
         "Panda Editor",
         rect,

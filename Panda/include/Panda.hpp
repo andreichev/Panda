@@ -9,8 +9,8 @@
 #include "Panda/Application/Layer.hpp"
 
 // Assets
-#include "Panda/Assets/AssetHandler.hpp"
-#include "Panda/Assets/AssetLoaderEditor.hpp"
+#include "Panda/Assets/Base/AssetHandler.hpp"
+#include "Panda/Assets/Base/AssetImporterBase.hpp"
 
 // Input
 #include "Panda/GameLogic/Input.hpp"
@@ -20,5 +20,5 @@
 #include "Panda/Renderer/Renderer3D.hpp"
 #include "Panda/Renderer/MeshData.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
-#include "Panda/GameLogic/Components/DynamicMesh.hpp"
-#include "Panda/GameLogic/Components/StaticMesh.hpp"
+#include "Panda/Assets/DynamicMeshAsset.hpp"
+#include "Panda/Assets/StaticMeshAsset.hpp"

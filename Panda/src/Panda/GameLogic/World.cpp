@@ -86,6 +86,7 @@ void World::updateRuntime(double deltaTime) {
         m_renderer2d.setViewProj(viewProjMtx);
         m_renderer3d.setViewProj(viewProjMtx);
     }
+
     updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
 
     m_renderer2d.end();
@@ -110,10 +111,10 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
         }
     }
 
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
-
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
+
+    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
 
     m_renderer2d.end();
     m_renderer3d.end();
@@ -127,6 +128,8 @@ void World::updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &sk
 
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
+
+    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
 
     m_renderer2d.end();
     m_renderer3d.end();

@@ -151,17 +151,17 @@ void JsonEncoder::encode(const char *key, const double &data) {
 
 void JsonEncoder::encode(const char *key, const std::string &data) {
     rapidjson::Value value;
-    value = rapidjson::StringRef(data.c_str());
+    value = rapidjson::Value(data.c_str(), *m_allocator);
     addValue(key, value);
 }
 
 void JsonEncoder::encode(const char *key, const char *&data) {
     rapidjson::Value value;
-    value = rapidjson::StringRef(data);
+    value = rapidjson::Value(data, *m_allocator);
     addValue(key, value);
 }
 
-void JsonEncoder::encode(const char *key, UUID &data) {
+void JsonEncoder::encode(const char *key, const UUID &data) {
     rapidjson::Value value;
     value = data;
     addValue(key, value);
