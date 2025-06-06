@@ -10,17 +10,28 @@
 #include <Panda/Base/Base.hpp>
 #include <Panda/GameLogic/Camera.hpp>
 #include <Miren/Miren.hpp>
+#include <unordered_set>
 
 namespace Panda {
 
 class ViewportOutput {
 public:
     virtual ~ViewportOutput() = default;
-    virtual void viewportPickEntityWithId(UUID id) = 0;
+    virtual std::unordered_set<UUID> viewportGetSelectedIds() = 0;
+    virtual void viewportPickEntitiesWithId(std::unordered_set<UUID> ids) = 0;
+    virtual void viewportUnselectEntitiesWithId(std::unordered_set<UUID> ids) = 0;
     virtual void viewportUnselectAll() = 0;
 };
 
 class Viewport final {
+    struct RectSelection {
+        bool isStarted = false;
+        bool appendSelection = false;
+        Rect rect;
+        std::unordered_set<UUID> initialSelection;
+        std::unordered_set<UUID> currentSelection;
+    };
+
 public:
     Viewport(ViewportOutput *output, CameraController *cameraController);
 
@@ -31,11 +42,14 @@ public:
     void focus();
     bool isFocused();
     bool isHovered();
-    int32_t getHoveredId();
     Miren::ViewId getMirenView();
 
 private:
     void updateViewportSize(Size size);
+    void beginRectSelection(bool appendSelection);
+    void updateRectSelection();
+    void endRectSelection();
+    std::unordered_set<UUID> getEntitiesInsideRectSelection();
 
     ViewportOutput *m_output;
     Gizmos m_gizmos;
@@ -48,8 +62,9 @@ private:
     bool m_focusNextFrame;
     bool m_focused;
     bool m_hovered;
-    uint32_t m_hoveredId;
+    Foundation::Memory m_idsBuffer;
     Rect m_frame;
+    RectSelection m_rectSelection;
 };
 
 } // namespace Panda

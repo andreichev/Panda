@@ -478,17 +478,38 @@ SceneState EditorLayer::toolbarGetCurrentSceneState() {
 
 #pragma region Viewport output
 
-void EditorLayer::viewportPickEntityWithId(UUID id) {
+std::unordered_set<UUID> EditorLayer::viewportGetSelectedIds() {
+    if (!m_currentWorld) { return {}; }
+    SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
+    auto entities = selectionContext.getSelectedEntities();
+    std::unordered_set<UUID> ids;
+    for (auto entity : entities) {
+        ids.insert(entity.getId());
+    }
+    return ids;
+}
+
+void EditorLayer::viewportPickEntitiesWithId(std::unordered_set<UUID> ids) {
     if (!m_currentWorld) { return; }
     SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
-    Entity selected = m_currentWorld->getById(id);
-    if (selected.isValid()) {
-        if (selectionContext.isSelected(selected)) {
-            selectionContext.removeSelectedEntity(selected);
-        } else {
-            selectionContext.addSelectedEntity(selected);
-        }
+    std::vector<Entity> entities;
+    for (UUID id : ids) {
+        Entity selected = m_currentWorld->getById(id);
+        entities.push_back(selected);
     }
+    selectionContext.addSelectedEntities(entities);
+}
+
+void EditorLayer::viewportUnselectEntitiesWithId(std::unordered_set<UUID> ids) {
+    if (!m_currentWorld) { return; }
+    if (!m_currentWorld) { return; }
+    SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
+    std::vector<Entity> entities;
+    for (UUID id : ids) {
+        Entity selected = m_currentWorld->getById(id);
+        entities.push_back(selected);
+    }
+    selectionContext.removeSelectedEntities(entities);
 }
 
 void EditorLayer::viewportUnselectAll() {

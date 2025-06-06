@@ -47,6 +47,10 @@ struct Vec2 : public Rain::Codable {
         return {x, y};
     }
 
+    bool isZero() {
+        return x == 0 && y == 0;
+    }
+
     RAIN_FIELDS_BEGIN(Vec2)
     RAIN_FIELD(x)
     RAIN_FIELD(y)

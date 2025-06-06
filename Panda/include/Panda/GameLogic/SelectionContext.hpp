@@ -44,7 +44,7 @@ public:
         if (needToCalculateMedian) { updateValues(); }
     }
 
-    void addSelectedEntities(std::vector<Entity> entities) {
+    void addSelectedEntities(const std::vector<Entity> &entities) {
         for (auto entity : entities) {
             addSelectedEntity(entity, false);
         }
@@ -61,6 +61,13 @@ public:
             m_manipulatingEntities.end()
         );
         if (needToCalculateMedian) { updateValues(); }
+    }
+
+    void removeSelectedEntities(const std::vector<Entity> &entities) {
+        for (auto entity : entities) {
+            removeSelectedEntity(entity, false);
+        }
+        updateValues();
     }
 
     void unselectAll() {

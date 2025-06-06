@@ -82,7 +82,9 @@ public:
 #pragma endregion
 
 #pragma region Viewport output
-    void viewportPickEntityWithId(UUID id) override;
+    std::unordered_set<UUID> viewportGetSelectedIds() override;
+    void viewportPickEntitiesWithId(std::unordered_set<UUID> ids) override;
+    void viewportUnselectEntitiesWithId(std::unordered_set<UUID> ids) override;
     void viewportUnselectAll() override;
 #pragma endregion
 
