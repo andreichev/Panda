@@ -19,7 +19,7 @@ class EditorLayer : public Layer,
                     public ComponentsDrawOutput,
                     public ContentBrowserOutput,
                     public ToolbarOutput,
-                    public ViewportOutput {
+                    public ViewportPanelOutput {
 public:
     EditorLayer(Fern::Window *window);
     ~EditorLayer() override = default;
@@ -81,7 +81,7 @@ public:
     SceneState toolbarGetCurrentSceneState() override;
 #pragma endregion
 
-#pragma region Viewport output
+#pragma region ViewportPanel output
     std::unordered_set<UUID> viewportGetSelectedIds() override;
     void viewportPickEntitiesWithId(std::unordered_set<UUID> ids) override;
     void viewportUnselectEntitiesWithId(std::unordered_set<UUID> ids) override;

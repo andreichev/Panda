@@ -6,7 +6,7 @@
 #include "UI/Other/Dockspace.hpp"
 #include "UI/Other/WorldHierarchyPanel.hpp"
 #include "UI/Other/StatisticsPanel.hpp"
-#include "UI/Viewport/Viewport.hpp"
+#include "UI/ViewportPanel/ViewportPanel.hpp"
 #include "UI/Console/ConsolePanel.hpp"
 #include "UI/Toolbar/Toolbar.hpp"
 #include "UI/ContentBrowser/ContentBrowser.hpp"
@@ -27,7 +27,7 @@ public:
     MenuBar menuBar;
     Toolbar toolbar;
     Dockspace dockspace;
-    Viewport viewport;
+    ViewportPanel viewport;
     StatisticsPanel statisticsPanel;
     ConsolePanel consolePanel;
     WorldHierarchyPanel hierarchyPanel;

@@ -7,23 +7,22 @@
 #include "UI/Gizmos/Gizmos.hpp"
 #include "Camera/CameraController.hpp"
 
-#include <Panda/Base/Base.hpp>
+#include <Viewport/Viewport.hpp>
 #include <Panda/GameLogic/Camera.hpp>
 #include <Miren/Miren.hpp>
-#include <unordered_set>
 
 namespace Panda {
 
-class ViewportOutput {
+class ViewportPanelOutput {
 public:
-    virtual ~ViewportOutput() = default;
+    virtual ~ViewportPanelOutput() = default;
     virtual std::unordered_set<UUID> viewportGetSelectedIds() = 0;
     virtual void viewportPickEntitiesWithId(std::unordered_set<UUID> ids) = 0;
     virtual void viewportUnselectEntitiesWithId(std::unordered_set<UUID> ids) = 0;
     virtual void viewportUnselectAll() = 0;
 };
 
-class Viewport final {
+class ViewportPanel final {
     struct RectSelection {
         bool isStarted = false;
         bool appendSelection = false;
@@ -33,12 +32,14 @@ class Viewport final {
     };
 
 public:
-    Viewport(ViewportOutput *output, CameraController *cameraController);
+    ViewportPanel(ViewportPanelOutput *output, CameraController *cameraController);
+    ~ViewportPanel();
 
     void initWithSize(Vec2 size);
     void setCamera(Camera *camera);
     void setWorld(World *world);
     void onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen);
+    void update();
     void focus();
     bool isFocused();
     bool isHovered();
@@ -49,21 +50,15 @@ private:
     void beginRectSelection(bool appendSelection);
     void updateRectSelection();
     void endRectSelection();
-    std::unordered_set<UUID> getEntitiesInsideRectSelection();
 
-    ViewportOutput *m_output;
+    ViewportPanelOutput *m_output;
+    Viewport m_viewport;
     Gizmos m_gizmos;
-    Miren::FrameBufferHandle m_sceneFB;
-    Miren::FrameBufferSpecification m_sceneFbSpecification;
-    Miren::ViewId m_sceneView;
-    Miren::TextureHandle m_colorAttachment;
     Camera *m_camera;
     CameraController *m_cameraController;
     bool m_focusNextFrame;
     bool m_focused;
     bool m_hovered;
-    Foundation::Memory m_idsBuffer;
-    Rect m_frame;
     RectSelection m_rectSelection;
 };
 

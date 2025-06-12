@@ -1,101 +1,35 @@
-#include "Viewport.hpp"
+#include "ViewportPanel.hpp"
 
 #include <Panda.hpp>
-#include <PandaUI/PandaUI.hpp>
 #include <imgui.h>
 #include <Panda/ImGui/FontAwesome.h>
 
 namespace Panda {
 
-Viewport::Viewport(ViewportOutput *output, CameraController *cameraController)
+ViewportPanel::ViewportPanel(ViewportPanelOutput *output, CameraController *cameraController)
     : m_output(output)
-    , m_frame()
+    , m_viewport()
     , m_rectSelection()
-    , m_idsBuffer()
     , m_camera(nullptr)
     , m_cameraController(cameraController)
     , m_focused(false)
     , m_hovered(false)
     , m_focusNextFrame(true)
-    , m_sceneFB()
-    , m_sceneFbSpecification()
-    , m_sceneView(1)
-    , m_colorAttachment()
     , m_gizmos(nullptr, cameraController) {}
 
-void Viewport::initWithSize(Vec2 size) {
-    m_frame.size = size;
-    PandaUI::initialize();
-    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
-    Fern::Size windowSize = Application::get()->getMainWindow()->getSize();
-    Miren::TextureCreate create;
-    create.m_data = Foundation::Memory(nullptr);
-    create.m_format = Miren::TextureFormat::RGBA8;
-    create.m_width = m_frame.size.width * dpi.width;
-    create.m_height = m_frame.size.height * dpi.height;
-    m_colorAttachment = Miren::createTexture(create);
-    create.m_format = Miren::TextureFormat::R32UI;
-    Miren::TextureHandle idAttachment = Miren::createTexture(create);
-    create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
-    Miren::TextureHandle depthAttachment = Miren::createTexture(create);
-    Miren::FrameBufferAttachment attachments[] = {m_colorAttachment, idAttachment, depthAttachment};
-    m_sceneFbSpecification = Miren::FrameBufferSpecification(attachments, 3);
-    m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
-    Miren::setViewport(
-        m_sceneView,
-        Miren::Rect(0, 0, m_frame.size.width * dpi.width, m_frame.size.height * dpi.height)
-    );
-    Miren::setViewport(
-        0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
-    );
-    Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
-    Miren::setViewClear(m_sceneView, 0x000000cff);
-    Miren::setViewClearAttachments(m_sceneView, {Miren::Clear(1, 0)});
-    PandaUI::Context::shared().updateViewId(m_sceneView);
-    uint32_t bufferSize =
-        sizeof(uint32_t) * m_frame.size.width * dpi.width * m_frame.size.height * dpi.height;
-    m_idsBuffer = Foundation::Memory::alloc(bufferSize);
-    memset(m_idsBuffer.data, 0, bufferSize);
+ViewportPanel::~ViewportPanel() {}
+
+void ViewportPanel::initWithSize(Vec2 size) {
+    m_viewport.initWithSize(size);
 }
 
-void Viewport::updateViewportSize(Size size) {
+void ViewportPanel::updateViewportSize(Size size) {
     if (size.width < 1 || size.height < 1) { return; }
-    m_frame.size = size;
-    PandaUI::Context::shared().updateViewportSize({size.width, size.height});
     if (m_camera) { m_camera->setViewportSize(size); }
-    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
-    Miren::setViewport(
-        m_sceneView, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
-    );
-    // COLOR ATTACHMENT
-    Miren::resizeTexture(
-        m_sceneFbSpecification.attachments[0].handle,
-        size.width * dpi.width,
-        size.height * dpi.height
-    );
-    // ID ATTACHMENT
-    Miren::resizeTexture(
-        m_sceneFbSpecification.attachments[1].handle,
-        size.width * dpi.width,
-        size.height * dpi.height
-    );
-    // DEPTH ATTACHMENT
-    Miren::resizeTexture(
-        m_sceneFbSpecification.attachments[2].handle,
-        size.width * dpi.width,
-        size.height * dpi.height
-    );
-    Miren::deleteFrameBuffer(m_sceneFB);
-    m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
-    Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
-    m_idsBuffer.release();
-    uint32_t bufferSize =
-        sizeof(uint32_t) * m_frame.size.width * dpi.width * m_frame.size.height * dpi.height;
-    m_idsBuffer = Foundation::Memory::alloc(bufferSize);
-    memset(m_idsBuffer.data, 0, bufferSize);
+    m_viewport.updateSize(size);
 }
 
-void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen) {
+void ViewportPanel::onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen) {
     ImGuiWindowFlags window_flags = 0;
     if (fullScreen) {
         const ImGuiViewport *viewport = ImGui::GetMainViewport();
@@ -114,7 +48,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     ImGui::Begin(fullScreen ? "Viewport (fullscreen mode)" : "Viewport", NULL, window_flags);
     ImVec2 viewportSpace = ImGui::GetContentRegionAvail();
     viewportSpace = ImVec2(viewportSpace.x - 4, viewportSpace.y - 4);
-    if (m_frame.size != viewportSpace) { updateViewportSize(viewportSpace); }
+    if (m_viewport.getFrame().size != viewportSpace) { updateViewportSize(viewportSpace); }
     m_hovered = ImGui::IsWindowHovered();
     if ((m_hovered && Input::isMouseButtonPressed(Fern::MouseButton::RIGHT)) || m_focusNextFrame) {
         ImGui::SetWindowFocus();
@@ -124,10 +58,16 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     Application::get()->getImGuiLayer()->setBlockEvents(!m_hovered);
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 1);
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 1);
-    m_frame.origin = ImGui::GetCursorScreenPos();
-    Input::setViewportFrame(m_frame);
-    ImGui::Image((void *)(uintptr_t)m_colorAttachment.id, m_frame.size, ImVec2(0, 1), ImVec2(1, 0));
-    m_gizmos.onImGuiRender(sceneState, m_frame);
+    Vec2 viewportOrigin = ImGui::GetCursorScreenPos();
+    m_viewport.updateOrigin(viewportOrigin);
+    Input::setViewportFrame(m_viewport.getFrame());
+    ImGui::Image(
+        (void *)(uintptr_t)m_viewport.getResultTexture().id,
+        viewportSpace,
+        ImVec2(0, 1),
+        ImVec2(1, 0)
+    );
+    m_gizmos.onImGuiRender(sceneState, m_viewport.getFrame());
 
     ImGuiStyle &style = ImGui::GetStyle();
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
@@ -138,24 +78,14 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     ImDrawList *draw_list = ImGui::GetForegroundDrawList();
     const Rect &selectionRect = m_rectSelection.rect;
     ImVec2 min = {
-        m_frame.origin.x + selectionRect.origin.x, m_frame.origin.y + selectionRect.origin.y
+        viewportOrigin.x + selectionRect.origin.x, viewportOrigin.y + selectionRect.origin.y
     };
     ImVec2 max = {min.x + selectionRect.size.width, min.y + selectionRect.size.height};
     draw_list->AddRectFilled(min, max, IM_COL32(100, 100, 100, 100));
 
     ImGui::End();
     ImGui::PopStyleVar();
-
-    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
-    Miren::readFrameBuffer(
-        m_sceneFB,
-        1,
-        0,
-        0,
-        m_frame.size.width * dpi.x,
-        m_frame.size.height * dpi.y,
-        m_idsBuffer.data
-    );
+    m_viewport.update();
     bool mouseDown = Input::isMouseButtonPressed(Fern::MouseButton::LEFT);
     if (m_focused && !m_gizmos.isUsing()) {
         if (!m_rectSelection.isStarted && mouseDown) {
@@ -173,7 +103,7 @@ void Viewport::onImGuiRender(SceneState sceneState, float offsetY, bool fullScre
     }
 }
 
-void Viewport::beginRectSelection(bool append) {
+void ViewportPanel::beginRectSelection(bool append) {
     m_rectSelection.isStarted = true;
     m_rectSelection.appendSelection = append;
     m_rectSelection.rect =
@@ -182,13 +112,13 @@ void Viewport::beginRectSelection(bool append) {
     m_rectSelection.initialSelection = m_rectSelection.currentSelection;
 }
 
-void Viewport::updateRectSelection() {
+void ViewportPanel::updateRectSelection() {
     m_rectSelection.rect.size.width =
         Input::getMouseViewportPositionX() - m_rectSelection.rect.origin.x;
     m_rectSelection.rect.size.height =
         Input::getMouseViewportPositionY() - m_rectSelection.rect.origin.y;
     if (m_rectSelection.rect.size.isZero()) { return; }
-    std::unordered_set<UUID> ids = getEntitiesInsideRectSelection();
+    std::unordered_set<UUID> ids = m_viewport.getEntitiesInsideRect(m_rectSelection.rect);
     std::unordered_set<UUID> select;
     std::unordered_set<UUID> unselect;
     // Был зажат ctrl или shift
@@ -246,15 +176,12 @@ void Viewport::updateRectSelection() {
     m_output->viewportUnselectEntitiesWithId(unselect);
 }
 
-void Viewport::endRectSelection() {
+void ViewportPanel::endRectSelection() {
     // Если был только клик, не растягивали прямоугольник выделения
     if (m_rectSelection.rect.size.isZero()) {
-        Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
-        int mouseX = Input::getMouseViewportPositionX() * dpi.x;
-        int mouseY = m_frame.size.height * dpi.y - Input::getMouseViewportPositionY() * dpi.y;
-        uint32_t texelIndex = m_frame.size.width * dpi.x * mouseY + mouseX;
-        uint32_t *buffer = static_cast<uint32_t *>(m_idsBuffer.data);
-        uint32_t hoveredId = buffer[texelIndex];
+        float mouseX = Input::getMouseViewportPositionX();
+        float mouseY = Input::getMouseViewportPositionY();
+        uint32_t hoveredId = m_viewport.getEntityInsidePoint({mouseX, mouseY});
         if (!m_rectSelection.appendSelection) { m_output->viewportUnselectAll(); }
         if (hoveredId) {
             bool alreadySelected = m_rectSelection.currentSelection.contains(hoveredId);
@@ -269,67 +196,30 @@ void Viewport::endRectSelection() {
     m_rectSelection.rect = Rect(0, 0, 0, 0);
 }
 
-std::unordered_set<UUID> Viewport::getEntitiesInsideRectSelection() {
-    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
-    //      m_frame
-    //   _________________________
-    //   |      selectedRegion   |
-    //   |      ___________      |
-    //   |     |           |     |
-    //   |     |___________|     |
-    //   |_______________________|
-    //
-    Rect selectedRegion = m_rectSelection.rect;
-    selectedRegion.size.x *= dpi.x;
-    selectedRegion.size.y *= dpi.y;
-    selectedRegion.origin.x *= dpi.x;
-    selectedRegion.origin.y *= dpi.y;
-    std::unordered_set<UUID> ids;
-    if (selectedRegion.size.width < 0) {
-        selectedRegion.origin.x += selectedRegion.size.width;
-        selectedRegion.size.width = -selectedRegion.size.width;
-    }
-    if (selectedRegion.size.height < 0) {
-        selectedRegion.origin.y += selectedRegion.size.height;
-        selectedRegion.size.height = -selectedRegion.size.height;
-    }
-    for (int regX = 0; regX < selectedRegion.size.width; regX++) {
-        for (int regY = 0; regY < selectedRegion.size.height; regY++) {
-            int texelX = selectedRegion.origin.x + regX;
-            int texelY = m_frame.size.height * dpi.y - selectedRegion.origin.y - regY;
-            uint32_t texelIndex = m_frame.size.width * dpi.x * texelY + texelX;
-            uint32_t *buffer = static_cast<uint32_t *>(m_idsBuffer.data);
-            uint32_t hoveredId = buffer[texelIndex];
-            if (hoveredId != 0) { ids.insert(hoveredId); }
-        }
-    }
-    return ids;
-}
-
-void Viewport::setCamera(Camera *camera) {
+void ViewportPanel::setCamera(Camera *camera) {
     m_camera = camera;
     m_gizmos.setCamera(camera);
-    if (m_camera) { m_camera->setViewportSize(m_frame.size); }
+    if (m_camera) { m_camera->setViewportSize(m_viewport.getFrame().size); }
 }
 
-void Viewport::setWorld(World *world) {
+void ViewportPanel::setWorld(World *world) {
     m_gizmos.setWorld(world);
 }
 
-bool Viewport::isFocused() {
+bool ViewportPanel::isFocused() {
     return m_focused;
 }
 
-bool Viewport::isHovered() {
+bool ViewportPanel::isHovered() {
     return m_hovered;
 }
 
-void Viewport::focus() {
+void ViewportPanel::focus() {
     m_focusNextFrame = true;
 }
 
-Miren::ViewId Viewport::getMirenView() {
-    return m_sceneView;
+Miren::ViewId ViewportPanel::getMirenView() {
+    return m_viewport.getRenderingView();
 }
 
 } // namespace Panda
