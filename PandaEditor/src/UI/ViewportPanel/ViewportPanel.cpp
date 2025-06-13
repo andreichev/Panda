@@ -29,6 +29,10 @@ void ViewportPanel::updateViewportSize(Size size) {
     m_viewport.updateSize(size);
 }
 
+void ViewportPanel::viewportDrawOutline() {
+    m_viewport.viewportDrawOutline();
+}
+
 void ViewportPanel::onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen) {
     ImGuiWindowFlags window_flags = 0;
     if (fullScreen) {
@@ -85,7 +89,7 @@ void ViewportPanel::onImGuiRender(SceneState sceneState, float offsetY, bool ful
 
     ImGui::End();
     ImGui::PopStyleVar();
-    m_viewport.update();
+    m_viewport.viewportReadIdsBuffer();
     bool mouseDown = Input::isMouseButtonPressed(Fern::MouseButton::LEFT);
     if (m_focused && !m_gizmos.isUsing()) {
         if (!m_rectSelection.isStarted && mouseDown) {

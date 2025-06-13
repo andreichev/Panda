@@ -15,7 +15,11 @@ Viewport::Viewport()
     , m_sceneFB()
     , m_sceneFbSpecification()
     , m_sceneView(1)
-    , m_colorAttachment() {}
+    , m_colorAttachment()
+    , m_outputFB()
+    , m_resultAttachment()
+    , m_outputView(2)
+    , m_outputFbSpecification() {}
 
 Viewport::~Viewport() {
     Miren::deleteFrameBuffer(m_sceneFB);
@@ -23,13 +27,27 @@ Viewport::~Viewport() {
         Miren::FrameBufferAttachment attachment = m_sceneFbSpecification.attachments[i];
         Miren::deleteTexture(attachment.handle);
     }
+    Miren::deleteFrameBuffer(m_outputFB);
+    for (int i = 0; i < m_outputFbSpecification.num; i++) {
+        Miren::FrameBufferAttachment attachment = m_outputFbSpecification.attachments[i];
+        Miren::deleteTexture(attachment.handle);
+    }
 }
 
 void Viewport::initWithSize(Vec2 size) {
     m_frame.size = size;
-    PandaUI::initialize();
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
-    Fern::Size windowSize = Application::get()->getMainWindow()->getSize();
+    PandaUI::initialize();
+    PandaUI::Context::shared().updateViewId(m_sceneView);
+    uint32_t bufferSize =
+        sizeof(uint32_t) * m_frame.size.width * dpi.width * m_frame.size.height * dpi.height;
+    m_idsBuffer = Foundation::Memory::alloc(bufferSize);
+    memset(m_idsBuffer.data, 0, bufferSize);
+
+    // -----------------------------------------------------------------------
+    //             SCENE RENDERING FRAMEBUFFER AND ATTACHMENTS
+    // -----------------------------------------------------------------------
+
     Miren::TextureCreate create;
     create.m_format = Miren::TextureFormat::RGBA8;
     create.m_width = m_frame.size.width * dpi.width;
@@ -39,24 +57,33 @@ void Viewport::initWithSize(Vec2 size) {
     Miren::TextureHandle idAttachment = Miren::createTexture(create);
     create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
     Miren::TextureHandle depthAttachment = Miren::createTexture(create);
-    Miren::FrameBufferAttachment attachments[] = {m_colorAttachment, idAttachment, depthAttachment};
-    m_sceneFbSpecification = Miren::FrameBufferSpecification(attachments, 3);
+    Miren::FrameBufferAttachment sceneAttachments[] = {
+        m_colorAttachment, idAttachment, depthAttachment
+    };
+    m_sceneFbSpecification = Miren::FrameBufferSpecification(sceneAttachments, 3);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewport(
         m_sceneView,
         Miren::Rect(0, 0, m_frame.size.width * dpi.width, m_frame.size.height * dpi.height)
     );
-    Miren::setViewport(
-        0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
-    );
     Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
     Miren::setViewClear(m_sceneView, 0x000000cff);
     Miren::setViewClearAttachments(m_sceneView, {Miren::Clear(1, 0)});
-    PandaUI::Context::shared().updateViewId(m_sceneView);
-    uint32_t bufferSize =
-        sizeof(uint32_t) * m_frame.size.width * dpi.width * m_frame.size.height * dpi.height;
-    m_idsBuffer = Foundation::Memory::alloc(bufferSize);
-    memset(m_idsBuffer.data, 0, bufferSize);
+
+    // -----------------------------------------------------------------------
+    // SELECTED OBJECT HIGHLIGHT OUTLINE RENDERING FRAMEBUFFER AND ATTACHMENTS
+    // -----------------------------------------------------------------------
+
+    create.m_format = Miren::TextureFormat::RGBA8;
+    m_resultAttachment = Miren::createTexture(create);
+    Miren::FrameBufferAttachment outputAttachments[] = {m_resultAttachment};
+    m_outputFbSpecification = Miren::FrameBufferSpecification(outputAttachments, 1);
+    m_outputFB = Miren::createFrameBuffer(m_outputFbSpecification);
+    Miren::setViewport(
+        m_outputView,
+        Miren::Rect(0, 0, m_frame.size.width * dpi.width, m_frame.size.height * dpi.height)
+    );
+    Miren::setViewFrameBuffer(m_outputView, m_outputFB);
 }
 
 void Viewport::updateOrigin(Vec2 origin) {
@@ -145,15 +172,17 @@ std::unordered_set<UUID> Viewport::getEntitiesInsideRect(Rect rect) {
 
 UUID Viewport::getEntityInsidePoint(Vec2 point) {
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
-    point.x *= dpi.x;
-    point.y = m_frame.size.height * dpi.y - point.y * dpi.y;
-    uint32_t texelIndex = m_frame.size.width * point.x + point.y;
+    int texelX = point.x * dpi.x;
+    int texelY = m_frame.size.height * dpi.y - point.y * dpi.y;
+    uint32_t texelIndex = m_frame.size.width * dpi.x * texelY + texelX;
     uint32_t *buffer = static_cast<uint32_t *>(m_idsBuffer.data);
     uint32_t hoveredId = buffer[texelIndex];
     return hoveredId;
 }
 
-void Viewport::update() {
+void Viewport::viewportDrawOutline() {}
+
+void Viewport::viewportReadIdsBuffer() {
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     Miren::readFrameBuffer(
         m_sceneFB,

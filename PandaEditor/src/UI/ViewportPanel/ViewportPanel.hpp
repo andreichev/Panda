@@ -39,7 +39,7 @@ public:
     void setCamera(Camera *camera);
     void setWorld(World *world);
     void onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen);
-    void update();
+    void viewportDrawOutline();
     void focus();
     bool isFocused();
     bool isHovered();

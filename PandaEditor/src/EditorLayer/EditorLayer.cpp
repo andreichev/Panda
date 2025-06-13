@@ -32,6 +32,12 @@ EditorLayer::EditorLayer(Fern::Window *window)
 void EditorLayer::onAttach() {
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
     GameContext::s_currentWorld = m_currentWorld;
+    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
+    Fern::Size windowSize = Application::get()->getMainWindow()->getSize();
+    // Default framebuffer initial size
+    Miren::setViewport(
+        0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
+    );
     m_panelsContainer.viewport.initWithSize(Size(100.f, 100.f));
     m_editingWorld.setViewId(m_panelsContainer.viewport.getMirenView());
     m_playingWorld.setViewId(m_panelsContainer.viewport.getMirenView());
@@ -77,6 +83,7 @@ void EditorLayer::onUpdate(double deltaTime) {
             break;
         }
     }
+    m_panelsContainer.viewport.viewportDrawOutline();
 }
 
 void EditorLayer::onImGuiRender() {

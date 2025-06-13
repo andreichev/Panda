@@ -22,7 +22,8 @@ public:
     std::unordered_set<UUID> getEntitiesInsideRect(Rect rect);
     UUID getEntityInsidePoint(Vec2 point);
     Rect getFrame();
-    void update();
+    void viewportDrawOutline();
+    void viewportReadIdsBuffer();
 
 private:
     Rect m_frame;
@@ -35,10 +36,10 @@ private:
     Foundation::Memory m_idsBuffer;
 
     // SELECTED OBJECT HIGHLIGHT OUTLINE:
-    // Miren::FrameBufferHandle m_outputFB;
-    // Miren::TextureHandle m_resultAttachment;
-    // Miren::FrameBufferSpecification m_outputFbSpecification;
-    // Miren::ViewId m_outputView;
+    Miren::FrameBufferHandle m_outputFB;
+    Miren::TextureHandle m_resultAttachment;
+    Miren::FrameBufferSpecification m_outputFbSpecification;
+    Miren::ViewId m_outputView;
 };
 
 } // namespace Panda

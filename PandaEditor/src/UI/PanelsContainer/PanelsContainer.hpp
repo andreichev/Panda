@@ -23,7 +23,6 @@ public:
     void onImGuiRender(bool isViewportFullScreen, SceneState sceneState);
     void setCurrentWorld(World *world);
 
-public:
     MenuBar menuBar;
     Toolbar toolbar;
     Dockspace dockspace;
