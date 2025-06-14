@@ -25,6 +25,7 @@ ProgramCreate compileProgram(ProgramCompile compile);
 ProgramHandle createProgram(ProgramCreate create);
 void deleteProgram(ProgramHandle handle);
 TextureHandle createTexture(TextureCreate create);
+void updateTexture(TextureHandle handle, Foundation::Memory mem);
 void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height);
 void deleteTexture(TextureHandle handle);
 IndexBufferHandle

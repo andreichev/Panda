@@ -535,6 +535,7 @@ World &World::operator=(World &other) {
 #ifdef PND_EDITOR
     sort();
 #endif
+    m_selectionContext = other.m_selectionContext;
     return *this;
 }
 

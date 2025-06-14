@@ -3,12 +3,12 @@
 #include <Panda.hpp>
 #include <imgui.h>
 #include <Panda/ImGui/FontAwesome.h>
+#include <Panda/GameLogic/GameContext.hpp>
 
 namespace Panda {
 
-ViewportPanel::ViewportPanel(ViewportPanelOutput *output, CameraController *cameraController)
-    : m_output(output)
-    , m_viewport()
+ViewportPanel::ViewportPanel(CameraController *cameraController)
+    : m_viewport()
     , m_rectSelection()
     , m_camera(nullptr)
     , m_cameraController(cameraController)
@@ -29,8 +29,9 @@ void ViewportPanel::updateViewportSize(Size size) {
     m_viewport.updateSize(size);
 }
 
-void ViewportPanel::viewportDrawOutline() {
-    m_viewport.viewportDrawOutline();
+void ViewportPanel::drawOutline() {
+    std::unordered_set<UUID> selection = getSelectedIds();
+    m_viewport.drawOutline(selection);
 }
 
 void ViewportPanel::onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen) {
@@ -89,7 +90,7 @@ void ViewportPanel::onImGuiRender(SceneState sceneState, float offsetY, bool ful
 
     ImGui::End();
     ImGui::PopStyleVar();
-    m_viewport.viewportReadIdsBuffer();
+    m_viewport.readIdsBuffer();
     bool mouseDown = Input::isMouseButtonPressed(Fern::MouseButton::LEFT);
     if (m_focused && !m_gizmos.isUsing()) {
         if (!m_rectSelection.isStarted && mouseDown) {
@@ -112,7 +113,7 @@ void ViewportPanel::beginRectSelection(bool append) {
     m_rectSelection.appendSelection = append;
     m_rectSelection.rect =
         Rect(Input::getMouseViewportPositionX(), Input::getMouseViewportPositionY(), 0, 0);
-    m_rectSelection.currentSelection = m_output->viewportGetSelectedIds();
+    m_rectSelection.currentSelection = getSelectedIds();
     m_rectSelection.initialSelection = m_rectSelection.currentSelection;
 }
 
@@ -176,8 +177,8 @@ void ViewportPanel::updateRectSelection() {
             }
         }
     }
-    m_output->viewportPickEntitiesWithId(select);
-    m_output->viewportUnselectEntitiesWithId(unselect);
+    pickEntitiesWithId(select);
+    unselectEntitiesWithId(unselect);
 }
 
 void ViewportPanel::endRectSelection() {
@@ -186,18 +187,60 @@ void ViewportPanel::endRectSelection() {
         float mouseX = Input::getMouseViewportPositionX();
         float mouseY = Input::getMouseViewportPositionY();
         uint32_t hoveredId = m_viewport.getEntityInsidePoint({mouseX, mouseY});
-        if (!m_rectSelection.appendSelection) { m_output->viewportUnselectAll(); }
+        if (!m_rectSelection.appendSelection) { unselectAll(); }
         if (hoveredId) {
             bool alreadySelected = m_rectSelection.currentSelection.contains(hoveredId);
             if (alreadySelected) {
-                m_output->viewportUnselectEntitiesWithId({hoveredId});
+                unselectEntitiesWithId({hoveredId});
             } else {
-                m_output->viewportPickEntitiesWithId({hoveredId});
+                pickEntitiesWithId({hoveredId});
             }
         }
     }
     m_rectSelection.isStarted = false;
     m_rectSelection.rect = Rect(0, 0, 0, 0);
+}
+
+std::unordered_set<UUID> ViewportPanel::getSelectedIds() {
+    World *currentWorld = GameContext::s_currentWorld;
+    if (!currentWorld) { return {}; }
+    SelectionContext &selectionContext = currentWorld->getSelectionContext();
+    auto entities = selectionContext.getSelectedEntities();
+    std::unordered_set<UUID> ids;
+    for (auto entity : entities) {
+        ids.insert(entity.getId());
+    }
+    return ids;
+}
+
+void ViewportPanel::pickEntitiesWithId(std::unordered_set<UUID> ids) {
+    World *currentWorld = GameContext::s_currentWorld;
+    if (!currentWorld) { return; }
+    SelectionContext &selectionContext = currentWorld->getSelectionContext();
+    std::vector<Entity> entities;
+    for (UUID id : ids) {
+        Entity selected = currentWorld->getById(id);
+        entities.push_back(selected);
+    }
+    selectionContext.addSelectedEntities(entities);
+}
+
+void ViewportPanel::unselectEntitiesWithId(std::unordered_set<UUID> ids) {
+    World *currentWorld = GameContext::s_currentWorld;
+    if (!currentWorld) { return; }
+    SelectionContext &selectionContext = currentWorld->getSelectionContext();
+    std::vector<Entity> entities;
+    for (UUID id : ids) {
+        Entity selected = currentWorld->getById(id);
+        entities.push_back(selected);
+    }
+    selectionContext.removeSelectedEntities(entities);
+}
+
+void ViewportPanel::unselectAll() {
+    World *currentWorld = GameContext::s_currentWorld;
+    if (!currentWorld) { return; }
+    currentWorld->getSelectionContext().unselectAll();
 }
 
 void ViewportPanel::setCamera(Camera *camera) {

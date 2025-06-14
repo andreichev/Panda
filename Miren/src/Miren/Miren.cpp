@@ -70,6 +70,11 @@ TextureHandle createTexture(TextureCreate create) {
     return s_context->createTexture(create);
 }
 
+void updateTexture(TextureHandle handle, Foundation::Memory mem) {
+    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    s_context->updateTexture(handle, mem);
+}
+
 void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     PND_ASSERT_F(width > 0 && height > 0, "INVALID TEXTURE SIZE w: %d, h: %d", width, height);

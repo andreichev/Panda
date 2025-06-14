@@ -71,6 +71,17 @@ void OpenGLTexture::create(TextureCreate &create) {
     GL_CALL(glTexParameteri(target, GL_TEXTURE_MAG_FILTER, openGLFiltering(create.m_magFiltering)));
 }
 
+void OpenGLTexture::update(Foundation::Memory mem) {
+    PND_ASSERT(m_id != -1, "TEXTURE IS NOT CREATED");
+    GL_CALL(glBindTexture(m_target, m_id));
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    GLenum internalFormat = s_textureFormat[m_create.m_format].m_internalFmt;
+    GL_CALL(glTexSubImage2D(
+        m_target, 0, 0, 0, m_create.m_width, m_create.m_height, internalFormat, m_type, mem.data
+    ));
+    mem.release();
+}
+
 void OpenGLTexture::resize(uint32_t width, uint32_t height) {
     PND_ASSERT(m_id != -1, "TEXTURE IS NOT CREATED");
     terminate();

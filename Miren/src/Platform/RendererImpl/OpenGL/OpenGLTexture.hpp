@@ -12,6 +12,7 @@ class OpenGLTexture {
 public:
     OpenGLTexture();
     void create(TextureCreate &create);
+    void update(Foundation::Memory mem);
     void resize(uint32_t width, uint32_t height);
     uint16_t getWidth() {
         return m_create.m_width;

@@ -117,6 +117,10 @@ void RendererOpenGL::createTexture(TextureHandle handle, TextureCreate create) {
     m_textures[handle.id].create(create);
 }
 
+void RendererOpenGL::updateTexture(TextureHandle handle, Foundation::Memory mem) {
+    m_textures[handle.id].update(mem);
+}
+
 void RendererOpenGL::resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) {
     m_textures[handle.id].resize(width, height);
 }

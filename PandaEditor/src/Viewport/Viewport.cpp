@@ -16,6 +16,7 @@ Viewport::Viewport()
     , m_sceneFbSpecification()
     , m_sceneView(1)
     , m_colorAttachment()
+    , m_outlineProgram()
     , m_outputFB()
     , m_resultAttachment()
     , m_outputView(2)
@@ -32,6 +33,7 @@ Viewport::~Viewport() {
         Miren::FrameBufferAttachment attachment = m_outputFbSpecification.attachments[i];
         Miren::deleteTexture(attachment.handle);
     }
+    Miren::deleteProgram(m_outlineProgram);
 }
 
 void Viewport::initWithSize(Vec2 size) {
@@ -44,9 +46,9 @@ void Viewport::initWithSize(Vec2 size) {
     m_idsBuffer = Foundation::Memory::alloc(bufferSize);
     memset(m_idsBuffer.data, 0, bufferSize);
 
-    // -----------------------------------------------------------------------
-    //             SCENE RENDERING FRAMEBUFFER AND ATTACHMENTS
-    // -----------------------------------------------------------------------
+    // -------------------------------------------
+    //              SCENE RENDERING
+    // -------------------------------------------
 
     Miren::TextureCreate create;
     create.m_format = Miren::TextureFormat::RGBA8;
@@ -70,19 +72,55 @@ void Viewport::initWithSize(Vec2 size) {
     Miren::setViewClear(m_sceneView, 0x000000cff);
     Miren::setViewClearAttachments(m_sceneView, {Miren::Clear(1, 0)});
 
-    // -----------------------------------------------------------------------
-    // SELECTED OBJECT HIGHLIGHT OUTLINE RENDERING FRAMEBUFFER AND ATTACHMENTS
-    // -----------------------------------------------------------------------
+    // -------------------------------------------
+    // SELECTED OBJECT HIGHLIGHT OUTLINE RENDERING
+    // -------------------------------------------
+
+    Miren::VertexBufferLayoutData layoutData;
+    // Position
+    layoutData.pushVec3();
+    // Texture coordinates
+    layoutData.pushVec2();
+    Miren::VertexLayoutHandle vertexLayout = createVertexLayout(layoutData);
+
+    // clang-format off
+    float x = -1.f, y = -1.f, z = 0.f;
+    auto *vertices = new float[20] {
+        // x     y        z  u  v
+        x,       y,       z, 0, 0,
+        x + 2.f, y,       z, 1, 0,
+        x + 2.f, y + 2.f, z, 1, 1,
+        x,       y + 2.f, z, 0, 1
+    };
+    // clang-format on
+
+    auto *indices = new uint32_t[6]{0, 1, 2, 2, 3, 0};
+    m_vertexBuffer = createVertexBuffer(vertices, sizeof(float) * 20, vertexLayout);
+    m_indexBuffer = Miren::createIndexBuffer(indices, Miren::BufferElementType::UnsignedInt, 6);
+
+    Foundation::Memory vertexMem =
+        AssetImporterBase::loadData("editor-shaders/selection_highlight_vertex.glsl");
+    Foundation::Memory fragmentMem =
+        AssetImporterBase::loadData("editor-shaders/selection_highlight_fragment.glsl");
+    m_outlineProgram = Miren::createProgram({vertexMem, fragmentMem});
 
     create.m_format = Miren::TextureFormat::RGBA8;
+    create.m_minFiltering = Miren::NEAREST;
+    create.m_magFiltering = Miren::NEAREST;
+    create.m_wrap = Miren::CLAMP;
     m_resultAttachment = Miren::createTexture(create);
     Miren::FrameBufferAttachment outputAttachments[] = {m_resultAttachment};
     m_outputFbSpecification = Miren::FrameBufferSpecification(outputAttachments, 1);
     m_outputFB = Miren::createFrameBuffer(m_outputFbSpecification);
+
+    create.m_format = Miren::TextureFormat::R8;
+    m_highlightMapTexture = Miren::createTexture(create);
+
     Miren::setViewport(
         m_outputView,
         Miren::Rect(0, 0, m_frame.size.width * dpi.width, m_frame.size.height * dpi.height)
     );
+    Miren::setViewClear(m_outputView, 0x000000ff);
     Miren::setViewFrameBuffer(m_outputView, m_outputFB);
 }
 
@@ -118,15 +156,29 @@ void Viewport::updateSize(Size size) {
     Miren::deleteFrameBuffer(m_sceneFB);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
-    m_idsBuffer.release();
+    Miren::setViewport(
+        m_outputView, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
+    );
+    // HIGHLIGHT FRAME BUFFER
+    Miren::resizeTexture(
+        m_outputFbSpecification.attachments[0].handle,
+        size.width * dpi.width,
+        size.height * dpi.height
+    );
+    Miren::deleteFrameBuffer(m_outputFB);
+    m_outputFB = Miren::createFrameBuffer(m_outputFbSpecification);
+    Miren::setViewFrameBuffer(m_outputView, m_outputFB);
+    // HIGHLIGHT TEXTURE
+    Miren::resizeTexture(m_highlightMapTexture, size.width * dpi.width, size.height * dpi.height);
     uint32_t bufferSize =
         sizeof(uint32_t) * m_frame.size.width * dpi.width * m_frame.size.height * dpi.height;
+    m_idsBuffer.release();
     m_idsBuffer = Foundation::Memory::alloc(bufferSize);
     memset(m_idsBuffer.data, 0, bufferSize);
 }
 
 Miren::TextureHandle Viewport::getResultTexture() {
-    return m_colorAttachment;
+    return m_resultAttachment;
 }
 
 Miren::ViewId Viewport::getRenderingView() {
@@ -180,9 +232,42 @@ UUID Viewport::getEntityInsidePoint(Vec2 point) {
     return hoveredId;
 }
 
-void Viewport::viewportDrawOutline() {}
+void Viewport::drawOutline(const std::unordered_set<UUID> &selection) {
+    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
+    uint32_t width = m_frame.size.width * dpi.x;
+    uint32_t height = m_frame.size.height * dpi.y;
+    uint32_t bufferSize = width * height;
+    Foundation::Memory highlightBuffer = Foundation::Memory::alloc(bufferSize);
+    uint8_t *highlightData = static_cast<uint8_t *>(highlightBuffer.data);
+    uint32_t *idsData = static_cast<uint32_t *>(m_idsBuffer.data);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int texelIndex = width * y + x;
+            UUID id = idsData[texelIndex];
+            if (selection.contains(id)) {
+                highlightData[texelIndex] = 0xff;
+            } else {
+                highlightData[texelIndex] = 0x00;
+            }
+        }
+    }
+    Miren::updateTexture(m_highlightMapTexture, highlightBuffer);
+    Miren::setState(0);
+    Miren::setShader(m_outlineProgram);
+    int samplerColor = 0;
+    Miren::setTexture(m_colorAttachment, samplerColor);
+    Miren::setUniform(m_outlineProgram, "colorTexture", &samplerColor, Miren::UniformType::Sampler);
+    int samplerHighlight = 1;
+    Miren::setTexture(m_highlightMapTexture, samplerHighlight);
+    Miren::setUniform(
+        m_outlineProgram, "highlightMapTexture", &samplerHighlight, Miren::UniformType::Sampler
+    );
+    Miren::setVertexBuffer(m_vertexBuffer);
+    Miren::setIndexBuffer(m_indexBuffer, 0, 6);
+    Miren::submit(m_outputView);
+}
 
-void Viewport::viewportReadIdsBuffer() {
+void Viewport::readIdsBuffer() {
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     Miren::readFrameBuffer(
         m_sceneFB,

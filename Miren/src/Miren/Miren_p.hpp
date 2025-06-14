@@ -131,6 +131,13 @@ struct Context {
                     m_renderer->resizeTexture(cmd->handle, cmd->width, cmd->height);
                     break;
                 }
+                case RendererCommandType::UpdateTexture: {
+                    CMDBUF_LOG("UPDATE TEXTURE COMMAND");
+                    const UpdateTextureCommand *cmd =
+                        static_cast<const UpdateTextureCommand *>(command);
+                    m_renderer->updateTexture(cmd->handle, cmd->mem);
+                    break;
+                }
                 case RendererCommandType::DestroyTexture: {
                     CMDBUF_LOG("DESTROY TEXTURE COMMAND");
                     const DeleteTextureCommand *cmd =
@@ -334,6 +341,11 @@ struct Context {
         CreateTextureCommand cmd(handle, create);
         m_submit->getPreCommandQueue().write(cmd);
         return handle;
+    }
+
+    void updateTexture(TextureHandle handle, Foundation::Memory mem) {
+        UpdateTextureCommand cmd(handle, mem);
+        m_submit->getPreCommandQueue().write(cmd);
     }
 
     void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) {

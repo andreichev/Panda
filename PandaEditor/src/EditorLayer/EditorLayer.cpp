@@ -83,7 +83,7 @@ void EditorLayer::onUpdate(double deltaTime) {
             break;
         }
     }
-    m_panelsContainer.viewport.viewportDrawOutline();
+    m_panelsContainer.viewport.drawOutline();
 }
 
 void EditorLayer::onImGuiRender() {
@@ -479,48 +479,6 @@ void EditorLayer::toolbarDidTapReloadScripts() {
 
 SceneState EditorLayer::toolbarGetCurrentSceneState() {
     return m_sceneState;
-}
-
-#pragma endregion
-
-#pragma region Viewport output
-
-std::unordered_set<UUID> EditorLayer::viewportGetSelectedIds() {
-    if (!m_currentWorld) { return {}; }
-    SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
-    auto entities = selectionContext.getSelectedEntities();
-    std::unordered_set<UUID> ids;
-    for (auto entity : entities) {
-        ids.insert(entity.getId());
-    }
-    return ids;
-}
-
-void EditorLayer::viewportPickEntitiesWithId(std::unordered_set<UUID> ids) {
-    if (!m_currentWorld) { return; }
-    SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
-    std::vector<Entity> entities;
-    for (UUID id : ids) {
-        Entity selected = m_currentWorld->getById(id);
-        entities.push_back(selected);
-    }
-    selectionContext.addSelectedEntities(entities);
-}
-
-void EditorLayer::viewportUnselectEntitiesWithId(std::unordered_set<UUID> ids) {
-    if (!m_currentWorld) { return; }
-    if (!m_currentWorld) { return; }
-    SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
-    std::vector<Entity> entities;
-    for (UUID id : ids) {
-        Entity selected = m_currentWorld->getById(id);
-        entities.push_back(selected);
-    }
-    selectionContext.removeSelectedEntities(entities);
-}
-
-void EditorLayer::viewportUnselectAll() {
-    m_currentWorld->getSelectionContext().unselectAll();
 }
 
 #pragma endregion

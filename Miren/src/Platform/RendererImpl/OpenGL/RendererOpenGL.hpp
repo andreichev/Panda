@@ -35,6 +35,7 @@ public:
     void createProgram(ProgramHandle handle, ProgramCreate create) override;
     void deleteShader(ProgramHandle handle) override;
     void createTexture(TextureHandle handle, TextureCreate create) override;
+    void updateTexture(TextureHandle handle, Foundation::Memory mem) override;
     void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) override;
     void deleteTexture(TextureHandle handle) override;
     void createIndexBuffer(

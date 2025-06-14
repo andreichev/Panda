@@ -13,15 +13,6 @@
 
 namespace Panda {
 
-class ViewportPanelOutput {
-public:
-    virtual ~ViewportPanelOutput() = default;
-    virtual std::unordered_set<UUID> viewportGetSelectedIds() = 0;
-    virtual void viewportPickEntitiesWithId(std::unordered_set<UUID> ids) = 0;
-    virtual void viewportUnselectEntitiesWithId(std::unordered_set<UUID> ids) = 0;
-    virtual void viewportUnselectAll() = 0;
-};
-
 class ViewportPanel final {
     struct RectSelection {
         bool isStarted = false;
@@ -32,14 +23,14 @@ class ViewportPanel final {
     };
 
 public:
-    ViewportPanel(ViewportPanelOutput *output, CameraController *cameraController);
+    ViewportPanel(CameraController *cameraController);
     ~ViewportPanel();
 
     void initWithSize(Vec2 size);
     void setCamera(Camera *camera);
     void setWorld(World *world);
     void onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen);
-    void viewportDrawOutline();
+    void drawOutline();
     void focus();
     bool isFocused();
     bool isHovered();
@@ -50,8 +41,11 @@ private:
     void beginRectSelection(bool appendSelection);
     void updateRectSelection();
     void endRectSelection();
+    std::unordered_set<UUID> getSelectedIds();
+    void pickEntitiesWithId(std::unordered_set<UUID> ids);
+    void unselectEntitiesWithId(std::unordered_set<UUID> ids);
+    void unselectAll();
 
-    ViewportPanelOutput *m_output;
     Viewport m_viewport;
     Gizmos m_gizmos;
     Camera *m_camera;

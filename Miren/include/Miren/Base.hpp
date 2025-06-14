@@ -44,6 +44,7 @@ MIREN_HANDLE(VertexLayoutHandle)
 
 enum TextureFormat {
     // Color
+    R8,
     RGB8,
     RGBA8,
     R32I,
@@ -97,6 +98,8 @@ struct TextureCreate {
 
     size_t bytesPerTexel() const {
         switch (m_format) {
+            case R8:
+                return 1;
             case RGB8:
                 return 3;
             case RGBA8:
