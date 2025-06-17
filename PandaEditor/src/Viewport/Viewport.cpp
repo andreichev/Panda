@@ -41,8 +41,7 @@ void Viewport::initWithSize(Vec2 size) {
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     PandaUI::initialize();
     PandaUI::Context::shared().updateViewId(m_sceneView);
-    uint32_t bufferSize =
-        sizeof(uint32_t) * m_frame.size.width * dpi.width * m_frame.size.height * dpi.height;
+    uint32_t bufferSize = sizeof(uint32_t) * m_frame.size.width / 4 * m_frame.size.height / 4;
     m_idsBuffer = Foundation::Memory::alloc(bufferSize);
     memset(m_idsBuffer.data, 0, bufferSize);
 
@@ -156,10 +155,10 @@ void Viewport::updateSize(Size size) {
     Miren::deleteFrameBuffer(m_sceneFB);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
+    // HIGHLIGHT FRAME BUFFER
     Miren::setViewport(
         m_outputView, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
     );
-    // HIGHLIGHT FRAME BUFFER
     Miren::resizeTexture(
         m_outputFbSpecification.attachments[0].handle,
         size.width * dpi.width,
@@ -169,9 +168,8 @@ void Viewport::updateSize(Size size) {
     m_outputFB = Miren::createFrameBuffer(m_outputFbSpecification);
     Miren::setViewFrameBuffer(m_outputView, m_outputFB);
     // HIGHLIGHT TEXTURE
-    Miren::resizeTexture(m_highlightMapTexture, size.width * dpi.width, size.height * dpi.height);
-    uint32_t bufferSize =
-        sizeof(uint32_t) * m_frame.size.width * dpi.width * m_frame.size.height * dpi.height;
+    Miren::resizeTexture(m_highlightMapTexture, size.width / 4, size.height / 4);
+    uint32_t bufferSize = sizeof(uint32_t) * m_frame.size.width / 4 * m_frame.size.height / 4;
     m_idsBuffer.release();
     m_idsBuffer = Foundation::Memory::alloc(bufferSize);
     memset(m_idsBuffer.data, 0, bufferSize);
@@ -233,25 +231,33 @@ UUID Viewport::getEntityInsidePoint(Vec2 point) {
 }
 
 void Viewport::drawOutline(const std::unordered_set<UUID> &selection) {
+    // UPDATING HIGHLIGHT TEXTURE
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
-    uint32_t width = m_frame.size.width * dpi.x;
-    uint32_t height = m_frame.size.height * dpi.y;
-    uint32_t bufferSize = width * height;
+    uint32_t idsWidth = m_frame.size.width * dpi.x;
+    uint32_t idsHeight = m_frame.size.height * dpi.y;
+    uint32_t highlightWidth = m_frame.size.width / 4;
+    uint32_t highlightHeight = m_frame.size.height / 4;
+    uint32_t bufferSize = 4 * highlightWidth * highlightHeight;
     Foundation::Memory highlightBuffer = Foundation::Memory::alloc(bufferSize);
     uint8_t *highlightData = static_cast<uint8_t *>(highlightBuffer.data);
     uint32_t *idsData = static_cast<uint32_t *>(m_idsBuffer.data);
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            int texelIndex = width * y + x;
-            UUID id = idsData[texelIndex];
+    for (int y = 0; y < highlightWidth; y++) {
+        for (int x = 0; x < highlightHeight; x++) {
+            int idsX = Foundation::min(x * (float)idsWidth / highlightWidth, (float)idsWidth - 1);
+            int idsY =
+                Foundation::min(y * (float)idsHeight / highlightHeight, (float)idsHeight - 1);
+            int texelIndexIds = idsWidth * idsY + idsX;
+            int texelIndexHighlight = highlightWidth * y + x;
+            UUID id = idsData[texelIndexIds];
             if (selection.contains(id)) {
-                highlightData[texelIndex] = 0xff;
+                highlightData[texelIndexHighlight] = 0xff;
             } else {
-                highlightData[texelIndex] = 0x00;
+                highlightData[texelIndexHighlight] = 0x00;
             }
         }
     }
     Miren::updateTexture(m_highlightMapTexture, highlightBuffer);
+    // RENDERING SELECTION HIGHLIGHT
     Miren::setState(0);
     Miren::setShader(m_outlineProgram);
     int samplerColor = 0;

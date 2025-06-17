@@ -24,6 +24,7 @@ void OpenGLTexture::create(TextureCreate &create) {
     GLenum target = create.m_isCubeMap ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D;
     m_target = target;
     GL_CALL(glBindTexture(target, m_id));
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     m_format = s_textureFormat[create.m_format].m_fmt;
     GLenum internalFormat = s_textureFormat[create.m_format].m_internalFmt;
@@ -109,6 +110,7 @@ void OpenGLTexture::unbind() {
 void OpenGLTexture::readPixels(void *data) {
     GL_CALL(glBindTexture(m_target, m_id));
 #ifdef PLATFORM_DESKTOP
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
     GL_CALL(glGetTexImage(m_target, 0, m_format, m_type, data));
 #else
     LOG_ERROR("READ TEXTURE NOT SUPPORTED IN GLES");
