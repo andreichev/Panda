@@ -11,16 +11,16 @@ namespace Panda {
 class ComponentsDrawOutput {
 public:
     virtual ~ComponentsDrawOutput() = default;
-    virtual void addScriptToEntities(const std::vector<Entity> &entities) = 0;
+    virtual void addScriptToEntities(const std::unordered_set<Entity> &entities) = 0;
 };
 
 class ComponentsDraw {
 public:
     ComponentsDraw(ComponentsDrawOutput *output);
-    void drawComponents(const std::vector<Entity> &entities);
+    void drawComponents(const std::unordered_set<Entity> &entities);
 
 private:
-    void displayAddScriptMenuItem(const std::vector<Entity> &entities);
+    void displayAddScriptMenuItem(const std::unordered_set<Entity> &entities);
 
     ComponentsDrawOutput *m_output;
 };

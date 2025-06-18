@@ -7,7 +7,7 @@ namespace Panda {
 
 class UpdateSpriteRendererCommand : public WorldCommand {
 public:
-    UpdateSpriteRendererCommand(const std::vector<Entity> &entities)
+    UpdateSpriteRendererCommand(const std::unordered_set<Entity> &entities)
         : m_entities(entities)
         , m_newSprites()
         , m_prevSprites() {}
@@ -54,7 +54,7 @@ public:
     }
 
 private:
-    std::vector<Entity> m_entities;
+    std::unordered_set<Entity> m_entities;
     std::unordered_map<UUID, SpriteRendererComponent> m_newSprites;
     std::unordered_map<UUID, SpriteRendererComponent> m_prevSprites;
 };

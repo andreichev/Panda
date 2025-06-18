@@ -217,10 +217,10 @@ void ViewportPanel::pickEntitiesWithId(std::unordered_set<UUID> ids) {
     World *currentWorld = GameContext::s_currentWorld;
     if (!currentWorld) { return; }
     SelectionContext &selectionContext = currentWorld->getSelectionContext();
-    std::vector<Entity> entities;
+    std::unordered_set<Entity> entities;
     for (UUID id : ids) {
         Entity selected = currentWorld->getById(id);
-        entities.push_back(selected);
+        entities.insert(selected);
     }
     selectionContext.addSelectedEntities(entities);
 }

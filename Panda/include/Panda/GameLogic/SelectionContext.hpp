@@ -2,6 +2,8 @@
 
 #include "Entity.hpp"
 
+#include <unordered_set>
+
 namespace Panda {
 
 class SelectionContext final {
@@ -10,11 +12,11 @@ public:
         unselectAll();
     }
 
-    std::vector<Entity> getSelectedEntities() {
+    std::unordered_set<Entity> getSelectedEntities() {
         return m_selectedEntities;
     }
 
-    std::vector<Entity> getManipulatingEntities() {
+    std::unordered_set<Entity> getManipulatingEntities() {
         return m_manipulatingEntities;
     }
 
@@ -25,10 +27,11 @@ public:
 
     void addSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
         if (isSelected(entity)) { return; }
-        m_selectedEntities.push_back(entity);
+        m_selectedEntities.insert(entity);
+        for (auto childId : entity.getChildEntities()) {}
         //  Далее избегаем того, что при перемещении родителя трансформация будет применяться и к
         //  детям.
-        std::vector<Entity> manipulating;
+        std::unordered_set<Entity> manipulating;
         for (auto item : m_manipulatingEntities) {
             if (entity.isDescendantOf(item)) {
                 // Если выбранный элемент находится в иерархии уже выбранных - ничего не делаем.
@@ -37,14 +40,14 @@ public:
                 // Если выбранный элемент является родителем - теперь он будет манипулировать.
                 continue;
             }
-            manipulating.push_back(item);
+            manipulating.insert(item);
         }
-        manipulating.push_back(entity);
+        manipulating.insert(entity);
         m_manipulatingEntities = manipulating;
         if (needToCalculateMedian) { updateValues(); }
     }
 
-    void addSelectedEntities(const std::vector<Entity> &entities) {
+    void addSelectedEntities(const std::unordered_set<Entity> &entities) {
         for (auto entity : entities) {
             addSelectedEntity(entity, false);
         }
@@ -52,14 +55,8 @@ public:
     }
 
     void removeSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
-        m_selectedEntities.erase(
-            std::remove(m_selectedEntities.begin(), m_selectedEntities.end(), entity),
-            m_selectedEntities.end()
-        );
-        m_manipulatingEntities.erase(
-            std::remove(m_manipulatingEntities.begin(), m_manipulatingEntities.end(), entity),
-            m_manipulatingEntities.end()
-        );
+        m_selectedEntities.erase(entity);
+        m_manipulatingEntities.erase(entity);
         if (needToCalculateMedian) { updateValues(); }
     }
 
@@ -117,8 +114,8 @@ public:
     }
 
 private:
-    std::vector<Entity> m_selectedEntities;
-    std::vector<Entity> m_manipulatingEntities;
+    std::unordered_set<Entity> m_selectedEntities;
+    std::unordered_set<Entity> m_manipulatingEntities;
     glm::vec3 m_medianPosition;
     glm::vec3 m_medianScale;
     glm::vec3 m_medianRotation;

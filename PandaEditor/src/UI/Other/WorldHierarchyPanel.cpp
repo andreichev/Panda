@@ -47,7 +47,7 @@ void WorldHierarchyPanel::onImGuiRender() {
     }
     ImGui::PopStyleVar();
     SelectionContext &selectionContext = m_world->getSelectionContext();
-    std::vector<Entity> selected = selectionContext.getSelectedEntities();
+    std::unordered_set<Entity> selected = selectionContext.getSelectedEntities();
     if (m_focused) {
         if (ImGui::IsKeyPressed(ImGuiKey_Backspace, false) ||
             ImGui::IsKeyPressed(ImGuiKey_Delete, false)) {
@@ -225,10 +225,10 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
             m_lastSelectedRow = -1;
         }
         if (ImGui::MenuItem("Duplicate", NULL)) {
-            std::vector<Entity> duplicates;
+            std::unordered_set<Entity> duplicates;
             for (auto entity : selectionContext.getSelectedEntities()) {
                 Entity duplicate = m_world->duplicateEntity(entity);
-                duplicates.push_back(duplicate);
+                duplicates.insert(duplicate);
                 selectionContext.removeSelectedEntity(entity, false);
                 selectionContext.addSelectedEntity(duplicate, false);
             }

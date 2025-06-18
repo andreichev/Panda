@@ -60,7 +60,7 @@ public:
 #pragma endregion
 
 #pragma region Components draw output
-    void addScriptToEntities(const std::vector<Entity> &entities) override;
+    void addScriptToEntities(const std::unordered_set<Entity> &entities) override;
 #pragma endregion
 
 #pragma region Content browser output

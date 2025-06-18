@@ -335,13 +335,14 @@ void EditorLayer::menuBarAbout() {
 
 #pragma region Components draw output
 
-void EditorLayer::addScriptToEntities(const std::vector<Entity> &entities) {
+void EditorLayer::addScriptToEntities(const std::unordered_set<Entity> &entities) {
     PickScriptPopup *popup = F_NEW(Foundation::getAllocator(), PickScriptPopup);
     popup->closeAction = [&]() {
         F_DELETE(Foundation::getAllocator(), m_popups.back());
         m_popups.pop_back();
     };
-    popup->selectAction = [&](const std::vector<Entity> &entities, ScriptClassManifest clazz) {
+    popup->selectAction = [&](const std::unordered_set<Entity> &entities,
+                              ScriptClassManifest clazz) {
         if (clazz.name) {
             for (Entity entity : entities) {
                 // Map manifest fields to internal ScriptField type
@@ -590,11 +591,11 @@ void EditorLayer::processShortcuts() {
     if (ImGui::IsKeyPressed(ImGuiKey_D, false) && ctrl) {
         SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
         if (m_currentWorld) {
-            std::vector<Entity> selected = selectionContext.getSelectedEntities();
-            std::vector<Entity> copies;
+            std::unordered_set<Entity> selected = selectionContext.getSelectedEntities();
+            std::unordered_set<Entity> copies;
             for (auto entity : selected) {
                 Entity duplicate = m_currentWorld->duplicateEntity(entity);
-                copies.push_back(duplicate);
+                copies.insert(duplicate);
                 selectionContext.removeSelectedEntity(entity, false);
                 selectionContext.addSelectedEntity(duplicate, false);
             }

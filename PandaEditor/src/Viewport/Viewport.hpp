@@ -39,7 +39,6 @@ private:
     Miren::IndexBufferHandle m_indexBuffer;
     Miren::ProgramHandle m_outlineProgram;
     Miren::FrameBufferHandle m_outputFB;
-    Miren::TextureHandle m_highlightMapTexture;
     Miren::TextureHandle m_resultAttachment;
     Miren::FrameBufferSpecification m_outputFbSpecification;
     Miren::ViewId m_outputView;

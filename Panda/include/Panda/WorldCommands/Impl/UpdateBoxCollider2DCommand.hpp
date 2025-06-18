@@ -7,7 +7,7 @@ namespace Panda {
 
 class UpdateBoxCollider2DCommand : public WorldCommand {
 public:
-    UpdateBoxCollider2DCommand(const std::vector<Entity> &entities)
+    UpdateBoxCollider2DCommand(const std::unordered_set<Entity> &entities)
         : m_entities(entities)
         , m_newColliders()
         , m_prevColliders() {}
@@ -56,7 +56,7 @@ public:
     }
 
 private:
-    std::vector<Entity> m_entities;
+    std::unordered_set<Entity> m_entities;
     std::unordered_map<UUID, BoxCollider2DComponent> m_newColliders;
     std::unordered_map<UUID, BoxCollider2DComponent> m_prevColliders;
 };

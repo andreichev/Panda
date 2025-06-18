@@ -8,7 +8,7 @@
 namespace Panda {
 
 using SelectScriptFunction =
-    std::function<void(const std::vector<Entity> &entities, ScriptClassManifest clazz)>;
+    std::function<void(const std::unordered_set<Entity> &entities, ScriptClassManifest clazz)>;
 
 class PickScriptPopup final : public EditorPopup {
 public:
@@ -66,7 +66,7 @@ public:
     const char *subtitle;
     SelectScriptFunction selectAction;
     PopupActionFunction closeAction;
-    std::vector<Entity> entities;
+    std::unordered_set<Entity> entities;
 };
 
 } // namespace Panda

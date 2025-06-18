@@ -7,7 +7,7 @@ namespace Panda {
 
 class AddRemoveEntitiesCommand : public WorldCommand {
 public:
-    AddRemoveEntitiesCommand(const std::vector<Entity> &entities)
+    AddRemoveEntitiesCommand(const std::unordered_set<Entity> &entities)
         : m_entities(entities) {}
 
     AddRemoveEntitiesCommand(AddRemoveEntitiesCommand &&other)
@@ -29,7 +29,7 @@ public:
 
     bool execute() override {
         if (m_entities.empty()) { return false; }
-        Entity firstEntity = m_entities[0];
+        Entity firstEntity = *m_entities.begin();
         World *world = firstEntity.getWorld();
         SelectionContext &selectionContext = world->getSelectionContext();
         for (auto entity : m_entities) {
@@ -48,7 +48,7 @@ public:
     }
 
 private:
-    std::vector<Entity> m_entities;
+    std::unordered_set<Entity> m_entities;
 };
 
 } // namespace Panda

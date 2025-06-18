@@ -7,7 +7,7 @@ namespace Panda {
 
 class UpdateRigidbody2DCommand : public WorldCommand {
 public:
-    UpdateRigidbody2DCommand(const std::vector<Entity> &entities)
+    UpdateRigidbody2DCommand(const std::unordered_set<Entity> &entities)
         : m_entities(entities)
         , m_newRigidbodies()
         , m_prevRigidbodies() {}
@@ -53,7 +53,7 @@ public:
     }
 
 private:
-    std::vector<Entity> m_entities;
+    std::unordered_set<Entity> m_entities;
     std::unordered_map<UUID, Rigidbody2DComponent> m_newRigidbodies;
     std::unordered_map<UUID, Rigidbody2DComponent> m_prevRigidbodies;
 };

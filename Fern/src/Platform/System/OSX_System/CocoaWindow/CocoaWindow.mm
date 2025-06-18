@@ -128,7 +128,6 @@ void CocoaWindow::setState(Fern::WindowState state) {
             const NSUInteger masks = m_handle.styleMask;
             if (!(masks & NSWindowStyleMaskFullScreen)) {
                 [m_handle toggleFullScreen:nil];
-                [m_handle makeKeyAndOrderFront:nil];
             }
             break;
         }
