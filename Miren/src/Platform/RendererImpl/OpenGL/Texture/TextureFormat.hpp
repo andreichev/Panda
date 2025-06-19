@@ -20,6 +20,8 @@ struct TextureFormatInfo {
 
 const static TextureFormatInfo s_textureFormat[] = {
     {GL_R8, GL_RED, GL_UNSIGNED_BYTE},           // R8
+    {GL_R8I, GL_RED_INTEGER, GL_BYTE},           // R8I
+    {GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE}, // R8UI
     {GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE},         // RGB8
     {GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE},       // RGBA8
     {GL_R32I, GL_RED_INTEGER, GL_INT},           // R32I

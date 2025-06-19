@@ -21,8 +21,7 @@ public:
     }
 
     bool isSelected(Entity entity) {
-        return std::find(m_selectedEntities.begin(), m_selectedEntities.end(), entity) !=
-               m_selectedEntities.end();
+        return m_selectedEntities.contains(entity);
     }
 
     void addSelectedEntity(Entity entity, bool needToCalculateMedian = true) {

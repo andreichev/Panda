@@ -168,6 +168,7 @@ void World::updateBasicComponents(
             rect.texture = spriteComponent.asset;
             rect.size = {1.f, 1.f};
             rect.id = id.id;
+            rect.isSelected = m_selectionContext.isSelected(entity);
             int xTileIndex = spriteComponent.index % spriteComponent.cols;
             int yTileIndex = spriteComponent.index % spriteComponent.rows;
             float tileWidth = (1.f / spriteComponent.cols);

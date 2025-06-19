@@ -25,10 +25,12 @@ Renderer2D::Renderer2D()
     layoutData.pushVec2();
     // Texture Index
     layoutData.pushInt(1);
-    // Object id
-    layoutData.pushUInt(1);
     // Color
     layoutData.pushVec4();
+    // Object id
+    layoutData.pushUInt(1);
+    // Is selected
+    layoutData.pushUInt(1);
     m_drawData.layout = Miren::createVertexLayout(layoutData);
     m_drawData.textureSlotIndex = 1;
     Foundation::Memory whiteTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
@@ -121,10 +123,11 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
 
     for (int i = 0; i < 4; i++) {
         m_drawData.vertices[verticesCount].pos = rect.transform * transform * positions[i];
+        m_drawData.vertices[verticesCount].textureCoords = textureCoords[i];
         m_drawData.vertices[verticesCount].textureIndex = textureIndex;
         m_drawData.vertices[verticesCount].color = rect.color;
         m_drawData.vertices[verticesCount].id = rect.id;
-        m_drawData.vertices[verticesCount].textureCoords = textureCoords[i];
+        m_drawData.vertices[verticesCount].isSelected = rect.isSelected;
         verticesCount++;
     }
     uint32_t &indicesCount = m_drawData.indicesCount;

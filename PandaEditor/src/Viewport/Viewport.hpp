@@ -22,7 +22,7 @@ public:
     std::unordered_set<UUID> getEntitiesInsideRect(Rect rect);
     UUID getEntityInsidePoint(Vec2 point);
     Rect getFrame();
-    void drawOutline(const std::unordered_set<UUID> &selection);
+    void drawOutline(float dt, const std::unordered_set<UUID> &selection);
     void readIdsBuffer();
 
 private:
@@ -32,6 +32,7 @@ private:
     Miren::FrameBufferSpecification m_sceneFbSpecification;
     Miren::ViewId m_sceneView;
     Miren::TextureHandle m_colorAttachment;
+    Miren::TextureHandle m_isSelectedAttachment;
     Foundation::Memory m_idsBuffer;
 
     // SELECTED OBJECT HIGHLIGHT OUTLINE:

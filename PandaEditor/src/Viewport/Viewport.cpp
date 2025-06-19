@@ -16,6 +16,7 @@ Viewport::Viewport()
     , m_sceneFbSpecification()
     , m_sceneView(1)
     , m_colorAttachment()
+    , m_isSelectedAttachment()
     , m_outlineProgram()
     , m_outputFB()
     , m_resultAttachment()
@@ -51,18 +52,23 @@ void Viewport::initWithSize(Vec2 size) {
     // -------------------------------------------
 
     Miren::TextureCreate create;
+    create.m_minFiltering = Miren::NEAREST;
+    create.m_magFiltering = Miren::NEAREST;
+    create.m_wrap = Miren::CLAMP;
     create.m_format = Miren::TextureFormat::RGBA8;
     create.m_width = m_frame.size.width * dpi.width;
     create.m_height = m_frame.size.height * dpi.height;
     m_colorAttachment = Miren::createTexture(create);
     create.m_format = Miren::TextureFormat::R32UI;
     Miren::TextureHandle idAttachment = Miren::createTexture(create);
+    create.m_format = Miren::TextureFormat::R8UI;
+    m_isSelectedAttachment = Miren::createTexture(create);
     create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
     Miren::TextureHandle depthAttachment = Miren::createTexture(create);
     Miren::FrameBufferAttachment sceneAttachments[] = {
-        m_colorAttachment, idAttachment, depthAttachment
+        m_colorAttachment, idAttachment, m_isSelectedAttachment, depthAttachment
     };
-    m_sceneFbSpecification = Miren::FrameBufferSpecification(sceneAttachments, 3);
+    m_sceneFbSpecification = Miren::FrameBufferSpecification(sceneAttachments, 4);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewport(
         m_sceneView,
@@ -70,7 +76,7 @@ void Viewport::initWithSize(Vec2 size) {
     );
     Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
     Miren::setViewClear(m_sceneView, 0x000000cff);
-    Miren::setViewClearAttachments(m_sceneView, {Miren::Clear(1, 0)});
+    Miren::setViewClearAttachments(m_sceneView, {Miren::Clear(1, 0), Miren::Clear(2, 0)});
 
     // -------------------------------------------
     // SELECTED OBJECT HIGHLIGHT OUTLINE RENDERING
@@ -105,9 +111,6 @@ void Viewport::initWithSize(Vec2 size) {
     m_outlineProgram = Miren::createProgram({vertexMem, fragmentMem});
 
     create.m_format = Miren::TextureFormat::RGBA8;
-    create.m_minFiltering = Miren::NEAREST;
-    create.m_magFiltering = Miren::NEAREST;
-    create.m_wrap = Miren::CLAMP;
     m_resultAttachment = Miren::createTexture(create);
     Miren::FrameBufferAttachment outputAttachments[] = {m_resultAttachment};
     m_outputFbSpecification = Miren::FrameBufferSpecification(outputAttachments, 1);
@@ -144,9 +147,15 @@ void Viewport::updateSize(Size size) {
         size.width * dpi.width,
         size.height * dpi.height
     );
-    // DEPTH ATTACHMENT
+    // IS SELECTED ATTACHMENT
     Miren::resizeTexture(
         m_sceneFbSpecification.attachments[2].handle,
+        size.width * dpi.width,
+        size.height * dpi.height
+    );
+    // DEPTH ATTACHMENT
+    Miren::resizeTexture(
+        m_sceneFbSpecification.attachments[3].handle,
         size.width * dpi.width,
         size.height * dpi.height
     );
@@ -228,13 +237,26 @@ UUID Viewport::getEntityInsidePoint(Vec2 point) {
     return hoveredId;
 }
 
-void Viewport::drawOutline(const std::unordered_set<UUID> &selection) {
+void Viewport::drawOutline(float dt, const std::unordered_set<UUID> &selection) {
     // RENDERING SELECTION HIGHLIGHT
     Miren::setState(0);
     Miren::setShader(m_outlineProgram);
     int samplerColor = 0;
     Miren::setTexture(m_colorAttachment, samplerColor);
     Miren::setUniform(m_outlineProgram, "colorTexture", &samplerColor, Miren::UniformType::Sampler);
+    int samplerIsSelected = 1;
+    Miren::setTexture(m_isSelectedAttachment, samplerIsSelected);
+    Miren::setUniform(
+        m_outlineProgram, "isSelectedTexture", &samplerIsSelected, Miren::UniformType::Sampler
+    );
+    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
+    Vec2 size = m_frame.size;
+    size.width *= dpi.width;
+    size.height *= dpi.height;
+    Miren::setUniform(m_outlineProgram, "resolution", &size, Miren::UniformType::Vec2);
+    static float time = 0.f;
+    time += dt;
+    Miren::setUniform(m_outlineProgram, "time", &time, Miren::UniformType::Float);
     Miren::setVertexBuffer(m_vertexBuffer);
     Miren::setIndexBuffer(m_indexBuffer, 0, 6);
     Miren::submit(m_outputView);

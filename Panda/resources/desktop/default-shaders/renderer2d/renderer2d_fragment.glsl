@@ -4,9 +4,11 @@ flat in int fragTextureIndex;
 in vec4 fragColor;
 in vec2 fragTexCoord;
 flat in uint fragId;
+flat in uint fragIsSelected;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out uint outId;
+layout(location = 2) out uint outIsSelected;
 
 uniform sampler2D u_textures[8];
 
@@ -27,4 +29,5 @@ void main() {
         discard;
     }
     outId = fragId;
+    outIsSelected = fragIsSelected;
 }

@@ -29,9 +29,9 @@ void ViewportPanel::updateViewportSize(Size size) {
     m_viewport.updateSize(size);
 }
 
-void ViewportPanel::drawOutline() {
+void ViewportPanel::drawOutline(float dt) {
     std::unordered_set<UUID> selection = getSelectedIds();
-    m_viewport.drawOutline(selection);
+    m_viewport.drawOutline(dt, selection);
 }
 
 void ViewportPanel::onImGuiRender(SceneState sceneState, float offsetY, bool fullScreen) {

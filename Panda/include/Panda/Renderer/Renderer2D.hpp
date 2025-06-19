@@ -26,6 +26,7 @@ public:
             , texture(nullptr)
             , rotation(0)
             , id(-1)
+            , isSelected(false)
             , textureCoords(0, 0, 1, 1)
             , transform(1.f) {}
 
@@ -34,6 +35,7 @@ public:
         Size size;
         Color color;
         uint32_t id;
+        bool isSelected;
         float rotation;
         glm::mat4 transform;
         Foundation::Shared<Asset> texture;
@@ -53,26 +55,34 @@ public:
 
     struct Vertex2D {
         Vertex2D(
-            glm::vec3 pos, glm::vec2 textureCoords, float textureIndex, int32_t id, Color color
+            glm::vec3 pos,
+            glm::vec2 textureCoords,
+            float textureIndex,
+            int32_t id,
+            bool isSelected,
+            Color color
         )
             : pos(pos)
             , textureCoords(textureCoords)
             , textureIndex(textureIndex)
+            , color(color)
             , id(id)
-            , color(color) {}
+            , isSelected(isSelected) {}
 
         Vertex2D()
             : pos()
             , textureCoords()
             , textureIndex(0)
+            , color()
             , id(-1)
-            , color() {}
+            , isSelected(0) {}
 
         glm::vec3 pos;
         glm::vec2 textureCoords;
         int32_t textureIndex;
-        uint32_t id;
         glm::vec4 color;
+        uint32_t id;
+        uint32_t isSelected;
     };
 
     struct DrawCallData {

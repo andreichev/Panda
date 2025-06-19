@@ -83,7 +83,7 @@ void EditorLayer::onUpdate(double deltaTime) {
             break;
         }
     }
-    m_panelsContainer.viewport.drawOutline();
+    m_panelsContainer.viewport.drawOutline(deltaTime);
 }
 
 void EditorLayer::onImGuiRender() {

@@ -76,7 +76,7 @@ int OpenGLShader::getUniformLocation(const std::string &name) {
         return m_uniformLocationCache[name];
     }
     int location = glGetUniformLocation(m_id, name.c_str());
-    PND_ASSERT_F(location != -1, "SHADER UNIFORM %s not found", name.c_str());
+    if (location == -1) { LOG_ERROR("SHADER UNIFORM %s NOT FOUND", name.c_str()); }
     m_uniformLocationCache[name] = location;
     return location;
 }
@@ -104,20 +104,20 @@ void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseV
                 PND_ASSERT(false, "Buffer element type is undefined");
                 break;
         }
-        if (type == GL_UNSIGNED_INT || type == GL_INT) {
-            GL_CALL(glVertexAttribIPointer(
-                i,
-                layout.m_elements[i].count,
-                type,
-                layout.m_stride,
-                reinterpret_cast<const void *>(pointer)
-            ));
-        } else {
+        if (type == GL_FLOAT || layout.m_elements[i].normalized) {
             GL_CALL(glVertexAttribPointer(
                 i,
                 layout.m_elements[i].count,
                 type,
                 layout.m_elements[i].normalized ? GL_TRUE : GL_FALSE,
+                layout.m_stride,
+                reinterpret_cast<const void *>(pointer)
+            ));
+        } else {
+            GL_CALL(glVertexAttribIPointer(
+                i,
+                layout.m_elements[i].count,
+                type,
                 layout.m_stride,
                 reinterpret_cast<const void *>(pointer)
             ));
@@ -136,23 +136,45 @@ void OpenGLShader::unbind() {
 }
 
 void OpenGLShader::setUniformFloat(const char *name, float *value, int count) {
-    GL_CALL(glUniform1fv(getUniformLocation(name), count, value));
+    int location = getUniformLocation(name);
+    if (location == -1) { return; }
+    GL_CALL(glUniform1fv(location, count, value));
+}
+
+void OpenGLShader::setUniformVec2(const char *name, float *value, int count) {
+    int location = getUniformLocation(name);
+    if (location == -1) { return; }
+    GL_CALL(glUniform2fv(location, count, value));
+}
+
+void OpenGLShader::setUniformVec3(const char *name, float *value, int count) {
+    int location = getUniformLocation(name);
+    if (location == -1) { return; }
+    GL_CALL(glUniform3fv(location, count, value));
 }
 
 void OpenGLShader::setUniformVec4(const char *name, float *value, int count) {
-    GL_CALL(glUniform4fv(getUniformLocation(name), count, value));
+    int location = getUniformLocation(name);
+    if (location == -1) { return; }
+    GL_CALL(glUniform4fv(location, count, value));
 }
 
 void OpenGLShader::setUniformMat3(const char *name, float *value, int count) {
-    GL_CALL(glUniformMatrix3fv(getUniformLocation(name), count, GL_FALSE, value));
+    int location = getUniformLocation(name);
+    if (location == -1) { return; }
+    GL_CALL(glUniformMatrix3fv(location, count, GL_FALSE, value));
 }
 
 void OpenGLShader::setUniformMat4(const char *name, float *value, int count) {
-    GL_CALL(glUniformMatrix4fv(getUniformLocation(name), count, GL_FALSE, value));
+    int location = getUniformLocation(name);
+    if (location == -1) { return; }
+    GL_CALL(glUniformMatrix4fv(location, count, GL_FALSE, value));
 }
 
 void OpenGLShader::setUniformInt(const char *name, int *value, int count) {
-    GL_CALL(glUniform1iv(getUniformLocation(name), count, value));
+    int location = getUniformLocation(name);
+    if (location == -1) { return; }
+    GL_CALL(glUniform1iv(location, count, value));
 }
 
 } // namespace Miren
