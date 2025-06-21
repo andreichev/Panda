@@ -16,12 +16,15 @@ Viewport::Viewport()
     , m_sceneFbSpecification()
     , m_sceneView(1)
     , m_colorAttachment()
-    , m_isSelectedAttachment()
     , m_outlineProgram()
     , m_outputFB()
     , m_resultAttachment()
     , m_outputView(2)
-    , m_outputFbSpecification() {}
+    , m_outputFbSpecification()
+    , m_selectedGeometryFB()
+    , m_selectedAttachment()
+    , m_selectedFbSpecification()
+    , m_selectedGeometryView(3) {}
 
 Viewport::~Viewport() {
     Miren::deleteFrameBuffer(m_sceneFB);
@@ -61,14 +64,12 @@ void Viewport::initWithSize(Vec2 size) {
     m_colorAttachment = Miren::createTexture(create);
     create.m_format = Miren::TextureFormat::R32UI;
     Miren::TextureHandle idAttachment = Miren::createTexture(create);
-    create.m_format = Miren::TextureFormat::R8UI;
-    m_isSelectedAttachment = Miren::createTexture(create);
     create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
     Miren::TextureHandle depthAttachment = Miren::createTexture(create);
     Miren::FrameBufferAttachment sceneAttachments[] = {
-        m_colorAttachment, idAttachment, m_isSelectedAttachment, depthAttachment
+        m_colorAttachment, idAttachment, depthAttachment
     };
-    m_sceneFbSpecification = Miren::FrameBufferSpecification(sceneAttachments, 4);
+    m_sceneFbSpecification = Miren::FrameBufferSpecification(sceneAttachments, 3);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewport(
         m_sceneView,
@@ -122,6 +123,27 @@ void Viewport::initWithSize(Vec2 size) {
     );
     Miren::setViewClear(m_outputView, 0x000000ff);
     Miren::setViewFrameBuffer(m_outputView, m_outputFB);
+
+    // -------------------------------------------
+    //  SELECTED GEOMETRY ISOLATION FRAME BUFFER
+    // -------------------------------------------
+
+    create.m_width = m_frame.size.width;
+    create.m_height = m_frame.size.height;
+    create.m_format = Miren::TextureFormat::R8UI;
+    m_selectedAttachment = Miren::createTexture(create);
+    create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
+    depthAttachment = Miren::createTexture(create);
+    Miren::FrameBufferAttachment selectedGeometryFBAttachments[] = {
+        m_selectedAttachment, depthAttachment
+    };
+    m_selectedFbSpecification = Miren::FrameBufferSpecification(selectedGeometryFBAttachments, 2);
+    m_selectedGeometryFB = Miren::createFrameBuffer(m_selectedFbSpecification);
+    Miren::setViewport(
+        m_selectedGeometryView, Miren::Rect(0, 0, m_frame.size.width, m_frame.size.height)
+    );
+    Miren::setViewClear(m_selectedGeometryView, 0);
+    Miren::setViewFrameBuffer(m_selectedGeometryView, m_selectedGeometryFB);
 }
 
 void Viewport::updateOrigin(Vec2 origin) {
@@ -147,15 +169,9 @@ void Viewport::updateSize(Size size) {
         size.width * dpi.width,
         size.height * dpi.height
     );
-    // IS SELECTED ATTACHMENT
-    Miren::resizeTexture(
-        m_sceneFbSpecification.attachments[2].handle,
-        size.width * dpi.width,
-        size.height * dpi.height
-    );
     // DEPTH ATTACHMENT
     Miren::resizeTexture(
-        m_sceneFbSpecification.attachments[3].handle,
+        m_sceneFbSpecification.attachments[2].handle,
         size.width * dpi.width,
         size.height * dpi.height
     );
@@ -180,6 +196,15 @@ void Viewport::updateSize(Size size) {
     m_idsBuffer.release();
     m_idsBuffer = Foundation::Memory::alloc(bufferSize);
     memset(m_idsBuffer.data, 0, bufferSize);
+    // SELECTED GEOMETRY FRAME BUFFER
+    Miren::setViewport(m_selectedGeometryView, Miren::Rect(0, 0, size.width, size.height));
+    // IS SELECTED ATTACHMENT
+    Miren::resizeTexture(m_selectedFbSpecification.attachments[0].handle, size.width, size.height);
+    // DEPTH ATTACHMENT
+    Miren::resizeTexture(m_selectedFbSpecification.attachments[1].handle, size.width, size.height);
+    Miren::deleteFrameBuffer(m_selectedGeometryFB);
+    m_selectedGeometryFB = Miren::createFrameBuffer(m_selectedFbSpecification);
+    Miren::setViewFrameBuffer(m_selectedGeometryView, m_selectedGeometryFB);
 }
 
 Miren::TextureHandle Viewport::getResultTexture() {
@@ -245,7 +270,7 @@ void Viewport::drawOutline(float dt, const std::unordered_set<UUID> &selection) 
     Miren::setTexture(m_colorAttachment, samplerColor);
     Miren::setUniform(m_outlineProgram, "colorTexture", &samplerColor, Miren::UniformType::Sampler);
     int samplerIsSelected = 1;
-    Miren::setTexture(m_isSelectedAttachment, samplerIsSelected);
+    Miren::setTexture(m_selectedAttachment, samplerIsSelected);
     Miren::setUniform(
         m_outlineProgram, "isSelectedTexture", &samplerIsSelected, Miren::UniformType::Sampler
     );

@@ -47,6 +47,7 @@ public:
         return m_renderer3d;
     }
     void setViewId(Miren::ViewId id);
+    void setSelectionViewId(Miren::ViewId id);
     glm::mat4 getWorldSpaceTransformMatrix(Entity entity);
     void convertToWorldSpace(Entity entity);
     void convertToLocalSpace(Entity entity);
@@ -90,7 +91,8 @@ private:
 #endif
 
     void releaseAllScriptingFields();
-    void updateBasicComponents(float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
+    void renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
+    void renderSelectedGeometry(glm::mat4 &viewProjMtx);
     Entity instantiateEntity(UUID id);
     void fillEntity(Entity entity, UUID id);
     void physics2DComponentsUpdatedAt(Entity entity);
@@ -103,6 +105,7 @@ private:
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;
     Miren::ViewId m_renderingViewId;
+    Miren::ViewId m_selectionViewId;
 
     friend class Entity;
     friend class WorldHierarchyPanel;

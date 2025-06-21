@@ -15,8 +15,9 @@ Renderer3D::Renderer3D(Panda::Renderer3D &&other)
     , m_viewProj(other.m_viewProj)
     , m_drawData(other.m_drawData) {}
 
-void Renderer3D::begin() {
+void Renderer3D::begin(Miren::ViewId id) {
     m_drawData.stats.drawCalls = 0;
+    m_viewId = id;
 }
 
 void Renderer3D::submit(glm::mat4 &transform, StaticMeshAsset *mesh) {
@@ -64,10 +65,6 @@ void Renderer3D::end() {}
 
 Renderer3D::Statistics Renderer3D::getStats() {
     return m_drawData.stats;
-}
-
-void Renderer3D::setViewId(Miren::ViewId id) {
-    m_viewId = id;
 }
 
 void Renderer3D::setViewProj(glm::mat4 viewProj) {

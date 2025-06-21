@@ -29,13 +29,12 @@ public:
     Renderer3D();
     Renderer3D(Renderer3D &&other);
     ~Renderer3D() = default;
-    void begin();
+    void begin(Miren::ViewId id);
     void submit(glm::mat4 &transform, StaticMeshAsset *mesh);
     void submit(glm::mat4 &transform, DynamicMeshAsset *mesh);
     void end();
     Statistics getStats();
     void setViewProj(glm::mat4 viewProj);
-    void setViewId(Miren::ViewId id);
 
     Renderer3D &operator=(Renderer3D &&other);
 

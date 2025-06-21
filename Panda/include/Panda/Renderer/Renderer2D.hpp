@@ -18,6 +18,8 @@ namespace Panda {
 /// и передать viewId.
 class Renderer2D {
 public:
+    enum class Mode { DEFAULT, GEOMETRY_ONLY };
+
     struct RectData {
         RectData()
             : center()
@@ -26,7 +28,6 @@ public:
             , texture(nullptr)
             , rotation(0)
             , id(-1)
-            , isSelected(false)
             , textureCoords(0, 0, 1, 1)
             , transform(1.f) {}
 
@@ -35,7 +36,6 @@ public:
         Size size;
         Color color;
         uint32_t id;
-        bool isSelected;
         float rotation;
         glm::mat4 transform;
         Foundation::Shared<Asset> texture;
@@ -66,23 +66,20 @@ public:
             , textureCoords(textureCoords)
             , textureIndex(textureIndex)
             , color(color)
-            , id(id)
-            , isSelected(isSelected) {}
+            , id(id) {}
 
         Vertex2D()
             : pos()
             , textureCoords()
             , textureIndex(0)
             , color()
-            , id(-1)
-            , isSelected(0) {}
+            , id(-1) {}
 
         glm::vec3 pos;
         glm::vec2 textureCoords;
         int32_t textureIndex;
         glm::vec4 color;
         uint32_t id;
-        uint32_t isSelected;
     };
 
     struct DrawCallData {
@@ -105,11 +102,10 @@ public:
     Renderer2D();
     Renderer2D(Renderer2D &other) = delete;
     ~Renderer2D();
-    void begin();
+    void begin(Mode mode, Miren::ViewId id);
     void drawRect(RectData rect);
     void end();
     Statistics getStats();
-    void setViewId(Miren::ViewId id);
     void setViewProj(glm::mat4 viewProj);
     Renderer2D &operator=(Renderer2D &other) = delete;
 
@@ -117,6 +113,8 @@ private:
     glm::mat4 m_viewProj;
     Miren::ViewId m_viewId;
     DrawCallData m_drawData;
+    Miren::ProgramHandle m_defaultShader;
+    Miren::ProgramHandle m_selectedGeometryShader;
 
     void reset();
     void flush();

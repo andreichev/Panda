@@ -6,7 +6,6 @@ uniform sampler2D skyTexture;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out uint outId;
-layout(location = 2) out uint outIsSelected;
 
 const vec2 invAtan = vec2(0.1591, 0.3183);
 vec2 sampleSphericalMap(vec3 v)  {
@@ -22,5 +21,4 @@ void main() {
 
 	outColor = vec4(color, 1.0);
 	outId = 0u;
-	outIsSelected = 0u;
 }

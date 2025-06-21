@@ -29,9 +29,9 @@ vec4 getSelectionColor() {
 float getSelectionBlurredColor() {
     float Pi2 = 6.28318530718;
     float directions = 8.0;
-    float quality = 3.0;
+    float quality = 2.0;
     // float size = 8.0 + (0.5 + 0.5 * cos(time * 3.0)) * 4.0;
-    float size = 8.0;
+    float size = 4.0;
     vec2 radius = size/resolution.xy;
     vec2 uv = gl_FragCoord.xy/resolution.xy;
     float color = texture(isSelectedTexture, uv).r;
@@ -48,6 +48,10 @@ void main() {
     vec4 color = texture(colorTexture, fragTexCoord);
     vec4 outline = getOutlineColor();
     outline.a = isSelected() ? 0.0 : getSelectionBlurredColor();
-    colorOut = mix(color, outline, outline.a);
-    colorOut.a = 1.0;
+    if (outline.a > 0.0) {
+        colorOut = outline;
+        colorOut.a = 1.0;
+    } else {
+        colorOut = color;
+    }
 }

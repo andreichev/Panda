@@ -4,7 +4,6 @@ in vec3 WorldPos;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out uint outId;
-layout(location = 2) out uint outIsSelected;
 
 uniform vec4 gCameraWorldPos;
 uniform float gGridSize = 100.0;
@@ -85,5 +84,4 @@ void main() {
 	Color.a *= OpacityFalloff;
 	outColor = Color;
 	outId = 0u;
-	outIsSelected = 0u;
 }

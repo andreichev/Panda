@@ -32,10 +32,15 @@ private:
     Miren::FrameBufferSpecification m_sceneFbSpecification;
     Miren::ViewId m_sceneView;
     Miren::TextureHandle m_colorAttachment;
-    Miren::TextureHandle m_isSelectedAttachment;
     Foundation::Memory m_idsBuffer;
 
-    // SELECTED OBJECT HIGHLIGHT OUTLINE:
+    // SELECTED GEOMETRY ISOLATION RENDERING:
+    Miren::FrameBufferHandle m_selectedGeometryFB;
+    Miren::TextureHandle m_selectedAttachment;
+    Miren::FrameBufferSpecification m_selectedFbSpecification;
+    Miren::ViewId m_selectedGeometryView;
+
+    // SELECTED OBJECT HIGHLIGHT OUTLINE RENDERING:
     Miren::VertexBufferHandle m_vertexBuffer;
     Miren::IndexBufferHandle m_indexBuffer;
     Miren::ProgramHandle m_outlineProgram;

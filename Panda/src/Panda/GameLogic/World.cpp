@@ -56,21 +56,10 @@ void World::finishRunning() {
 
 void World::updateRuntime(double deltaTime) {
     if (!m_isRunning) { return; }
-    m_renderer2d.begin();
-    m_renderer3d.begin();
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_renderingViewId);
+    m_renderer3d.begin(m_renderingViewId);
 
     m_physics2D.update(this, deltaTime);
-    // Update native scripts
-    {
-        auto view = m_registry.view<ScriptListComponent>();
-        for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) { continue; }
-            auto &component = view.get<ScriptListComponent>(entityHandle);
-            for (auto &container : component.scripts) {
-                container.invokeUpdate(deltaTime);
-            }
-        }
-    }
     glm::mat4 viewProjMtx;
     glm::mat4 skyViewProjMtx;
     Entity cameraEntity = findMainCameraEntity();
@@ -87,16 +76,29 @@ void World::updateRuntime(double deltaTime) {
         m_renderer3d.setViewProj(viewProjMtx);
     }
 
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
+    // Update native scripts
+    {
+        auto view = m_registry.view<ScriptListComponent>();
+        for (auto entityHandle : view) {
+            if (!isValidEntt(entityHandle)) { continue; }
+            auto &component = view.get<ScriptListComponent>(entityHandle);
+            for (auto &container : component.scripts) {
+                container.invokeUpdate(deltaTime);
+            }
+        }
+    }
+
+    renderWorld(viewProjMtx, skyViewProjMtx);
 
     m_renderer2d.end();
     m_renderer3d.end();
 }
 
 void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
-    m_renderer2d.begin();
-    m_renderer3d.begin();
-
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_renderingViewId);
+    m_renderer3d.begin(m_renderingViewId);
+    m_renderer2d.setViewProj(viewProjMtx);
+    m_renderer3d.setViewProj(viewProjMtx);
     m_physics2D.update(this, deltaTime);
 
     // Update native scripts
@@ -111,33 +113,23 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
         }
     }
 
-    m_renderer2d.setViewProj(viewProjMtx);
-    m_renderer3d.setViewProj(viewProjMtx);
-
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
+    renderWorld(viewProjMtx, skyViewProjMtx);
 
     m_renderer2d.end();
     m_renderer3d.end();
 }
 
 void World::updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
-    m_renderer2d.begin();
-    m_renderer3d.begin();
-
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
-
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_renderingViewId);
+    m_renderer3d.begin(m_renderingViewId);
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
-
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
-
+    renderWorld(viewProjMtx, skyViewProjMtx);
     m_renderer2d.end();
     m_renderer3d.end();
 }
 
-void World::updateBasicComponents(
-    float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx
-) {
+void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
     // Draw sky
     {
         auto view = m_registry.view<SkyComponent>();
@@ -168,7 +160,63 @@ void World::updateBasicComponents(
             rect.texture = spriteComponent.asset;
             rect.size = {1.f, 1.f};
             rect.id = id.id;
-            rect.isSelected = m_selectionContext.isSelected(entity);
+            int xTileIndex = spriteComponent.index % spriteComponent.cols;
+            int yTileIndex = spriteComponent.index % spriteComponent.rows;
+            float tileWidth = (1.f / spriteComponent.cols);
+            float tileHeight = (1.f / spriteComponent.rows);
+            float xTexCoord = tileWidth * xTileIndex;
+            float yTexCoord = tileHeight * yTileIndex;
+            rect.textureCoords = {xTexCoord, yTexCoord, tileWidth, tileHeight};
+            m_renderer2d.drawRect(rect);
+        }
+    }
+    // Render static meshes
+    {
+        auto view = m_registry.view<StaticMeshComponent, TransformComponent>();
+        for (auto entityHandle : view) {
+            if (!isValidEntt(entityHandle)) { continue; }
+            auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
+            auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
+            for (auto &mesh : staticMeshComponent.meshes) {
+                m_renderer3d.submit(transform, &mesh);
+            }
+        }
+    }
+    // Render dynamic meshes
+    {
+        auto view = m_registry.view<DynamicMeshComponent, TransformComponent>();
+        for (auto entityHandle : view) {
+            if (!isValidEntt(entityHandle)) { continue; }
+            auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
+            auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
+            for (auto &mesh : dynamicMeshComponent.meshes) {
+                m_renderer3d.submit(transform, &mesh);
+            }
+        }
+    }
+}
+
+void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
+    // Render Sprites
+    {
+        auto view = m_registry.view<IdComponent, SpriteRendererComponent, TransformComponent>();
+        for (auto entityHandle : view) {
+            if (!isValidEntt(entityHandle)) { continue; }
+            Entity entity = {entityHandle, this};
+            auto &id = view.get<IdComponent>(entityHandle);
+            auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
+            auto &transform = view.get<TransformComponent>(entityHandle);
+            Panda::Renderer2D::RectData rect;
+            rect.transform = getWorldSpaceTransformMatrix(entity);
+            rect.color = spriteComponent.color;
+            // Load texture if it needs.
+            AssetHandler *assetHandler = GameContext::s_assetHandler;
+            if (spriteComponent.textureId && !spriteComponent.asset && assetHandler) {
+                spriteComponent.asset = assetHandler->load(spriteComponent.textureId);
+            }
+            rect.texture = spriteComponent.asset;
+            rect.size = {1.f, 1.f};
+            rect.id = id.id;
             int xTileIndex = spriteComponent.index % spriteComponent.cols;
             int yTileIndex = spriteComponent.index % spriteComponent.rows;
             float tileWidth = (1.f / spriteComponent.cols);
@@ -469,9 +517,11 @@ Entity World::getById(UUID id) {
 }
 
 void World::setViewId(Miren::ViewId id) {
-    m_renderer2d.setViewId(id);
-    m_renderer3d.setViewId(id);
     m_renderingViewId = id;
+}
+
+void World::setSelectionViewId(Miren::ViewId id) {
+    m_selectionViewId = id;
 }
 
 glm::mat4 World::getWorldSpaceTransformMatrix(Entity entity) {

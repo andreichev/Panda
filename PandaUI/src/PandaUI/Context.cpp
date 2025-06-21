@@ -26,7 +26,6 @@ Context::Context()
     m_camera.setViewportSize(m_viewportSize);
     // View matrix is identity
     m_renderer2d.setViewProj(m_camera.getProjection());
-    m_renderer2d.setViewId(0);
     // Make background view transparent
     if (m_rootView) { m_rootView->setBackgroundColor(Color(0x00000000)); }
     // YGConfigRef config = YGConfigNew();
@@ -35,7 +34,7 @@ Context::Context()
 
 void Context::update(double deltaTime) {
     if (m_rootView) {
-        m_renderer2d.begin();
+        m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_mirenViewId);
         m_rootView->render(0, 0);
         m_renderer2d.end();
     }
@@ -58,7 +57,6 @@ void Context::updateViewportSize(Size size) {
 
 void Context::updateViewId(Miren::ViewId viewId) {
     m_mirenViewId = viewId;
-    m_renderer2d.setViewId(viewId);
 }
 
 } // namespace PandaUI
