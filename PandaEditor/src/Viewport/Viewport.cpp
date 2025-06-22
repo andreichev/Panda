@@ -22,7 +22,7 @@ Viewport::Viewport()
     , m_outputView(2)
     , m_outputFbSpecification()
     , m_selectedGeometryFB()
-    , m_selectedAttachment()
+    , m_selectedGeometryAttachment()
     , m_selectedFbSpecification()
     , m_selectedGeometryView(3) {}
 
@@ -135,14 +135,10 @@ void Viewport::initWithSize(Vec2 size) {
 
     create.m_width = m_frame.size.width;
     create.m_height = m_frame.size.height;
-    create.m_format = Miren::TextureFormat::R8UI;
-    m_selectedAttachment = Miren::createTexture(create);
-    create.m_format = Miren::TextureFormat::DEPTH24STENCIL8;
-    depthAttachment = Miren::createTexture(create);
-    Miren::FrameBufferAttachment selectedGeometryFBAttachments[] = {
-        m_selectedAttachment, depthAttachment
-    };
-    m_selectedFbSpecification = Miren::FrameBufferSpecification(selectedGeometryFBAttachments, 2);
+    create.m_format = Miren::TextureFormat::RGBA8;
+    m_selectedGeometryAttachment = Miren::createTexture(create);
+    Miren::FrameBufferAttachment selectedGeometryFBAttachments[] = {m_selectedGeometryAttachment};
+    m_selectedFbSpecification = Miren::FrameBufferSpecification(selectedGeometryFBAttachments, 1);
     m_selectedGeometryFB = Miren::createFrameBuffer(m_selectedFbSpecification);
     Miren::setViewport(
         m_selectedGeometryView, Miren::Rect(0, 0, m_frame.size.width, m_frame.size.height)
@@ -203,10 +199,8 @@ void Viewport::updateSize(Size size) {
     memset(m_idsBuffer.data, 0, bufferSize);
     // SELECTED GEOMETRY FRAME BUFFER
     Miren::setViewport(m_selectedGeometryView, Miren::Rect(0, 0, size.width, size.height));
-    // IS SELECTED ATTACHMENT
+    // SELECTED GEOMETRY ATTACHMENT
     Miren::resizeTexture(m_selectedFbSpecification.attachments[0].handle, size.width, size.height);
-    // DEPTH ATTACHMENT
-    Miren::resizeTexture(m_selectedFbSpecification.attachments[1].handle, size.width, size.height);
     Miren::deleteFrameBuffer(m_selectedGeometryFB);
     m_selectedGeometryFB = Miren::createFrameBuffer(m_selectedFbSpecification);
     Miren::setViewFrameBuffer(m_selectedGeometryView, m_selectedGeometryFB);
@@ -278,17 +272,14 @@ void Viewport::drawOutline(float dt, const std::unordered_set<UUID> &selection) 
     int samplerColor = 0;
     Miren::setTexture(m_colorAttachment, samplerColor);
     Miren::setUniform(m_outlineProgram, "colorTexture", &samplerColor, Miren::UniformType::Sampler);
-    int samplerIsSelected = 1;
-    Miren::setTexture(m_selectedAttachment, samplerIsSelected);
+    int samplerSelectedGeometry = 1;
+    Miren::setTexture(m_selectedGeometryAttachment, samplerSelectedGeometry);
     Miren::setUniform(
-        m_outlineProgram, "isSelectedTexture", &samplerIsSelected, Miren::UniformType::Sampler
+        m_outlineProgram,
+        "selectedGeometryTexture",
+        &samplerSelectedGeometry,
+        Miren::UniformType::Sampler
     );
-    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
-    Vec2 size = m_frame.size;
-    Miren::setUniform(m_outlineProgram, "resolution", &size, Miren::UniformType::Vec2);
-    static float time = 0.f;
-    time += dt;
-    Miren::setUniform(m_outlineProgram, "time", &time, Miren::UniformType::Float);
     Miren::setVertexBuffer(m_vertexBuffer);
     Miren::setIndexBuffer(m_indexBuffer, 0, 6);
     Miren::submit(m_outputView);

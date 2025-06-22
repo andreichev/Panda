@@ -29,6 +29,7 @@ public:
     void
     setUniform(ProgramHandle handle, const char *name, void *value, UniformType type, int count);
     void setTexture(TextureHandle textureHandle, uint32_t slot);
+    void resetCurrentDrawCall();
     void submitCurrentDrawCall(ViewId id);
     void queueFree(FrameBufferHandle handle);
     void queueFree(ProgramHandle handle);

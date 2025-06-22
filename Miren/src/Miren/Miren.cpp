@@ -228,6 +228,11 @@ void setVertexLayout(VertexLayoutHandle handle) {
     s_context->setVertexLayout(handle);
 }
 
+void discard() {
+    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    s_context->discard();
+}
+
 void submit(ViewId id) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     s_context->submit(id);

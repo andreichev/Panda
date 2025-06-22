@@ -111,6 +111,7 @@ public:
 
 private:
     glm::mat4 m_viewProj;
+    Mode m_mode;
     Miren::ViewId m_viewId;
     DrawCallData m_drawData;
     Miren::ProgramHandle m_defaultShader;

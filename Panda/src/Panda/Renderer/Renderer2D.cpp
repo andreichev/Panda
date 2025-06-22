@@ -8,7 +8,8 @@ Renderer2D::Renderer2D()
     , m_viewProj(1.f)
     , m_drawData()
     , m_defaultShader()
-    , m_selectedGeometryShader() {
+    , m_selectedGeometryShader()
+    , m_mode(Mode::DEFAULT) {
     m_drawData.vbSize = 0;
     m_drawData.indicesCount = 0;
     m_drawData.vertices =
@@ -69,6 +70,7 @@ Renderer2D::~Renderer2D() {
 }
 
 void Renderer2D::begin(Mode mode, Miren::ViewId viewId) {
+    m_mode = mode;
     reset();
     switch (mode) {
         case Mode::DEFAULT:
@@ -192,8 +194,14 @@ void Renderer2D::flush() {
         &tib, m_drawData.indicesCount, Miren::BufferElementType::UnsignedShort
     );
     memcpy(tib.data, m_drawData.indices, m_drawData.ibSize);
-
-    Miren::setState(MIREN_STATE_DEPTH_TEST);
+    switch (m_mode) {
+        case Mode::DEFAULT:
+            Miren::setState(MIREN_STATE_DEPTH_TEST);
+            break;
+        case Mode::GEOMETRY_ONLY:
+            Miren::setState(MIREN_STATE_WIREFRAME);
+            break;
+    }
     for (int i = 0; i < m_drawData.textureSlotIndex; i++) {
         Miren::setTexture(m_drawData.textures[i]->getMirenHandle(), i);
     }

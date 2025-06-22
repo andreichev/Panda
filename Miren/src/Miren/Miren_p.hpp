@@ -530,6 +530,10 @@ struct Context {
         m_submit->setVertexLayout(handle);
     }
 
+    void discard() {
+        m_submit->resetCurrentDrawCall();
+    }
+
     void submit(ViewId id) {
         m_submit->submitCurrentDrawCall(id);
         m_submit->beginDrawCall();

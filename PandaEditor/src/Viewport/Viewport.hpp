@@ -37,7 +37,7 @@ private:
 
     // SELECTED GEOMETRY ISOLATION RENDERING:
     Miren::FrameBufferHandle m_selectedGeometryFB;
-    Miren::TextureHandle m_selectedAttachment;
+    Miren::TextureHandle m_selectedGeometryAttachment;
     Miren::FrameBufferSpecification m_selectedFbSpecification;
     Miren::ViewId m_selectedGeometryView;
 

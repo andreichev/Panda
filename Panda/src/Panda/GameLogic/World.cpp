@@ -240,6 +240,9 @@ void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
             }
         }
     }
+    // TOUCH SELECTION VIEW ID TO CLEAN
+    Miren::discard();
+    Miren::submit(m_selectionViewId);
 }
 
 Entity World::instantiateEntity() {

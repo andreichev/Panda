@@ -58,8 +58,6 @@ RendererOpenGL::RendererOpenGL(Fern::GraphicsContext *ctx)
     GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     // glBlendEquation(GL_FUNC_ADD);
     // glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    // glLineWidth(2.0f);
     MIREN_LOG("OPENGL VERSION %s", (const char *)glGetString(GL_VERSION));
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
     // glEnable(GL_DEBUG_OUTPUT);
@@ -312,6 +310,7 @@ void RendererOpenGL::viewChanged(View &view) {
 
 void RendererOpenGL::submit(RenderDraw *draw) {
     // TODO: Capture time
+    if (!draw->m_shader.isValid()) { return; }
     m_shaders[draw->m_shader.id].bind();
     draw->m_uniformBuffer.finishWriting();
     Uniform *uniform;
@@ -331,6 +330,11 @@ void RendererOpenGL::submit(RenderDraw *draw) {
         GL_CALL(glEnable(GL_DEPTH_TEST));
     } else {
         GL_CALL(glDisable(GL_DEPTH_TEST));
+    }
+    if (draw->m_state & MIREN_STATE_WIREFRAME) {
+        GL_CALL(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
+    } else {
+        GL_CALL(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
     }
     if (!draw->m_scissorRect.isZero()) {
         GL_CALL(glEnable(GL_SCISSOR_TEST));

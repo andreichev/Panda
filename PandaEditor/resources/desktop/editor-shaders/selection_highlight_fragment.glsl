@@ -2,10 +2,8 @@
 
 in vec2 fragTexCoord;
 
-uniform float time;
-uniform vec2 resolution;
 uniform sampler2D colorTexture;
-uniform usampler2D isSelectedTexture;
+uniform sampler2D selectedGeometryTexture;
 
 out vec4 colorOut;
 
@@ -16,41 +14,8 @@ vec4 getOutlineColor() {
     return vec4(0.92, 0.55, 0.0, 1.0);
 }
 
-bool isSelected() {
-    uint isSelected = texture(isSelectedTexture, fragTexCoord).r;
-    return isSelected != 0u;
-}
-
-vec4 getSelectionColor() {
-    return isSelected() ? vec4(1.0) : vec4(0.0);
-}
-
-float getSelectionBlurredColor() {
-    float Pi2 = 6.28318530718;
-    float directions = 8.0;
-    float quality = 2.0;
-    // float size = 8.0 + (0.5 + 0.5 * cos(time * 3.0)) * 4.0;
-    float size = 2.0;
-    vec2 radius = size/resolution.xy;
-    vec2 uv = fragTexCoord;
-    float color = texture(isSelectedTexture, uv).r;
-    for( float d=0.0; d<Pi2; d+=Pi2/directions) {
-        for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
-            color += texture(isSelectedTexture, uv+vec2(cos(d),sin(d))*radius*i).r;
-        }
-    }
-    color /= quality * directions - 15.0;
-    return color;
-}
-
 void main() {
     vec4 color = texture(colorTexture, fragTexCoord);
-    vec4 outline = getOutlineColor();
-    outline.a = isSelected() ? 0.0 : getSelectionBlurredColor();
-    if (outline.a > 0.0) {
-        colorOut = outline;
-        colorOut.a = 1.0;
-    } else {
-        colorOut = color;
-    }
+    vec4 selection = texture(selectedGeometryTexture, fragTexCoord);
+    colorOut = color + selection * getOutlineColor();
 }

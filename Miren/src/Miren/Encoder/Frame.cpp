@@ -66,6 +66,11 @@ void Frame::setScissorRect(Rect rect) {
     draw.m_scissorRect = rect;
 }
 
+void Frame::resetCurrentDrawCall() {
+    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    draw.reset();
+}
+
 void Frame::submitCurrentDrawCall(ViewId id) {
     RenderDraw &draw = m_drawCalls[m_drawCallsCount];
     draw.m_viewId = id;
