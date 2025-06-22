@@ -19,6 +19,7 @@ public:
     void updateOrigin(Vec2 origin);
     Miren::TextureHandle getResultTexture();
     Miren::ViewId getRenderingView();
+    Miren::ViewId getSelectionRenderingView();
     std::unordered_set<UUID> getEntitiesInsideRect(Rect rect);
     UUID getEntityInsidePoint(Vec2 point);
     Rect getFrame();

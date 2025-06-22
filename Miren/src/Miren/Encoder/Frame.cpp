@@ -156,4 +156,12 @@ Foundation::CommandBuffer &Frame::getPostCommandQueue() {
     return m_postCommandQueue;
 }
 
+void Frame::sort() {
+    std::stable_sort(
+        m_drawCalls,
+        m_drawCalls + m_drawCallsCount,
+        [](const RenderDraw &l, const RenderDraw &r) { return l.m_viewId > r.m_viewId; }
+    );
+}
+
 } // namespace Miren

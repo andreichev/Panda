@@ -26,6 +26,29 @@ public:
         m_data = (uint8_t *)F_ALLOC(Foundation::getAllocator(), size);
     }
 
+    UniformBuffer(const UniformBuffer &other)
+        : m_size(other.m_size)
+        , m_pos(other.m_pos)
+        , m_data(other.m_data) {}
+
+    UniformBuffer(UniformBuffer &&other) noexcept
+        : m_size(other.m_size)
+        , m_pos(other.m_pos)
+        , m_data(other.m_data) {
+        other.m_data = nullptr;
+        other.m_pos = 0;
+        other.m_size = 0;
+    }
+
+    UniformBuffer &operator=(UniformBuffer &&other) noexcept {
+        if (this == &other) { return *this; }
+        m_size = other.m_size;
+        m_pos = other.m_pos;
+        m_data = other.m_data;
+        other.m_data = nullptr;
+        return *this;
+    }
+
     ~UniformBuffer() {
         F_FREE(Foundation::getAllocator(), m_data);
     }

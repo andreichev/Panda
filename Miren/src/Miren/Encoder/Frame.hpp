@@ -45,6 +45,7 @@ public:
     void reset();
     Foundation::CommandBuffer &getPreCommandQueue();
     Foundation::CommandBuffer &getPostCommandQueue();
+    void sort();
 
     TransientIndexBuffer m_transientIb;
     TransientVertexBuffer m_transientVb;

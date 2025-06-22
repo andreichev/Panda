@@ -280,6 +280,7 @@ struct Context {
         }
         rendererExecuteCommands(m_render->getPreCommandQueue());
         if (m_render->m_drawCallsCount != 0) {
+            m_render->sort();
             m_renderer->submit(m_render);
             m_ctx->swapBuffers();
         }

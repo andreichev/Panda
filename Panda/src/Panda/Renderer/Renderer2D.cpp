@@ -21,8 +21,8 @@ Renderer2D::Renderer2D()
     fragmentMem =
         Panda::AssetImporterBase::loadData("default-shaders/renderer2d/renderer2d_fragment.glsl");
     m_defaultShader = Miren::createProgram({vertexMem, fragmentMem});
-    vertexMem = AssetImporterBase::loadData("editor-shaders/selection_map_vertex.glsl");
-    fragmentMem = Panda::AssetImporterBase::loadData("editor-shaders/selection_map_fragment.glsl");
+    vertexMem = AssetImporterBase::loadData("default-shaders/selection_map_vertex.glsl");
+    fragmentMem = Panda::AssetImporterBase::loadData("default-shaders/selection_map_fragment.glsl");
     m_selectedGeometryShader = Miren::createProgram({vertexMem, fragmentMem});
     Miren::VertexBufferLayoutData layoutData;
     // Position

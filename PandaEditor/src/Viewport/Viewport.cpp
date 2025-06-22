@@ -32,6 +32,11 @@ Viewport::~Viewport() {
         Miren::FrameBufferAttachment attachment = m_sceneFbSpecification.attachments[i];
         Miren::deleteTexture(attachment.handle);
     }
+    Miren::deleteFrameBuffer(m_selectedGeometryFB);
+    for (int i = 0; i < m_selectedFbSpecification.num; i++) {
+        Miren::FrameBufferAttachment attachment = m_selectedFbSpecification.attachments[i];
+        Miren::deleteTexture(attachment.handle);
+    }
     Miren::deleteFrameBuffer(m_outputFB);
     for (int i = 0; i < m_outputFbSpecification.num; i++) {
         Miren::FrameBufferAttachment attachment = m_outputFbSpecification.attachments[i];
@@ -215,6 +220,10 @@ Miren::ViewId Viewport::getRenderingView() {
     return m_sceneView;
 }
 
+Miren::ViewId Viewport::getSelectionRenderingView() {
+    return m_selectedGeometryView;
+}
+
 std::unordered_set<UUID> Viewport::getEntitiesInsideRect(Rect rect) {
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     //      m_frame
@@ -276,8 +285,6 @@ void Viewport::drawOutline(float dt, const std::unordered_set<UUID> &selection) 
     );
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     Vec2 size = m_frame.size;
-    size.width *= dpi.width;
-    size.height *= dpi.height;
     Miren::setUniform(m_outlineProgram, "resolution", &size, Miren::UniformType::Vec2);
     static float time = 0.f;
     time += dt;

@@ -17,8 +17,7 @@ vec4 getOutlineColor() {
 }
 
 bool isSelected() {
-    ivec2 texelCoord = ivec2(gl_FragCoord.xy);
-    uint isSelected = texelFetch(isSelectedTexture, texelCoord, 0).r;
+    uint isSelected = texture(isSelectedTexture, fragTexCoord).r;
     return isSelected != 0u;
 }
 
@@ -31,9 +30,9 @@ float getSelectionBlurredColor() {
     float directions = 8.0;
     float quality = 2.0;
     // float size = 8.0 + (0.5 + 0.5 * cos(time * 3.0)) * 4.0;
-    float size = 4.0;
+    float size = 2.0;
     vec2 radius = size/resolution.xy;
-    vec2 uv = gl_FragCoord.xy/resolution.xy;
+    vec2 uv = fragTexCoord;
     float color = texture(isSelectedTexture, uv).r;
     for( float d=0.0; d<Pi2; d+=Pi2/directions) {
         for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {

@@ -91,8 +91,8 @@ void BaseLayer::onAttach() {
 void BaseLayer::onDetach() {}
 
 void BaseLayer::onUpdate(double deltaTime) {
-    m_renderer2d.begin();
-    m_renderer3d.begin();
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, 0);
+    m_renderer3d.begin(0);
 
     glm::mat4 viewProjMtx;
     glm::mat4 skyViewProjMtx;

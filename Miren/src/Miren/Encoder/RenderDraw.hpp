@@ -40,6 +40,10 @@ struct RenderDraw {
         , m_scissorRect(Rect::zero())
         , m_uniformBuffer(1000) {}
 
+    RenderDraw(RenderDraw &&other) = default;
+
+    RenderDraw &operator=(RenderDraw &&other) = default;
+
     void reset() {
         m_isSubmitted = false;
         m_state = MIREN_STATE_CULL_FACE | MIREN_STATE_DEPTH_TEST;

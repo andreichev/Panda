@@ -114,7 +114,11 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
     }
 
     renderWorld(viewProjMtx, skyViewProjMtx);
-
+    m_renderer2d.end();
+    m_renderer3d.end();
+    m_renderer2d.begin(Panda::Renderer2D::Mode::GEOMETRY_ONLY, m_selectionViewId);
+    m_renderer3d.begin(m_selectionViewId);
+    renderSelectedGeometry(viewProjMtx);
     m_renderer2d.end();
     m_renderer3d.end();
 }
@@ -125,6 +129,11 @@ void World::updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &sk
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
     renderWorld(viewProjMtx, skyViewProjMtx);
+    m_renderer2d.end();
+    m_renderer3d.end();
+    m_renderer2d.begin(Panda::Renderer2D::Mode::GEOMETRY_ONLY, m_selectionViewId);
+    m_renderer3d.begin(m_selectionViewId);
+    renderSelectedGeometry(viewProjMtx);
     m_renderer2d.end();
     m_renderer3d.end();
 }
@@ -197,43 +206,24 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
 }
 
 void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
+    auto selected = m_selectionContext.getSelectedEntities();
     // Render Sprites
     {
-        auto view = m_registry.view<IdComponent, SpriteRendererComponent, TransformComponent>();
-        for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) { continue; }
-            Entity entity = {entityHandle, this};
-            auto &id = view.get<IdComponent>(entityHandle);
-            auto &spriteComponent = view.get<SpriteRendererComponent>(entityHandle);
-            auto &transform = view.get<TransformComponent>(entityHandle);
+        for (auto entity : selected) {
+            if (!entity.hasComponent<SpriteRendererComponent>()) { continue; }
+            auto &spriteComponent = entity.getComponent<SpriteRendererComponent>();
             Panda::Renderer2D::RectData rect;
             rect.transform = getWorldSpaceTransformMatrix(entity);
-            rect.color = spriteComponent.color;
-            // Load texture if it needs.
-            AssetHandler *assetHandler = GameContext::s_assetHandler;
-            if (spriteComponent.textureId && !spriteComponent.asset && assetHandler) {
-                spriteComponent.asset = assetHandler->load(spriteComponent.textureId);
-            }
-            rect.texture = spriteComponent.asset;
             rect.size = {1.f, 1.f};
-            rect.id = id.id;
-            int xTileIndex = spriteComponent.index % spriteComponent.cols;
-            int yTileIndex = spriteComponent.index % spriteComponent.rows;
-            float tileWidth = (1.f / spriteComponent.cols);
-            float tileHeight = (1.f / spriteComponent.rows);
-            float xTexCoord = tileWidth * xTileIndex;
-            float yTexCoord = tileHeight * yTileIndex;
-            rect.textureCoords = {xTexCoord, yTexCoord, tileWidth, tileHeight};
             m_renderer2d.drawRect(rect);
         }
     }
     // Render static meshes
     {
-        auto view = m_registry.view<StaticMeshComponent, TransformComponent>();
-        for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) { continue; }
-            auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
-            auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
+        for (auto entity : selected) {
+            if (!entity.hasComponent<StaticMeshComponent>()) { continue; }
+            auto &staticMeshComponent = entity.getComponent<StaticMeshComponent>();
+            auto transform = getWorldSpaceTransformMatrix(entity);
             for (auto &mesh : staticMeshComponent.meshes) {
                 m_renderer3d.submit(transform, &mesh);
             }
@@ -241,11 +231,10 @@ void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
     }
     // Render dynamic meshes
     {
-        auto view = m_registry.view<DynamicMeshComponent, TransformComponent>();
-        for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) { continue; }
-            auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
-            auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
+        for (auto entity : selected) {
+            if (!entity.hasComponent<DynamicMeshComponent>()) { continue; }
+            auto &dynamicMeshComponent = entity.getComponent<DynamicMeshComponent>();
+            auto transform = getWorldSpaceTransformMatrix(entity);
             for (auto &mesh : dynamicMeshComponent.meshes) {
                 m_renderer3d.submit(transform, &mesh);
             }
