@@ -91,25 +91,39 @@ public:
     void resetValues() {
         m_medianPosition = glm::vec3(0.0f);
         m_medianScale = glm::vec3(1.0f);
-        m_medianRotation = glm::vec3(0.0f);
+        m_medianRotation = glm::quat();
         m_medianMatrix = glm::mat4(1.f);
     }
 
     void updateValues() {
         resetValues();
-        for (auto entity : m_selectedEntities) {
-            auto transformComponent = entity.calculateWorldSpaceTransform();
+        if (m_selectedEntities.empty()) { return; }
+        auto it = m_selectedEntities.begin();
+        Entity entity = *it;
+        auto transformComponent = entity.calculateWorldSpaceTransform();
+        m_medianPosition = transformComponent.getPosition();
+        m_medianScale = transformComponent.getScale();
+        m_medianRotation = transformComponent.getRotation();
+        ++it;
+        while (it != m_selectedEntities.end()) {
+            entity = *it;
+            transformComponent = entity.calculateWorldSpaceTransform();
             // auto transformComponent = entity.getTransform();
             m_medianPosition += transformComponent.getPosition();
             m_medianScale += transformComponent.getScale();
-            m_medianRotation += transformComponent.getRotationEuler();
+            m_medianRotation = glm::slerp(m_medianRotation, transformComponent.getRotation(), 0.5f);
+            // if (glm::dot(m_medianRotation, transformComponent.getRotation()) < 0.0f) {
+            //     m_medianRotation -= transformComponent.getRotation();
+            // } else {
+            //     m_medianRotation += transformComponent.getRotation();
+            // }
+            m_medianRotation = glm::normalize(m_medianRotation);
+            ++it;
         }
         m_medianPosition /= m_selectedEntities.size();
         m_medianScale /= m_selectedEntities.size();
-        m_medianRotation /= m_selectedEntities.size();
         m_medianMatrix = glm::translate(glm::mat4(1.0f), m_medianPosition) *
-                         glm::toMat4(glm::quat(glm::radians(m_medianRotation))) *
-                         glm::scale(glm::mat4(1.0f), m_medianScale);
+                         glm::toMat4(m_medianRotation) * glm::scale(glm::mat4(1.0f), m_medianScale);
     }
 
 private:
@@ -117,7 +131,7 @@ private:
     std::unordered_set<Entity> m_manipulatingEntities;
     glm::vec3 m_medianPosition;
     glm::vec3 m_medianScale;
-    glm::vec3 m_medianRotation;
+    glm::quat m_medianRotation;
     glm::mat4 m_medianMatrix;
 };
 
