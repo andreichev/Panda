@@ -7,6 +7,10 @@
 
 namespace Panda {
 
+bool ViewportPanel::RectSelection::isEqualTo(IRect _rect) {
+    return rect.size.width == _rect.size.width && rect.size.height == _rect.size.height;
+}
+
 ViewportPanel::ViewportPanel(CameraController *cameraController)
     : m_viewport()
     , m_rectSelection()
@@ -81,7 +85,7 @@ void ViewportPanel::onImGuiRender(SceneState sceneState, float offsetY, bool ful
     ImGui::PopStyleVar();
 
     ImDrawList *draw_list = ImGui::GetForegroundDrawList();
-    const Rect &selectionRect = m_rectSelection.rect;
+    const IRect &selectionRect = m_rectSelection.rect;
     ImVec2 min = {
         viewportOrigin.x + selectionRect.origin.x, viewportOrigin.y + selectionRect.origin.y
     };
@@ -90,7 +94,6 @@ void ViewportPanel::onImGuiRender(SceneState sceneState, float offsetY, bool ful
 
     ImGui::End();
     ImGui::PopStyleVar();
-    m_viewport.readIdsBuffer();
     bool mouseDown = Input::isMouseButtonPressed(Fern::MouseButton::LEFT);
     if (m_focused && !m_gizmos.isUsing()) {
         if (!m_rectSelection.isStarted && mouseDown) {
@@ -106,24 +109,43 @@ void ViewportPanel::onImGuiRender(SceneState sceneState, float offsetY, bool ful
     } else if (m_rectSelection.isStarted && (!m_gizmos.isUsing() || !m_focused)) {
         endRectSelection();
     }
+    readIdsMemoryIfNeed();
 }
 
-void ViewportPanel::beginRectSelection(bool append) {
-    m_rectSelection.isStarted = true;
-    m_rectSelection.appendSelection = append;
-    m_rectSelection.rect =
-        Rect(Input::getMouseViewportPositionX(), Input::getMouseViewportPositionY(), 0, 0);
-    m_rectSelection.currentSelection = getSelectedIds();
-    m_rectSelection.initialSelection = m_rectSelection.currentSelection;
+std::unordered_set<UUID>
+ViewportPanel::getEntitiesFromRequest(const ViewportPanel::ReadFrameBufferRequest &request) {
+    std::unordered_set<UUID> ids;
+    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
+    for (int regX = 0; regX < request.bufferSize.width; regX++) {
+        for (int regY = 0; regY < request.bufferSize.height; regY++) {
+            uint32_t texelIndex = request.bufferSize.width * regY + regX;
+            uint32_t *buffer = static_cast<uint32_t *>(request.mem.data);
+            uint32_t hoveredId = buffer[texelIndex];
+            if (hoveredId != 0) { ids.insert(hoveredId); }
+        }
+    }
+    return ids;
 }
 
-void ViewportPanel::updateRectSelection() {
-    m_rectSelection.rect.size.width =
-        Input::getMouseViewportPositionX() - m_rectSelection.rect.origin.x;
-    m_rectSelection.rect.size.height =
-        Input::getMouseViewportPositionY() - m_rectSelection.rect.origin.y;
-    if (m_rectSelection.rect.size.isZero()) { return; }
-    std::unordered_set<UUID> ids = m_viewport.getEntitiesInsideRect(m_rectSelection.rect);
+void ViewportPanel::readIdsMemoryIfNeed() {
+    if (m_rectSelection.readRequests.empty()) { return; }
+    std::unordered_set<UUID> ids;
+    auto &requests = m_rectSelection.readRequests;
+    auto it = requests.begin();
+    bool hasRequests = false;
+    while (it != requests.end()) {
+        ReadFrameBufferRequest &request = *it;
+        if (Miren::getFrameNumber() >= request.ready) {
+            std::unordered_set<UUID> _ids = getEntitiesFromRequest(request);
+            ids.insert(_ids.begin(), _ids.end());
+            request.mem.release();
+            it = requests.erase(it);
+            hasRequests = true;
+        } else {
+            it++;
+        }
+    }
+    if (!hasRequests) { return; }
     std::unordered_set<UUID> select;
     std::unordered_set<UUID> unselect;
     // Был зажат ctrl или shift
@@ -181,24 +203,58 @@ void ViewportPanel::updateRectSelection() {
     unselectEntitiesWithId(unselect);
 }
 
-void ViewportPanel::endRectSelection() {
-    // Если был только клик, не растягивали прямоугольник выделения
-    if (m_rectSelection.rect.size.isZero()) {
-        float mouseX = Input::getMouseViewportPositionX();
-        float mouseY = Input::getMouseViewportPositionY();
-        uint32_t hoveredId = m_viewport.getEntityInsidePoint({mouseX, mouseY});
-        if (!m_rectSelection.appendSelection) { unselectAll(); }
-        if (hoveredId) {
-            bool alreadySelected = m_rectSelection.currentSelection.contains(hoveredId);
-            if (alreadySelected) {
-                unselectEntitiesWithId({hoveredId});
-            } else {
-                pickEntitiesWithId({hoveredId});
-            }
-        }
+void ViewportPanel::beginRectSelection(bool append) {
+    m_rectSelection.isStarted = true;
+    m_rectSelection.appendSelection = append;
+    m_rectSelection.rect =
+        IRect(Input::getMouseViewportPositionX(), Input::getMouseViewportPositionY(), 0, 0);
+    m_rectSelection.currentSelection = getSelectedIds();
+    m_rectSelection.initialSelection = m_rectSelection.currentSelection;
+}
+
+void ViewportPanel::updateRectSelection() {
+    IRect selectedRegion = m_rectSelection.rect;
+    selectedRegion.size.width = Input::getMouseViewportPositionX() - m_rectSelection.rect.origin.x;
+    selectedRegion.size.height = Input::getMouseViewportPositionY() - m_rectSelection.rect.origin.y;
+    if (selectedRegion.size.width == 0) { selectedRegion.size.width = 1; }
+    if (selectedRegion.size.height == 0) { selectedRegion.size.height = 1; }
+    if (m_rectSelection.isEqualTo(selectedRegion)) { return; }
+    m_rectSelection.rect = selectedRegion;
+    ReadFrameBufferRequest &request = m_rectSelection.readRequests.emplace_back();
+    if (selectedRegion.size.width < 0) {
+        selectedRegion.origin.x += selectedRegion.size.width;
+        selectedRegion.size.width = -selectedRegion.size.width;
     }
+    if (selectedRegion.size.height < 0) {
+        selectedRegion.origin.y += selectedRegion.size.height;
+        selectedRegion.size.height = -selectedRegion.size.height;
+    }
+    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
+    selectedRegion.size.x *= dpi.x;
+    selectedRegion.size.y *= dpi.y;
+    selectedRegion.origin.x *= dpi.x;
+    selectedRegion.origin.y *= dpi.y;
+    request.bufferSize = selectedRegion.size;
+    uint32_t bufferSize = sizeof(uint32_t) * selectedRegion.size.width * dpi.width *
+                          selectedRegion.size.height * dpi.height;
+    request.mem = Foundation::Memory::alloc(bufferSize);
+    memset(request.mem.data, 0, bufferSize);
+    uint32_t textureHeight = m_viewport.getFrame().size.height * dpi.y;
+    request.ready = Miren::readFrameBuffer(
+        m_viewport.getSceneFrameBuffer(),
+        1,
+        selectedRegion.origin.x,
+        // Так как текстура хранится перевернутой, тут мы переворачиваем координату по Y
+        textureHeight - selectedRegion.origin.y - selectedRegion.size.height,
+        selectedRegion.size.width,
+        selectedRegion.size.height,
+        request.mem.data
+    );
+}
+
+void ViewportPanel::endRectSelection() {
     m_rectSelection.isStarted = false;
-    m_rectSelection.rect = Rect(0, 0, 0, 0);
+    m_rectSelection.rect = IRect(0, 0, 0, 0);
 }
 
 std::unordered_set<UUID> ViewportPanel::getSelectedIds() {

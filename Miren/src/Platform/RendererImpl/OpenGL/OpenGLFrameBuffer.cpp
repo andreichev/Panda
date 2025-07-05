@@ -82,7 +82,7 @@ void OpenGLFrameBuffer::clearUIntAttachment(int index, uint32_t value) {
 void OpenGLFrameBuffer::readPixels(
     RendererOpenGL *renderer, int index, int x, int y, int width, int height, void *data
 ) {
-    bind();
+    GL_CALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_id));
     OpenGLTexture &texture = renderer->getTexture(spec.attachments[index].handle);
     TextureFormat format = texture.getFormat();
     int attachmentType;
@@ -95,6 +95,7 @@ void OpenGLFrameBuffer::readPixels(
 
     GLenum fmt = s_textureFormat[format].m_internalFmt;
     GLenum type = s_textureFormat[format].m_type;
+    GL_CALL(glPixelStorei(GL_PACK_ALIGNMENT, 1));
     GL_CALL(glReadPixels(x, y, width, height, fmt, type, data));
 }
 

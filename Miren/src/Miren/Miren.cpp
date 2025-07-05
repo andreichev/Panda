@@ -168,6 +168,11 @@ uint32_t frame() {
     return s_context->frame();
 }
 
+uint32_t getFrameNumber() {
+    PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
+    return s_context->getFrameNumber();
+}
+
 void setViewClear(ViewId id, uint32_t color) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
     s_context->setViewClear(id, color);

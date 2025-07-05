@@ -14,15 +14,25 @@
 namespace Panda {
 
 class ViewportPanel final {
+public:
+    struct ReadFrameBufferRequest {
+        int ready;
+        Foundation::Memory mem;
+        // Multiplied by screen content scale
+        ISize bufferSize;
+    };
+
     struct RectSelection {
         bool isStarted = false;
         bool appendSelection = false;
-        Rect rect;
+        IRect rect;
         std::unordered_set<UUID> initialSelection;
         std::unordered_set<UUID> currentSelection;
+        std::vector<ReadFrameBufferRequest> readRequests;
+
+        bool isEqualTo(IRect rect);
     };
 
-public:
     ViewportPanel(CameraController *cameraController);
     ~ViewportPanel();
 
@@ -39,6 +49,8 @@ public:
 
 private:
     void updateViewportSize(Size size);
+    std::unordered_set<UUID> getEntitiesFromRequest(const ReadFrameBufferRequest &request);
+    void readIdsMemoryIfNeed();
     void beginRectSelection(bool appendSelection);
     void updateRectSelection();
     void endRectSelection();

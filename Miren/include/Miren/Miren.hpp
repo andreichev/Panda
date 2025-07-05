@@ -79,5 +79,7 @@ bool renderFrame();
 /// Frame processing finished (from app thread). Wait for renderer to finish rendering frame.
 /// Returns frame number
 uint32_t frame();
+/// Current frame number. Need
+uint32_t getFrameNumber();
 
 } // namespace Miren

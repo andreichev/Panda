@@ -311,7 +311,7 @@ struct Context {
     ) {
         ReadFrameBufferCommand cmd(handle, attachIndex, x, y, width, height, data);
         m_submit->getPostCommandQueue().write(cmd);
-        return m_frameNumber + 1;
+        return m_frameNumber + 2;
     }
 
     void deleteFrameBuffer(FrameBufferHandle handle) {
@@ -554,6 +554,10 @@ struct Context {
         m_submit->reset();
         m_apiSemaphore.post();
         return m_frameNumber++;
+    }
+
+    uint32_t getFrameNumber() {
+        return m_frameNumber;
     }
 
     void setViewport(ViewId id, Rect rect) {

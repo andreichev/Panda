@@ -20,11 +20,9 @@ public:
     Miren::TextureHandle getResultTexture();
     Miren::ViewId getRenderingView();
     Miren::ViewId getSelectionRenderingView();
-    std::unordered_set<UUID> getEntitiesInsideRect(Rect rect);
-    UUID getEntityInsidePoint(Vec2 point);
+    Miren::FrameBufferHandle getSceneFrameBuffer();
     Rect getFrame();
     void drawOutline(float dt, const std::unordered_set<UUID> &selection);
-    void readIdsBuffer();
 
 private:
     Rect m_frame;
@@ -33,7 +31,6 @@ private:
     Miren::FrameBufferSpecification m_sceneFbSpecification;
     Miren::ViewId m_sceneView;
     Miren::TextureHandle m_colorAttachment;
-    Foundation::Memory m_idsBuffer;
 
     // SELECTED GEOMETRY ISOLATION RENDERING:
     Miren::FrameBufferHandle m_selectedGeometryFB;
