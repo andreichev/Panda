@@ -118,7 +118,7 @@ void EditorLayer::onEvent(Fern::Event *event) {
     if (event->type == Fern::EventType::QuitRequest ||
         event->type == Fern::EventType::WindowCloseRequest) {
         event->isHandled = true;
-        closeApp();
+        closeAppRequest();
     } else if (event->type == Fern::EventType::WindowResize) {
         const Fern::WindowResizeEvent *ev = static_cast<const Fern::WindowResizeEvent *>(event);
         windowSizeChanged(Size(ev->getWidth(), ev->getHeight()));
@@ -276,26 +276,7 @@ const path_t &EditorLayer::menuBarGetOpenedProjectPath() {
 }
 
 void EditorLayer::menuBarCloseApp() {
-    if (m_editingWorld.isChanged()) {
-        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
-        popup->yesAction = [this, popup]() {
-            saveWorld();
-            closeApp();
-            popup->isDeleted = true;
-        };
-        popup->noAction = [this, popup]() {
-            closeApp();
-            popup->isDeleted = true;
-        };
-        popup->closeAction = [this, popup]() { popup->isDeleted = true; };
-        popup->title = "Save current world?";
-        popup->subtitle = "Do you want to save your changes?";
-        popup->yesText = "Save";
-        popup->noText = "Not save";
-        m_popups.emplace_back(popup);
-    } else {
-        closeApp();
-    }
+    closeAppRequest();
 }
 
 void EditorLayer::menuBarOpenCppProject() {
@@ -564,6 +545,29 @@ void EditorLayer::closeProject() {
     savingState.height = m_window->getSize().height;
     m_loader.saveWindowState(savingState);
     m_loader.closeProject();
+}
+
+void EditorLayer::closeAppRequest() {
+    if (m_editingWorld.isChanged()) {
+        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
+        popup->yesAction = [this, popup]() {
+            saveWorld();
+            closeApp();
+            popup->isDeleted = true;
+        };
+        popup->noAction = [this, popup]() {
+            closeApp();
+            popup->isDeleted = true;
+        };
+        popup->closeAction = [this, popup]() { popup->isDeleted = true; };
+        popup->title = "Save current world?";
+        popup->subtitle = "Do you want to save your changes?";
+        popup->yesText = "Save";
+        popup->noText = "Not save";
+        m_popups.emplace_back(popup);
+    } else {
+        closeApp();
+    }
 }
 
 void EditorLayer::closeApp() {
