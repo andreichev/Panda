@@ -91,13 +91,14 @@ private:
     void redo();
     void updateWindowState();
     void processShortcuts();
+    void openProjectFolderDialog();
 
     bool m_viewportFullscreen;
     ProjectLoader m_loader;
     StartPanel m_startPanel;
     EditorCamera m_editorCamera;
     CameraController m_cameraController;
-    std::vector<EditorPopup *> m_popups;
+    std::list<EditorPopup *> m_popups;
     SceneGrid m_grid;
     Fern::Window *m_window;
     PanelsContainer m_panelsContainer;

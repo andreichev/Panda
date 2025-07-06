@@ -12,6 +12,7 @@ public:
     virtual void onImGuiRender() = 0;
 
     const char *title;
+    bool isDeleted;
 };
 
 } // namespace Panda
