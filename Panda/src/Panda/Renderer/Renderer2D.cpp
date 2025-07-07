@@ -6,18 +6,25 @@ namespace Panda {
 Renderer2D::Renderer2D()
     : m_viewId(0)
     , m_viewProj(1.f)
-    , m_drawData() {
+    , m_drawData()
+    , m_defaultShader()
+    , m_selectedGeometryShader()
+    , m_mode(Mode::DEFAULT) {
     m_drawData.vbSize = 0;
     m_drawData.indicesCount = 0;
     m_drawData.vertices =
         (Vertex2D *)F_ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
     m_drawData.indices =
         (uint16_t *)F_ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
-    Foundation::Memory vertexMem =
-        AssetImporterBase::loadData("default-shaders/renderer2d/renderer2d_vertex.glsl");
-    Foundation::Memory fragmentMem =
+    Foundation::Memory vertexMem;
+    Foundation::Memory fragmentMem;
+    vertexMem = AssetImporterBase::loadData("default-shaders/renderer2d/renderer2d_vertex.glsl");
+    fragmentMem =
         Panda::AssetImporterBase::loadData("default-shaders/renderer2d/renderer2d_fragment.glsl");
-    m_drawData.shader = Miren::createProgram({vertexMem, fragmentMem});
+    m_defaultShader = Miren::createProgram({vertexMem, fragmentMem});
+    vertexMem = AssetImporterBase::loadData("default-shaders/selection_map_vertex.glsl");
+    fragmentMem = Panda::AssetImporterBase::loadData("default-shaders/selection_map_fragment.glsl");
+    m_selectedGeometryShader = Miren::createProgram({vertexMem, fragmentMem});
     Miren::VertexBufferLayoutData layoutData;
     // Position
     layoutData.pushVec3();
@@ -25,10 +32,10 @@ Renderer2D::Renderer2D()
     layoutData.pushVec2();
     // Texture Index
     layoutData.pushInt(1);
-    // Object id
-    layoutData.pushUInt(1);
     // Color
     layoutData.pushVec4();
+    // Object id
+    layoutData.pushUInt(1);
     m_drawData.layout = Miren::createVertexLayout(layoutData);
     m_drawData.textureSlotIndex = 1;
     Foundation::Memory whiteTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
@@ -41,7 +48,7 @@ Renderer2D::Renderer2D()
         m_drawData.samplers[i] = i;
     }
     Miren::setUniform(
-        m_drawData.shader,
+        m_defaultShader,
         "u_textures",
         m_drawData.samplers,
         Miren::UniformType::Sampler,
@@ -51,7 +58,8 @@ Renderer2D::Renderer2D()
 }
 
 Renderer2D::~Renderer2D() {
-    if (m_drawData.shader.isValid()) { Miren::deleteProgram(m_drawData.shader); }
+    if (m_defaultShader.isValid()) { Miren::deleteProgram(m_defaultShader); }
+    if (m_selectedGeometryShader.isValid()) { Miren::deleteProgram(m_selectedGeometryShader); }
     if (m_drawData.layout.isValid()) { Miren::deleteVertexLayout(m_drawData.layout); }
     for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i) {
         m_drawData.textures[i] = nullptr;
@@ -61,8 +69,18 @@ Renderer2D::~Renderer2D() {
     if (m_drawData.indices) { F_FREE(Foundation::getAllocator(), m_drawData.indices); }
 }
 
-void Renderer2D::begin() {
+void Renderer2D::begin(Mode mode, Miren::ViewId viewId) {
+    m_mode = mode;
     reset();
+    switch (mode) {
+        case Mode::DEFAULT:
+            m_drawData.shader = m_defaultShader;
+            break;
+        case Mode::GEOMETRY_ONLY:
+            m_drawData.shader = m_selectedGeometryShader;
+            break;
+    }
+    m_viewId = viewId;
 }
 
 void Renderer2D::drawRect(RectData rect) {
@@ -121,10 +139,10 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
 
     for (int i = 0; i < 4; i++) {
         m_drawData.vertices[verticesCount].pos = rect.transform * transform * positions[i];
+        m_drawData.vertices[verticesCount].textureCoords = textureCoords[i];
         m_drawData.vertices[verticesCount].textureIndex = textureIndex;
         m_drawData.vertices[verticesCount].color = rect.color;
         m_drawData.vertices[verticesCount].id = rect.id;
-        m_drawData.vertices[verticesCount].textureCoords = textureCoords[i];
         verticesCount++;
     }
     uint32_t &indicesCount = m_drawData.indicesCount;
@@ -176,8 +194,14 @@ void Renderer2D::flush() {
         &tib, m_drawData.indicesCount, Miren::BufferElementType::UnsignedShort
     );
     memcpy(tib.data, m_drawData.indices, m_drawData.ibSize);
-
-    Miren::setState(MIREN_STATE_DEPTH_TEST);
+    switch (m_mode) {
+        case Mode::DEFAULT:
+            Miren::setState(MIREN_STATE_DEPTH_TEST);
+            break;
+        case Mode::GEOMETRY_ONLY:
+            Miren::setState(MIREN_STATE_WIREFRAME);
+            break;
+    }
     for (int i = 0; i < m_drawData.textureSlotIndex; i++) {
         Miren::setTexture(m_drawData.textures[i]->getMirenHandle(), i);
     }
@@ -186,10 +210,6 @@ void Renderer2D::flush() {
     Miren::setIndexBuffer(tib.handle, tib.startIndex, m_drawData.indicesCount);
     Miren::submit(m_viewId);
     reset();
-}
-
-void Renderer2D::setViewId(Miren::ViewId id) {
-    m_viewId = id;
 }
 
 void Renderer2D::setViewProj(glm::mat4 viewProj) {

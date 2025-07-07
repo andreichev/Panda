@@ -104,6 +104,9 @@ void AssetHandlerEditor::openProject(const path_t &path) {
 }
 
 void AssetHandlerEditor::loadAssetRegistry() {
+    m_registry.clear();
+    m_registeredAssets.clear();
+    m_cache.clear();
     std::ifstream file(m_assetRegistryPath);
     if (file.is_open()) {
         AssetRegistryDto registryDto;
@@ -148,6 +151,7 @@ void AssetHandlerEditor::closeProject() {
     m_registry.clear();
     m_assetRegistryPath.clear();
     m_projectPath.clear();
+    m_cache.clear();
 }
 
 void AssetHandlerEditor::saveAssetRegistry() {

@@ -131,6 +131,13 @@ struct Context {
                     m_renderer->resizeTexture(cmd->handle, cmd->width, cmd->height);
                     break;
                 }
+                case RendererCommandType::UpdateTexture: {
+                    CMDBUF_LOG("UPDATE TEXTURE COMMAND");
+                    const UpdateTextureCommand *cmd =
+                        static_cast<const UpdateTextureCommand *>(command);
+                    m_renderer->updateTexture(cmd->handle, cmd->mem);
+                    break;
+                }
                 case RendererCommandType::DestroyTexture: {
                     CMDBUF_LOG("DESTROY TEXTURE COMMAND");
                     const DeleteTextureCommand *cmd =
@@ -273,6 +280,7 @@ struct Context {
         }
         rendererExecuteCommands(m_render->getPreCommandQueue());
         if (m_render->m_drawCallsCount != 0) {
+            m_render->sort();
             m_renderer->submit(m_render);
             m_ctx->swapBuffers();
         }
@@ -303,7 +311,7 @@ struct Context {
     ) {
         ReadFrameBufferCommand cmd(handle, attachIndex, x, y, width, height, data);
         m_submit->getPostCommandQueue().write(cmd);
-        return m_frameNumber + 1;
+        return m_frameNumber + 2;
     }
 
     void deleteFrameBuffer(FrameBufferHandle handle) {
@@ -334,6 +342,11 @@ struct Context {
         CreateTextureCommand cmd(handle, create);
         m_submit->getPreCommandQueue().write(cmd);
         return handle;
+    }
+
+    void updateTexture(TextureHandle handle, Foundation::Memory mem) {
+        UpdateTextureCommand cmd(handle, mem);
+        m_submit->getPreCommandQueue().write(cmd);
     }
 
     void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) {
@@ -517,6 +530,10 @@ struct Context {
         m_submit->setVertexLayout(handle);
     }
 
+    void discard() {
+        m_submit->resetCurrentDrawCall();
+    }
+
     void submit(ViewId id) {
         m_submit->submitCurrentDrawCall(id);
         m_submit->beginDrawCall();
@@ -537,6 +554,10 @@ struct Context {
         m_submit->reset();
         m_apiSemaphore.post();
         return m_frameNumber++;
+    }
+
+    uint32_t getFrameNumber() {
+        return m_frameNumber;
     }
 
     void setViewport(ViewId id, Rect rect) {

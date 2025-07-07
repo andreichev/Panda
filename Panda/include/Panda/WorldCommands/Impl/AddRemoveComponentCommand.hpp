@@ -8,7 +8,7 @@ namespace Panda {
 template<typename T>
 class AddRemoveComponentCommand : public WorldCommand {
 public:
-    AddRemoveComponentCommand(const std::vector<Entity> &entities)
+    AddRemoveComponentCommand(const std::unordered_set<Entity> &entities)
         : m_entities(entities) {}
 
     bool undo() override {
@@ -43,7 +43,7 @@ public:
     }
 
 private:
-    std::vector<Entity> m_entities;
+    std::unordered_set<Entity> m_entities;
     T component;
 };
 

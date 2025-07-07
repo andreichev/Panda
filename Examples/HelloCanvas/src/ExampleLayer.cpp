@@ -34,7 +34,7 @@ void ExampleLayer::onAttach() {
 void ExampleLayer::onDetach() {}
 
 void ExampleLayer::onUpdate(double deltaTime) {
-    m_renderer2d.begin();
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, 0);
 
     glm::mat4 viewMtx = glm::inverse(m_cameraTransform.getLocalTransform());
     glm::mat4 projMtx = m_camera.getProjection();

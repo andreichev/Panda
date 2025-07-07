@@ -25,6 +25,7 @@ ProgramCreate compileProgram(ProgramCompile compile);
 ProgramHandle createProgram(ProgramCreate create);
 void deleteProgram(ProgramHandle handle);
 TextureHandle createTexture(TextureCreate create);
+void updateTexture(TextureHandle handle, Foundation::Memory mem);
 void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height);
 void deleteTexture(TextureHandle handle);
 IndexBufferHandle
@@ -68,6 +69,8 @@ void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, size_t count);
 void setVertexLayout(VertexLayoutHandle handle);
 void setShader(ProgramHandle handle);
 void setTexture(TextureHandle textureHandle, uint32_t slot);
+/// Cancel all encoder settings
+void discard();
 /// Submit draw call
 void submit(ViewId id);
 // MARK: - Main functions
@@ -76,5 +79,7 @@ bool renderFrame();
 /// Frame processing finished (from app thread). Wait for renderer to finish rendering frame.
 /// Returns frame number
 uint32_t frame();
+/// Current frame number. Need
+uint32_t getFrameNumber();
 
 } // namespace Miren

@@ -18,8 +18,7 @@ class EditorLayer : public Layer,
                     public MenuBarOutput,
                     public ComponentsDrawOutput,
                     public ContentBrowserOutput,
-                    public ToolbarOutput,
-                    public ViewportOutput {
+                    public ToolbarOutput {
 public:
     EditorLayer(Fern::Window *window);
     ~EditorLayer() override = default;
@@ -61,7 +60,7 @@ public:
 #pragma endregion
 
 #pragma region Components draw output
-    void addScriptToEntities(const std::vector<Entity> &entities) override;
+    void addScriptToEntities(const std::unordered_set<Entity> &entities) override;
 #pragma endregion
 
 #pragma region Content browser output
@@ -81,14 +80,10 @@ public:
     SceneState toolbarGetCurrentSceneState() override;
 #pragma endregion
 
-#pragma region Viewport output
-    void viewportPickEntityWithId(UUID id) override;
-    void viewportUnselectAll() override;
-#pragma endregion
-
 private:
     void windowSizeChanged(Size size);
     void closeProject();
+    void closeAppRequest();
     void closeApp();
     void saveWorld();
     bool canUndo();
@@ -97,13 +92,14 @@ private:
     void redo();
     void updateWindowState();
     void processShortcuts();
+    void openProjectFolderDialog();
 
     bool m_viewportFullscreen;
     ProjectLoader m_loader;
     StartPanel m_startPanel;
     EditorCamera m_editorCamera;
     CameraController m_cameraController;
-    std::vector<EditorPopup *> m_popups;
+    std::list<EditorPopup *> m_popups;
     SceneGrid m_grid;
     Fern::Window *m_window;
     PanelsContainer m_panelsContainer;

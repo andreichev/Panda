@@ -170,3 +170,16 @@ private:
 };
 
 } // namespace Panda
+
+namespace std {
+
+using namespace Panda;
+
+template<>
+struct hash<Entity> {
+    std::size_t operator()(const Panda::Entity &entity) const {
+        return entity.getId();
+    }
+};
+
+} // namespace std

@@ -32,10 +32,17 @@ EditorLayer::EditorLayer(Fern::Window *window)
 void EditorLayer::onAttach() {
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
     GameContext::s_currentWorld = m_currentWorld;
+    Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
+    Fern::Size windowSize = Application::get()->getMainWindow()->getSize();
+    // Default framebuffer initial size
+    Miren::setViewport(
+        0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
+    );
     m_panelsContainer.viewport.initWithSize(Size(100.f, 100.f));
-    m_editingWorld.setViewId(m_panelsContainer.viewport.getMirenView());
-    m_playingWorld.setViewId(m_panelsContainer.viewport.getMirenView());
-    m_grid.setViewId(m_panelsContainer.viewport.getMirenView());
+    m_editingWorld.setViewId(m_panelsContainer.viewport.getRenderingView());
+    m_editingWorld.setSelectionViewId(m_panelsContainer.viewport.getSelectionRenderingView());
+    m_playingWorld.setViewId(m_panelsContainer.viewport.getRenderingView());
+    m_grid.setViewId(m_panelsContainer.viewport.getRenderingView());
     m_panelsContainer.viewport.setCamera(&m_editorCamera);
     m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_cameraController.setPosition({0.f, 0.f, 4.f});
@@ -77,13 +84,20 @@ void EditorLayer::onUpdate(double deltaTime) {
             break;
         }
     }
+    m_panelsContainer.viewport.drawOutline(deltaTime);
 }
 
 void EditorLayer::onImGuiRender() {
     // ImGui::ShowDemoWindow();
-    if (!m_popups.empty()) {
-        auto &popup = m_popups.back();
+    while (!m_popups.empty()) {
+        auto popup = m_popups.back();
+        if (popup->isDeleted) {
+            F_DELETE(Foundation::getAllocator(), popup);
+            m_popups.pop_back();
+            continue;
+        }
         popup->onImGuiRender();
+        break;
     }
     if (m_loader.hasOpenedProject()) {
         m_panelsContainer.onImGuiRender(m_viewportFullscreen, m_sceneState);
@@ -104,7 +118,7 @@ void EditorLayer::onEvent(Fern::Event *event) {
     if (event->type == Fern::EventType::QuitRequest ||
         event->type == Fern::EventType::WindowCloseRequest) {
         event->isHandled = true;
-        closeApp();
+        closeAppRequest();
     } else if (event->type == Fern::EventType::WindowResize) {
         const Fern::WindowResizeEvent *ev = static_cast<const Fern::WindowResizeEvent *>(event);
         windowSizeChanged(Size(ev->getWidth(), ev->getHeight()));
@@ -208,30 +222,41 @@ void EditorLayer::menuBarRedo() {
 }
 
 void EditorLayer::menuBarOpenProject() {
-    std::optional<path_t> optionalPath = SystemTools::openFolderDialog();
-    if (!optionalPath.has_value()) { return; }
-    path_t path = optionalPath.value();
-    m_loader.openProject(path);
+    if (m_editingWorld.isChanged()) {
+        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
+        popup->yesAction = [this, popup]() {
+            saveWorld();
+            openProjectFolderDialog();
+            popup->isDeleted = true;
+        };
+        popup->noAction = [this, popup]() {
+            openProjectFolderDialog();
+            popup->isDeleted = true;
+        };
+        popup->closeAction = [this, popup]() { popup->isDeleted = true; };
+        popup->title = "Save current world?";
+        popup->subtitle = "Do you want to save your changes?";
+        popup->yesText = "Save";
+        popup->noText = "Not save";
+        m_popups.emplace_back(popup);
+    } else {
+        openProjectFolderDialog();
+    }
 }
 
 void EditorLayer::menuBarOpenProject(const RecentProject &project) {
     if (m_editingWorld.isChanged()) {
         EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
-        popup->yesAction = [&]() {
+        popup->yesAction = [this, popup, &project]() {
             saveWorld();
             m_loader.openProject(project.path);
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
+            popup->isDeleted = true;
         };
-        popup->noAction = [&]() {
+        popup->noAction = [this, popup, &project]() {
             m_loader.openProject(project.path);
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
+            popup->isDeleted = true;
         };
-        popup->closeAction = [&]() {
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
-        };
+        popup->closeAction = [this, popup]() { popup->isDeleted = true; };
         popup->title = "Save current world?";
         popup->subtitle = "Do you want to save your changes?";
         popup->yesText = "Save";
@@ -251,31 +276,7 @@ const path_t &EditorLayer::menuBarGetOpenedProjectPath() {
 }
 
 void EditorLayer::menuBarCloseApp() {
-    if (m_editingWorld.isChanged()) {
-        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
-        popup->yesAction = [&]() {
-            saveWorld();
-            closeApp();
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
-        };
-        popup->noAction = [&]() {
-            closeApp();
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
-        };
-        popup->closeAction = [&]() {
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
-        };
-        popup->title = "Save current world?";
-        popup->subtitle = "Do you want to save your changes?";
-        popup->yesText = "Save";
-        popup->noText = "Not save";
-        m_popups.emplace_back(popup);
-    } else {
-        closeApp();
-    }
+    closeAppRequest();
 }
 
 void EditorLayer::menuBarOpenCppProject() {
@@ -289,21 +290,16 @@ void EditorLayer::menuBarSaveWorld() {
 void EditorLayer::menuBarCloseProject() {
     if (m_editingWorld.isChanged()) {
         EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
-        popup->yesAction = [&]() {
+        popup->yesAction = [this, popup]() {
             saveWorld();
             closeProject();
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
+            popup->isDeleted = true;
         };
-        popup->noAction = [&]() {
+        popup->noAction = [this, popup]() {
             closeProject();
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
+            popup->isDeleted = true;
         };
-        popup->closeAction = [&]() {
-            F_DELETE(Foundation::getAllocator(), m_popups.back());
-            m_popups.pop_back();
-        };
+        popup->closeAction = [this, popup]() { popup->isDeleted = true; };
         popup->title = "Save current world?";
         popup->subtitle = "Do you want to save your changes?";
         popup->yesText = "Save";
@@ -316,7 +312,7 @@ void EditorLayer::menuBarCloseProject() {
 
 void EditorLayer::menuBarAbout() {
     EditorAboutPopup *popup = F_NEW(Foundation::getAllocator(), EditorAboutPopup);
-    popup->closeAction = [&]() {
+    popup->closeAction = [this, popup]() {
         F_DELETE(Foundation::getAllocator(), m_popups.back());
         m_popups.pop_back();
     };
@@ -328,13 +324,14 @@ void EditorLayer::menuBarAbout() {
 
 #pragma region Components draw output
 
-void EditorLayer::addScriptToEntities(const std::vector<Entity> &entities) {
+void EditorLayer::addScriptToEntities(const std::unordered_set<Entity> &entities) {
     PickScriptPopup *popup = F_NEW(Foundation::getAllocator(), PickScriptPopup);
-    popup->closeAction = [&]() {
+    popup->closeAction = [this, popup]() {
         F_DELETE(Foundation::getAllocator(), m_popups.back());
         m_popups.pop_back();
     };
-    popup->selectAction = [&](const std::vector<Entity> &entities, ScriptClassManifest clazz) {
+    popup->selectAction = [&](const std::unordered_set<Entity> &entities,
+                              ScriptClassManifest clazz) {
         if (clazz.name) {
             for (Entity entity : entities) {
                 // Map manifest fields to internal ScriptField type
@@ -383,7 +380,7 @@ void EditorLayer::addScriptToEntities(const std::vector<Entity> &entities) {
 
 void EditorLayer::showCreateFolderPopup() {
     EnterNamePopup *popup = F_NEW(Foundation::getAllocator(), EnterNamePopup);
-    popup->closeAction = [&]() {
+    popup->closeAction = [this, popup]() {
         F_DELETE(Foundation::getAllocator(), m_popups.back());
         m_popups.pop_back();
     };
@@ -399,12 +396,12 @@ void EditorLayer::showCreateFolderPopup() {
 
 void EditorLayer::deleteFileShowPopup(path_t path) {
     EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
-    popup->yesAction = [&]() {
+    popup->yesAction = [this, popup]() {
         m_panelsContainer.contentBrowser.confirmDeletion();
         F_DELETE(Foundation::getAllocator(), m_popups.back());
         m_popups.pop_back();
     };
-    popup->noAction = [&]() {
+    popup->noAction = [this, popup]() {
         F_DELETE(Foundation::getAllocator(), m_popups.back());
         m_popups.pop_back();
     };
@@ -476,26 +473,12 @@ SceneState EditorLayer::toolbarGetCurrentSceneState() {
 
 #pragma endregion
 
-#pragma region Viewport output
-
-void EditorLayer::viewportPickEntityWithId(UUID id) {
-    if (!m_currentWorld) { return; }
-    SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
-    Entity selected = m_currentWorld->getById(id);
-    if (selected.isValid()) {
-        if (selectionContext.isSelected(selected)) {
-            selectionContext.removeSelectedEntity(selected);
-        } else {
-            selectionContext.addSelectedEntity(selected);
-        }
-    }
+void EditorLayer::openProjectFolderDialog() {
+    std::optional<path_t> optionalPath = SystemTools::openFolderDialog();
+    if (!optionalPath.has_value()) { return; }
+    path_t path = optionalPath.value();
+    m_loader.openProject(path);
 }
-
-void EditorLayer::viewportUnselectAll() {
-    m_currentWorld->getSelectionContext().unselectAll();
-}
-
-#pragma endregion
 
 void EditorLayer::updateWindowState() {
     m_window->setResizable(m_loader.hasOpenedProject());
@@ -564,6 +547,29 @@ void EditorLayer::closeProject() {
     m_loader.closeProject();
 }
 
+void EditorLayer::closeAppRequest() {
+    if (m_editingWorld.isChanged()) {
+        EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
+        popup->yesAction = [this, popup]() {
+            saveWorld();
+            closeApp();
+            popup->isDeleted = true;
+        };
+        popup->noAction = [this, popup]() {
+            closeApp();
+            popup->isDeleted = true;
+        };
+        popup->closeAction = [this, popup]() { popup->isDeleted = true; };
+        popup->title = "Save current world?";
+        popup->subtitle = "Do you want to save your changes?";
+        popup->yesText = "Save";
+        popup->noText = "Not save";
+        m_popups.emplace_back(popup);
+    } else {
+        closeApp();
+    }
+}
+
 void EditorLayer::closeApp() {
     Fern::WindowState windowState = m_window->getState();
     LastOpenedProjectWindowState savingState;
@@ -604,11 +610,11 @@ void EditorLayer::processShortcuts() {
     if (ImGui::IsKeyPressed(ImGuiKey_D, false) && ctrl) {
         SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
         if (m_currentWorld) {
-            std::vector<Entity> selected = selectionContext.getSelectedEntities();
-            std::vector<Entity> copies;
+            std::unordered_set<Entity> selected = selectionContext.getSelectedEntities();
+            std::unordered_set<Entity> copies;
             for (auto entity : selected) {
                 Entity duplicate = m_currentWorld->duplicateEntity(entity);
-                copies.push_back(duplicate);
+                copies.insert(duplicate);
                 selectionContext.removeSelectedEntity(entity, false);
                 selectionContext.addSelectedEntity(duplicate, false);
             }

@@ -44,6 +44,9 @@ MIREN_HANDLE(VertexLayoutHandle)
 
 enum TextureFormat {
     // Color
+    R8,
+    R8I,
+    R8UI,
     RGB8,
     RGBA8,
     R32I,
@@ -97,6 +100,10 @@ struct TextureCreate {
 
     size_t bytesPerTexel() const {
         switch (m_format) {
+            case R8:
+            case R8I:
+            case R8UI:
+                return 1;
             case RGB8:
                 return 3;
             case RGBA8:
@@ -110,7 +117,7 @@ struct TextureCreate {
     }
 };
 
-enum UniformType { Sampler, Vec4, Mat3, Mat4, Count };
+enum UniformType { Sampler, Float, Vec2, Vec3, Vec4, Mat3, Mat4, Count };
 
 struct FrameBufferAttachment {
     FrameBufferAttachment()

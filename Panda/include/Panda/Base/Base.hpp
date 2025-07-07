@@ -7,35 +7,39 @@
 
 namespace Panda {
 
-struct Vec2 : public Rain::Codable {
+template<size_t L, typename T>
+struct Vec;
+
+template<typename T>
+struct Vec<2, T> : public Rain::Codable {
     union {
-        float x, width;
+        T x, width;
     };
     union {
-        float y, height;
+        T y, height;
     };
 
-    Vec2()
+    Vec()
         : x(0)
         , y(0) {}
 
-    Vec2(glm::vec2 c)
+    Vec(glm::vec2 c)
         : x(c.x)
         , y(c.y) {}
 
-    Vec2(float x, float y)
+    Vec(T x, T y)
         : x(x)
         , y(y) {}
 
-    Vec2(const ImVec2 &vec)
+    Vec(const ImVec2 &vec)
         : x(vec.x)
         , y(vec.y) {}
 
-    bool operator==(const Vec2 &l) {
+    bool operator==(const Vec &l) {
         return l.x == x && l.y == y;
     }
 
-    bool operator!=(const Vec2 &l) {
+    bool operator!=(const Vec &l) {
         return !(*this == l);
     }
 
@@ -47,34 +51,43 @@ struct Vec2 : public Rain::Codable {
         return {x, y};
     }
 
-    RAIN_FIELDS_BEGIN(Vec2)
+    bool isZero() {
+        return x == 0 && y == 0;
+    }
+
+    RAIN_FIELDS_BEGIN(Vec)
     RAIN_FIELD(x)
     RAIN_FIELD(y)
     RAIN_FIELDS_END
 };
 
-struct Vec3 : public Rain::Codable {
+using Vec2 = Vec<2, float>;
+using UVec2 = Vec<2, uint32_t>;
+using IVec2 = Vec<2, int32_t>;
+
+template<typename T>
+struct Vec<3, T> : public Rain::Codable {
     union {
-        float x, r, width;
+        T x, r, width;
     };
     union {
-        float y, g, height;
+        T y, g, height;
     };
     union {
-        float z, b;
+        T z, b;
     };
 
-    Vec3()
+    Vec()
         : x(0)
         , y(0)
         , z(0) {}
 
-    Vec3(glm::vec3 c)
+    Vec(glm::vec3 c)
         : x(c.x)
         , y(c.y)
         , z(c.z) {}
 
-    Vec3(float x, float y, float z)
+    Vec(float x, float y, float z)
         : x(x)
         , y(y)
         , z(z) {}
@@ -83,46 +96,51 @@ struct Vec3 : public Rain::Codable {
         return {x, y, z};
     }
 
-    RAIN_FIELDS_BEGIN(Vec3)
+    RAIN_FIELDS_BEGIN(Vec)
     RAIN_FIELD(x)
     RAIN_FIELD(y)
     RAIN_FIELD(z)
     RAIN_FIELDS_END
 };
 
-struct Vec4 : public Rain::Codable {
+using Vec3 = Vec<3, float>;
+using UVec3 = Vec<3, uint32_t>;
+using IVec3 = Vec<3, int32_t>;
+
+template<typename T>
+struct Vec<4, T> : public Rain::Codable {
     union {
-        float x, r, width;
+        T x, r, width;
     };
     union {
-        float y, g, height;
+        T y, g, height;
     };
     union {
-        float z, b;
+        T z, b;
     };
     union {
-        float w, a;
+        T w, a;
     };
 
-    Vec4()
+    Vec()
         : x(0)
         , y(0)
         , z(0)
         , w(0) {}
 
-    Vec4(glm::vec4 c)
+    Vec(glm::vec4 c)
         : x(c.x)
         , y(c.y)
         , z(c.z)
         , w(c.w) {}
 
-    Vec4(glm::quat c)
+    Vec(glm::quat c)
         : x(c.x)
         , y(c.y)
         , z(c.z)
         , w(c.w) {}
 
-    Vec4(float x, float y, float z, float w)
+    Vec(float x, float y, float z, float w)
         : x(x)
         , y(y)
         , z(z)
@@ -141,14 +159,14 @@ struct Vec4 : public Rain::Codable {
         return q;
     }
 
-    bool operator==(const Vec4 &other) const {
+    bool operator==(const Vec &other) const {
         return glm::epsilonEqual(x, other.x, FLT_EPSILON) &&
                glm::epsilonEqual(y, other.y, FLT_EPSILON) &&
                glm::epsilonEqual(z, other.z, FLT_EPSILON) &&
                glm::epsilonEqual(w, other.w, FLT_EPSILON);
     }
 
-    RAIN_FIELDS_BEGIN(Vec4)
+    RAIN_FIELDS_BEGIN(Vec)
     RAIN_FIELD(x)
     RAIN_FIELD(y)
     RAIN_FIELD(z)
@@ -156,24 +174,35 @@ struct Vec4 : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
+using Vec4 = Vec<4, float>;
+using UVec4 = Vec<4, uint32_t>;
+using IVec4 = Vec<4, int32_t>;
+
 using Size = Vec2;
+using USize = UVec2;
+using ISize = IVec2;
 using Color = Vec4;
 using Quat = Vec4;
 
-struct Rect : public Rain::Codable {
-    Vec2 origin;
-    Vec2 size;
+template<typename T = float>
+struct TRect : public Rain::Codable {
+    Vec<2, T> origin;
+    Vec<2, T> size;
 
-    Rect() {}
+    TRect() {}
 
-    Rect(float x, float y, float width, float height)
+    TRect(T x, T y, T width, T height)
         : origin(x, y)
         , size(width, height) {}
 
-    RAIN_FIELDS_BEGIN(Rect)
+    RAIN_FIELDS_BEGIN(TRect)
     RAIN_FIELD(origin)
     RAIN_FIELD(size)
     RAIN_FIELDS_END
 };
+
+using Rect = TRect<float>;
+using URect = TRect<uint32_t>;
+using IRect = TRect<int32_t>;
 
 } // namespace Panda

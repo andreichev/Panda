@@ -35,6 +35,7 @@ public:
     virtual void createProgram(ProgramHandle handle, ProgramCreate) = 0;
     virtual void deleteShader(ProgramHandle handle) = 0;
     virtual void createTexture(TextureHandle handle, TextureCreate) = 0;
+    virtual void updateTexture(TextureHandle handle, Foundation::Memory mem) = 0;
     virtual void resizeTexture(TextureHandle handle, uint32_t width, uint32_t height) = 0;
     virtual void deleteTexture(TextureHandle handle) = 0;
     virtual void createIndexBuffer(

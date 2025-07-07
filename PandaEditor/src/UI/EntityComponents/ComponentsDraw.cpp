@@ -21,17 +21,17 @@ namespace Panda {
 static float coefficientRounding = 3.0f;
 
 template<typename T>
-using UIFunction = std::function<void(std::vector<Entity>, WorldCommandManager &, T &)>;
+using UIFunction = std::function<void(std::unordered_set<Entity>, WorldCommandManager &, T &)>;
 
 template<typename T>
 static void drawComponent(
     const std::string &name,
-    const std::vector<Entity> &entities,
+    const std::unordered_set<Entity> &entities,
     bool canRemove,
     UIFunction<T> uiFunction
 ) {
     if (entities.empty()) { return; }
-    Entity firstEntity = entities[0];
+    Entity firstEntity = *entities.begin();
     World *world = firstEntity.getWorld();
     if (!world) { return; }
     WorldCommandManager &cmd = world->getCommandManger();
@@ -79,9 +79,9 @@ static void drawComponent(
     style.IndentSpacing = indentSpacing;
 }
 
-static void drawTag(const std::vector<Entity> &entities) {
+static void drawTag(const std::unordered_set<Entity> &entities) {
     if (entities.empty()) { return; }
-    Entity firstEntity = entities[0];
+    Entity firstEntity = *entities.begin();
     const bool inconsistentTag = isInconsistentPrimitive<std::string, TagComponent>(
         entities, [](const TagComponent &tagComponent) { return tagComponent.tag; }
     );
@@ -103,7 +103,9 @@ static void drawTag(const std::vector<Entity> &entities) {
 
 template<typename T>
 static void displayAddComponentEntry(
-    const std::vector<Entity> &entities, WorldCommandManager &cmd, const std::string &entryName
+    const std::unordered_set<Entity> &entities,
+    WorldCommandManager &cmd,
+    const std::string &entryName
 ) {
     bool allEntitiesHaveComponent = true;
     for (Entity entity : entities) {
@@ -121,7 +123,7 @@ static void displayAddComponentEntry(
     }
 }
 
-void ComponentsDraw::displayAddScriptMenuItem(const std::vector<Entity> &entities) {
+void ComponentsDraw::displayAddScriptMenuItem(const std::unordered_set<Entity> &entities) {
     if (ImGui::MenuItem("Add Script")) {
         m_output->addScriptToEntities(entities);
         ImGui::CloseCurrentPopup();
@@ -131,10 +133,10 @@ void ComponentsDraw::displayAddScriptMenuItem(const std::vector<Entity> &entitie
 ComponentsDraw::ComponentsDraw(Panda::ComponentsDrawOutput *output)
     : m_output(output) {}
 
-void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
+void ComponentsDraw::drawComponents(const std::unordered_set<Entity> &entities) {
     if (entities.empty()) { return; }
     const bool isMultiSelect = entities.size() > 1;
-    Entity firstEntity = entities[0];
+    Entity firstEntity = *entities.begin();
     World *world = firstEntity.getWorld();
     if (!world) { return; }
     WorldCommandManager &cmd = world->getCommandManger();
@@ -157,7 +159,7 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
         "Transform",
         entities,
         false,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &firstComponent) {
+        [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &firstComponent) {
             glm::vec3 position = firstComponent.getPosition();
             glm::vec3 rotation = firstComponent.getRotationEuler();
             glm::vec3 scale = firstComponent.getScale();
@@ -213,7 +215,7 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
         "Scripts",
         entities,
         false,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &component) {
+        [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &component) {
             if (isMultiSelect) {
                 ImGui::Text("Scripts multi edit not supported");
                 return;
@@ -261,7 +263,7 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
         "Sprite Renderer",
         entities,
         true,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &firstComponent) {
+        [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &firstComponent) {
             UpdateSpriteRendererCommand update(entities);
             update.saveBeforeEdit();
             bool modified = false;
@@ -336,7 +338,7 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
         "Dynamic Mesh",
         entities,
         false,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &component) {
+        [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &component) {
             if (isMultiSelect) {
                 ImGui::Text("Multi edit not supported");
                 return;
@@ -348,7 +350,7 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
         "Static Mesh",
         entities,
         false,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &component) {
+        [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &component) {
             if (isMultiSelect) {
                 ImGui::Text("Multi edit not supported");
                 return;
@@ -360,7 +362,7 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
         "Camera",
         entities,
         true,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &component) {
+        [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &component) {
             if (isMultiSelect) {
                 ImGui::Text("Multi edit not supported");
                 return;
@@ -397,7 +399,7 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
         "Rigidbody 2D",
         entities,
         true,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &firstComponent) {
+        [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &firstComponent) {
             bool modified = false;
             UpdateRigidbody2DCommand update(entities);
             update.saveBeforeEdit();
@@ -446,7 +448,7 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
         "Box Collider 2D",
         entities,
         true,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &firstComponent) {
+        [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &firstComponent) {
             bool modified = false;
             UpdateBoxCollider2DCommand update(entities);
             update.saveBeforeEdit();
@@ -572,7 +574,7 @@ void ComponentsDraw::drawComponents(const std::vector<Entity> &entities) {
         "Cube Map Rendering",
         entities,
         true,
-        [&](std::vector<Entity> entities, WorldCommandManager &cmd, auto &component) {}
+        [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &component) {}
     );
 }
 

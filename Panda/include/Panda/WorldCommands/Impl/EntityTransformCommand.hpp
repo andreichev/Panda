@@ -8,7 +8,7 @@ namespace Panda {
 
 class EntityTransformCommand : public WorldCommand {
 public:
-    EntityTransformCommand(const std::vector<Entity> &entities)
+    EntityTransformCommand(const std::unordered_set<Entity> &entities)
         : m_entities(entities)
         , m_beforeTransforms()
         , m_afterTransforms() {}
@@ -16,7 +16,8 @@ public:
     bool undo() override {
         PND_ASSERT(!m_entities.empty(), "WRONG TRANSFORM COMMAND DATA");
         bool selectionsUpdated = false;
-        SelectionContext &selectionContext = m_entities[0].getWorld()->getSelectionContext();
+        Entity first = *m_entities.begin();
+        SelectionContext &selectionContext = first.getWorld()->getSelectionContext();
         for (auto entity : m_entities) {
             if (!entity.isValid()) { return false; }
             auto &transformComponent = entity.getTransform();
@@ -33,7 +34,8 @@ public:
     bool execute() override {
         PND_ASSERT(!m_entities.empty(), "WRONG TRANSFORM COMMAND DATA");
         bool selectionsUpdated = false;
-        SelectionContext &selectionContext = m_entities[0].getWorld()->getSelectionContext();
+        Entity first = *m_entities.begin();
+        SelectionContext &selectionContext = first.getWorld()->getSelectionContext();
         for (auto entity : m_entities) {
             if (!entity.isValid()) { return false; }
             auto &transformComponent = entity.getTransform();
@@ -71,7 +73,7 @@ public:
     }
 
 private:
-    std::vector<Entity> m_entities;
+    std::unordered_set<Entity> m_entities;
     std::unordered_map<UUID, glm::mat4> m_beforeTransforms;
     std::unordered_map<UUID, glm::mat4> m_afterTransforms;
 };

@@ -19,6 +19,7 @@ enum RendererCommandType {
     CreateProgram,
     DestroyProgram,
     CreateTexture,
+    UpdateTexture,
     ResizeTexture,
     DestroyTexture,
     CreateIndexBuffer,
@@ -85,6 +86,16 @@ struct CreateTextureCommand : Foundation::CommandBuffer::Command {
         : Command(RendererCommandType::CreateTexture)
         , handle(handle)
         , create(create) {}
+};
+
+struct UpdateTextureCommand : Foundation::CommandBuffer::Command {
+    TextureHandle handle;
+    Foundation::Memory mem;
+
+    UpdateTextureCommand(TextureHandle handle, Foundation::Memory mem)
+        : Command(RendererCommandType::UpdateTexture)
+        , handle(handle)
+        , mem(mem) {}
 };
 
 struct ResizeTextureCommand : Foundation::CommandBuffer::Command {

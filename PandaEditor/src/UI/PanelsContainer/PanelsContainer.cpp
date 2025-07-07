@@ -5,7 +5,7 @@ namespace Panda {
 PanelsContainer::PanelsContainer(EditorLayer *layer, CameraController *cameraController)
     : toolbar(layer)
     , dockspace()
-    , viewport(layer, cameraController)
+    , viewport(cameraController)
     , hierarchyPanel(nullptr, layer)
     , statisticsPanel(nullptr)
     , consolePanel()

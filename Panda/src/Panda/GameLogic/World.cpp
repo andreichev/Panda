@@ -56,21 +56,10 @@ void World::finishRunning() {
 
 void World::updateRuntime(double deltaTime) {
     if (!m_isRunning) { return; }
-    m_renderer2d.begin();
-    m_renderer3d.begin();
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_renderingViewId);
+    m_renderer3d.begin(m_renderingViewId);
 
     m_physics2D.update(this, deltaTime);
-    // Update native scripts
-    {
-        auto view = m_registry.view<ScriptListComponent>();
-        for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) { continue; }
-            auto &component = view.get<ScriptListComponent>(entityHandle);
-            for (auto &container : component.scripts) {
-                container.invokeUpdate(deltaTime);
-            }
-        }
-    }
     glm::mat4 viewProjMtx;
     glm::mat4 skyViewProjMtx;
     Entity cameraEntity = findMainCameraEntity();
@@ -87,16 +76,29 @@ void World::updateRuntime(double deltaTime) {
         m_renderer3d.setViewProj(viewProjMtx);
     }
 
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
+    // Update native scripts
+    {
+        auto view = m_registry.view<ScriptListComponent>();
+        for (auto entityHandle : view) {
+            if (!isValidEntt(entityHandle)) { continue; }
+            auto &component = view.get<ScriptListComponent>(entityHandle);
+            for (auto &container : component.scripts) {
+                container.invokeUpdate(deltaTime);
+            }
+        }
+    }
+
+    renderWorld(viewProjMtx, skyViewProjMtx);
 
     m_renderer2d.end();
     m_renderer3d.end();
 }
 
 void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
-    m_renderer2d.begin();
-    m_renderer3d.begin();
-
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_renderingViewId);
+    m_renderer3d.begin(m_renderingViewId);
+    m_renderer2d.setViewProj(viewProjMtx);
+    m_renderer3d.setViewProj(viewProjMtx);
     m_physics2D.update(this, deltaTime);
 
     // Update native scripts
@@ -111,33 +113,32 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
         }
     }
 
-    m_renderer2d.setViewProj(viewProjMtx);
-    m_renderer3d.setViewProj(viewProjMtx);
-
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
-
+    renderWorld(viewProjMtx, skyViewProjMtx);
+    m_renderer2d.end();
+    m_renderer3d.end();
+    m_renderer2d.begin(Panda::Renderer2D::Mode::GEOMETRY_ONLY, m_selectionViewId);
+    m_renderer3d.begin(m_selectionViewId);
+    renderSelectedGeometry(viewProjMtx);
     m_renderer2d.end();
     m_renderer3d.end();
 }
 
 void World::updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
-    m_renderer2d.begin();
-    m_renderer3d.begin();
-
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
-
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_renderingViewId);
+    m_renderer3d.begin(m_renderingViewId);
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
-
-    updateBasicComponents(deltaTime, viewProjMtx, skyViewProjMtx);
-
+    renderWorld(viewProjMtx, skyViewProjMtx);
+    m_renderer2d.end();
+    m_renderer3d.end();
+    m_renderer2d.begin(Panda::Renderer2D::Mode::GEOMETRY_ONLY, m_selectionViewId);
+    m_renderer3d.begin(m_selectionViewId);
+    renderSelectedGeometry(viewProjMtx);
     m_renderer2d.end();
     m_renderer3d.end();
 }
 
-void World::updateBasicComponents(
-    float deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx
-) {
+void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
     // Draw sky
     {
         auto view = m_registry.view<SkyComponent>();
@@ -202,6 +203,46 @@ void World::updateBasicComponents(
             }
         }
     }
+}
+
+void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
+    auto selected = m_selectionContext.getSelectedEntities();
+    // Render Sprites
+    {
+        for (auto entity : selected) {
+            if (!entity.hasComponent<SpriteRendererComponent>()) { continue; }
+            auto &spriteComponent = entity.getComponent<SpriteRendererComponent>();
+            Panda::Renderer2D::RectData rect;
+            rect.transform = getWorldSpaceTransformMatrix(entity);
+            rect.size = {1.f, 1.f};
+            m_renderer2d.drawRect(rect);
+        }
+    }
+    // Render static meshes
+    {
+        for (auto entity : selected) {
+            if (!entity.hasComponent<StaticMeshComponent>()) { continue; }
+            auto &staticMeshComponent = entity.getComponent<StaticMeshComponent>();
+            auto transform = getWorldSpaceTransformMatrix(entity);
+            for (auto &mesh : staticMeshComponent.meshes) {
+                m_renderer3d.submit(transform, &mesh);
+            }
+        }
+    }
+    // Render dynamic meshes
+    {
+        for (auto entity : selected) {
+            if (!entity.hasComponent<DynamicMeshComponent>()) { continue; }
+            auto &dynamicMeshComponent = entity.getComponent<DynamicMeshComponent>();
+            auto transform = getWorldSpaceTransformMatrix(entity);
+            for (auto &mesh : dynamicMeshComponent.meshes) {
+                m_renderer3d.submit(transform, &mesh);
+            }
+        }
+    }
+    // TOUCH SELECTION VIEW ID TO CLEAN
+    Miren::discard();
+    Miren::submit(m_selectionViewId);
 }
 
 Entity World::instantiateEntity() {
@@ -468,9 +509,11 @@ Entity World::getById(UUID id) {
 }
 
 void World::setViewId(Miren::ViewId id) {
-    m_renderer2d.setViewId(id);
-    m_renderer3d.setViewId(id);
     m_renderingViewId = id;
+}
+
+void World::setSelectionViewId(Miren::ViewId id) {
+    m_selectionViewId = id;
 }
 
 glm::mat4 World::getWorldSpaceTransformMatrix(Entity entity) {
@@ -535,6 +578,7 @@ World &World::operator=(World &other) {
 #ifdef PND_EDITOR
     sort();
 #endif
+    m_selectionContext = other.m_selectionContext;
     return *this;
 }
 

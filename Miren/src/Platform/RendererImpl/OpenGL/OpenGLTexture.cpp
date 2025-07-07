@@ -24,6 +24,7 @@ void OpenGLTexture::create(TextureCreate &create) {
     GLenum target = create.m_isCubeMap ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D;
     m_target = target;
     GL_CALL(glBindTexture(target, m_id));
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
 
     m_format = s_textureFormat[create.m_format].m_fmt;
     GLenum internalFormat = s_textureFormat[create.m_format].m_internalFmt;
@@ -71,6 +72,17 @@ void OpenGLTexture::create(TextureCreate &create) {
     GL_CALL(glTexParameteri(target, GL_TEXTURE_MAG_FILTER, openGLFiltering(create.m_magFiltering)));
 }
 
+void OpenGLTexture::update(Foundation::Memory mem) {
+    PND_ASSERT(m_id != -1, "TEXTURE IS NOT CREATED");
+    GL_CALL(glBindTexture(m_target, m_id));
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+    GLenum internalFormat = s_textureFormat[m_create.m_format].m_internalFmt;
+    GL_CALL(glTexSubImage2D(
+        m_target, 0, 0, 0, m_create.m_width, m_create.m_height, internalFormat, m_type, mem.data
+    ));
+    mem.release();
+}
+
 void OpenGLTexture::resize(uint32_t width, uint32_t height) {
     PND_ASSERT(m_id != -1, "TEXTURE IS NOT CREATED");
     terminate();
@@ -98,6 +110,7 @@ void OpenGLTexture::unbind() {
 void OpenGLTexture::readPixels(void *data) {
     GL_CALL(glBindTexture(m_target, m_id));
 #ifdef PLATFORM_DESKTOP
+    GL_CALL(glPixelStorei(GL_PACK_ALIGNMENT, 1));
     GL_CALL(glGetTexImage(m_target, 0, m_format, m_type, data));
 #else
     LOG_ERROR("READ TEXTURE NOT SUPPORTED IN GLES");

@@ -10,6 +10,9 @@ namespace Miren {
 
 const static uint32_t s_uniformTypeSize[UniformType::Count + 1] = {
     sizeof(int32_t),       // Sampler
+    sizeof(float),         // Float
+    2 * sizeof(float),     // Vec2
+    3 * sizeof(float),     // Vec3
     4 * sizeof(float),     // Vec4
     3 * 3 * sizeof(float), // Mat3
     4 * 4 * sizeof(float), // Mat4
@@ -21,6 +24,29 @@ public:
         : m_size(size)
         , m_pos(0) {
         m_data = (uint8_t *)F_ALLOC(Foundation::getAllocator(), size);
+    }
+
+    UniformBuffer(const UniformBuffer &other)
+        : m_size(other.m_size)
+        , m_pos(other.m_pos)
+        , m_data(other.m_data) {}
+
+    UniformBuffer(UniformBuffer &&other) noexcept
+        : m_size(other.m_size)
+        , m_pos(other.m_pos)
+        , m_data(other.m_data) {
+        other.m_data = nullptr;
+        other.m_pos = 0;
+        other.m_size = 0;
+    }
+
+    UniformBuffer &operator=(UniformBuffer &&other) noexcept {
+        if (this == &other) { return *this; }
+        m_size = other.m_size;
+        m_pos = other.m_pos;
+        m_data = other.m_data;
+        other.m_data = nullptr;
+        return *this;
     }
 
     ~UniformBuffer() {
