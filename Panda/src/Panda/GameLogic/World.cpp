@@ -179,26 +179,14 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
             m_renderer2d.drawRect(rect);
         }
     }
-    // Render static meshes
+    // Render meshes
     {
-        auto view = m_registry.view<StaticMeshComponent, TransformComponent>();
+        auto view = m_registry.view<MeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
             if (!isValidEntt(entityHandle)) { continue; }
-            auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
+            auto &staticMeshComponent = view.get<MeshComponent>(entityHandle);
             auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
             for (auto &mesh : staticMeshComponent.meshes) {
-                m_renderer3d.submit(transform, &mesh);
-            }
-        }
-    }
-    // Render dynamic meshes
-    {
-        auto view = m_registry.view<DynamicMeshComponent, TransformComponent>();
-        for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) { continue; }
-            auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
-            auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
-            for (auto &mesh : dynamicMeshComponent.meshes) {
                 m_renderer3d.submit(transform, &mesh);
             }
         }
@@ -218,22 +206,11 @@ void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
             m_renderer2d.drawRect(rect);
         }
     }
-    // Render static meshes
-    {
-        for (auto entity : selected) {
-            if (!entity.hasComponent<StaticMeshComponent>()) { continue; }
-            auto &staticMeshComponent = entity.getComponent<StaticMeshComponent>();
-            auto transform = getWorldSpaceTransformMatrix(entity);
-            for (auto &mesh : staticMeshComponent.meshes) {
-                m_renderer3d.submit(transform, &mesh);
-            }
-        }
-    }
     // Render dynamic meshes
     {
         for (auto entity : selected) {
-            if (!entity.hasComponent<DynamicMeshComponent>()) { continue; }
-            auto &dynamicMeshComponent = entity.getComponent<DynamicMeshComponent>();
+            if (!entity.hasComponent<MeshComponent>()) { continue; }
+            auto &dynamicMeshComponent = entity.getComponent<MeshComponent>();
             auto transform = getWorldSpaceTransformMatrix(entity);
             for (auto &mesh : dynamicMeshComponent.meshes) {
                 m_renderer3d.submit(transform, &mesh);
@@ -408,8 +385,7 @@ void World::fillEntity(Entity entity, UUID id) {
     entity.addComponent<TagComponent>("Entity");
     entity.addComponent<RelationshipComponent>();
     entity.addComponent<TransformComponent>();
-    entity.addComponent<StaticMeshComponent>();
-    entity.addComponent<DynamicMeshComponent>();
+    entity.addComponent<MeshComponent>();
     entity.addComponent<ScriptListComponent>();
 }
 
@@ -556,8 +532,7 @@ World &World::operator=(World &other) {
     copyAllComponents<TransformComponent>(src, dst);
     copyAllComponents<RelationshipComponent>(src, dst);
     copyAllComponents<SpriteRendererComponent>(src, dst);
-    copyAllComponents<StaticMeshComponent>(src, dst);
-    copyAllComponents<DynamicMeshComponent>(src, dst);
+    copyAllComponents<MeshComponent>(src, dst);
     copyAllComponents<CameraComponent>(src, dst);
     copyAllComponents<SkyComponent>(src, dst);
     copyAllComponents<Rigidbody2DComponent>(src, dst);
@@ -594,8 +569,7 @@ Entity World::duplicateEntity(Entity entity) {
 #endif
     copyComponent<TransformComponent>(src, dst, m_registry);
     copyComponent<SpriteRendererComponent>(src, dst, m_registry);
-    copyComponent<StaticMeshComponent>(src, dst, m_registry);
-    copyComponent<DynamicMeshComponent>(src, dst, m_registry);
+    copyComponent<MeshComponent>(src, dst, m_registry);
     copyComponent<CameraComponent>(src, dst, m_registry);
     copyComponent<SkyComponent>(src, dst, m_registry);
     copyComponent<Rigidbody2DComponent>(src, dst, m_registry);

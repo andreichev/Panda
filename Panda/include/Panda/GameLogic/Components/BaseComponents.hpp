@@ -6,8 +6,7 @@
 
 #include "Panda/Base/Base.hpp"
 
-#include "Panda/Assets/StaticMeshAsset.hpp"
-#include "Panda/Assets/DynamicMeshAsset.hpp"
+#include "Panda/Assets/MeshAsset.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
 #include "Panda/ScriptEngine/ExternalScript.hpp"
 
@@ -88,16 +87,12 @@ struct SpriteRendererComponent final {
     }
 };
 
-struct StaticMeshComponent final {
-    std::vector<StaticMeshAsset> meshes;
-};
+struct MeshComponent final {
+    std::vector<MeshAsset> meshes;
 
-struct DynamicMeshComponent final {
-    std::vector<DynamicMeshAsset> meshes;
-
-    DynamicMeshComponent() = default;
-    DynamicMeshComponent(const DynamicMeshComponent &other) = default;
-    DynamicMeshComponent &operator=(DynamicMeshComponent &other) = default;
+    MeshComponent() = default;
+    MeshComponent(const MeshComponent &other) = default;
+    MeshComponent &operator=(MeshComponent &other) = default;
 };
 
 struct CameraComponent final {

@@ -14,7 +14,11 @@ AssetHandlerEditor::AssetHandlerEditor()
     , m_registry()
     , m_jsonEncoder(true)
     , m_jsonDecoder()
-    , m_registeredAssets() {}
+    , m_registeredAssets()
+    , m_registerAssetFunc() {
+    m_registerAssetFunc.emplace(".png", &AssetHandlerEditor::registerTextureAsset);
+    m_registerAssetFunc.emplace(".jpeg", &AssetHandlerEditor::registerTextureAsset);
+}
 
 Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
     if (m_registry.find(id) == m_registry.end()) {
@@ -82,6 +86,16 @@ void AssetHandlerEditor::registerTextureAsset(const path_t &path) {
     m_registry[info.id] = info;
     m_registeredAssets[assetPath] = info.id;
     saveAssetRegistry();
+}
+
+void AssetHandlerEditor::registerAsset(const path_t &path) {
+    std::string extension = path.extension().string();
+    if (m_registerAssetFunc.find(extension) == m_registerAssetFunc.end()) {
+        LOG_ERROR_EDITOR("EXTENSION %s IMPORT NOT SUPPORTED YET", extension.c_str());
+        return;
+    }
+    RegisterAssetFunc registerAssetFunc = m_registerAssetFunc[extension];
+    (this->*registerAssetFunc)(path);
 }
 
 UUID AssetHandlerEditor::getAssetId(path_t path) {

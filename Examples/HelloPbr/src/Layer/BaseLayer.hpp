@@ -30,7 +30,7 @@ private:
     Panda::TransformComponent m_transform;
     Panda::SkyComponent m_skyComponent;
     TerrainMeshGenerator m_meshGenerator;
-    Panda::DynamicMeshAsset m_mesh;
+    Panda::MeshAsset m_mesh;
 
     Miren::ProgramHandle m_shader;
     Miren::TextureHandle m_heightMapTexture;

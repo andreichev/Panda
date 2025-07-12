@@ -415,7 +415,7 @@ void EditorLayer::deleteFileShowPopup(path_t path) {
 
 void EditorLayer::importAsset(const path_t &path) {
     auto &assetHandler = m_loader.getAssetHandler();
-    assetHandler.registerTextureAsset(path);
+    assetHandler.registerAsset(path);
 }
 
 UUID EditorLayer::getAssetId(const path_t &path) {

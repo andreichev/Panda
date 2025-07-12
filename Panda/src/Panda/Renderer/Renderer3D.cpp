@@ -20,25 +20,7 @@ void Renderer3D::begin(Miren::ViewId id) {
     m_viewId = id;
 }
 
-void Renderer3D::submit(glm::mat4 &transform, StaticMeshAsset *mesh) {
-    PND_ASSERT(mesh->m_shaderHandle.isValid(), "Invalid shader for mesh");
-    Miren::setShader(mesh->m_shaderHandle);
-    Miren::setUniform(
-        mesh->m_shaderHandle, "model", glm::value_ptr(transform), Miren::UniformType::Mat4
-    );
-    Miren::setUniform(
-        mesh->m_shaderHandle, "projViewMtx", glm::value_ptr(m_viewProj), Miren::UniformType::Mat4
-    );
-    Miren::setTexture(mesh->m_textureHandle, 0);
-    PND_ASSERT(mesh->m_vertexBufferHandle.isValid(), "Invalid vertex buffer for mesh");
-    Miren::setVertexBuffer(mesh->m_vertexBufferHandle);
-    PND_ASSERT(mesh->m_vertexBufferHandle.isValid(), "Invalid index buffer for mesh");
-    Miren::setIndexBuffer(mesh->m_indexBufferHandle, 0, mesh->m_indicesCount);
-    Miren::submit(m_viewId);
-    m_drawData.stats.drawCalls += 1;
-}
-
-void Renderer3D::submit(glm::mat4 &transform, DynamicMeshAsset *mesh) {
+void Renderer3D::submit(glm::mat4 &transform, MeshAsset *mesh) {
     PND_ASSERT(mesh->m_shaderHandle.isValid(), "Invalid shader for mesh");
     Miren::setShader(mesh->m_shaderHandle);
     Miren::setUniform(

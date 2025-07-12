@@ -5,8 +5,8 @@
 #pragma once
 
 #include "Panda/GameLogic/Components/TransformComponent.hpp"
-#include "Panda/Assets/StaticMeshAsset.hpp"
-#include "Panda/Assets/DynamicMeshAsset.hpp"
+#include "Panda/Assets/MeshAsset.hpp"
+#include "Panda/Assets/MeshAsset.hpp"
 #include "Panda/GameLogic/Camera.hpp"
 
 #include <Miren/Miren.hpp>
@@ -30,8 +30,7 @@ public:
     Renderer3D(Renderer3D &&other);
     ~Renderer3D() = default;
     void begin(Miren::ViewId id);
-    void submit(glm::mat4 &transform, StaticMeshAsset *mesh);
-    void submit(glm::mat4 &transform, DynamicMeshAsset *mesh);
+    void submit(glm::mat4 &transform, MeshAsset *mesh);
     void end();
     Statistics getStats();
     void setViewProj(glm::mat4 viewProj);

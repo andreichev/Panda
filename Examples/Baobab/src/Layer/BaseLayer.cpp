@@ -48,7 +48,7 @@ void BaseLayer::onAttach() {
                 Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(
                     layoutHandle, m_chunksStorage, indexX, indexY, indexZ, true
                 );
-                Panda::DynamicMeshAsset &dynamicMesh =
+                Panda::MeshAsset &dynamicMesh =
                     m_chunksStorage
                         .chunks
                             [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +

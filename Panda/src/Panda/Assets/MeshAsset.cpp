@@ -2,16 +2,16 @@
 // Created by Admin on 12.02.2022.
 //
 
-#include "Panda/Assets/DynamicMeshAsset.hpp"
+#include "Panda/Assets/MeshAsset.hpp"
 
 namespace Panda {
 
-DynamicMeshAsset::~DynamicMeshAsset() {
+MeshAsset::~MeshAsset() {
     if (m_vertexBufferHandle.isValid()) { Miren::deleteVertexBuffer(m_vertexBufferHandle); }
     if (m_indexBufferHandle.isValid()) { Miren::deleteIndexBuffer(m_indexBufferHandle); }
 }
 
-DynamicMeshAsset::DynamicMeshAsset()
+MeshAsset::MeshAsset()
     : m_bufferLayoutHandle(MIREN_INVALID_HANDLE)
     , m_indexBufferHandle(MIREN_INVALID_HANDLE)
     , m_vertexBufferHandle(MIREN_INVALID_HANDLE)
@@ -19,7 +19,7 @@ DynamicMeshAsset::DynamicMeshAsset()
     , m_bindings()
     , m_shaderHandle(MIREN_INVALID_HANDLE) {}
 
-void DynamicMeshAsset::create(
+void MeshAsset::create(
     const Panda::MeshData &data, std::vector<TextureBinding> bindings, Miren::ProgramHandle shader
 ) {
     PND_ASSERT(shader.isValid(), "Invalid shader for mesh");
@@ -35,7 +35,7 @@ void DynamicMeshAsset::create(
     );
 }
 
-void DynamicMeshAsset::update(const MeshData &data) {
+void MeshAsset::update(const MeshData &data) {
     PND_ASSERT(m_shaderHandle.isValid(), "Invalid shader for mesh");
     m_indicesCount = data.indicesCount;
     Miren::updateDynamicVertexBuffer(

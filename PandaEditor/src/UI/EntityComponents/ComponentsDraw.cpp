@@ -334,20 +334,8 @@ void ComponentsDraw::drawComponents(const std::unordered_set<Entity> &entities) 
             }
         }
     );
-    drawComponent<DynamicMeshComponent>(
-        "Dynamic Mesh",
-        entities,
-        false,
-        [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &component) {
-            if (isMultiSelect) {
-                ImGui::Text("Multi edit not supported");
-                return;
-            }
-            ImGui::Text("Meshes count: %d", (int)component.meshes.size());
-        }
-    );
-    drawComponent<StaticMeshComponent>(
-        "Static Mesh",
+    drawComponent<MeshComponent>(
+        "Mesh",
         entities,
         false,
         [&](std::unordered_set<Entity> entities, WorldCommandManager &cmd, auto &component) {
