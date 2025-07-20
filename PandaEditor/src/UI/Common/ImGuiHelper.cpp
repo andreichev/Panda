@@ -4,6 +4,7 @@
 #include <Panda/GameLogic/GameContext.hpp>
 #include <Panda/ImGui/FontAwesome.h>
 #include <Panda/ImGui/ImGui+DragScalar.hpp>
+#include <Panda/GameLogic/World.hpp>
 #include <string>
 
 namespace Panda {

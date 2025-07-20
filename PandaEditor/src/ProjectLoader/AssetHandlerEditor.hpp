@@ -24,6 +24,7 @@ public:
 
 private:
     void registerTextureAsset(const path_t &path);
+    void registerShaderAsset(const path_t &path);
     void loadAssetRegistry();
     void saveAssetRegistry();
 

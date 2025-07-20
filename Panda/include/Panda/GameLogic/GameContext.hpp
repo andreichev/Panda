@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Panda/GameLogic/World.hpp"
+#include "Panda/Assets/Base/AssetHandler.hpp"
 #include "Panda/ScriptEngine/ScriptEngine.hpp"
 
 namespace Panda {
+
+class World;
 
 class GameContext {
 public:

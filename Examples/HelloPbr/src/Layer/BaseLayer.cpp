@@ -13,30 +13,23 @@
 #include <PandaUI/PandaUI.hpp>
 #include <Miren/Miren.hpp>
 
-BaseLayer::~BaseLayer() {
-    Miren::deleteProgram(m_shader);
-    Miren::deleteTexture(m_colorTexture);
-}
-
 BaseLayer::BaseLayer(Fern::Window *window)
     : m_window(window)
     , m_cameraMove(&m_transform) {}
 
 void BaseLayer::onAttach() {
     Miren::setViewClear(0, 0x3D75C9FF);
-    Foundation::Memory vertexMem =
-        Panda::AssetImporterBase::loadData("shaders/ground/ground_vertex.glsl");
-    Foundation::Memory fragmentMem =
-        Panda::AssetImporterBase::loadData("shaders/ground/ground_fragment.glsl");
-    m_shader = Miren::createProgram({vertexMem, fragmentMem});
-    m_cameraMove.setShader(m_shader);
+    m_shader = Foundation::makeShared<Panda::ShaderAsset>(
+        "shaders/ground/ground_vertex.glsl", "shaders/ground/ground_fragment.glsl"
+    );
+    m_cameraMove.setShader(m_shader->getMirenHandle());
     LOG_INFO("MESH GENERATION STARTED");
 
     Miren::TextureCreate colorTextureCreate =
         Panda::AssetImporterBase::load2DTexture("textures/grass1.png");
     colorTextureCreate.m_numMips = 4;
     colorTextureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
-    m_colorTexture = Miren::createTexture(colorTextureCreate);
+    m_colorTexture = Foundation::makeShared<Panda::TextureAsset>(colorTextureCreate);
 
 #ifdef HEIGHT_MAP
     Panda::TextureAsset heightTextureAsset = Panda::AssetLoader::loadTexture("textures/map2.png");
@@ -62,9 +55,11 @@ void BaseLayer::onAttach() {
     Panda::MeshData meshData = m_meshGenerator.makeMesh(layoutHandle, width, height, heightMap);
     F_FREE(Foundation::getAllocator(), heightMap);
 
-    m_mesh.create(
-        meshData, {{"texture1", m_colorTexture}, {"iSky", m_skyComponent.getSkyTexture()}}, m_shader
-    );
+    std::vector<Panda::TextureBinding> bindings = {
+        {"texture1", m_colorTexture}, {"iSky", m_skyComponent.getSkyTextureAsset()}
+    };
+    auto material = Foundation::makeShared<Panda::MaterialAsset>(m_shader, bindings);
+    m_mesh.create(meshData, material);
 
     auto windowSize = m_window->getSize();
     m_camera.setViewportSize({windowSize.width, windowSize.height});

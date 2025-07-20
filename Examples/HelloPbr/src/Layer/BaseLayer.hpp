@@ -15,7 +15,6 @@
 class BaseLayer : public Panda::Layer {
 public:
     BaseLayer(Fern::Window *window);
-    ~BaseLayer();
 
     void onAttach() override;
     void onDetach() override;
@@ -32,10 +31,10 @@ private:
     TerrainMeshGenerator m_meshGenerator;
     Panda::MeshAsset m_mesh;
 
-    Miren::ProgramHandle m_shader;
-    Miren::TextureHandle m_heightMapTexture;
-    Miren::TextureHandle m_colorTexture;
-    Miren::TextureHandle m_patternTexture;
+    Foundation::Shared<Panda::ShaderAsset> m_shader;
+    Foundation::Shared<Panda::TextureAsset> m_heightMapTexture;
+    Foundation::Shared<Panda::TextureAsset> m_colorTexture;
+    Foundation::Shared<Panda::TextureAsset> m_patternTexture;
     Panda::Renderer2D m_renderer2d;
     Panda::Renderer3D m_renderer3d;
 };

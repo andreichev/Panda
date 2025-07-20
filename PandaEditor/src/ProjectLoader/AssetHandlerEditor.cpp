@@ -2,7 +2,7 @@
 
 #include <Panda/Assets/Base/AssetImporterBase.hpp>
 #include <Panda/Assets/TextureAsset.hpp>
-#include <Panda/Assets/GpuProgramAsset.hpp>
+#include <Panda/Assets/ShaderAsset.hpp>
 
 #include <fstream>
 
@@ -18,6 +18,7 @@ AssetHandlerEditor::AssetHandlerEditor()
     , m_registerAssetFunc() {
     m_registerAssetFunc.emplace(".png", &AssetHandlerEditor::registerTextureAsset);
     m_registerAssetFunc.emplace(".jpeg", &AssetHandlerEditor::registerTextureAsset);
+    m_registerAssetFunc.emplace(".glsl", &AssetHandlerEditor::registerTextureAsset);
 }
 
 Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
@@ -51,18 +52,17 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
             }
             break;
         }
-        case AssetType::PROGRAM: {
-            auto meta = std::get<GpuProgramAssetMeta>(assetInfo.meta);
-            asset = Foundation::makeShared<GpuProgramAsset>(
-                m_projectPath / meta.vertexCodePath, m_projectPath / meta.fragmentCodePath
-            );
-            LOG_INFO("CREATED GPU PROGRAM: %u", id);
+        case AssetType::SHADER: {
+            auto meta = std::get<ShaderAssetMeta>(assetInfo.meta);
+            asset = Foundation::makeShared<ShaderAsset>(m_projectPath / meta.fragmentCodePath);
+            LOG_INFO("CREATED SHADER: %u", id);
             break;
         }
         case AssetType::CUBE_MAP: {
             asset = nullptr;
             break;
         }
+        case AssetType::MATERIAL:
         case AssetType::NONE: {
             asset = nullptr;
             break;
@@ -73,7 +73,6 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
 }
 
 void AssetHandlerEditor::registerTextureAsset(const path_t &path) {
-    PND_ASSERT(!getAssetId(path), "ASSET ALREADY IMPORTED");
     path_t assetPath = std::filesystem::relative(path, m_projectPath);
     AssetInfo info;
     info.id = UUID();
@@ -88,7 +87,10 @@ void AssetHandlerEditor::registerTextureAsset(const path_t &path) {
     saveAssetRegistry();
 }
 
+void registerShaderAsset(const path_t &path) {}
+
 void AssetHandlerEditor::registerAsset(const path_t &path) {
+    PND_ASSERT(!getAssetId(path), "ASSET ALREADY IMPORTED");
     std::string extension = path.extension().string();
     if (m_registerAssetFunc.find(extension) == m_registerAssetFunc.end()) {
         LOG_ERROR_EDITOR("EXTENSION %s IMPORT NOT SUPPORTED YET", extension.c_str());
@@ -144,9 +146,8 @@ void AssetHandlerEditor::loadAssetRegistry() {
                     m_registry[info.id] = info;
                     break;
                 }
-                case AssetType::PROGRAM: {
-                    auto meta = std::get<GpuProgramAssetMeta>(info.meta);
-                    m_registeredAssets[meta.vertexCodePath] = info.id;
+                case AssetType::SHADER: {
+                    auto meta = std::get<ShaderAssetMeta>(info.meta);
                     m_registeredAssets[meta.fragmentCodePath] = info.id;
                     m_registry[info.id] = info;
                     break;

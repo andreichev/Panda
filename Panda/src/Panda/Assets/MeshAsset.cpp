@@ -16,15 +16,11 @@ MeshAsset::MeshAsset()
     , m_indexBufferHandle(MIREN_INVALID_HANDLE)
     , m_vertexBufferHandle(MIREN_INVALID_HANDLE)
     , m_indicesCount(0)
-    , m_bindings()
-    , m_shaderHandle(MIREN_INVALID_HANDLE) {}
+    , m_material() {}
 
-void MeshAsset::create(
-    const Panda::MeshData &data, std::vector<TextureBinding> bindings, Miren::ProgramHandle shader
-) {
-    PND_ASSERT(shader.isValid(), "Invalid shader for mesh");
-    m_shaderHandle = shader;
-    m_bindings = bindings;
+void MeshAsset::create(const Panda::MeshData &data, Foundation::Shared<MaterialAsset> material) {
+    PND_ASSERT(material && material->isValid(), "Invalid material for mesh");
+    m_material = material;
     m_indicesCount = data.indicesCount;
     m_bufferLayoutHandle = data.layoutHandle;
     m_vertexBufferHandle = Miren::createDynamicVertexBuffer(
@@ -36,12 +32,16 @@ void MeshAsset::create(
 }
 
 void MeshAsset::update(const MeshData &data) {
-    PND_ASSERT(m_shaderHandle.isValid(), "Invalid shader for mesh");
+    PND_ASSERT(m_material && m_material->isValid(), "Invalid shader for mesh");
     m_indicesCount = data.indicesCount;
     Miren::updateDynamicVertexBuffer(
         m_vertexBufferHandle, data.vertexBuffer, data.vertexBufferSize
     );
     Miren::updateDynamicIndexBuffer(m_indexBufferHandle, data.indices, m_indicesCount);
+}
+
+Foundation::Shared<MaterialAsset> MeshAsset::getMaterialAsset() {
+    return m_material;
 }
 
 } // namespace Panda

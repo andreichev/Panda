@@ -15,7 +15,6 @@
 class BaseLayer : public Panda::Layer {
 public:
     BaseLayer(Fern::Window *window);
-    ~BaseLayer();
 
     void onAttach() override;
     void onDetach() override;
@@ -31,8 +30,8 @@ private:
     Panda::SkyComponent m_skyComponent;
     ChunksStorage m_chunksStorage;
     BlocksCreation m_blocksCreation;
-    Miren::ProgramHandle m_groundShader;
-    Miren::TextureHandle m_blocksTileTexture;
+    Foundation::Shared<Panda::ShaderAsset> m_groundShader;
+    Foundation::Shared<Panda::TextureAsset> m_blocksTileTexture;
     Panda::Renderer2D m_renderer2d;
     Panda::Renderer3D m_renderer3d;
 };

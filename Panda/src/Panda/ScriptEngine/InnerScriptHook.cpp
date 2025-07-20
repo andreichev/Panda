@@ -4,6 +4,7 @@
 #include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 #include "Rain/TypeName.hpp"
+#include "Panda/GameLogic/World.hpp"
 
 #include <unordered_map>
 

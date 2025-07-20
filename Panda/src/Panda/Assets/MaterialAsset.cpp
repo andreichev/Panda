@@ -1,0 +1,1 @@
+#include "Panda/Assets/MaterialAsset.hpp"

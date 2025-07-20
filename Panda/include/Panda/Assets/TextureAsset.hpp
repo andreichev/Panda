@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-#include "Base/AssetHandler.hpp"
+#include "Base/Asset.hpp"
+#include "Base/Path.hpp"
 #include "Base/AssetImporterBase.hpp"
 
 #include <Miren/Miren.hpp>

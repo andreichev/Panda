@@ -15,7 +15,8 @@ Foundation::Shared<TextureAsset> ThumbnailProvider::getThumbnailOrNull(AssetId a
         }
         case AssetType::NONE:
         case AssetType::CUBE_MAP:
-        case AssetType::PROGRAM:
+        case AssetType::SHADER:
+        case AssetType::MATERIAL:
             break;
     }
     if (thumbnail) { m_cache[assetId] = thumbnail; }

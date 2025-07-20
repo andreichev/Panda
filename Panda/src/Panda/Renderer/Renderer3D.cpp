@@ -21,23 +21,31 @@ void Renderer3D::begin(Miren::ViewId id) {
 }
 
 void Renderer3D::submit(glm::mat4 &transform, MeshAsset *mesh) {
-    PND_ASSERT(mesh->m_shaderHandle.isValid(), "Invalid shader for mesh");
-    Miren::setShader(mesh->m_shaderHandle);
-    Miren::setUniform(
-        mesh->m_shaderHandle, "model", glm::value_ptr(transform), Miren::UniformType::Mat4
-    );
-    Miren::setUniform(
-        mesh->m_shaderHandle, "projViewMtx", glm::value_ptr(m_viewProj), Miren::UniformType::Mat4
-    );
-    for (int i = 0; i < mesh->m_bindings.size(); i++) {
-        Miren::setTexture(mesh->m_bindings[i].texture, i);
-        Miren::setUniform(
-            mesh->m_shaderHandle, mesh->m_bindings[i].name, &i, Miren::UniformType::Sampler
-        );
+    auto material = mesh->getMaterialAsset();
+    if (!material || !material->isValid()) {
+        PND_ASSERT(false, "Invalid material for mesh");
+        return;
     }
-    PND_ASSERT(mesh->m_vertexBufferHandle.isValid(), "Invalid vertex buffer for mesh");
+    if (!mesh->m_vertexBufferHandle.isValid()) {
+        PND_ASSERT(false, "Invalid vertex buffer for mesh");
+        return;
+    }
+    if (!mesh->m_vertexBufferHandle.isValid()) {
+        PND_ASSERT(false, "Invalid index buffer for mesh");
+        return;
+    }
+    Miren::ProgramHandle shaderHandle = material->getShaderAsset()->getMirenHandle();
+    Miren::setShader(shaderHandle);
+    auto bindings = material->getBindings();
+    for (int i = 0; i < bindings.size(); i++) {
+        Miren::setTexture(bindings[i].texture->getMirenHandle(), i);
+        Miren::setUniform(shaderHandle, bindings[i].name, &i, Miren::UniformType::Sampler);
+    }
+    Miren::setUniform(shaderHandle, "model", glm::value_ptr(transform), Miren::UniformType::Mat4);
+    Miren::setUniform(
+        shaderHandle, "projViewMtx", glm::value_ptr(m_viewProj), Miren::UniformType::Mat4
+    );
     Miren::setVertexBuffer(mesh->m_vertexBufferHandle);
-    PND_ASSERT(mesh->m_vertexBufferHandle.isValid(), "Invalid index buffer for mesh");
     Miren::setIndexBuffer(mesh->m_indexBufferHandle, 0, mesh->m_indicesCount);
     Miren::submit(m_viewId);
     m_drawData.stats.drawCalls += 1;

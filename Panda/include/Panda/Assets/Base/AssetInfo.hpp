@@ -23,17 +23,15 @@ struct TextureAssetMeta : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-struct GpuProgramAssetMeta : public Rain::Codable {
-    path_t vertexCodePath;
+struct ShaderAssetMeta : public Rain::Codable {
     path_t fragmentCodePath;
 
-    RAIN_FIELDS_BEGIN(GpuProgramAssetMeta)
-    RAIN_FIELD(vertexCodePath)
+    RAIN_FIELDS_BEGIN(ShaderAssetMeta)
     RAIN_FIELD(fragmentCodePath)
     RAIN_FIELDS_END
 };
 
-using AssetMeta = std::variant<std::monostate, TextureAssetMeta, GpuProgramAssetMeta>;
+using AssetMeta = std::variant<std::monostate, TextureAssetMeta, ShaderAssetMeta>;
 
 struct AssetInfo : public Rain::Codable {
     AssetId id;
@@ -50,8 +48,8 @@ struct AssetInfo : public Rain::Codable {
                 encoder->encode("meta", meta);
                 break;
             }
-            case AssetType::PROGRAM: {
-                GpuProgramAssetMeta meta = std::get<GpuProgramAssetMeta>(data.meta);
+            case AssetType::SHADER: {
+                ShaderAssetMeta meta = std::get<ShaderAssetMeta>(data.meta);
                 encoder->encode("meta", meta);
                 break;
             }
@@ -73,8 +71,8 @@ struct AssetInfo : public Rain::Codable {
                 data.meta = meta;
                 break;
             }
-            case AssetType::PROGRAM: {
-                GpuProgramAssetMeta meta;
+            case AssetType::SHADER: {
+                ShaderAssetMeta meta;
                 decoder->decode("meta", meta);
                 data.meta = meta;
                 break;

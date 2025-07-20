@@ -6,7 +6,6 @@
 
 #include "Panda/GameLogic/Components/TransformComponent.hpp"
 #include "Panda/Assets/MeshAsset.hpp"
-#include "Panda/Assets/MeshAsset.hpp"
 #include "Panda/GameLogic/Camera.hpp"
 
 #include <Miren/Miren.hpp>

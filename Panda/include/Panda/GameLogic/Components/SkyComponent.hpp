@@ -3,6 +3,7 @@
 #include "Panda/Assets/Base/AssetHandler.hpp"
 #include "Panda/Assets/Base/AssetImporterBase.hpp"
 #include "Panda/Application/Application.hpp"
+#include "Panda/Assets/TextureAsset.hpp"
 
 #include <glm/glm.hpp>
 #include <Miren/Miren.hpp>
@@ -42,7 +43,7 @@ public:
         return *this;
     }
 
-    Miren::TextureHandle getSkyTexture() {
+    Foundation::Shared<TextureAsset> getSkyTextureAsset() {
         return m_texture;
     }
 
@@ -50,7 +51,6 @@ public:
         Miren::deleteVertexBuffer(m_vertexBuffer);
         Miren::deleteIndexBuffer(m_indexBuffer);
         Miren::deleteProgram(m_shader);
-        Miren::deleteTexture(m_texture);
     }
 
     void initResources() {
@@ -122,7 +122,7 @@ public:
         m_skyHdrTextureConfig.m_minFiltering = NEAREST;
         m_skyHdrTextureConfig.m_magFiltering = NEAREST;
         m_skyHdrTextureConfig.m_wrap = CLAMP;
-        m_texture = Miren::createTexture(m_skyHdrTextureConfig);
+        m_texture = Foundation::makeShared<Panda::TextureAsset>(m_skyHdrTextureConfig);
 
         m_model = glm::mat4(1.f);
     }
@@ -131,7 +131,7 @@ public:
         m_viewProjection = viewProjection;
         Miren::setShader(m_shader);
         int samplerCube = 0;
-        Miren::setTexture(m_texture, samplerCube);
+        Miren::setTexture(m_texture->getMirenHandle(), samplerCube);
         Miren::setUniform(m_shader, "skyTexture", &samplerCube, Miren::UniformType::Sampler);
         Miren::setUniform(m_shader, "model", &m_model[0][0], Miren::UniformType::Mat4);
         Miren::setUniform(
@@ -152,7 +152,7 @@ private:
     glm::mat4 m_viewProjection;
     Miren::ViewId m_sceneViewId;
 
-    Miren::TextureHandle m_texture;
+    Foundation::Shared<Panda::TextureAsset> m_texture;
     Miren::ProgramHandle m_shader;
 
     Miren::IndexBufferHandle m_indexBuffer;

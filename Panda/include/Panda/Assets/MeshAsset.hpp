@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "MaterialAsset.hpp"
 #include "Panda/Renderer/MeshData.hpp"
-#include "Panda/Renderer/TextureBinding.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -16,13 +16,13 @@ public:
     ~MeshAsset();
     MeshAsset();
 
-    void
-    create(const MeshData &data, std::vector<TextureBinding> bindings, Miren::ProgramHandle shader);
+    void create(const MeshData &data, Foundation::Shared<MaterialAsset> material);
     void update(const MeshData &data);
 
+    Foundation::Shared<MaterialAsset> getMaterialAsset();
+
 private:
-    std::vector<TextureBinding> m_bindings;
-    Miren::ProgramHandle m_shaderHandle;
+    Foundation::Shared<MaterialAsset> m_material;
     Miren::VertexLayoutHandle m_bufferLayoutHandle;
     Miren::IndexBufferHandle m_indexBufferHandle;
     Miren::VertexBufferHandle m_vertexBufferHandle;

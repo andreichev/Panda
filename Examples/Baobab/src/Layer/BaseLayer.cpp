@@ -17,29 +17,23 @@
 #include <PandaUI/PandaUI.hpp>
 #include <Miren/Miren.hpp>
 
-BaseLayer::~BaseLayer() {
-    Miren::deleteProgram(m_groundShader);
-    Miren::deleteTexture(m_blocksTileTexture);
-}
-
 BaseLayer::BaseLayer(Fern::Window *window)
     : m_window(window)
     , m_blocksCreation(&m_transform)
-    , m_cameraMove(&m_transform) {}
+    , m_cameraMove(&m_transform)
+    , m_groundShader() {}
 
 void BaseLayer::onAttach() {
     Miren::setViewClear(0, 0x3D75C9FF);
-    Foundation::Memory vertexMem =
-        Panda::AssetImporterBase::loadData("shaders/ground/ground_vertex.glsl");
-    Foundation::Memory fragmentMem =
-        Panda::AssetImporterBase::loadData("shaders/ground/ground_fragment.glsl");
-    m_groundShader = Miren::createProgram({vertexMem, fragmentMem});
+    m_groundShader = Foundation::makeShared<Panda::ShaderAsset>(
+        "shaders/ground/ground_vertex.glsl", "shaders/ground/ground_fragment.glsl"
+    );
     Miren::TextureCreate textureCreate =
         Panda::AssetImporterBase::load2DTexture("textures/BlocksTile.png");
     textureCreate.m_numMips = 4;
     textureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
     textureCreate.m_magFiltering = Miren::NEAREST;
-    m_blocksTileTexture = Miren::createTexture(textureCreate);
+    m_blocksTileTexture = Foundation::makeShared<Panda::TextureAsset>(textureCreate);
     Miren::VertexLayoutHandle layoutHandle =
         Miren::createVertexLayout(Vertex::createBufferLayout());
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
@@ -54,7 +48,10 @@ void BaseLayer::onAttach() {
                             [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                              indexX * ChunksStorage::SIZE_X + indexZ]
                         .getMesh();
-                dynamicMesh.create(meshData, {{"texture1", m_blocksTileTexture}}, m_groundShader);
+                std::vector<Panda::TextureBinding> bindings = {{"texture1", m_blocksTileTexture}};
+                Foundation::Shared<Panda::MaterialAsset> material =
+                    Foundation::makeShared<Panda::MaterialAsset>(m_groundShader, bindings);
+                dynamicMesh.create(meshData, material);
             }
         }
     }
