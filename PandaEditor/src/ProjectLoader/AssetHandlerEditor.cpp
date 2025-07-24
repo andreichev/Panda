@@ -3,6 +3,7 @@
 #include <Panda/Assets/Base/AssetImporterBase.hpp>
 #include <Panda/Assets/TextureAsset.hpp>
 #include <Panda/Assets/ShaderAsset.hpp>
+#include <Panda/Assets/MaterialAsset.hpp>
 
 #include <fstream>
 
@@ -18,7 +19,8 @@ AssetHandlerEditor::AssetHandlerEditor()
     , m_registerAssetFunc() {
     m_registerAssetFunc.emplace(".png", &AssetHandlerEditor::registerTextureAsset);
     m_registerAssetFunc.emplace(".jpeg", &AssetHandlerEditor::registerTextureAsset);
-    m_registerAssetFunc.emplace(".glsl", &AssetHandlerEditor::registerTextureAsset);
+    m_registerAssetFunc.emplace(".glsl", &AssetHandlerEditor::registerShaderAsset);
+    m_registerAssetFunc.emplace(".mat", &AssetHandlerEditor::registerMaterialAsset);
 }
 
 Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
@@ -58,17 +60,41 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
             LOG_INFO("CREATED SHADER: %u", id);
             break;
         }
-        case AssetType::CUBE_MAP: {
-            asset = nullptr;
+        case AssetType::MATERIAL: {
+            auto meta = std::get<MaterialAssetMeta>(assetInfo.meta);
+            MaterialData data;
+            std::ifstream file(m_projectPath / meta.materialPath);
+            if (file.is_open()) {
+                Rain::Decoder *decoder = &m_jsonDecoder;
+                decoder->decode(file, data);
+                file.close();
+                Foundation::Shared<ShaderAsset> shader;
+                if (data.shader) {
+                    shader = Foundation::SharedCast<ShaderAsset>(load(data.shader));
+                }
+                std::vector<TextureBinding> bindings;
+                // for (auto textureId : data.textures) {
+                //     Foundation::Shared<TextureAsset> texture;
+                //     texture = Foundation::SharedCast<TextureAsset>(load(textureId));
+                //     if (texture) {
+                //         bindings.push_back(texture);
+                //     }
+                // }
+                asset = Foundation::makeShared<MaterialAsset>(shader, bindings);
+                LOG_INFO("CREATED MATERIAL: %u", id);
+            } else {
+                LOG_INFO("MATERIAL FILE NOT FOUND. MATERIAL IMPORT FAILED");
+                asset = nullptr;
+            }
             break;
         }
-        case AssetType::MATERIAL:
+        case AssetType::CUBE_MAP:
         case AssetType::NONE: {
             asset = nullptr;
             break;
         }
     }
-    m_cache[id] = asset;
+    if (asset) { m_cache[id] = asset; }
     return asset;
 }
 
@@ -87,7 +113,31 @@ void AssetHandlerEditor::registerTextureAsset(const path_t &path) {
     saveAssetRegistry();
 }
 
-void registerShaderAsset(const path_t &path) {}
+void AssetHandlerEditor::registerShaderAsset(const path_t &path) {
+    path_t assetPath = std::filesystem::relative(path, m_projectPath);
+    AssetInfo info;
+    info.id = UUID();
+    info.type = AssetType::SHADER;
+    ShaderAssetMeta meta;
+    meta.fragmentCodePath = assetPath;
+    info.meta = meta;
+    m_registry[info.id] = info;
+    m_registeredAssets[assetPath] = info.id;
+    saveAssetRegistry();
+}
+
+void AssetHandlerEditor::registerMaterialAsset(const path_t &path) {
+    path_t assetPath = std::filesystem::relative(path, m_projectPath);
+    AssetInfo info;
+    info.id = UUID();
+    info.type = AssetType::MATERIAL;
+    MaterialAssetMeta meta;
+    meta.materialPath = assetPath;
+    info.meta = meta;
+    m_registry[info.id] = info;
+    m_registeredAssets[assetPath] = info.id;
+    saveAssetRegistry();
+}
 
 void AssetHandlerEditor::registerAsset(const path_t &path) {
     PND_ASSERT(!getAssetId(path), "ASSET ALREADY IMPORTED");
@@ -148,7 +198,37 @@ void AssetHandlerEditor::loadAssetRegistry() {
                 }
                 case AssetType::SHADER: {
                     auto meta = std::get<ShaderAssetMeta>(info.meta);
+                    if (meta.fragmentCodePath.empty()) {
+                        LOG_ERROR_EDITOR(
+                            "Empty asset path. Skipping broken asset",
+                            meta.fragmentCodePath.string().c_str()
+                        );
+                        break;
+                    }
+                    if (!std::filesystem::exists(m_projectPath / meta.fragmentCodePath)) {
+                        LOG_ERROR_EDITOR(
+                            "Shader asset %s not found.", meta.fragmentCodePath.string().c_str()
+                        );
+                    }
                     m_registeredAssets[meta.fragmentCodePath] = info.id;
+                    m_registry[info.id] = info;
+                    break;
+                }
+                case AssetType::MATERIAL: {
+                    auto meta = std::get<MaterialAssetMeta>(info.meta);
+                    if (meta.materialPath.empty()) {
+                        LOG_ERROR_EDITOR(
+                            "Empty asset path. Skipping broken asset",
+                            meta.materialPath.string().c_str()
+                        );
+                        break;
+                    }
+                    if (!std::filesystem::exists(m_projectPath / meta.materialPath)) {
+                        LOG_ERROR_EDITOR(
+                            "Material asset %s not found.", meta.materialPath.string().c_str()
+                        );
+                    }
+                    m_registeredAssets[meta.materialPath] = info.id;
                     m_registry[info.id] = info;
                     break;
                 }

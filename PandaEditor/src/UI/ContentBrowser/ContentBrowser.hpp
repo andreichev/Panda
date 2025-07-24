@@ -27,6 +27,7 @@ public:
     void confirmDeletion();
 
 private:
+    path_t m_selectedPath;
     path_t m_baseDirectory;
     path_t m_currentDirectory;
     path_t m_deletingDirectory;

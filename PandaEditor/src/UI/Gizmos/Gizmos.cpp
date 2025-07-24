@@ -19,7 +19,7 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
     if (sceneState == SceneState::PLAY) { return; }
     if (!m_camera || !m_world) { return; }
     SelectionContext &selectionContext = m_world->getSelectionContext();
-    if (selectionContext.empty()) { return; }
+    if (selectionContext.isEmpty()) { return; }
     ImGuizmo::SetOrthographic(false);
     ImGuizmo::SetDrawlist();
 

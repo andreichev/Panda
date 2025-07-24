@@ -18,6 +18,10 @@ struct MaterialData : public Rain::Codable {
     UUID shader;
     std::vector<UUID> textures;
 
+    MaterialData()
+        : shader(0)
+        , textures() {}
+
     RAIN_FIELDS_BEGIN(MaterialData)
     RAIN_FIELD(shader)
     RAIN_FIELD(textures)

@@ -37,13 +37,6 @@ ContentBrowser::ContentBrowser(ContentBrowserOutput *output)
     m_fileIcons.emplace(".zip", TextureAsset("ui/icons/zip.png"));
 }
 
-bool isMouseInsideWindow(ImVec2 windowPos, ImVec2 windowSize) {
-    ImVec2 maxSize = windowPos;
-    maxSize.x += windowSize.x;
-    maxSize.y += windowSize.y;
-    return ImGui::IsMouseHoveringRect(windowPos, maxSize);
-}
-
 void ContentBrowser::onImGuiRender() {
     if (m_currentDirectory.empty()) { return; }
     ImGui::Begin("Content Browser");
@@ -116,7 +109,12 @@ void ContentBrowser::onImGuiRender() {
                 }
             }
         }
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        if (m_selectedPath == path) {
+            const ImU32 col = ImGui::GetColorU32(ImGuiCol_ButtonActive);
+            ImGui::PushStyleColor(ImGuiCol_Button, col);
+        } else {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        }
         ImVec2 thumbnailPos = ImGui::GetCursorPos();
         Miren::TextureHandle handle =
             thumbnail ? thumbnail->getMirenHandle() : icon->getMirenHandle();
@@ -124,9 +122,11 @@ void ContentBrowser::onImGuiRender() {
         float aspect = 1.f;
         if (thumbnail) { aspect = thumbnail->getSize().width / thumbnail->getSize().height; }
         float width = height * aspect;
-        ImGui::ImageButton(
+        if (ImGui::ImageButton(
             filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {width, height}
-        );
+        )) {
+            m_selectedPath = path;
+        }
         if (assetId) {
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
                 if (ImGui::GetDragDropPayload() == nullptr) {

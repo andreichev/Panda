@@ -19,7 +19,7 @@ Foundation::Shared<TextureAsset> ThumbnailProvider::getThumbnailOrNull(AssetId a
         case AssetType::MATERIAL:
             break;
     }
-    if (thumbnail) { m_cache[assetId] = thumbnail; }
+    m_cache[assetId] = thumbnail;
     return thumbnail;
 }
 

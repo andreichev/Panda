@@ -31,7 +31,16 @@ struct ShaderAssetMeta : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-using AssetMeta = std::variant<std::monostate, TextureAssetMeta, ShaderAssetMeta>;
+struct MaterialAssetMeta : public Rain::Codable {
+    path_t materialPath;
+
+    RAIN_FIELDS_BEGIN(MaterialAssetMeta)
+    RAIN_FIELD(materialPath)
+    RAIN_FIELDS_END
+};
+
+using AssetMeta =
+    std::variant<std::monostate, TextureAssetMeta, ShaderAssetMeta, MaterialAssetMeta>;
 
 struct AssetInfo : public Rain::Codable {
     AssetId id;
@@ -50,6 +59,11 @@ struct AssetInfo : public Rain::Codable {
             }
             case AssetType::SHADER: {
                 ShaderAssetMeta meta = std::get<ShaderAssetMeta>(data.meta);
+                encoder->encode("meta", meta);
+                break;
+            }
+            case AssetType::MATERIAL: {
+                MaterialAssetMeta meta = std::get<MaterialAssetMeta>(data.meta);
                 encoder->encode("meta", meta);
                 break;
             }
@@ -73,6 +87,12 @@ struct AssetInfo : public Rain::Codable {
             }
             case AssetType::SHADER: {
                 ShaderAssetMeta meta;
+                decoder->decode("meta", meta);
+                data.meta = meta;
+                break;
+            }
+            case AssetType::MATERIAL: {
+                MaterialAssetMeta meta;
                 decoder->decode("meta", meta);
                 data.meta = meta;
                 break;

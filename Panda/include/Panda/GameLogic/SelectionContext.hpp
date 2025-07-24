@@ -76,7 +76,7 @@ public:
         return m_selectedEntities.size();
     }
 
-    bool empty() {
+    bool isEmpty() {
         return m_selectedEntities.empty();
     }
 
