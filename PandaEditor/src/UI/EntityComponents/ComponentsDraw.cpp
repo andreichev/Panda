@@ -206,7 +206,7 @@ void ComponentsDraw::drawComponents(const std::unordered_set<Entity> &entities) 
                 }
                 command.saveAfterEdit();
                 cmd.SAVE(command, false);
-                world->getSelectionContext().updateValues();
+                SelectionContext::updateValues();
                 firstEntity.setWorldChanged();
             }
         }

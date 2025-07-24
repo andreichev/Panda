@@ -596,10 +596,9 @@ void EditorLayer::processShortcuts() {
         } else {
             // Move to selected entity
             if (m_currentWorld) {
-                SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
-                auto selected = selectionContext.getSelectedEntities();
+                auto selected = SelectionContext::getSelectedEntities();
                 if (!selected.empty()) {
-                    m_cameraController.reset(selectionContext.getMedianPosition());
+                    m_cameraController.reset(SelectionContext::getMedianPosition());
                 }
             }
         }
@@ -608,15 +607,14 @@ void EditorLayer::processShortcuts() {
         m_viewportFullscreen = !m_viewportFullscreen;
     }
     if (ImGui::IsKeyPressed(ImGuiKey_D, false) && ctrl) {
-        SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
         if (m_currentWorld) {
-            std::unordered_set<Entity> selected = selectionContext.getSelectedEntities();
+            std::unordered_set<Entity> selected = SelectionContext::getSelectedEntities();
             std::unordered_set<Entity> copies;
             for (auto entity : selected) {
                 Entity duplicate = m_currentWorld->duplicateEntity(entity);
                 copies.insert(duplicate);
-                selectionContext.removeSelectedEntity(entity, false);
-                selectionContext.addSelectedEntity(duplicate, false);
+                SelectionContext::removeSelectedEntity(entity, false);
+                SelectionContext::addSelectedEntity(duplicate, false);
             }
             WorldCommandManager &cmd = m_currentWorld->getCommandManger();
             AddRemoveEntitiesCommand update(copies);

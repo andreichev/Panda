@@ -123,8 +123,8 @@ void ContentBrowser::onImGuiRender() {
         if (thumbnail) { aspect = thumbnail->getSize().width / thumbnail->getSize().height; }
         float width = height * aspect;
         if (ImGui::ImageButton(
-            filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {width, height}
-        )) {
+                filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {width, height}
+            )) {
             m_selectedPath = path;
         }
         if (assetId) {

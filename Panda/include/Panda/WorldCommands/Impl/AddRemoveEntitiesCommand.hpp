@@ -2,6 +2,7 @@
 
 #include "Panda/WorldCommands/WorldCommand.hpp"
 #include "Panda/GameLogic/Entity.hpp"
+#include "Panda/GameLogic/SelectionContext.hpp"
 
 namespace Panda {
 
@@ -31,12 +32,11 @@ public:
         if (m_entities.empty()) { return false; }
         Entity firstEntity = *m_entities.begin();
         World *world = firstEntity.getWorld();
-        SelectionContext &selectionContext = world->getSelectionContext();
         for (auto entity : m_entities) {
             EditorMetadataComponent &metadata = entity.getComponent<EditorMetadataComponent>();
             metadata.isDeleted = !metadata.isDeleted;
-            if (metadata.isDeleted && selectionContext.isSelected(entity)) {
-                selectionContext.removeSelectedEntity(entity);
+            if (metadata.isDeleted && SelectionContext::isSelected(entity)) {
+                SelectionContext::removeSelectedEntity(entity);
             }
         }
         firstEntity.setWorldChanged();

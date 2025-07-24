@@ -3,6 +3,7 @@
 #include "Panda/WorldCommands/WorldCommand.hpp"
 #include "Panda/GameLogic/Entity.hpp"
 #include "Panda/GameLogic/Components/TransformComponent.hpp"
+#include "Panda/GameLogic/SelectionContext.hpp"
 
 namespace Panda {
 
@@ -17,7 +18,6 @@ public:
         PND_ASSERT(!m_entities.empty(), "WRONG TRANSFORM COMMAND DATA");
         bool selectionsUpdated = false;
         Entity first = *m_entities.begin();
-        SelectionContext &selectionContext = first.getWorld()->getSelectionContext();
         for (auto entity : m_entities) {
             if (!entity.isValid()) { return false; }
             auto &transformComponent = entity.getTransform();
@@ -25,9 +25,9 @@ public:
             transformComponent.setTransform(prevTransform);
             entity.setWorldChanged();
             entity.physics2DPropertiesUpdated();
-            selectionsUpdated |= selectionContext.isSelected(entity);
+            selectionsUpdated |= SelectionContext::isSelected(entity);
         }
-        if (selectionsUpdated) { selectionContext.updateValues(); }
+        if (selectionsUpdated) { SelectionContext::updateValues(); }
         return true;
     }
 
@@ -35,7 +35,6 @@ public:
         PND_ASSERT(!m_entities.empty(), "WRONG TRANSFORM COMMAND DATA");
         bool selectionsUpdated = false;
         Entity first = *m_entities.begin();
-        SelectionContext &selectionContext = first.getWorld()->getSelectionContext();
         for (auto entity : m_entities) {
             if (!entity.isValid()) { return false; }
             auto &transformComponent = entity.getTransform();
@@ -43,9 +42,9 @@ public:
             transformComponent.setTransform(newTransform);
             entity.setWorldChanged();
             entity.physics2DPropertiesUpdated();
-            selectionsUpdated |= selectionContext.isSelected(entity);
+            selectionsUpdated |= SelectionContext::isSelected(entity);
         }
-        if (selectionsUpdated) { selectionContext.updateValues(); }
+        if (selectionsUpdated) { SelectionContext::updateValues(); }
         return true;
     }
 

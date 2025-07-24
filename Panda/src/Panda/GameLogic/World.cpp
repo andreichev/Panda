@@ -6,6 +6,7 @@
 #include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
 #include "Panda/Physics/Physics2D.hpp"
+#include "Panda/GameLogic/SelectionContext.hpp"
 
 #include <Rain/Rain.hpp>
 #include <entt/entt.hpp>
@@ -19,7 +20,6 @@ World::World()
 #ifdef PND_EDITOR
     , m_isChanged(false)
     , m_commandManager()
-    , m_selectionContext()
 #endif
     , m_physics2D() {
 }
@@ -194,7 +194,7 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
 }
 
 void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
-    auto selected = m_selectionContext.getSelectedEntities();
+    auto selected = SelectionContext::getSelectedEntities();
     // Render Sprites
     {
         for (auto entity : selected) {
@@ -400,7 +400,7 @@ void World::destroy(Entity entity) {
     m_registry.destroy(entity.m_handle);
 #ifdef PND_EDITOR
     m_isChanged = true;
-    if (m_selectionContext.isSelected(entity)) { m_selectionContext.removeSelectedEntity(entity); }
+    if (SelectionContext::isSelected(entity)) { SelectionContext::removeSelectedEntity(entity); }
 #endif
 }
 
@@ -409,7 +409,7 @@ void World::clear() {
 #ifdef PND_EDITOR
     m_commandManager.CLEAR();
     m_isChanged = false;
-    m_selectionContext.unselectAll();
+    SelectionContext::unselectAll();
 #endif
     for (auto id : m_registry.storage<entt::entity>()) {
         m_registry.destroy(id);
@@ -553,7 +553,6 @@ World &World::operator=(World &other) {
 #ifdef PND_EDITOR
     sort();
 #endif
-    m_selectionContext = other.m_selectionContext;
     return *this;
 }
 

@@ -8,23 +8,21 @@ namespace Panda {
 
 class SelectionContext final {
 public:
-    SelectionContext() {
-        unselectAll();
-    }
+    SelectionContext() = delete;
 
-    std::unordered_set<Entity> getSelectedEntities() {
+    static std::unordered_set<Entity> getSelectedEntities() {
         return m_selectedEntities;
     }
 
-    std::unordered_set<Entity> getManipulatingEntities() {
+    static std::unordered_set<Entity> getManipulatingEntities() {
         return m_manipulatingEntities;
     }
 
-    bool isSelected(Entity entity) {
+    static bool isSelected(Entity entity) {
         return m_selectedEntities.contains(entity);
     }
 
-    void addSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
+    static void addSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
         if (isSelected(entity)) { return; }
         m_selectedEntities.insert(entity);
         for (auto childId : entity.getChildEntities()) {}
@@ -46,56 +44,56 @@ public:
         if (needToCalculateMedian) { updateValues(); }
     }
 
-    void addSelectedEntities(const std::unordered_set<Entity> &entities) {
+    static void addSelectedEntities(const std::unordered_set<Entity> &entities) {
         for (auto entity : entities) {
             addSelectedEntity(entity, false);
         }
         updateValues();
     }
 
-    void removeSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
+    static void removeSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
         m_selectedEntities.erase(entity);
         m_manipulatingEntities.erase(entity);
         if (needToCalculateMedian) { updateValues(); }
     }
 
-    void removeSelectedEntities(const std::vector<Entity> &entities) {
+    static void removeSelectedEntities(const std::vector<Entity> &entities) {
         for (auto entity : entities) {
             removeSelectedEntity(entity, false);
         }
         updateValues();
     }
 
-    void unselectAll() {
+    static void unselectAll() {
         m_selectedEntities.clear();
         m_manipulatingEntities.clear();
         resetValues();
     }
 
-    int selectedCount() {
+    static int selectedCount() {
         return m_selectedEntities.size();
     }
 
-    bool isEmpty() {
+    static bool isEmpty() {
         return m_selectedEntities.empty();
     }
 
-    glm::mat4 getMedianMatrix() {
+    static glm::mat4 getMedianMatrix() {
         return m_medianMatrix;
     }
 
-    glm::vec3 getMedianPosition() {
+    static glm::vec3 getMedianPosition() {
         return m_medianPosition;
     }
 
-    void resetValues() {
+    static void resetValues() {
         m_medianPosition = glm::vec3(0.0f);
         m_medianScale = glm::vec3(1.0f);
         m_medianRotation = glm::quat();
         m_medianMatrix = glm::mat4(1.f);
     }
 
-    void updateValues() {
+    static void updateValues() {
         resetValues();
         if (m_selectedEntities.empty()) { return; }
         auto it = m_selectedEntities.begin();
@@ -127,12 +125,13 @@ public:
     }
 
 private:
-    std::unordered_set<Entity> m_selectedEntities;
-    std::unordered_set<Entity> m_manipulatingEntities;
-    glm::vec3 m_medianPosition;
-    glm::vec3 m_medianScale;
-    glm::quat m_medianRotation;
-    glm::mat4 m_medianMatrix;
+    static std::unordered_set<UUID> m_selectedAssets;
+    static std::unordered_set<Entity> m_selectedEntities;
+    static std::unordered_set<Entity> m_manipulatingEntities;
+    static glm::vec3 m_medianPosition;
+    static glm::vec3 m_medianScale;
+    static glm::quat m_medianRotation;
+    static glm::mat4 m_medianMatrix;
 };
 
 } // namespace Panda

@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <Panda/ImGui/FontAwesome.h>
 #include <Panda/GameLogic/GameContext.hpp>
+#include <Panda/GameLogic/SelectionContext.hpp>
 
 namespace Panda {
 
@@ -260,8 +261,7 @@ void ViewportPanel::endRectSelection() {
 std::unordered_set<UUID> ViewportPanel::getSelectedIds() {
     World *currentWorld = GameContext::s_currentWorld;
     if (!currentWorld) { return {}; }
-    SelectionContext &selectionContext = currentWorld->getSelectionContext();
-    auto entities = selectionContext.getSelectedEntities();
+    auto entities = SelectionContext::getSelectedEntities();
     std::unordered_set<UUID> ids;
     for (auto entity : entities) {
         ids.insert(entity.getId());
@@ -272,31 +272,29 @@ std::unordered_set<UUID> ViewportPanel::getSelectedIds() {
 void ViewportPanel::pickEntitiesWithId(std::unordered_set<UUID> ids) {
     World *currentWorld = GameContext::s_currentWorld;
     if (!currentWorld) { return; }
-    SelectionContext &selectionContext = currentWorld->getSelectionContext();
     std::unordered_set<Entity> entities;
     for (UUID id : ids) {
         Entity selected = currentWorld->getById(id);
         entities.insert(selected);
     }
-    selectionContext.addSelectedEntities(entities);
+    SelectionContext::addSelectedEntities(entities);
 }
 
 void ViewportPanel::unselectEntitiesWithId(std::unordered_set<UUID> ids) {
     World *currentWorld = GameContext::s_currentWorld;
     if (!currentWorld) { return; }
-    SelectionContext &selectionContext = currentWorld->getSelectionContext();
     std::vector<Entity> entities;
     for (UUID id : ids) {
         Entity selected = currentWorld->getById(id);
         entities.push_back(selected);
     }
-    selectionContext.removeSelectedEntities(entities);
+    SelectionContext::removeSelectedEntities(entities);
 }
 
 void ViewportPanel::unselectAll() {
     World *currentWorld = GameContext::s_currentWorld;
     if (!currentWorld) { return; }
-    currentWorld->getSelectionContext().unselectAll();
+    SelectionContext::unselectAll();
 }
 
 void ViewportPanel::setCamera(Camera *camera) {

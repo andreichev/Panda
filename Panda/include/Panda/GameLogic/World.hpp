@@ -9,9 +9,6 @@
 #include "Panda/Renderer/Renderer3D.hpp"
 #include "Panda/WorldCommands/WorldCommandManager.hpp"
 #include "Panda/Physics/Physics2D.hpp"
-#ifdef PND_EDITOR
-#    include "Panda/GameLogic/SelectionContext.hpp"
-#endif
 
 #include <Miren/Miren.hpp>
 
@@ -69,9 +66,6 @@ public:
     inline WorldCommandManager &getCommandManger() {
         return m_commandManager;
     }
-    inline SelectionContext &getSelectionContext() {
-        return m_selectionContext;
-    }
     bool isChanged();
     bool needToDestroy(Entity entity);
     bool isDeleted(entt::entity handle);
@@ -87,7 +81,6 @@ private:
     void debugPrint();
     bool m_isChanged;
     WorldCommandManager m_commandManager;
-    SelectionContext m_selectionContext;
 #endif
 
     void releaseAllScriptingFields();
