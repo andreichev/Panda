@@ -32,7 +32,7 @@ void Toolbar::onImGuiRender(float offsetY) {
     ImGui::SetCursorPos({width / 2.f - 70.f, 4.f});
     switch (m_output->toolbarGetCurrentSceneState()) {
         case SceneState::EDIT: {
-            ScriptEngine *scriptEngine = GameContext::s_scriptEngine;
+            ScriptEngine *scriptEngine = GameContext::getScriptEngine();
             bool scriptsLoaded = scriptEngine && scriptEngine->isLoaded();
             ImGui::BeginDisabled(!scriptsLoaded);
             if (ImGui::Button(getString(ICON_PLAY).c_str())) {

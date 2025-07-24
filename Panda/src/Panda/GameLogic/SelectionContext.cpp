@@ -2,12 +2,12 @@
 
 namespace Panda {
 
-std::unordered_set<UUID> SelectionContext::m_selectedAssets;
-std::unordered_set<UUID> SelectionContext::m_selectedEntities;
-std::unordered_set<UUID> SelectionContext::m_manipulatingEntities;
-glm::vec3 SelectionContext::m_medianPosition;
-glm::vec3 SelectionContext::m_medianScale;
-glm::quat SelectionContext::m_medianRotation;
-glm::mat4 SelectionContext::m_medianMatrix;
+std::unordered_set<UUID> SelectionContext::s_selectedAssets;
+std::unordered_set<UUID> SelectionContext::s_selectedEntities;
+std::unordered_set<UUID> SelectionContext::s_manipulatingEntities;
+glm::vec3 SelectionContext::s_medianPosition;
+glm::vec3 SelectionContext::s_medianScale;
+glm::quat SelectionContext::s_medianRotation;
+glm::mat4 SelectionContext::s_medianMatrix;
 
 } // namespace Panda

@@ -31,7 +31,7 @@ EditorLayer::EditorLayer(Fern::Window *window)
 
 void EditorLayer::onAttach() {
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
-    GameContext::s_currentWorld = m_currentWorld;
+    GameContext::setCurrentWorld(m_currentWorld);
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     Fern::Size windowSize = Application::get()->getMainWindow()->getSize();
     // Default framebuffer initial size
@@ -51,7 +51,7 @@ void EditorLayer::onAttach() {
 }
 
 void EditorLayer::onDetach() {
-    GameContext::s_currentWorld = nullptr;
+    GameContext::setCurrentWorld(nullptr);
 }
 
 void EditorLayer::onUpdate(double deltaTime) {
@@ -139,7 +139,7 @@ void EditorLayer::play() {
     m_sceneState = SceneState::PLAY;
     m_playingWorld = m_editingWorld;
     m_currentWorld = &m_playingWorld;
-    GameContext::s_currentWorld = m_currentWorld;
+    GameContext::setCurrentWorld(m_currentWorld);
     m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_playingWorld.startRunning();
     m_panelsContainer.viewport.focus();
@@ -149,7 +149,7 @@ void EditorLayer::simulate() {
     m_sceneState = SceneState::SIMULATE;
     m_playingWorld = m_editingWorld;
     m_currentWorld = &m_playingWorld;
-    GameContext::s_currentWorld = m_currentWorld;
+    GameContext::setCurrentWorld(m_currentWorld);
     m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_playingWorld.startRunning();
     m_panelsContainer.viewport.focus();
@@ -159,7 +159,7 @@ void EditorLayer::stop() {
     m_sceneState = SceneState::EDIT;
     m_panelsContainer.viewport.setCamera(&m_editorCamera);
     m_currentWorld = &m_editingWorld;
-    GameContext::s_currentWorld = m_currentWorld;
+    GameContext::setCurrentWorld(m_currentWorld);
     m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_playingWorld.finishRunning();
     m_panelsContainer.viewport.focus();

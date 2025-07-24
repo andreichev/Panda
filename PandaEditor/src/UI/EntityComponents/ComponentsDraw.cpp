@@ -221,7 +221,7 @@ void ComponentsDraw::drawComponents(const std::unordered_set<Entity> &entities) 
                 return;
             }
             bool modified = false;
-            ScriptEngine *scriptEngine = GameContext::s_scriptEngine;
+            ScriptEngine *scriptEngine = GameContext::getScriptEngine();
             for (auto &script : component.scripts) {
                 shiftCursorY(8);
                 ImGui::Text("%s", script.getName().c_str());

@@ -566,7 +566,7 @@ bool propertyEntity(const char *label, UUID *value) {
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
-    World *currentWorld = GameContext::s_currentWorld;
+    World *currentWorld = GameContext::getCurrentWorld();
     if (value && *value && currentWorld) {
         Entity entity = currentWorld->getById(*value);
         ImGui::Text("%s", entity.getName().c_str());
@@ -631,7 +631,7 @@ bool drawScriptFieldValue(ScriptField &field) {
         }
         case ScriptFieldType::TEXTURE: {
             // Load texture if it needs.
-            AssetHandler *assetHandler = GameContext::s_assetHandler;
+            AssetHandler *assetHandler = GameContext::getAssetHandler();
             UUID textureId = *(UUID *)field.value.data;
             if (textureId && !field.asset && assetHandler) {
                 field.asset = assetHandler->load(textureId);

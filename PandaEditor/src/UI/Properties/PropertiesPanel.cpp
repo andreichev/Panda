@@ -17,7 +17,7 @@ PropertiesPanel::PropertiesPanel(ComponentsDrawOutput *componentsDrawOutput)
 void PropertiesPanel::onImGuiRender() {
     ImGui::Begin("Properties");
     std::unordered_set<UUID> selectedIds = SelectionContext::getSelectedEntities();
-    World *world = GameContext::s_currentWorld;
+    World *world = GameContext::getCurrentWorld();
     if (selectedIds.empty() || !world) {
         ImGui::End();
         return;

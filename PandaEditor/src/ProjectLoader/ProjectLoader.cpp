@@ -23,16 +23,16 @@ ProjectLoader::ProjectLoader(World *world, ProjectLoaderOutput *output)
     , m_projectPath()
     , m_worldPath()
     , m_assetHandler() {
-    GameContext::s_scriptEngine = &m_scriptEngine;
-    GameContext::s_assetHandler = &m_assetHandler;
+    GameContext::setScriptEngine(&m_scriptEngine);
+    GameContext::setAssetHandler(&m_assetHandler);
 }
 
 ProjectLoader::~ProjectLoader() {
     saveAppSettings();
     saveProjectSettings();
     m_assetHandler.closeProject();
-    GameContext::s_scriptEngine = nullptr;
-    GameContext::s_assetHandler = nullptr;
+    GameContext::setScriptEngine(nullptr);
+    GameContext::setAssetHandler(nullptr);
 }
 
 void ProjectLoader::loadInitialData() {

@@ -259,7 +259,7 @@ void ViewportPanel::endRectSelection() {
 }
 
 void ViewportPanel::unselectAll() {
-    World *currentWorld = GameContext::s_currentWorld;
+    World *currentWorld = GameContext::getCurrentWorld();
     if (!currentWorld) { return; }
     SelectionContext::unselectAll();
 }

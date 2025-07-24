@@ -162,7 +162,7 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
             rect.transform = getWorldSpaceTransformMatrix(entity);
             rect.color = spriteComponent.color;
             // Load texture if it needs.
-            AssetHandler *assetHandler = GameContext::s_assetHandler;
+            AssetHandler *assetHandler = GameContext::getAssetHandler();
             if (spriteComponent.textureId && !spriteComponent.asset && assetHandler) {
                 spriteComponent.asset = assetHandler->load(spriteComponent.textureId);
             }
@@ -246,9 +246,10 @@ Entity World::instantiateEntity(UUID id) {
 }
 
 void World::updateScriptsAndFields() {
-    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) { return; }
+    ScriptEngine* scriptEngine = GameContext::getScriptEngine();
+    if (!scriptEngine || !scriptEngine->isLoaded()) { return; }
     auto view = m_registry.view<ScriptListComponent>();
-    auto manifest = GameContext::s_scriptEngine->getManifest();
+    auto manifest = scriptEngine->getManifest();
     for (auto entityHandle : view) {
         if (!isValidEntt(entityHandle)) { continue; }
         auto &component = view.get<ScriptListComponent>(entityHandle);
@@ -326,9 +327,10 @@ void World::updateScriptsAndFields() {
 }
 
 void World::initializeScriptCore() {
-    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) { return; }
+    ScriptEngine* scriptEngine = GameContext::getScriptEngine();
+    if (!scriptEngine || !scriptEngine->isLoaded()) { return; }
     auto view = m_registry.view<ScriptListComponent>();
-    auto manifest = GameContext::s_scriptEngine->getManifest();
+    auto manifest = scriptEngine->getManifest();
     for (auto entityHandle : view) {
         if (!isValidEntt(entityHandle)) { continue; }
         auto &component = view.get<ScriptListComponent>(entityHandle);
@@ -413,7 +415,6 @@ void World::clear() {
 #ifdef PND_EDITOR
     m_commandManager.CLEAR();
     m_isChanged = false;
-    SelectionContext::unselectAll();
 #endif
     for (auto id : m_registry.storage<entt::entity>()) {
         m_registry.destroy(id);
