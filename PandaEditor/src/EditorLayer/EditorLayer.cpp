@@ -608,13 +608,14 @@ void EditorLayer::processShortcuts() {
     }
     if (ImGui::IsKeyPressed(ImGuiKey_D, false) && ctrl) {
         if (m_currentWorld) {
-            std::unordered_set<Entity> selected = SelectionContext::getSelectedEntities();
+            std::unordered_set<UUID> selectedIds = SelectionContext::getSelectedEntities();
+            std::unordered_set<Entity> selected = m_currentWorld->getById(selectedIds);
             std::unordered_set<Entity> copies;
             for (auto entity : selected) {
                 Entity duplicate = m_currentWorld->duplicateEntity(entity);
                 copies.insert(duplicate);
-                SelectionContext::removeSelectedEntity(entity, false);
-                SelectionContext::addSelectedEntity(duplicate, false);
+                SelectionContext::removeSelectedEntity(entity.getId(), false);
+                SelectionContext::addSelectedEntity(duplicate.getId(), false);
             }
             WorldCommandManager &cmd = m_currentWorld->getCommandManger();
             AddRemoveEntitiesCommand update(copies);

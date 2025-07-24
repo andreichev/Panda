@@ -25,7 +25,7 @@ public:
             transformComponent.setTransform(prevTransform);
             entity.setWorldChanged();
             entity.physics2DPropertiesUpdated();
-            selectionsUpdated |= SelectionContext::isSelected(entity);
+            selectionsUpdated |= SelectionContext::isSelected(entity.getId());
         }
         if (selectionsUpdated) { SelectionContext::updateValues(); }
         return true;
@@ -42,7 +42,7 @@ public:
             transformComponent.setTransform(newTransform);
             entity.setWorldChanged();
             entity.physics2DPropertiesUpdated();
-            selectionsUpdated |= SelectionContext::isSelected(entity);
+            selectionsUpdated |= SelectionContext::isSelected(entity.getId());
         }
         if (selectionsUpdated) { SelectionContext::updateValues(); }
         return true;

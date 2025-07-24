@@ -10,6 +10,7 @@
 #include "UI/Console/ConsolePanel.hpp"
 #include "UI/Toolbar/Toolbar.hpp"
 #include "UI/ContentBrowser/ContentBrowser.hpp"
+#include "UI/Properties/PropertiesPanel.hpp"
 
 namespace Panda {
 
@@ -31,6 +32,7 @@ public:
     ConsolePanel consolePanel;
     WorldHierarchyPanel hierarchyPanel;
     ContentBrowser contentBrowser;
+    PropertiesPanel propertiesPanel;
 };
 
 } // namespace Panda

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Entity.hpp"
+#include "World.hpp"
 
 #include <unordered_set>
 
@@ -10,56 +11,60 @@ class SelectionContext final {
 public:
     SelectionContext() = delete;
 
-    static std::unordered_set<Entity> getSelectedEntities() {
+    static std::unordered_set<UUID> getSelectedEntities() {
         return m_selectedEntities;
     }
 
-    static std::unordered_set<Entity> getManipulatingEntities() {
+    static std::unordered_set<UUID> getManipulatingEntities() {
         return m_manipulatingEntities;
     }
 
-    static bool isSelected(Entity entity) {
-        return m_selectedEntities.contains(entity);
+    static bool isSelected(UUID id) {
+        return m_selectedEntities.contains(id);
     }
 
-    static void addSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
-        if (isSelected(entity)) { return; }
-        m_selectedEntities.insert(entity);
+    static void addSelectedEntity(UUID id, bool needToCalculateMedian = true) {
+        if (isSelected(id)) { return; }
+        m_selectedEntities.insert(id);
+        World *world = GameContext::s_currentWorld;
+        if (!world) { return; }
+        Entity entity = world->getById(id);
         for (auto childId : entity.getChildEntities()) {}
         //  Далее избегаем того, что при перемещении родителя трансформация будет применяться и к
         //  детям.
-        std::unordered_set<Entity> manipulating;
-        for (auto item : m_manipulatingEntities) {
-            if (entity.isDescendantOf(item)) {
+        std::unordered_set<UUID> manipulating;
+        for (auto manipulatingId : m_manipulatingEntities) {
+            Entity manipulatingEntity = world->getById(manipulatingId);
+            if (entity.isDescendantOf(manipulatingEntity)) {
                 // Если выбранный элемент находится в иерархии уже выбранных - ничего не делаем.
                 return;
-            } else if (entity.isAncestorOf(item)) {
+            } else if (entity.isAncestorOf(manipulatingEntity)) {
                 // Если выбранный элемент является родителем - теперь он будет манипулировать.
                 continue;
             }
-            manipulating.insert(item);
+            manipulating.insert(manipulatingId);
         }
-        manipulating.insert(entity);
+        manipulating.insert(id);
         m_manipulatingEntities = manipulating;
         if (needToCalculateMedian) { updateValues(); }
     }
 
-    static void addSelectedEntities(const std::unordered_set<Entity> &entities) {
-        for (auto entity : entities) {
-            addSelectedEntity(entity, false);
+    static void addSelectedEntities(const std::unordered_set<UUID> &ids) {
+        for (auto id : ids) {
+            addSelectedEntity(id, false);
         }
         updateValues();
     }
 
-    static void removeSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
-        m_selectedEntities.erase(entity);
-        m_manipulatingEntities.erase(entity);
+    static void removeSelectedEntity(UUID id, bool needToCalculateMedian = true) {
+        m_selectedEntities.erase(id);
+        m_manipulatingEntities.erase(id);
         if (needToCalculateMedian) { updateValues(); }
     }
 
-    static void removeSelectedEntities(const std::vector<Entity> &entities) {
-        for (auto entity : entities) {
-            removeSelectedEntity(entity, false);
+    static void removeSelectedEntities(const std::unordered_set<UUID> &ids) {
+        for (auto id : ids) {
+            removeSelectedEntity(id, false);
         }
         updateValues();
     }
@@ -96,15 +101,19 @@ public:
     static void updateValues() {
         resetValues();
         if (m_selectedEntities.empty()) { return; }
+        World *world = GameContext::s_currentWorld;
+        if (!world) { return; }
         auto it = m_selectedEntities.begin();
-        Entity entity = *it;
+        UUID id = *it;
+        Entity entity = world->getById(id);
         auto transformComponent = entity.calculateWorldSpaceTransform();
         m_medianPosition = transformComponent.getPosition();
         m_medianScale = transformComponent.getScale();
         m_medianRotation = transformComponent.getRotation();
         ++it;
         while (it != m_selectedEntities.end()) {
-            entity = *it;
+            id = *it;
+            entity = world->getById(id);
             transformComponent = entity.calculateWorldSpaceTransform();
             // auto transformComponent = entity.getTransform();
             m_medianPosition += transformComponent.getPosition();
@@ -126,8 +135,8 @@ public:
 
 private:
     static std::unordered_set<UUID> m_selectedAssets;
-    static std::unordered_set<Entity> m_selectedEntities;
-    static std::unordered_set<Entity> m_manipulatingEntities;
+    static std::unordered_set<UUID> m_selectedEntities;
+    static std::unordered_set<UUID> m_manipulatingEntities;
     static glm::vec3 m_medianPosition;
     static glm::vec3 m_medianScale;
     static glm::quat m_medianRotation;

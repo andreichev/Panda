@@ -4,15 +4,13 @@
 
 #pragma once
 
-#include "UI/EntityComponents/ComponentsDraw.hpp"
-
 #include <Panda/GameLogic/World.hpp>
 
 namespace Panda {
 
 class WorldHierarchyPanel final {
 public:
-    WorldHierarchyPanel(World *world, ComponentsDrawOutput *componentsDrawOutput);
+    WorldHierarchyPanel(World *world);
     void onImGuiRender();
     void setWorld(World *world) {
         m_world = world;
@@ -30,7 +28,6 @@ private:
     int m_firstSelectedRow;
     int m_lastSelectedRow;
     bool m_shiftSelectionRunning;
-    ComponentsDraw m_componentsDraw;
     World *m_world;
 };
 

@@ -3,7 +3,6 @@
 //
 
 #include "WorldHierarchyPanel.hpp"
-#include "UI/EntityComponents/ComponentsDraw.hpp"
 #include "Model/DragDropItem.hpp"
 #include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 #include "Panda/WorldCommands/Impl/HierarchyCommand.hpp"
@@ -15,10 +14,9 @@
 
 namespace Panda {
 
-WorldHierarchyPanel::WorldHierarchyPanel(World *world, ComponentsDrawOutput *componentsDrawOutput)
+WorldHierarchyPanel::WorldHierarchyPanel(World *world)
     : m_world(world)
     , m_rowIndex(0)
-    , m_componentsDraw(componentsDrawOutput)
     , m_firstSelectedRow(-1)
     , m_lastSelectedRow(-1)
     , m_shiftSelectionRunning(false) {}
@@ -46,11 +44,12 @@ void WorldHierarchyPanel::onImGuiRender() {
         ImGui::EndPopup();
     }
     ImGui::PopStyleVar();
-    std::unordered_set<Entity> selected = SelectionContext::getSelectedEntities();
     if (m_focused) {
         if (ImGui::IsKeyPressed(ImGuiKey_Backspace, false) ||
             ImGui::IsKeyPressed(ImGuiKey_Delete, false)) {
             WorldCommandManager &cmd = m_world->getCommandManger();
+            std::unordered_set<UUID> selectedIds = SelectionContext::getSelectedEntities();
+            std::unordered_set<Entity> selected = m_world->getById(selectedIds);
             AddRemoveEntitiesCommand update(selected);
             cmd.SAVE(update, true);
             m_world->setChanged();
@@ -80,9 +79,6 @@ void WorldHierarchyPanel::onImGuiRender() {
         }
         ImGui::EndDragDropTarget();
     }
-    ImGui::Begin("Properties");
-    if (!selected.empty()) { m_componentsDraw.drawComponents(selected); }
-    ImGui::End();
     ImGui::End();
 
     if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) ||
@@ -100,11 +96,12 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     // Uncomment if you need to remove bullets
     // float indent = ImGui::GetTreeNodeToLabelSpacing() - 5;
     // ImGui::Unindent(indent);
+    UUID entityId = entity.getId();
     m_rowIndex++;
     WorldCommandManager &cmd = m_world->getCommandManger();
     auto &tag = entity.getComponent<TagComponent>().tag;
     ImGuiTreeNodeFlags flags =
-        (SelectionContext::isSelected(entity) ? ImGuiTreeNodeFlags_Selected : 0);
+        (SelectionContext::isSelected(entityId) ? ImGuiTreeNodeFlags_Selected : 0);
     flags |= ImGuiTreeNodeFlags_OpenOnArrow;
     flags |= ImGuiTreeNodeFlags_SpanFullWidth;
     flags |= ImGuiTreeNodeFlags_FramePadding;
@@ -117,8 +114,8 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     bool opened = ImGui::TreeNodeCustom(ImGui::GetID(id), flags, tag.c_str(), nullptr, &isClicked);
     ImGui::PopStyleVar(2);
     if (m_rowIndex >= m_firstSelectedRow && m_rowIndex <= m_lastSelectedRow &&
-        !SelectionContext::isSelected(entity) && m_shiftSelectionRunning) {
-        SelectionContext::addSelectedEntity(entity);
+        !SelectionContext::isSelected(entityId) && m_shiftSelectionRunning) {
+        SelectionContext::addSelectedEntity(entityId);
         if (SelectionContext::selectedCount() == (m_lastSelectedRow - m_firstSelectedRow) + 1) {
             m_shiftSelectionRunning = false;
         }
@@ -127,10 +124,10 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
         if (ImGui::GetDragDropPayload() == nullptr) {
             DragDropItem item;
             item.type = DragDropItemType::ENTITY;
-            if (SelectionContext::isSelected(entity)) {
+            if (SelectionContext::isSelected(entityId)) {
                 std::vector<UUID> selectedIds;
                 for (auto selected : SelectionContext::getSelectedEntities()) {
-                    selectedIds.push_back(selected.getId());
+                    selectedIds.push_back(selected);
                 }
                 PND_ASSERT_F(
                     sizeof(UUID) * selectedIds.size() <= sizeof(DragDropItem::data),
@@ -141,10 +138,9 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
                 item.count = SelectionContext::selectedCount();
             } else {
                 SelectionContext::unselectAll();
-                SelectionContext::addSelectedEntity(entity);
-                UUID assetId = entity.getId();
-                PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
-                memcpy(item.data, &assetId, sizeof(assetId));
+                SelectionContext::addSelectedEntity(entityId);
+                PND_STATIC_ASSERT(sizeof(entityId) <= sizeof(DragDropItem::data));
+                memcpy(item.data, &entityId, sizeof(entityId));
                 item.count = 1;
             }
             ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
@@ -167,7 +163,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
                 std::vector<Entity> droppedEntities;
                 for (int i = 0; i < item.count; i++) {
                     // If we didn't drop to the same entity
-                    if (droppedIds[i] == entity.getId()) { continue; }
+                    if (droppedIds[i] == entityId) { continue; }
                     Entity droppedEntity = m_world->getById(droppedIds[i]);
                     // If entity doesn't have that child already
                     if (entity.hasChild(droppedEntity)) { continue; }
@@ -196,26 +192,28 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
             m_shiftSelectionRunning = true;
         } else if (!ctrl || shift) {
             SelectionContext::unselectAll();
-            SelectionContext::addSelectedEntity(entity);
+            SelectionContext::addSelectedEntity(entityId);
             m_firstSelectedRow = m_rowIndex;
             m_lastSelectedRow = -1;
         } else {
-            if (SelectionContext::isSelected(entity)) {
-                SelectionContext::removeSelectedEntity(entity);
+            if (SelectionContext::isSelected(entityId)) {
+                SelectionContext::removeSelectedEntity(entityId);
             } else {
-                SelectionContext::addSelectedEntity(entity);
+                SelectionContext::addSelectedEntity(entityId);
             }
         }
         ImGui::FocusWindow(ImGui::GetCurrentWindow());
     }
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
     if (ImGui::BeginPopupContextItem()) {
-        if (!SelectionContext::isSelected(entity)) {
+        if (!SelectionContext::isSelected(entityId)) {
             SelectionContext::unselectAll();
-            SelectionContext::addSelectedEntity(entity);
+            SelectionContext::addSelectedEntity(entityId);
         }
         if (ImGui::MenuItem("Delete", NULL)) {
-            AddRemoveEntitiesCommand update({SelectionContext::getSelectedEntities()});
+            std::unordered_set<Entity> entities =
+                m_world->getById({SelectionContext::getSelectedEntities()});
+            AddRemoveEntitiesCommand update(entities);
             cmd.SAVE(update, true);
             m_world->setChanged();
             SelectionContext::unselectAll();
@@ -224,18 +222,23 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
         }
         if (ImGui::MenuItem("Duplicate", NULL)) {
             std::unordered_set<Entity> duplicates;
-            for (auto entity : SelectionContext::getSelectedEntities()) {
+            for (auto id : SelectionContext::getSelectedEntities()) {
+                Entity entity = m_world->getById(id);
                 Entity duplicate = m_world->duplicateEntity(entity);
                 duplicates.insert(duplicate);
-                SelectionContext::removeSelectedEntity(entity, false);
-                SelectionContext::addSelectedEntity(duplicate, false);
+                SelectionContext::removeSelectedEntity(id, false);
+                SelectionContext::addSelectedEntity(duplicate.getId(), false);
             }
             AddRemoveEntitiesCommand update(duplicates);
             cmd.SAVE(update, false);
             m_world->setChanged();
             m_world->sort();
             SelectionContext::unselectAll();
-            SelectionContext::addSelectedEntities(duplicates);
+            std::unordered_set<UUID> duplicatesIds;
+            for (Entity entity : duplicates) {
+                duplicatesIds.emplace(entity.getId());
+            }
+            SelectionContext::addSelectedEntities(duplicatesIds);
             m_firstSelectedRow = -1;
             m_lastSelectedRow = -1;
         }

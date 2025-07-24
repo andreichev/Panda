@@ -34,6 +34,7 @@ public:
     bool isEmpty();
     Entity findByTag(const char *tag);
     Entity getById(UUID id);
+    std::unordered_set<Entity> getById(std::unordered_set<UUID> ids);
     inline bool isRunning() {
         return m_isRunning;
     }

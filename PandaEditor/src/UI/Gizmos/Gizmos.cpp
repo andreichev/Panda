@@ -59,7 +59,8 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
     LOG_INFO_EDITOR("%.3f, %.3f, %.3f", deltaPosition.x, deltaPosition.y, deltaPosition.z);
      */
 
-    auto entities = SelectionContext::getManipulatingEntities();
+    auto ids = SelectionContext::getManipulatingEntities();
+    std::unordered_set<Entity> entities = m_world->getById(ids);
     EntityTransformCommand move(entities);
     move.saveBeforeEdit();
     for (auto entity : entities) {

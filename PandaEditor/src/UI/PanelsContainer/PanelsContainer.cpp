@@ -6,7 +6,8 @@ PanelsContainer::PanelsContainer(EditorLayer *layer, CameraController *cameraCon
     : toolbar(layer)
     , dockspace()
     , viewport(cameraController)
-    , hierarchyPanel(nullptr, layer)
+    , hierarchyPanel(nullptr)
+    , propertiesPanel(layer)
     , statisticsPanel(nullptr)
     , consolePanel()
     , menuBar(layer)
@@ -23,6 +24,7 @@ void PanelsContainer::onImGuiRender(bool isViewportFullScreen, SceneState sceneS
         statisticsPanel.onImGuiRender();
         viewport.onImGuiRender(sceneState, 0, false);
         hierarchyPanel.onImGuiRender();
+        propertiesPanel.onImGuiRender();
         contentBrowser.onImGuiRender();
         consolePanel.onImGuiRender();
         dockspace.endImGuiDockspace();

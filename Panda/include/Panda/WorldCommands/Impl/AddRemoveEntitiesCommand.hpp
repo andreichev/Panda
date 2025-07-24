@@ -35,8 +35,9 @@ public:
         for (auto entity : m_entities) {
             EditorMetadataComponent &metadata = entity.getComponent<EditorMetadataComponent>();
             metadata.isDeleted = !metadata.isDeleted;
-            if (metadata.isDeleted && SelectionContext::isSelected(entity)) {
-                SelectionContext::removeSelectedEntity(entity);
+            UUID id = entity.getId();
+            if (metadata.isDeleted && SelectionContext::isSelected(id)) {
+                SelectionContext::removeSelectedEntity(id);
             }
         }
         firstEntity.setWorldChanged();

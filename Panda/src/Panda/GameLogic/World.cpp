@@ -194,7 +194,8 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
 }
 
 void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
-    auto selected = SelectionContext::getSelectedEntities();
+    auto selectedIds = SelectionContext::getSelectedEntities();
+    auto selected = getById(selectedIds);
     // Render Sprites
     {
         for (auto entity : selected) {
@@ -390,17 +391,20 @@ void World::fillEntity(Entity entity, UUID id) {
 }
 
 void World::destroy(Entity entity) {
+    UUID entityId = entity.getId();
     entity.removeFromParent();
     std::vector<UUID> children = entity.getChildEntities();
     for (UUID childHandle : children) {
         Entity child = getById(childHandle);
         destroy(child);
     }
-    m_entityIdMap.erase(entity.getId());
+    m_entityIdMap.erase(entityId);
     m_registry.destroy(entity.m_handle);
 #ifdef PND_EDITOR
     m_isChanged = true;
-    if (SelectionContext::isSelected(entity)) { SelectionContext::removeSelectedEntity(entity); }
+    if (SelectionContext::isSelected(entityId)) {
+        SelectionContext::removeSelectedEntity(entityId);
+    }
 #endif
 }
 
@@ -482,6 +486,14 @@ Entity World::getById(UUID id) {
         m_entityIdMap.find(id) != m_entityIdMap.end(), "ENTITY %u DOES NOT EXISTS", (uint32_t)id
     );
     return m_entityIdMap.at(id);
+}
+
+std::unordered_set<Entity> World::getById(std::unordered_set<UUID> ids) {
+    std::unordered_set<Entity> result;
+    for (UUID id : ids) {
+        result.emplace(getById(id));
+    }
+    return result;
 }
 
 void World::setViewId(Miren::ViewId id) {
