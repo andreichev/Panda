@@ -246,7 +246,7 @@ Entity World::instantiateEntity(UUID id) {
 }
 
 void World::updateScriptsAndFields() {
-    ScriptEngine* scriptEngine = GameContext::getScriptEngine();
+    ScriptEngine *scriptEngine = GameContext::getScriptEngine();
     if (!scriptEngine || !scriptEngine->isLoaded()) { return; }
     auto view = m_registry.view<ScriptListComponent>();
     auto manifest = scriptEngine->getManifest();
@@ -327,7 +327,7 @@ void World::updateScriptsAndFields() {
 }
 
 void World::initializeScriptCore() {
-    ScriptEngine* scriptEngine = GameContext::getScriptEngine();
+    ScriptEngine *scriptEngine = GameContext::getScriptEngine();
     if (!scriptEngine || !scriptEngine->isLoaded()) { return; }
     auto view = m_registry.view<ScriptListComponent>();
     auto manifest = scriptEngine->getManifest();

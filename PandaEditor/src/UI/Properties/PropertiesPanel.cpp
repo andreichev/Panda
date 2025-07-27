@@ -12,18 +12,32 @@
 namespace Panda {
 
 PropertiesPanel::PropertiesPanel(ComponentsDrawOutput *componentsDrawOutput)
-    : m_componentsDraw(componentsDrawOutput) {}
+    : m_componentsDraw(componentsDrawOutput)
+    , m_assetPropertiesDraw() {}
 
 void PropertiesPanel::onImGuiRender() {
     ImGui::Begin("Properties");
     std::unordered_set<UUID> selectedIds = SelectionContext::getSelectedEntities();
+    std::unordered_set<path_t> selectedAssets = SelectionContext::getSelectedAssets();
     World *world = GameContext::getCurrentWorld();
-    if (selectedIds.empty() || !world) {
+    if (selectedIds.empty() && selectedAssets.empty() || !world) {
+        ImGui::Text("No selection");
         ImGui::End();
         return;
     }
-    std::unordered_set<Entity> selected = world->getById(selectedIds);
-    m_componentsDraw.drawComponents(selected);
+    if (!selectedIds.empty() && !selectedAssets.empty()) {
+        ImGui::Text(
+            "Selected %d entities and %d assets", selectedIds.size(), selectedAssets.size()
+        );
+    } else if (!selectedIds.empty()) {
+        std::unordered_set<Entity> selected = world->getById(selectedIds);
+        m_componentsDraw.drawComponents(selected);
+    } else if (selectedAssets.size() > 1) {
+        ImGui::Text("Selected %d assets", selectedAssets.size());
+    } else {
+        m_assetPropertiesDraw.drawProperties(*selectedAssets.begin());
+    }
+
     ImGui::End();
 }
 

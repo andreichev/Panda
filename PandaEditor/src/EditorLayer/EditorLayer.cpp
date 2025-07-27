@@ -173,6 +173,7 @@ void EditorLayer::loaderDidLoadProject(const std::string &name, const path_t &pa
 }
 
 void EditorLayer::loaderDidLoadWorld() {
+    SelectionContext::unselectAll();
     m_window->setTitle(m_loader.getProjectSettings().worldPath.c_str());
 }
 

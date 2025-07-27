@@ -1,9 +1,11 @@
 
 #include "ContentBrowser.hpp"
 #include "Model/DragDropItem.hpp"
-#include "Panda/ImGui/FontAwesome.h"
 
+#include <Panda/ImGui/FontAwesome.h>
+#include <Panda/GameLogic/SelectionContext.hpp>
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Panda {
 
@@ -39,7 +41,10 @@ ContentBrowser::ContentBrowser(ContentBrowserOutput *output)
 
 void ContentBrowser::onImGuiRender() {
     if (m_currentDirectory.empty()) { return; }
+    bool ctrl = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+    bool shift = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
     ImGui::Begin("Content Browser");
+    ImRect windowRect = ImGui::GetCurrentWindow()->Rect();
     if (m_currentDirectory != m_baseDirectory) {
         if (ImGui::Button(getString(ICON_ARROW_LEFT).c_str())) {
             m_currentDirectory = m_currentDirectory.parent_path();
@@ -109,7 +114,7 @@ void ContentBrowser::onImGuiRender() {
                 }
             }
         }
-        if (m_selectedPath == path) {
+        if (SelectionContext::isSelected(path)) {
             const ImU32 col = ImGui::GetColorU32(ImGuiCol_ButtonActive);
             ImGui::PushStyleColor(ImGuiCol_Button, col);
         } else {
@@ -125,7 +130,8 @@ void ContentBrowser::onImGuiRender() {
         if (ImGui::ImageButton(
                 filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {width, height}
             )) {
-            m_selectedPath = path;
+            if (!shift && !ctrl) { SelectionContext::unselectAll(); }
+            SelectionContext::addSelectedAsset(path);
         }
         if (assetId) {
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
@@ -177,6 +183,14 @@ void ContentBrowser::onImGuiRender() {
     // ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
     // ImGui::SliderFloat("Padding", &padding, 0, 32);
     ImGui::End();
+
+    if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) ||
+        ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+        if (ImGui::IsMouseHoveringRect(windowRect.Min, windowRect.Max, false) &&
+            !ImGui::IsAnyItemHovered()) {
+            SelectionContext::unselectAll();
+        }
+    }
 }
 
 void ContentBrowser::setBaseDirectory(const path_t &path) {

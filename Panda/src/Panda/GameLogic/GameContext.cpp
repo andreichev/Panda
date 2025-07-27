@@ -6,34 +6,36 @@ World *GameContext::s_currentWorld = nullptr;
 AssetHandler *GameContext::s_assetHandler = nullptr;
 ScriptEngine *GameContext::s_scriptEngine = nullptr;
 
-World* GameContext::getCurrentWorld() {
+World *GameContext::getCurrentWorld() {
     return s_currentWorld;
 }
 
-void GameContext::setCurrentWorld(World* world) {
+void GameContext::setCurrentWorld(World *world) {
     s_currentWorld = world;
+    if (!world) {
+        SelectionContext::unselectAll();
+        return;
+    }
     std::unordered_set<UUID> selectedIds = SelectionContext::getSelectedEntities();
-    for (UUID id: selectedIds) {
-        if (!world->isValid(id)) {
-            SelectionContext::removeSelectedEntity(id, false);
-        }
+    for (UUID id : selectedIds) {
+        if (!world->isValid(id)) { SelectionContext::removeSelectedEntity(id, false); }
     }
     SelectionContext::updateValues();
 }
 
-AssetHandler* GameContext::getAssetHandler() {
+AssetHandler *GameContext::getAssetHandler() {
     return s_assetHandler;
 }
 
-void GameContext::setAssetHandler(AssetHandler* handler) {
+void GameContext::setAssetHandler(AssetHandler *handler) {
     s_assetHandler = handler;
 }
 
-ScriptEngine* GameContext::getScriptEngine() {
+ScriptEngine *GameContext::getScriptEngine() {
     return s_scriptEngine;
 }
 
-void GameContext::setScriptEngine(ScriptEngine* engine) {
+void GameContext::setScriptEngine(ScriptEngine *engine) {
     s_scriptEngine = engine;
 }
 

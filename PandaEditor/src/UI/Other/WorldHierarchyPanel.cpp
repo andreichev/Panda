@@ -27,7 +27,7 @@ void WorldHierarchyPanel::onImGuiRender() {
     if (m_world->isChanged()) { flags |= ImGuiWindowFlags_UnsavedDocument; }
     ImGui::Begin("World Hierarchy", nullptr, flags);
     m_rowIndex = 0;
-    ImRect windowRect = {ImGui::GetWindowContentRegionMin(), ImGui::GetWindowContentRegionMax()};
+    ImRect windowRect = ImGui::GetCurrentWindow()->Rect();
     m_focused = ImGui::IsWindowFocused();
     if (m_world && !m_world->isEmpty()) {
         for (auto entityId : m_world->m_registry.view<entt::entity>()) {

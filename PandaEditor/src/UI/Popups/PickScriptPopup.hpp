@@ -15,7 +15,7 @@ public:
     void onImGuiRender() override {
         static int selectedClassIndex = -1;
         static ScriptClassManifest selectedClass;
-        ScriptEngine* scriptEngine = GameContext::getScriptEngine();
+        ScriptEngine *scriptEngine = GameContext::getScriptEngine();
         if (!scriptEngine || !scriptEngine->isLoaded()) {
             PND_ASSERT(false, "SCRIPT ENGINE IS NOT INITIALIZED");
             return;

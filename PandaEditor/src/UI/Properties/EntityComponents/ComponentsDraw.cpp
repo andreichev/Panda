@@ -3,8 +3,8 @@
 //
 
 #include "UI/Common/ImGuiHelper.hpp"
-#include "UI/EntityComponents/ComponentsDraw.hpp"
-#include "UI/EntityComponents/ConsistensyCheck.hpp"
+#include "UI/Properties/EntityComponents/ComponentsDraw.hpp"
+#include "UI/Properties/EntityComponents/ConsistensyCheck.hpp"
 
 #include <Panda/WorldCommands/Impl/EntityTransformCommand.hpp>
 #include <Panda/WorldCommands/Impl/UpdateSpriteRendererCommand.hpp>

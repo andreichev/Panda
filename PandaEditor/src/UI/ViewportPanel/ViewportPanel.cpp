@@ -202,6 +202,7 @@ void ViewportPanel::readIdsMemoryIfNeed() {
     }
     SelectionContext::addSelectedEntities(select);
     SelectionContext::removeSelectedEntities(unselect);
+    if (!m_rectSelection.appendSelection) { SelectionContext::unselectAllAssets(); }
 }
 
 void ViewportPanel::beginRectSelection(bool append) {
@@ -259,8 +260,6 @@ void ViewportPanel::endRectSelection() {
 }
 
 void ViewportPanel::unselectAll() {
-    World *currentWorld = GameContext::getCurrentWorld();
-    if (!currentWorld) { return; }
     SelectionContext::unselectAll();
 }
 

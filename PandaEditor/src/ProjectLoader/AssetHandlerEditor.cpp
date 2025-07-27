@@ -140,14 +140,38 @@ void AssetHandlerEditor::registerMaterialAsset(const path_t &path) {
 }
 
 void AssetHandlerEditor::registerAsset(const path_t &path) {
-    PND_ASSERT(!getAssetId(path), "ASSET ALREADY IMPORTED");
-    std::string extension = path.extension().string();
-    if (m_registerAssetFunc.find(extension) == m_registerAssetFunc.end()) {
+    path_t extension = path.extension();
+    if (!canImport(path)) {
         LOG_ERROR_EDITOR("EXTENSION %s IMPORT NOT SUPPORTED YET", extension.c_str());
         return;
     }
     RegisterAssetFunc registerAssetFunc = m_registerAssetFunc[extension];
     (this->*registerAssetFunc)(path);
+}
+
+bool AssetHandlerEditor::canImport(const path_t &path) {
+    PND_ASSERT(!getAssetId(path), "ASSET ALREADY IMPORTED");
+    path_t extension = path.extension();
+    return m_registerAssetFunc.find(extension) != m_registerAssetFunc.end();
+}
+
+AssetInfo AssetHandlerEditor::getInfo(AssetId id) {
+    if (m_registry.find(id) == m_registry.end()) {
+        PND_ASSERT(false, "UNKNOWN ASSET ID");
+        return {};
+    }
+    return m_registry.at(id);
+}
+
+void AssetHandlerEditor::updateInfo(AssetId id, const AssetInfo &assetInfo) {
+    if (m_registry.find(id) == m_registry.end()) {
+        PND_ASSERT(false, "UNKNOWN ASSET ID");
+        return;
+    }
+    PND_ASSERT(assetInfo.id == id, "ASSET ID DOES NOT MATCH");
+    AssetInfo &prevInfo = m_registry.at(id);
+    PND_ASSERT(prevInfo.type == assetInfo.type, "CAN'T CHANGE ASSET TYPE");
+    m_registry[id] = assetInfo;
 }
 
 UUID AssetHandlerEditor::getAssetId(path_t path) {

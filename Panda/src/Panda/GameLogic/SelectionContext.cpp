@@ -2,7 +2,7 @@
 
 namespace Panda {
 
-std::unordered_set<UUID> SelectionContext::s_selectedAssets;
+std::unordered_set<path_t> SelectionContext::s_selectedAssets;
 std::unordered_set<UUID> SelectionContext::s_selectedEntities;
 std::unordered_set<UUID> SelectionContext::s_manipulatingEntities;
 glm::vec3 SelectionContext::s_medianPosition;

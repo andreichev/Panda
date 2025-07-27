@@ -18,6 +18,9 @@ public:
     AssetHandlerEditor();
     Foundation::Shared<Asset> load(AssetId id) override;
     void registerAsset(const path_t &path);
+    bool canImport(const path_t &path);
+    AssetInfo getInfo(AssetId id);
+    void updateInfo(AssetId assetId, const AssetInfo &assetInfo);
     UUID getAssetId(path_t path);
     void openProject(const path_t &path);
     void closeProject();

@@ -15,12 +15,24 @@ public:
         return s_selectedEntities;
     }
 
+    static std::unordered_set<path_t> getSelectedAssets() {
+        return s_selectedAssets;
+    }
+
     static std::unordered_set<UUID> getManipulatingEntities() {
         return s_manipulatingEntities;
     }
 
     static bool isSelected(UUID id) {
         return s_selectedEntities.contains(id);
+    }
+
+    static bool isSelected(path_t path) {
+        return s_selectedAssets.contains(path);
+    }
+
+    static void addSelectedAsset(path_t path) {
+        s_selectedAssets.emplace(path);
     }
 
     static void addSelectedEntity(UUID id, bool needToCalculateMedian = true) {
@@ -70,9 +82,14 @@ public:
     }
 
     static void unselectAll() {
+        s_selectedAssets.clear();
         s_selectedEntities.clear();
         s_manipulatingEntities.clear();
         resetValues();
+    }
+
+    static void unselectAllAssets() {
+        s_selectedAssets.clear();
     }
 
     static int selectedCount() {
@@ -134,7 +151,7 @@ public:
     }
 
 private:
-    static std::unordered_set<UUID> s_selectedAssets;
+    static std::unordered_set<path_t> s_selectedAssets;
     static std::unordered_set<UUID> s_selectedEntities;
     static std::unordered_set<UUID> s_manipulatingEntities;
     static glm::vec3 s_medianPosition;
