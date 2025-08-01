@@ -613,6 +613,55 @@ bool propertyEntity(const char *label, UUID *value) {
     return changed;
 }
 
+bool propertyShader(const char *label, UUID &shaderId, bool isInconsistent) {
+    bool changed = false;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    shiftCursorY(6.0f);
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label);
+    ImGui::NextColumn();
+    if (shaderId) {
+        ImGui::Button("Shader Asset", {100, 55});
+    } else {
+        ImGui::Button("No shader", {100, 55});
+    }
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        if (ImGui::GetDragDropPayload() == nullptr) {
+            DragDropItem item;
+            item.type = DragDropItemType::SHADER;
+            PND_STATIC_ASSERT(sizeof(shaderId) <= sizeof(DragDropItem::data));
+            memcpy(item.data, &shaderId, sizeof(shaderId));
+            item.count = 1;
+            ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        }
+        ImGui::Text("Shader");
+        ImGui::EndDragDropSource();
+    }
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
+            PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
+            DragDropItem &item = *(DragDropItem *)payload->Data;
+            if (item.type == DragDropItemType::SHADER) {
+                memcpy(&shaderId, item.data, sizeof(shaderId));
+                changed = true;
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+    if (shaderId) {
+        ImGui::SameLine();
+        if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+            changed = true;
+            shaderId = 0;
+        }
+    }
+    ImGui::NextColumn();
+    ImGui::PopStyleVar();
+    ImGui::Columns(1);
+    return changed;
+}
+
 bool drawScriptFieldValue(ScriptField &field) {
     bool changed = false;
     ImGui::PushID(field.fieldId);

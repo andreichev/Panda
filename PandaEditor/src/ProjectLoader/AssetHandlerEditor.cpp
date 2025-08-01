@@ -172,6 +172,7 @@ void AssetHandlerEditor::updateInfo(AssetId id, const AssetInfo &assetInfo) {
     AssetInfo &prevInfo = m_registry.at(id);
     PND_ASSERT(prevInfo.type == assetInfo.type, "CAN'T CHANGE ASSET TYPE");
     m_registry[id] = assetInfo;
+    saveAssetRegistry();
 }
 
 UUID AssetHandlerEditor::getAssetId(path_t path) {

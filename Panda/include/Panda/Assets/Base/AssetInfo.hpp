@@ -33,9 +33,11 @@ struct ShaderAssetMeta : public Rain::Codable {
 
 struct MaterialAssetMeta : public Rain::Codable {
     path_t materialPath;
+    UUID shader;
 
     RAIN_FIELDS_BEGIN(MaterialAssetMeta)
     RAIN_FIELD(materialPath)
+    RAIN_FIELD(shader)
     RAIN_FIELDS_END
 };
 

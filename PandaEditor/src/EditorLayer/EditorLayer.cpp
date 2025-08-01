@@ -414,15 +414,6 @@ void EditorLayer::deleteFileShowPopup(path_t path) {
     m_popups.emplace_back(popup);
 }
 
-void EditorLayer::importAsset(const path_t &path) {
-    auto &assetHandler = m_loader.getAssetHandler();
-    assetHandler.registerAsset(path);
-}
-
-UUID EditorLayer::getAssetId(const path_t &path) {
-    return m_loader.getAssetHandler().getAssetId(path);
-}
-
 #pragma endregion
 
 #pragma region Toolbar output

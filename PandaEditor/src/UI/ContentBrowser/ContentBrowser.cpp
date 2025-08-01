@@ -1,5 +1,6 @@
 
 #include "ContentBrowser.hpp"
+#include "ProjectLoader/AssetHandlerEditor.hpp"
 #include "Model/DragDropItem.hpp"
 
 #include <Panda/ImGui/FontAwesome.h>
@@ -41,6 +42,9 @@ ContentBrowser::ContentBrowser(ContentBrowserOutput *output)
 
 void ContentBrowser::onImGuiRender() {
     if (m_currentDirectory.empty()) { return; }
+    if (!GameContext::getAssetHandler()) { return; }
+    AssetHandlerEditor *assetHandler =
+        static_cast<AssetHandlerEditor *>(GameContext::getAssetHandler());
     bool ctrl = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
     bool shift = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
     ImGui::Begin("Content Browser");
@@ -91,7 +95,7 @@ void ContentBrowser::onImGuiRender() {
     ImGui::Columns(columnCount, 0, false);
     for (auto &directoryEntry : std::filesystem::directory_iterator(m_currentDirectory)) {
         const path_t &path = directoryEntry.path();
-        UUID assetId = m_output->getAssetId(path);
+        UUID assetId = assetHandler->getAssetId(path);
         std::string filenameString = path.filename().string();
 
         if (!showHiddenFiles && filenameString[0] == '.') { continue; }
@@ -134,17 +138,44 @@ void ContentBrowser::onImGuiRender() {
             SelectionContext::addSelectedAsset(path);
         }
         if (assetId) {
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                if (ImGui::GetDragDropPayload() == nullptr) {
-                    DragDropItem item;
-                    item.type = DragDropItemType::TEXTURE;
-                    item.count = 1;
-                    PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
-                    memcpy(item.data, &assetId, sizeof(UUID));
-                    ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+            AssetInfo assetInfo = assetHandler->getInfo(assetId);
+            switch (assetInfo.type) {
+                case AssetType::TEXTURE: {
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                        if (ImGui::GetDragDropPayload() == nullptr) {
+                            DragDropItem item;
+                            item.type = DragDropItemType::TEXTURE;
+                            item.count = 1;
+                            PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
+                            memcpy(item.data, &assetId, sizeof(UUID));
+                            ImGui::SetDragDropPayload(
+                                PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
+                            );
+                        }
+                        ImGui::Text("Texture");
+                        ImGui::EndDragDropSource();
+                    }
+                    break;
                 }
-                ImGui::Text("Texture");
-                ImGui::EndDragDropSource();
+                case AssetType::SHADER: {
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                        if (ImGui::GetDragDropPayload() == nullptr) {
+                            DragDropItem item;
+                            item.type = DragDropItemType::SHADER;
+                            item.count = 1;
+                            PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
+                            memcpy(item.data, &assetId, sizeof(UUID));
+                            ImGui::SetDragDropPayload(
+                                PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
+                            );
+                        }
+                        ImGui::Text("Shader");
+                        ImGui::EndDragDropSource();
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
 
             ImVec2 nextThumbnailPos = ImGui::GetCursorPos();
@@ -165,8 +196,8 @@ void ContentBrowser::onImGuiRender() {
                 m_deletingDirectory = path;
                 m_output->deleteFileShowPopup(path);
             }
-            if (!assetId) {
-                if (ImGui::MenuItem("Import Asset")) { m_output->importAsset(path); }
+            if (!assetId && assetHandler->canImport(path)) {
+                if (ImGui::MenuItem("Import Asset")) { assetHandler->registerAsset(path); }
             }
             ImGui::EndPopup();
         }
