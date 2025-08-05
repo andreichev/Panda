@@ -24,6 +24,7 @@ public:
     UUID getAssetId(path_t path);
     void openProject(const path_t &path);
     void closeProject();
+    const path_t &getProjectPath();
 
 private:
     void registerTextureAsset(const path_t &path);

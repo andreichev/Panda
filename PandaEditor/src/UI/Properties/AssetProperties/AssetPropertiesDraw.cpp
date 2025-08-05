@@ -77,7 +77,23 @@ void AssetPropertiesDraw::drawProperties(const path_t &assetPath) {
             Fonts::popFont();
             MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
             bool changed = false;
-            if (propertyShader("Shader", meta.shader, false)) { changed = true; }
+            path_t shaderPath;
+            if (meta.shader) {
+                AssetInfo shaderInfo = assetHandler->getInfo(meta.shader);
+                ShaderAssetMeta shaderMeta = std::get<ShaderAssetMeta>(shaderInfo.meta);
+                shaderPath = assetHandler->getProjectPath() / shaderMeta.fragmentCodePath;
+            } else {
+                shaderPath = "No shader";
+            }
+            if (propertyShader(
+                    "Shader",
+                    shaderPath.filename().string().c_str(),
+                    shaderPath.string().c_str(),
+                    meta.shader,
+                    false
+                )) {
+                changed = true;
+            }
             if (changed) {
                 info.meta = meta;
                 assetHandler->updateInfo(assetId, info);

@@ -1,4 +1,5 @@
 #include "ThumbnailProvider.hpp"
+#include "ProjectLoader/AssetHandlerEditor.hpp"
 
 #include <Panda/GameLogic/GameContext.hpp>
 
@@ -6,10 +7,14 @@ namespace Panda {
 
 Foundation::Shared<TextureAsset> ThumbnailProvider::getThumbnailOrNull(AssetId assetId, Size size) {
     if (m_cache.find(assetId) != m_cache.end()) { return m_cache.at(assetId); }
-    Foundation::Shared<Asset> asset = GameContext::getAssetHandler()->load(assetId);
+    if (!GameContext::getAssetHandler()) { return nullptr; }
+    AssetHandlerEditor *assetHandler =
+        static_cast<AssetHandlerEditor *>(GameContext::getAssetHandler());
+    AssetInfo info = assetHandler->getInfo(assetId);
     Foundation::Shared<TextureAsset> thumbnail = nullptr;
-    switch (asset->getType()) {
+    switch (info.type) {
         case AssetType::TEXTURE: {
+            auto asset = assetHandler->load(assetId);
             thumbnail = Foundation::SharedCast<TextureAsset>(asset);
             break;
         }

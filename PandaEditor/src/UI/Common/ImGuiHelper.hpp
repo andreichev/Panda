@@ -120,7 +120,9 @@ bool propertyColor(const char *label, Color &value, bool isInconsistent);
 bool propertyTexture(
     const char *label, UUID &textureId, Foundation::Shared<Asset> asset, bool isInconsistent
 );
-bool propertyShader(const char *label, UUID &shaderId, bool isInconsistent);
+bool propertyShader(
+    const char *label, const char *filename, path_t path, UUID &shaderId, bool isInconsistent
+);
 bool drawScriptFieldValue(ScriptField &field);
 
 } // namespace Panda

@@ -2,7 +2,6 @@
 
 #include "Panda/Base/Base.hpp"
 #include "Panda/GameLogic/GameContext.hpp"
-#include "Panda/Renderer/MaterialData.hpp"
 #include "Panda/Assets/TextureAsset.hpp"
 #include "Base/Asset.hpp"
 #include "Base/Path.hpp"

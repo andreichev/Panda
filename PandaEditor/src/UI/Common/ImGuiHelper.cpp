@@ -1,5 +1,6 @@
 #include "ImGuiHelper.hpp"
 #include "Model/DragDropItem.hpp"
+#include "SystemTools/SystemTools.hpp"
 
 #include <Panda/GameLogic/GameContext.hpp>
 #include <Panda/ImGui/FontAwesome.h>
@@ -613,7 +614,9 @@ bool propertyEntity(const char *label, UUID *value) {
     return changed;
 }
 
-bool propertyShader(const char *label, UUID &shaderId, bool isInconsistent) {
+bool propertyShader(
+    const char *label, const char *filename, path_t path, UUID &shaderId, bool isInconsistent
+) {
     bool changed = false;
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     shiftCursorY(6.0f);
@@ -622,7 +625,11 @@ bool propertyShader(const char *label, UUID &shaderId, bool isInconsistent) {
     ImGui::Text(isInconsistent ? "*%s" : "%s", label);
     ImGui::NextColumn();
     if (shaderId) {
-        ImGui::Button("Shader Asset", {100, 55});
+        if (filename) {
+            if (ImGui::Button(filename, {100, 55})) { SystemTools::open(path); }
+        } else {
+            if (ImGui::Button("Shader Asset", {100, 55})) { SystemTools::open(path); }
+        }
     } else {
         ImGui::Button("No shader", {100, 55});
     }

@@ -5,26 +5,22 @@
 
 namespace Panda {
 
-/* TODO: Add material fields
 enum class MaterialFieldType : uint32_t { INTEGER, FLOAT, TEXTURE, UNKNOWN };
 
 struct MaterialField : public Rain::Codable {
     std::string name;
+    MaterialFieldType type;
     Foundation::Memory value;
 };
-*/
 
 struct MaterialData : public Rain::Codable {
-    UUID shader;
-    std::vector<UUID> textures;
+    std::vector<MaterialField> inputs;
 
     MaterialData()
-        : shader(0)
-        , textures() {}
+        : inputs() {}
 
     RAIN_FIELDS_BEGIN(MaterialData)
-    RAIN_FIELD(shader)
-    RAIN_FIELD(textures)
+    RAIN_FIELD(inputs)
     RAIN_FIELDS_END
 };
 

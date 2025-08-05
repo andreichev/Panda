@@ -27,13 +27,13 @@ void PropertiesPanel::onImGuiRender() {
     }
     if (!selectedIds.empty() && !selectedAssets.empty()) {
         ImGui::Text(
-            "Selected %d entities and %d assets", selectedIds.size(), selectedAssets.size()
+            "Selected %ld entities and %ld assets", selectedIds.size(), selectedAssets.size()
         );
     } else if (!selectedIds.empty()) {
         std::unordered_set<Entity> selected = world->getById(selectedIds);
         m_componentsDraw.drawComponents(selected);
     } else if (selectedAssets.size() > 1) {
-        ImGui::Text("Selected %d assets", selectedAssets.size());
+        ImGui::Text("Selected %ld assets", selectedAssets.size());
     } else {
         m_assetPropertiesDraw.drawProperties(*selectedAssets.begin());
     }

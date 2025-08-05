@@ -3,6 +3,7 @@
 #include <Panda/Assets/Base/AssetImporterBase.hpp>
 #include <Panda/Assets/TextureAsset.hpp>
 #include <Panda/Assets/ShaderAsset.hpp>
+#include <Panda/Renderer/MaterialData.hpp>
 #include <Panda/Assets/MaterialAsset.hpp>
 
 #include <fstream>
@@ -69,8 +70,8 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
                 decoder->decode(file, data);
                 file.close();
                 Foundation::Shared<ShaderAsset> shader;
-                if (data.shader) {
-                    shader = Foundation::SharedCast<ShaderAsset>(load(data.shader));
+                if (meta.shader) {
+                    shader = Foundation::SharedCast<ShaderAsset>(load(meta.shader));
                 }
                 std::vector<TextureBinding> bindings;
                 // for (auto textureId : data.textures) {
@@ -288,6 +289,10 @@ void AssetHandlerEditor::saveAssetRegistry() {
     } else {
         LOG_INFO("ASSET REGISTRY SAVING ERROR");
     }
+}
+
+const path_t &AssetHandlerEditor::getProjectPath() {
+    return m_projectPath;
 }
 
 } // namespace Panda
