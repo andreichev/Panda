@@ -75,13 +75,13 @@ struct SpriteRendererComponent final {
     int cols = 1;
     int rows = 1;
     int index = 0;
-    UUID textureId = 0;
+    UUID materialId = 0;
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const SpriteRendererComponent &other) = default;
 
-    // Cache
-    Foundation::Shared<Asset> asset;
+    // Material asset cache
+    Foundation::Shared<MaterialAsset> asset;
     void resetCache() {
         asset = nullptr;
     }

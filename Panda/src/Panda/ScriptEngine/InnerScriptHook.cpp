@@ -189,10 +189,11 @@ namespace InternalCalls {
         sr.color.a = a;
     }
 
+    // TODO: Replace with set material field
     void spriteRendererComponent_SetTexture(EntityHandle entityId, TextureHandle textureId) {
         Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
-        sr.textureId = textureId;
+        sr.materialId = textureId;
         sr.resetCache();
     }
 

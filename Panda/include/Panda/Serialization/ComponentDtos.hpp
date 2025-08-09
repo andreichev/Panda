@@ -55,7 +55,7 @@ struct SpriteRendererComponentDto : public Rain::Codable {
     int cols = 1;
     int rows = 1;
     int index = 0;
-    UUID texture = 0;
+    UUID material = 0;
 
     SpriteRendererComponentDto() = default;
     SpriteRendererComponentDto(const SpriteRendererComponentDto &other) = default;
@@ -65,7 +65,7 @@ struct SpriteRendererComponentDto : public Rain::Codable {
     RAIN_FIELD(cols)
     RAIN_FIELD(rows)
     RAIN_FIELD(index)
-    RAIN_FIELD(texture)
+    RAIN_FIELD(material)
     RAIN_FIELDS_END
 };
 
@@ -124,6 +124,7 @@ struct ScriptFieldDto : public Rain::Codable {
     std::string name;
     uint32_t fieldId;
     ScriptFieldType type;
+    // TODO: Replace with std::variant
     Foundation::Memory value;
 
     static void encode(const char *key, Rain::Encoder *encoder, const ScriptFieldDto &data) {

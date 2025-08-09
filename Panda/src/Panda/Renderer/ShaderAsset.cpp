@@ -7,7 +7,7 @@ ShaderAsset::ShaderAsset()
     : m_handle(MIREN_INVALID_HANDLE) {}
 
 ShaderAsset::ShaderAsset(const path_t &fragmentCodePath) {
-    path_t vertexCodePath = "default-shaders/renderer3d/base_vertex.glsl";
+    path_t vertexCodePath = "default-shaders/default_vertex.glsl";
     Foundation::Memory vertexMem = Panda::AssetImporterBase::loadData(vertexCodePath);
     Foundation::Memory fragmentMem = Panda::AssetImporterBase::loadData(fragmentCodePath);
     m_handle = Miren::createProgram({vertexMem, fragmentMem});

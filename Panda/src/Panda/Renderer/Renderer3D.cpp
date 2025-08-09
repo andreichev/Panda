@@ -36,11 +36,7 @@ void Renderer3D::submit(glm::mat4 &transform, MeshAsset *mesh) {
     }
     Miren::ProgramHandle shaderHandle = material->getShaderAsset()->getMirenHandle();
     Miren::setShader(shaderHandle);
-    auto bindings = material->getBindings();
-    for (int i = 0; i < bindings.size(); i++) {
-        Miren::setTexture(bindings[i].texture->getMirenHandle(), i);
-        Miren::setUniform(shaderHandle, bindings[i].name, &i, Miren::UniformType::Sampler);
-    }
+    material->bindFields();
     Miren::setUniform(shaderHandle, "model", glm::value_ptr(transform), Miren::UniformType::Mat4);
     Miren::setUniform(
         shaderHandle, "projViewMtx", glm::value_ptr(m_viewProj), Miren::UniformType::Mat4

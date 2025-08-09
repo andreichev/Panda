@@ -123,6 +123,7 @@ bool propertyTexture(
 bool propertyShader(
     const char *label, const char *filename, path_t path, UUID &shaderId, bool isInconsistent
 );
+bool propertyMaterial(const char *label, UUID &materialId, bool isInconsistent);
 bool drawScriptFieldValue(ScriptField &field);
 
 } // namespace Panda

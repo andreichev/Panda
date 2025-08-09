@@ -11,6 +11,7 @@ struct ScriptField {
     FieldHandle fieldId;
     std::string name;
     ScriptFieldType type;
+    // TODO: Replace with std::variant
     Foundation::Memory value;
 
     ScriptField(

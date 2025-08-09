@@ -14,8 +14,9 @@
 namespace Panda {
 
 void AssetPropertiesDraw::drawProperties(const path_t &assetPath) {
-    AssetHandlerEditor *assetHandler =
-        static_cast<AssetHandlerEditor *>(GameContext::getAssetHandler());
+    AssetHandler *handler = GameContext::getAssetHandler();
+    PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
+    AssetHandlerEditor *assetHandler = static_cast<AssetHandlerEditor *>(handler);
     AssetId assetId = assetHandler->getAssetId(assetPath);
     if (!assetId) {
         if (assetHandler->canImport(assetPath)) {

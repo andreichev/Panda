@@ -3,6 +3,7 @@
 #include "Panda/Base/Base.hpp"
 #include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/Assets/TextureAsset.hpp"
+#include "Panda/Renderer/MaterialData.hpp"
 #include "Base/Asset.hpp"
 #include "Base/Path.hpp"
 #include "ShaderAsset.hpp"
@@ -12,37 +13,32 @@
 
 namespace Panda {
 
-// TODO: Replace with material fields
-struct TextureBinding {
-    const char *name;
-    Foundation::Shared<TextureAsset> texture;
-};
-
 class MaterialAsset final : public Asset {
 public:
     MaterialAsset()
         : Asset(AssetType::MATERIAL) {}
 
-    MaterialAsset(Foundation::Shared<ShaderAsset> shader, std::vector<TextureBinding> bindings)
+    MaterialAsset(const MaterialData &data, Foundation::Shared<ShaderAsset> shader)
         : Asset(AssetType::MATERIAL)
         , m_shader(shader)
-        , m_bindings(bindings) {}
+        , m_fields(data.inputs) {}
 
     Foundation::Shared<ShaderAsset> getShaderAsset() {
         return m_shader;
     }
 
-    // TODO: Replace with material fields
-    const std::vector<TextureBinding> &getBindings() {
-        return m_bindings;
+    const std::vector<MaterialField> &getFields() {
+        return m_fields;
     }
 
     bool isValid() {
         return m_shader->getMirenHandle().isValid();
     }
 
+    void bindFields();
+
 private:
-    std::vector<TextureBinding> m_bindings;
+    std::vector<MaterialField> m_fields;
     Foundation::Shared<ShaderAsset> m_shader;
 };
 

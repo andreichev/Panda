@@ -5,9 +5,8 @@
 #pragma once
 
 #include "PandaUI/View.hpp"
+#include "PandaUI/UIRenderer.hpp"
 #include "PandaUI/UICamera.hpp"
-
-#include <Panda/Renderer/Renderer2D.hpp>
 
 namespace PandaUI {
 
@@ -33,8 +32,8 @@ public:
         m_rootView = view;
     }
 
-    Panda::Renderer2D &getRenderer() {
-        return m_renderer2d;
+    UIRenderer &getRenderer() {
+        return m_renderer;
     }
 
     static Context &shared();
@@ -47,7 +46,7 @@ private:
 
     static Context *s_shared;
     Foundation::Shared<View> m_rootView;
-    Panda::Renderer2D m_renderer2d;
+    UIRenderer m_renderer;
     UICamera m_camera;
     Miren::ViewId m_mirenViewId;
     Size m_viewportSize;

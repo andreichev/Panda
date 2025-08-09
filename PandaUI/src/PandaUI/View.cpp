@@ -168,7 +168,7 @@ void View::render(float offsetX, float offsetY) {
     for (auto subview : m_subviews) {
         subview->render(origin.x + offsetX, origin.y + offsetY);
     }
-    Panda::Renderer2D::RectData rect;
+    UIRenderer::RectData rect;
     origin.x += offsetX;
     origin.y += offsetY;
     Size size = m_frame.size;

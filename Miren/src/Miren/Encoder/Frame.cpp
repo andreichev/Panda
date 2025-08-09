@@ -5,6 +5,7 @@
 #include "Frame.hpp"
 
 #include <Foundation/Allocator.hpp>
+#include <algorithm>
 
 namespace Miren {
 

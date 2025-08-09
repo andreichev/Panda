@@ -174,6 +174,23 @@ void ContentBrowser::onImGuiRender() {
                     }
                     break;
                 }
+                case AssetType::MATERIAL: {
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                        if (ImGui::GetDragDropPayload() == nullptr) {
+                            DragDropItem item;
+                            item.type = DragDropItemType::MATERIAL;
+                            item.count = 1;
+                            PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
+                            memcpy(item.data, &assetId, sizeof(UUID));
+                            ImGui::SetDragDropPayload(
+                                PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
+                            );
+                        }
+                        ImGui::Text("Material");
+                        ImGui::EndDragDropSource();
+                    }
+                    break;
+                }
                 default:
                     break;
             }

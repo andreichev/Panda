@@ -40,7 +40,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
             spriteRenderer.cols = spriteRendererDto.cols;
             spriteRenderer.rows = spriteRendererDto.rows;
             spriteRenderer.index = spriteRendererDto.index;
-            spriteRenderer.textureId = spriteRendererDto.texture;
+            spriteRenderer.materialId = spriteRendererDto.material;
         }
         // CUBE MAP COMPONENT
         if (entityDto.cubeMapComponent.has_value()) { entity.addComponent<SkyComponent>(); }
@@ -126,7 +126,7 @@ WorldDto WorldMapper::toDto(const World &world) {
             spriteRendererDto.cols = spriteRenderer.cols;
             spriteRendererDto.rows = spriteRenderer.rows;
             spriteRendererDto.index = spriteRenderer.index;
-            spriteRendererDto.texture = spriteRenderer.textureId;
+            spriteRendererDto.material = spriteRenderer.materialId;
             entityDto.spriteRendererComponent = spriteRendererDto;
         }
         // PHYSICS

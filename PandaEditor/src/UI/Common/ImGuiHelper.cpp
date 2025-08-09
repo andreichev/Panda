@@ -1,6 +1,7 @@
 #include "ImGuiHelper.hpp"
 #include "Model/DragDropItem.hpp"
 #include "SystemTools/SystemTools.hpp"
+#include "ProjectLoader/AssetHandlerEditor.hpp"
 
 #include <Panda/GameLogic/GameContext.hpp>
 #include <Panda/ImGui/FontAwesome.h>
@@ -661,6 +662,66 @@ bool propertyShader(
         if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
             changed = true;
             shaderId = 0;
+        }
+    }
+    ImGui::NextColumn();
+    ImGui::PopStyleVar();
+    ImGui::Columns(1);
+    return changed;
+}
+
+bool propertyMaterial(const char *label, UUID &materialId, bool isInconsistent) {
+    bool changed = false;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    shiftCursorY(6.0f);
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label);
+    ImGui::NextColumn();
+    if (materialId) {
+        AssetHandler *handler = GameContext::getAssetHandler();
+        PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
+        AssetHandlerEditor *assetHandler = static_cast<AssetHandlerEditor *>(handler);
+        AssetInfo info = assetHandler->getInfo(materialId);
+        MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
+        path_t path = meta.materialPath;
+        path_t filename = path.filename();
+        if (!filename.empty()) {
+            if (ImGui::Button(filename.string().c_str(), {100, 55})) { SystemTools::open(path); }
+        } else {
+            if (ImGui::Button("Material Asset", {100, 55})) { SystemTools::open(path); }
+        }
+    } else {
+        ImGui::Button("No material", {100, 55});
+    }
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        if (ImGui::GetDragDropPayload() == nullptr) {
+            DragDropItem item;
+            item.type = DragDropItemType::MATERIAL;
+            PND_STATIC_ASSERT(sizeof(materialId) <= sizeof(DragDropItem::data));
+            memcpy(item.data, &materialId, sizeof(materialId));
+            item.count = 1;
+            ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        }
+        ImGui::Text("Material");
+        ImGui::EndDragDropSource();
+    }
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
+            PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
+            DragDropItem &item = *(DragDropItem *)payload->Data;
+            if (item.type == DragDropItemType::MATERIAL) {
+                memcpy(&materialId, item.data, sizeof(materialId));
+                changed = true;
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+    if (materialId) {
+        ImGui::SameLine();
+        if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+            changed = true;
+            materialId = 0;
         }
     }
     ImGui::NextColumn();

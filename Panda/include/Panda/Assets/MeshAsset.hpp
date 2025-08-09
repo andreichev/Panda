@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "MaterialAsset.hpp"
+#include "Panda/Assets/MaterialAsset.hpp"
 #include "Panda/Renderer/MeshData.hpp"
 
 #include <Miren/Miren.hpp>

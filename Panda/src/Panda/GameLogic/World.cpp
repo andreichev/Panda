@@ -163,10 +163,11 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
             rect.color = spriteComponent.color;
             // Load texture if it needs.
             AssetHandler *assetHandler = GameContext::getAssetHandler();
-            if (spriteComponent.textureId && !spriteComponent.asset && assetHandler) {
-                spriteComponent.asset = assetHandler->load(spriteComponent.textureId);
+            if (spriteComponent.materialId && !spriteComponent.asset && assetHandler) {
+                auto asset = assetHandler->load(spriteComponent.materialId);
+                spriteComponent.asset = Foundation::SharedCast<MaterialAsset>(asset);
             }
-            rect.texture = spriteComponent.asset;
+            rect.material = spriteComponent.asset;
             rect.size = {1.f, 1.f};
             rect.id = id.id;
             int xTileIndex = spriteComponent.index % spriteComponent.cols;

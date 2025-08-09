@@ -5,6 +5,7 @@
 #include <Panda/Assets/ShaderAsset.hpp>
 #include <Panda/Renderer/MaterialData.hpp>
 #include <Panda/Assets/MaterialAsset.hpp>
+#include <Panda/Serialization/AssetsMapper.hpp>
 
 #include <fstream>
 
@@ -63,25 +64,19 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
         }
         case AssetType::MATERIAL: {
             auto meta = std::get<MaterialAssetMeta>(assetInfo.meta);
-            MaterialData data;
+            MaterialDataDto dataDto;
             std::ifstream file(m_projectPath / meta.materialPath);
             if (file.is_open()) {
                 Rain::Decoder *decoder = &m_jsonDecoder;
-                decoder->decode(file, data);
+                decoder->decode(file, dataDto);
                 file.close();
                 Foundation::Shared<ShaderAsset> shader;
                 if (meta.shader) {
                     shader = Foundation::SharedCast<ShaderAsset>(load(meta.shader));
                 }
-                std::vector<TextureBinding> bindings;
-                // for (auto textureId : data.textures) {
-                //     Foundation::Shared<TextureAsset> texture;
-                //     texture = Foundation::SharedCast<TextureAsset>(load(textureId));
-                //     if (texture) {
-                //         bindings.push_back(texture);
-                //     }
-                // }
-                asset = Foundation::makeShared<MaterialAsset>(shader, bindings);
+                MaterialData data;
+                AssetsMapper::toData(data, dataDto);
+                asset = Foundation::makeShared<MaterialAsset>(data, shader);
                 LOG_INFO("CREATED MATERIAL: %u", id);
             } else {
                 LOG_INFO("MATERIAL FILE NOT FOUND. MATERIAL IMPORT FAILED");

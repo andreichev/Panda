@@ -278,16 +278,14 @@ void ComponentsDraw::drawComponents(const std::unordered_set<Entity> &entities) 
                 }
                 modified = true;
             }
-            // Texture
-            bool isInconsistentTexture = isInconsistentPrimitive<UUID, SpriteRendererComponent>(
-                entities, [](const SpriteRendererComponent &other) { return other.textureId; }
+            // Material
+            bool isInconsistentMaterial = isInconsistentPrimitive<UUID, SpriteRendererComponent>(
+                entities, [](const SpriteRendererComponent &other) { return other.materialId; }
             );
-            if (propertyTexture(
-                    "Texture", firstComponent.textureId, firstComponent.asset, isInconsistentTexture
-                )) {
+            if (propertyMaterial("Material", firstComponent.materialId, isInconsistentMaterial)) {
                 for (Entity entity : entities) {
                     auto &component = entity.getComponent<SpriteRendererComponent>();
-                    component.textureId = firstComponent.textureId;
+                    component.materialId = firstComponent.materialId;
                     component.resetCache();
                 }
                 modified = true;
