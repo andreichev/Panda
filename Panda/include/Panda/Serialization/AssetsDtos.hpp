@@ -62,7 +62,7 @@ struct MaterialFieldDto : public Rain::Codable {
                 break;
             }
             case MaterialFieldType::TEXTURE: {
-                UUID value = 0;
+                UUID value;
                 decoder->decode("value", value);
                 data.value = value;
                 break;

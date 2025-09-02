@@ -3,12 +3,11 @@
 
 class CocoaWindow;
 
-@interface CocoaWindowDelegate : NSObject<NSWindowDelegate> {
-    CocoaWindow* window;
+@interface CocoaWindowDelegate : NSObject <NSWindowDelegate> {
+    CocoaWindow *window;
 }
 
 - (instancetype)initWithCocoa:(CocoaWindow *)initWindow;
 - (void)postWindowSize;
 
 @end
-

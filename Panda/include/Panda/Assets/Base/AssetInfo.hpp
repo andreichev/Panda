@@ -2,6 +2,7 @@
 
 #include "Panda/Assets/Base/Path.hpp"
 #include "Panda/Assets/Base/Asset.hpp"
+#include "Panda/Serialization/AssetsDtos.hpp"
 
 #include <Rain/Rain.hpp>
 #include <Miren/Miren.hpp>

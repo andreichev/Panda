@@ -12,13 +12,14 @@ MeshAsset::~MeshAsset() {
 }
 
 MeshAsset::MeshAsset()
-    : m_bufferLayoutHandle(MIREN_INVALID_HANDLE)
+    : Asset(AssetType::MESH)
+    , m_bufferLayoutHandle(MIREN_INVALID_HANDLE)
     , m_indexBufferHandle(MIREN_INVALID_HANDLE)
     , m_vertexBufferHandle(MIREN_INVALID_HANDLE)
     , m_indicesCount(0)
     , m_material() {}
 
-void MeshAsset::create(const Panda::MeshData &data, Foundation::Shared<MaterialAsset> material) {
+void MeshAsset::create(const Panda::MeshData &data, AssetRef<MaterialAsset> material) {
     PND_ASSERT(material && material->isValid(), "Invalid material for mesh");
     m_material = material;
     m_indicesCount = data.indicesCount;
@@ -40,7 +41,7 @@ void MeshAsset::update(const MeshData &data) {
     Miren::updateDynamicIndexBuffer(m_indexBufferHandle, data.indices, m_indicesCount);
 }
 
-Foundation::Shared<MaterialAsset> MeshAsset::getMaterialAsset() {
+AssetRef<MaterialAsset> MeshAsset::getMaterialAsset() {
     return m_material;
 }
 

@@ -8,6 +8,7 @@
 #include <Panda/ScriptEngine/ExternalScript.hpp>
 #include <Panda/Base/Base.hpp>
 #include <Panda/Assets/TextureAsset.hpp>
+#include <Panda/Assets/MaterialAsset.hpp>
 #include <imgui_internal.h>
 #include <imgui.h>
 #include <glm/glm.hpp>
@@ -117,13 +118,9 @@ bool drawVec3Control(
     uint32_t inconsistentAxes = 0
 );
 bool propertyColor(const char *label, Color &value, bool isInconsistent);
-bool propertyTexture(
-    const char *label, UUID &textureId, Foundation::Shared<Asset> asset, bool isInconsistent
-);
-bool propertyShader(
-    const char *label, const char *filename, path_t path, UUID &shaderId, bool isInconsistent
-);
-bool propertyMaterial(const char *label, UUID &materialId, bool isInconsistent);
+bool propertyTexture(const char *label, AssetRef<Asset> &asset, bool isInconsistent);
+bool propertyShader(const char *label, path_t path, AssetRef<Asset> &asset, bool isInconsistent);
+bool propertyMaterial(const char *label, AssetRef<Asset> &asset, bool isInconsistent);
 bool drawScriptFieldValue(ScriptField &field);
 
 } // namespace Panda

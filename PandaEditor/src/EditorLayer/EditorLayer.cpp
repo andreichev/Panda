@@ -338,19 +338,19 @@ void EditorLayer::addScriptToEntities(const std::unordered_set<Entity> &entities
                 // Map manifest fields to internal ScriptField type
                 std::vector<ScriptField> fields;
                 for (auto manifestField : clazz.fields) {
-                    Foundation::Memory data;
+                    ScriptFieldValue value;
                     switch (manifestField.type) {
                         case ScriptFieldType::INTEGER: {
-                            data = Foundation::Memory::alloc(sizeof(int));
+                            value = int32_t(0);
                             break;
                         }
                         case ScriptFieldType::FLOAT: {
-                            data = Foundation::Memory::alloc(sizeof(float));
+                            value = float(0.f);
                             break;
                         }
                         case ScriptFieldType::TEXTURE:
                         case ScriptFieldType::ENTITY: {
-                            data = Foundation::Memory::alloc(sizeof(UUID));
+                            value = UUID(0);
                             break;
                         }
                         default: {
@@ -358,7 +358,7 @@ void EditorLayer::addScriptToEntities(const std::unordered_set<Entity> &entities
                         }
                     }
                     ScriptField field(
-                        0, manifestField.handle, manifestField.name, manifestField.type, data
+                        0, manifestField.handle, manifestField.name, manifestField.type, value
                     );
                     fields.emplace_back(field);
                 }

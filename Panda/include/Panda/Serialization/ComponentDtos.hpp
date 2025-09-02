@@ -55,7 +55,7 @@ struct SpriteRendererComponentDto : public Rain::Codable {
     int cols = 1;
     int rows = 1;
     int index = 0;
-    UUID material = 0;
+    UUID material;
 
     SpriteRendererComponentDto() = default;
     SpriteRendererComponentDto(const SpriteRendererComponentDto &other) = default;
@@ -124,8 +124,7 @@ struct ScriptFieldDto : public Rain::Codable {
     std::string name;
     uint32_t fieldId;
     ScriptFieldType type;
-    // TODO: Replace with std::variant
-    Foundation::Memory value;
+    ScriptFieldValue value;
 
     static void encode(const char *key, Rain::Encoder *encoder, const ScriptFieldDto &data) {
         encoder->beginObject(key);
@@ -134,19 +133,19 @@ struct ScriptFieldDto : public Rain::Codable {
         encoder->encode("type", data.type);
         switch (data.type) {
             case ScriptFieldType::INTEGER: {
-                int *value = (int *)data.value.data;
-                encoder->encode("value", *value);
+                int value = std::get<int32_t>(data.value);
+                encoder->encode("value", value);
                 break;
             }
             case ScriptFieldType::FLOAT: {
-                float *value = (float *)data.value.data;
-                encoder->encode("value", *value);
+                float value = std::get<float>(data.value);
+                encoder->encode("value", value);
                 break;
             }
             case ScriptFieldType::ENTITY:
             case ScriptFieldType::TEXTURE: {
-                UUID *value = (UUID *)data.value.data;
-                encoder->encode("value", *value);
+                UUID value = std::get<UUID>(data.value);
+                encoder->encode("value", value);
                 break;
             }
             default: {
@@ -162,28 +161,24 @@ struct ScriptFieldDto : public Rain::Codable {
         decoder->decode("name", data.name);
         decoder->decode("fieldId", data.fieldId);
         decoder->decode("type", data.type);
-        data.value.release();
         switch (data.type) {
             case ScriptFieldType::INTEGER: {
-                data.value = Foundation::Memory::alloc(sizeof(int));
                 int value = 0;
                 decoder->decode("value", value);
-                memcpy(data.value.data, &value, sizeof(int));
+                data.value = value;
                 break;
             }
             case ScriptFieldType::FLOAT: {
-                data.value = Foundation::Memory::alloc(sizeof(float));
                 float value = 0;
                 decoder->decode("value", value);
-                memcpy(data.value.data, &value, sizeof(float));
+                data.value = value;
                 break;
             }
             case ScriptFieldType::TEXTURE:
             case ScriptFieldType::ENTITY: {
-                data.value = Foundation::Memory::alloc(sizeof(UUID));
                 UUID value = 0;
                 decoder->decode("value", value);
-                memcpy(data.value.data, &value, sizeof(UUID));
+                data.value = value;
                 break;
             }
             default: {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Asset.hpp"
+#include "AssetRef.hpp"
 #include "Path.hpp"
 
 #include <Miren/Base.hpp>
@@ -13,10 +13,33 @@ namespace Panda {
 class AssetHandler {
 public:
     virtual ~AssetHandler() = default;
-    /// Загрузка метаданных Asset и самих данных.
-    /// Инициализация Asset и полная подготовка для дальнейшей работы. Кеширования и
-    /// повторного использования на этом этапе нет.
-    virtual Foundation::Shared<Asset> load(AssetId id) = 0;
+
+    AssetHandler(Foundation::AllocatorI *allocator)
+        : m_allocator(allocator)
+        , m_loadedAssets() {}
+
+    template<typename T = Asset>
+    AssetRef<T> makeRef(AssetId id) {
+        return AssetRef<T>(this, id);
+    }
+
+    template<typename T, typename... Args>
+    AssetRef<T> createStaticAsset(AssetId id, Args &&...args) {
+        T *asset = F_NEW(m_allocator, T)(std::forward<Args>(args)...);
+        m_loadedAssets[id] = asset;
+        return AssetRef<T>(this, id);
+    }
+
+protected:
+    virtual Asset *loadInternal(AssetId id) = 0;
+    virtual void incrementRefCount(AssetId id) {}
+    virtual void decrementRefCount(AssetId id) {}
+
+    std::unordered_map<AssetId, Asset *> m_loadedAssets;
+    Foundation::AllocatorI *m_allocator;
+
+    template<typename T>
+    friend class AssetRef;
 };
 
 } // namespace Panda

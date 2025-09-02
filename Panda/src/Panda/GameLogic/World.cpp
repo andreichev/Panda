@@ -26,7 +26,6 @@ World::World()
 
 World::~World() {
     m_physics2D.shutdown();
-    releaseAllScriptingFields();
 }
 
 void World::startRunning() {
@@ -161,13 +160,9 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
             Panda::Renderer2D::RectData rect;
             rect.transform = getWorldSpaceTransformMatrix(entity);
             rect.color = spriteComponent.color;
-            // Load texture if it needs.
-            AssetHandler *assetHandler = GameContext::getAssetHandler();
-            if (spriteComponent.materialId && !spriteComponent.asset && assetHandler) {
-                auto asset = assetHandler->load(spriteComponent.materialId);
-                spriteComponent.asset = Foundation::SharedCast<MaterialAsset>(asset);
+            if (spriteComponent.material) {
+                rect.material = spriteComponent.material.as<MaterialAsset>();
             }
-            rect.material = spriteComponent.asset;
             rect.size = {1.f, 1.f};
             rect.id = id.id;
             int xTileIndex = spriteComponent.index % spriteComponent.cols;
@@ -291,31 +286,12 @@ void World::updateScriptsAndFields() {
             for (auto &fieldManifest : clazz.fields) {
                 // Check if field is new - allocate memory and save it
                 if (!container.hasField(fieldManifest.name)) {
-                    Foundation::Memory value;
-                    switch (fieldManifest.type) {
-                        case ScriptFieldType::INTEGER: {
-                            value = Foundation::Memory::alloc(sizeof(int));
-                            memset(value.data, 0, sizeof(int));
-                            break;
-                        }
-                        case ScriptFieldType::FLOAT: {
-                            value = Foundation::Memory::alloc(sizeof(float));
-                            memset(value.data, 0, sizeof(float));
-                            break;
-                        }
-                        case ScriptFieldType::TEXTURE:
-                        case ScriptFieldType::ENTITY: {
-                            value = Foundation::Memory::alloc(sizeof(UUID));
-                            memset(value.data, 0, sizeof(UUID));
-                            break;
-                        }
-                        default: {
-                            PND_ASSERT(false, "Unknown field type");
-                            break;
-                        }
-                    }
                     ScriptField field = ScriptField(
-                        0, fieldManifest.handle, fieldManifest.name, fieldManifest.type, value
+                        0,
+                        fieldManifest.handle,
+                        fieldManifest.name,
+                        fieldManifest.type,
+                        std::monostate()
                     );
                     container.addField(field);
                     continue;
@@ -354,7 +330,7 @@ void World::initializeScriptCore() {
             for (ScriptField &field : container.getFields()) {
                 field.instanceId = scriptInstanceId;
                 // field.fieldId = classManifest.getField(field.name.c_str()).handle;
-                ExternalCalls::setFieldValue(scriptInstanceId, field.fieldId, field.value.data);
+                ExternalCalls::setFieldValue(scriptInstanceId, field.fieldId, &field.value);
             }
         }
     }
@@ -412,7 +388,6 @@ void World::destroy(Entity entity) {
 }
 
 void World::clear() {
-    releaseAllScriptingFields();
 #ifdef PND_EDITOR
     m_commandManager.CLEAR();
     m_isChanged = false;
@@ -552,18 +527,6 @@ World &World::operator=(World &other) {
     copyAllComponents<Rigidbody2DComponent>(src, dst);
     copyAllComponents<BoxCollider2DComponent>(src, dst);
     copyAllComponents<ScriptListComponent>(src, dst);
-    // Duplicate scripting fields memory
-    {
-        auto view = dst.view<ScriptListComponent>();
-        for (auto entityHandle : view) {
-            auto &scriptList = view.get<ScriptListComponent>(entityHandle);
-            for (ExternalScript &script : scriptList.scripts) {
-                for (ScriptField &field : script.getFields()) {
-                    field.value = Foundation::Memory::copying(field.value.data, field.getSize());
-                }
-            }
-        }
-    }
 #ifdef PND_EDITOR
     sort();
 #endif
@@ -588,15 +551,6 @@ Entity World::duplicateEntity(Entity entity) {
     copyComponent<Rigidbody2DComponent>(src, dst, m_registry);
     copyComponent<BoxCollider2DComponent>(src, dst, m_registry);
     copyComponent<ScriptListComponent>(src, dst, m_registry);
-    // Duplicate scripting fields memory
-    {
-        auto &scriptList = m_registry.get<ScriptListComponent>(dst);
-        for (ExternalScript &script : scriptList.scripts) {
-            for (ScriptField &field : script.getFields()) {
-                field.value = Foundation::Memory::copying(field.value.data, field.getSize());
-            }
-        }
-    }
     // Duplicate relationship component
     {
         RelationshipComponent &srcRelationship = m_registry.get<RelationshipComponent>(src);
@@ -626,14 +580,6 @@ Entity World::duplicateEntity(Entity entity) {
     m_isChanged = true;
 #endif
     return newEntity;
-}
-
-void World::releaseAllScriptingFields() {
-    auto view = m_registry.view<ScriptListComponent>();
-    for (auto entityHandle : view) {
-        ScriptListComponent &scriptList = view.get<ScriptListComponent>(entityHandle);
-        scriptList.releaseFields();
-    }
 }
 
 bool World::isValidEntt(entt::entity handle) {

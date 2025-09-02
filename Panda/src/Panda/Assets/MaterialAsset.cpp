@@ -3,7 +3,7 @@
 namespace Panda {
 
 void MaterialAsset::bindFields() {
-    Miren::ProgramHandle shaderHandle = m_shader->getMirenHandle();
+    Miren::ProgramHandle shaderHandle = m_shaderRef->getMirenHandle();
     if (!shaderHandle.isValid()) { return; }
     int textureSlot = 0;
     for (auto &field : m_fields) {
@@ -19,8 +19,8 @@ void MaterialAsset::bindFields() {
                 break;
             }
             case MaterialFieldType::TEXTURE: {
-                auto asset = std::get<Foundation::Shared<Asset>>(field.value);
-                auto texture = Foundation::SharedCast<TextureAsset>(asset);
+                auto asset = std::get<AssetRef<Asset>>(field.value);
+                auto texture = asset.as<TextureAsset>();
                 Miren::setTexture(texture->getMirenHandle(), textureSlot);
                 Miren::setUniform(
                     shaderHandle, field.name.c_str(), &textureSlot, Miren::UniformType::Sampler

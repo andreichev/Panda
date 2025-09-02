@@ -1,5 +1,6 @@
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Assets/Base/AssetImporterBase.hpp"
+#include "Panda/Assets/StaticResources.hpp"
 
 namespace Panda {
 
@@ -7,8 +8,6 @@ Renderer2D::Renderer2D()
     : m_viewId(0)
     , m_viewProj(1.f)
     , m_drawData()
-    , m_defaultMaterial()
-    , m_selectedGeometryMaterial()
     , m_mode(Mode::DEFAULT) {
     m_drawData.vbSize = 0;
     m_drawData.indicesCount = 0;
@@ -16,14 +15,6 @@ Renderer2D::Renderer2D()
         (Vertex2D *)F_ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
     m_drawData.indices =
         (uint16_t *)F_ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
-    Foundation::Shared<ShaderAsset> defaultShader =
-        Foundation::makeShared<ShaderAsset>("default-shaders/default_fragment.glsl");
-    MaterialData materialData;
-    m_defaultMaterial = Foundation::makeShared<MaterialAsset>(materialData, defaultShader);
-    Foundation::Shared<ShaderAsset> selectedGeometryShader =
-        Foundation::makeShared<ShaderAsset>("default-shaders/selection_map_fragment.glsl");
-    m_selectedGeometryMaterial =
-        Foundation::makeShared<MaterialAsset>(materialData, selectedGeometryShader);
     Miren::VertexBufferLayoutData layoutData;
     // Position
     layoutData.pushVec3();
@@ -48,10 +39,10 @@ void Renderer2D::begin(Mode mode, Miren::ViewId viewId) {
     reset();
     switch (mode) {
         case Mode::DEFAULT:
-            m_drawData.material = m_defaultMaterial;
+            m_drawData.material = StaticResources::defaultMaterial;
             break;
         case Mode::GEOMETRY_ONLY:
-            m_drawData.material = m_selectedGeometryMaterial;
+            m_drawData.material = StaticResources::selectedGeometryMaterial;
             break;
     }
     m_viewId = viewId;
@@ -69,12 +60,12 @@ void Renderer2D::drawRect(RectData rect) {
 }
 
 void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
-    if (!rect.material) { rect.material = m_defaultMaterial; }
+    if (!rect.material) { rect.material = StaticResources::defaultMaterial; }
     if (rect.material != m_drawData.material) {
         flush();
         m_drawData.material = rect.material;
     }
-    if (!m_drawData.material || !m_drawData.material->isValid()) {
+    if (!m_drawData.material) {
         PND_ASSERT(false, "Invalid material for rect");
         return;
     }

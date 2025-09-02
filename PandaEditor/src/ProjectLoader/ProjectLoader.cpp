@@ -1,10 +1,10 @@
 #include "ProjectLoader.hpp"
 #include "Panda/Serialization/WorldMapper.hpp"
+#include "Panda/GameLogic/GameContext.hpp"
+#include "Panda/Assets/StaticResources.hpp"
 
 #include <fstream>
 #include <sstream>
-
-#include "Panda/GameLogic/GameContext.hpp"
 
 namespace Panda {
 
@@ -25,6 +25,7 @@ ProjectLoader::ProjectLoader(World *world, ProjectLoaderOutput *output)
     , m_assetHandler() {
     GameContext::setScriptEngine(&m_scriptEngine);
     GameContext::setAssetHandler(&m_assetHandler);
+    StaticResources::initStaticResources();
 }
 
 ProjectLoader::~ProjectLoader() {

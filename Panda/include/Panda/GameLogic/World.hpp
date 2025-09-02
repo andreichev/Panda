@@ -84,7 +84,6 @@ private:
     WorldCommandManager m_commandManager;
 #endif
 
-    void releaseAllScriptingFields();
     void renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     void renderSelectedGeometry(glm::mat4 &viewProjMtx);
     Entity instantiateEntity(UUID id);

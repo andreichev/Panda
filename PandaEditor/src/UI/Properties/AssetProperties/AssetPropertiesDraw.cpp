@@ -83,16 +83,10 @@ void AssetPropertiesDraw::drawProperties(const path_t &assetPath) {
                 AssetInfo shaderInfo = assetHandler->getInfo(meta.shader);
                 ShaderAssetMeta shaderMeta = std::get<ShaderAssetMeta>(shaderInfo.meta);
                 shaderPath = assetHandler->getProjectPath() / shaderMeta.fragmentCodePath;
-            } else {
-                shaderPath = "No shader";
             }
-            if (propertyShader(
-                    "Shader",
-                    shaderPath.filename().string().c_str(),
-                    shaderPath.string().c_str(),
-                    meta.shader,
-                    false
-                )) {
+            AssetRef<Asset> asset = AssetRef<Asset>(meta.shader);
+            if (propertyShader("Shader", shaderPath, asset, false)) {
+                meta.shader = asset.getId();
                 changed = true;
             }
             if (changed) {
@@ -102,9 +96,11 @@ void AssetPropertiesDraw::drawProperties(const path_t &assetPath) {
             break;
         }
         case AssetType::CUBE_MAP:
+        case AssetType::MESH:
         case AssetType::NONE:
             break;
     }
+    if (ImGui::Button("Reimport")) { assetHandler->registerAsset(assetPath); }
 }
 
 } // namespace Panda

@@ -60,7 +60,7 @@ void SystemTools::copyFolder(const path_t &sourcePath, const path_t &newPath) {
 
 void SystemTools::open(const path_t &path) {
 #ifdef PLATFORM_POSIX
-    std::string command = "open " + path.string();
+    std::string command = "open -R " + path.string();
     system(command.c_str());
 #elif defined(PLATFORM_WINDOWS)
     std::string command = "start " + path.string();
@@ -89,8 +89,8 @@ void SystemTools::openCppProject(const Panda::path_t &path) {
             "/Applications/CLion.app/Contents/MacOS/clion \"" + path.string() + "\"";
         system(command.c_str());
     } else if (std::filesystem::exists("/Applications/Visual Studio Code.app")) {
-        std::string command =
-            "/Applications/Visual Studio Code.app/Contents/MacOS/clion \"" + path.string() + "\"";
+        std::string command = "/Applications/Visual Studio Code.app/Contents/MacOS/Electron \"" +
+                              path.string() + "\"";
         system(command.c_str());
     }
 #endif

@@ -1,25 +1,27 @@
 #pragma once
 
 #include <Foundation/Memory.hpp>
-#include <Panda/ScriptEngine/InnerScriptHook.hpp>
-#include <Panda/Assets/Base/Asset.hpp>
+#include <Rain/UUID.hpp>
+
+#include "Panda/ScriptEngine/InnerScriptHook.hpp"
 
 namespace Panda {
+
+using ScriptFieldValue = std::variant<std::monostate, int32_t, float, UUID>;
 
 struct ScriptField {
     ScriptInstanceHandle instanceId;
     FieldHandle fieldId;
     std::string name;
     ScriptFieldType type;
-    // TODO: Replace with std::variant
-    Foundation::Memory value;
+    ScriptFieldValue value;
 
     ScriptField(
         ScriptInstanceHandle instanceId,
         FieldHandle fieldId,
         const std::string &name,
         ScriptFieldType type,
-        Foundation::Memory value
+        ScriptFieldValue value
     )
         : instanceId(instanceId)
         , fieldId(fieldId)
@@ -28,36 +30,11 @@ struct ScriptField {
         , value(value) {}
 
     operator bool() {
-        return value.data;
+        return !std::holds_alternative<std::monostate>(value);
     }
 
     bool operator==(const ScriptField &other) const {
         return instanceId == other.instanceId && fieldId == other.fieldId;
-    }
-
-    size_t getSize() {
-        switch (type) {
-            case ScriptFieldType::INTEGER: {
-                return sizeof(int);
-            }
-            case ScriptFieldType::FLOAT: {
-                return sizeof(float);
-            }
-            case ScriptFieldType::TEXTURE:
-            case ScriptFieldType::ENTITY: {
-                return sizeof(UUID);
-            }
-            default: {
-                PND_ASSERT(false, "Unknown field type");
-                return 4;
-            }
-        }
-    }
-
-    // Cache
-    Foundation::Shared<Asset> asset;
-    void resetCache() {
-        asset = nullptr;
     }
 };
 

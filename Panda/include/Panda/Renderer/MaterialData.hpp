@@ -1,11 +1,11 @@
 #pragma once
 
+#include "Panda/Assets/Base/AssetRef.hpp"
 #include "Panda/Serialization/AssetsDtos.hpp"
-#include "Panda/Assets/TextureAsset.hpp"
 
 namespace Panda {
 
-using MaterialFieldData = std::variant<int, float, Foundation::Shared<Asset>>;
+using MaterialFieldData = std::variant<int, float, AssetRef<Asset>>;
 
 struct MaterialField {
     std::string name;

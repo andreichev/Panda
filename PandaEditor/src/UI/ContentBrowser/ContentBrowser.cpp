@@ -95,20 +95,25 @@ void ContentBrowser::onImGuiRender() {
     ImGui::Columns(columnCount, 0, false);
     for (auto &directoryEntry : std::filesystem::directory_iterator(m_currentDirectory)) {
         const path_t &path = directoryEntry.path();
-        UUID assetId = assetHandler->getAssetId(path);
+        AssetRef<Asset> asset;
+        {
+            UUID assetId = assetHandler->getAssetId(path);
+            asset = AssetRef<Asset>(assetHandler, assetId);
+        }
         std::string filenameString = path.filename().string();
 
         if (!showHiddenFiles && filenameString[0] == '.') { continue; }
 
         ImGui::PushID(filenameString.c_str());
         TextureAsset *icon;
-        Foundation::Shared<TextureAsset> thumbnail;
+        Foundation::Shared<Thumbnail> thumbnail;
         if (directoryEntry.is_directory()) {
             icon = &m_directoryIcon;
         } else {
-            if (assetId) {
-                thumbnail =
-                    m_thumbnailProvider.getThumbnailOrNull(assetId, {thumbnailSize, thumbnailSize});
+            if (asset) {
+                thumbnail = m_thumbnailProvider.getThumbnailOrNull(
+                    asset.getId(), {thumbnailSize, thumbnailSize}
+                );
             }
             if (!thumbnail) {
                 if (m_fileIcons.find(path.extension().string()) != m_fileIcons.end()) {
@@ -125,8 +130,7 @@ void ContentBrowser::onImGuiRender() {
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
         }
         ImVec2 thumbnailPos = ImGui::GetCursorPos();
-        Miren::TextureHandle handle =
-            thumbnail ? thumbnail->getMirenHandle() : icon->getMirenHandle();
+        Miren::TextureHandle handle = thumbnail ? thumbnail->getHandle() : icon->getMirenHandle();
         float height = thumbnailSize;
         float aspect = 1.f;
         if (thumbnail) { aspect = thumbnail->getSize().width / thumbnail->getSize().height; }
@@ -137,8 +141,8 @@ void ContentBrowser::onImGuiRender() {
             if (!shift && !ctrl) { SelectionContext::unselectAll(); }
             SelectionContext::addSelectedAsset(path);
         }
-        if (assetId) {
-            AssetInfo assetInfo = assetHandler->getInfo(assetId);
+        if (asset) {
+            AssetInfo assetInfo = assetHandler->getInfo(asset.getId());
             switch (assetInfo.type) {
                 case AssetType::TEXTURE: {
                     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
@@ -146,8 +150,10 @@ void ContentBrowser::onImGuiRender() {
                             DragDropItem item;
                             item.type = DragDropItemType::TEXTURE;
                             item.count = 1;
-                            PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
-                            memcpy(item.data, &assetId, sizeof(UUID));
+                            PND_STATIC_ASSERT(
+                                sizeof(AssetRef<Asset>) <= sizeof(DragDropItem::data)
+                            );
+                            memcpy(item.data, &asset, sizeof(AssetRef<Asset>));
                             ImGui::SetDragDropPayload(
                                 PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
                             );
@@ -163,8 +169,8 @@ void ContentBrowser::onImGuiRender() {
                             DragDropItem item;
                             item.type = DragDropItemType::SHADER;
                             item.count = 1;
-                            PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
-                            memcpy(item.data, &assetId, sizeof(UUID));
+                            PND_STATIC_ASSERT(sizeof(asset) <= sizeof(DragDropItem::data));
+                            memcpy(item.data, &asset, sizeof(AssetRef<Asset>));
                             ImGui::SetDragDropPayload(
                                 PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
                             );
@@ -180,8 +186,8 @@ void ContentBrowser::onImGuiRender() {
                             DragDropItem item;
                             item.type = DragDropItemType::MATERIAL;
                             item.count = 1;
-                            PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
-                            memcpy(item.data, &assetId, sizeof(UUID));
+                            PND_STATIC_ASSERT(sizeof(asset) <= sizeof(DragDropItem::data));
+                            memcpy(item.data, &asset, sizeof(AssetRef<Asset>));
                             ImGui::SetDragDropPayload(
                                 PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
                             );
@@ -213,7 +219,7 @@ void ContentBrowser::onImGuiRender() {
                 m_deletingDirectory = path;
                 m_output->deleteFileShowPopup(path);
             }
-            if (!assetId && assetHandler->canImport(path)) {
+            if (!asset && assetHandler->canImport(path)) {
                 if (ImGui::MenuItem("Import Asset")) { assetHandler->registerAsset(path); }
             }
             ImGui::EndPopup();

@@ -24,7 +24,7 @@ public:
             : center()
             , size()
             , color()
-            , material(nullptr)
+            , material()
             , rotation(0)
             , id(-1)
             , textureCoords(0, 0, 1, 1)
@@ -37,7 +37,7 @@ public:
         uint32_t id;
         float rotation;
         glm::mat4 transform;
-        Foundation::Shared<MaterialAsset> material;
+        AssetRef<MaterialAsset> material;
     };
 
     struct Statistics {
@@ -75,7 +75,7 @@ public:
         Renderer2D::Statistics stats;
         glm::mat4 projMat;
         Miren::VertexLayoutHandle layout;
-        Foundation::Shared<MaterialAsset> material;
+        AssetRef<MaterialAsset> material;
         Vertex2D *vertices;
         uint32_t verticesCount;
         uint16_t *indices;
@@ -99,8 +99,6 @@ private:
     Mode m_mode;
     Miren::ViewId m_viewId;
     DrawCallData m_drawData;
-    Foundation::Shared<MaterialAsset> m_defaultMaterial;
-    Foundation::Shared<MaterialAsset> m_selectedGeometryMaterial;
 
     void reset();
     void flush();

@@ -16,7 +16,6 @@ using RegisterAssetFunc = void (AssetHandlerEditor::*)(const path_t &path);
 class AssetHandlerEditor : public AssetHandler {
 public:
     AssetHandlerEditor();
-    Foundation::Shared<Asset> load(AssetId id) override;
     void registerAsset(const path_t &path);
     bool canImport(const path_t &path);
     AssetInfo getInfo(AssetId id);
@@ -27,6 +26,7 @@ public:
     const path_t &getProjectPath();
 
 private:
+    Asset *loadInternal(AssetId id) override;
     void registerTextureAsset(const path_t &path);
     void registerShaderAsset(const path_t &path);
     void registerMaterialAsset(const path_t &path);
@@ -37,7 +37,6 @@ private:
     path_t m_assetRegistryPath;
     Rain::JsonEncoder m_jsonEncoder;
     Rain::JsonDecoder m_jsonDecoder;
-    std::unordered_map<AssetId, Foundation::Weak<Asset>> m_cache;
     std::unordered_map<AssetId, AssetInfo> m_registry;
     std::unordered_map<path_t, AssetId> m_registeredAssets;
     std::map<path_t, RegisterAssetFunc> m_registerAssetFunc;

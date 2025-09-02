@@ -18,10 +18,10 @@ void AssetsMapper::toData(MaterialData &data, const MaterialDataDto &dto) {
                 break;
             }
             case MaterialFieldType::TEXTURE: {
-                UUID id = std::get<UUID>(fieldDto.value);
+                UUID assetId = std::get<UUID>(fieldDto.value);
                 AssetHandler *handler = GameContext::getAssetHandler();
                 PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
-                auto texture = handler->load(id);
+                auto texture = handler->makeRef<Asset>(assetId);
                 field.value = texture;
                 break;
             }
@@ -49,10 +49,8 @@ void AssetsMapper::toDto(const MaterialData &data, MaterialDataDto &dto) {
                 break;
             }
             case MaterialFieldType::TEXTURE: {
-                auto asset = std::get<Foundation::Shared<Asset>>(field.value);
-                auto texture = Foundation::SharedCast<TextureAsset>(asset);
-                PND_ASSERT(false, "NOT IMPLEMENTED YET");
-                fieldDto.value = UUID(0);
+                auto assetRef = std::get<AssetRef<Asset>>(field.value);
+                fieldDto.value = assetRef.getId();
                 break;
             }
             default: {

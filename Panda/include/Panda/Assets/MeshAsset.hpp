@@ -11,18 +11,18 @@
 
 namespace Panda {
 
-class MeshAsset {
+class MeshAsset : public Asset {
 public:
     ~MeshAsset();
     MeshAsset();
 
-    void create(const MeshData &data, Foundation::Shared<MaterialAsset> material);
+    void create(const MeshData &data, AssetRef<MaterialAsset> material);
     void update(const MeshData &data);
 
-    Foundation::Shared<MaterialAsset> getMaterialAsset();
+    AssetRef<MaterialAsset> getMaterialAsset();
 
 private:
-    Foundation::Shared<MaterialAsset> m_material;
+    AssetRef<MaterialAsset> m_material;
     Miren::VertexLayoutHandle m_bufferLayoutHandle;
     Miren::IndexBufferHandle m_indexBufferHandle;
     Miren::VertexBufferHandle m_vertexBufferHandle;

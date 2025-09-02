@@ -18,24 +18,22 @@ AssetHandlerEditor::AssetHandlerEditor()
     , m_jsonEncoder(true)
     , m_jsonDecoder()
     , m_registeredAssets()
-    , m_registerAssetFunc() {
+    , m_registerAssetFunc()
+    , AssetHandler(Foundation::getAllocator()) {
     m_registerAssetFunc.emplace(".png", &AssetHandlerEditor::registerTextureAsset);
     m_registerAssetFunc.emplace(".jpeg", &AssetHandlerEditor::registerTextureAsset);
     m_registerAssetFunc.emplace(".glsl", &AssetHandlerEditor::registerShaderAsset);
     m_registerAssetFunc.emplace(".mat", &AssetHandlerEditor::registerMaterialAsset);
 }
 
-Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
+Asset *AssetHandlerEditor::loadInternal(AssetId id) {
+    if (m_loadedAssets.find(id) != m_loadedAssets.end()) { return m_loadedAssets.at(id); }
     if (m_registry.find(id) == m_registry.end()) {
         PND_ASSERT(false, "UNKNOWN ASSET ID");
         return nullptr;
     }
-    if (m_cache.find(id) != m_cache.end()) {
-        auto asset = m_cache.at(id).lock();
-        if (asset) { return asset; }
-    }
     auto assetInfo = m_registry.at(id);
-    Foundation::Shared<Asset> asset;
+    Asset *asset;
     switch (assetInfo.type) {
         case AssetType::TEXTURE: {
             auto meta = std::get<TextureAssetMeta>(assetInfo.meta);
@@ -45,20 +43,20 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
                 create.m_minFiltering = meta.minFiltering;
                 create.m_magFiltering = meta.magFiltering;
                 create.m_numMips = meta.numMips;
-                asset = Foundation::makeShared<TextureAsset>(create);
+                asset = F_NEW(m_allocator, TextureAsset)(create);
                 LOG_INFO("CREATED TEXTURE: %u", id);
             } else {
                 Foundation::Memory violetTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
                 *(uint32_t *)violetTextureData.data = 0xFFFF008F;
                 Miren::TextureCreate violetTextureCreate;
                 violetTextureCreate.m_data = violetTextureData;
-                asset = Foundation::makeShared<TextureAsset>(violetTextureCreate);
+                asset = F_NEW(m_allocator, TextureAsset)(violetTextureCreate);
             }
             break;
         }
         case AssetType::SHADER: {
             auto meta = std::get<ShaderAssetMeta>(assetInfo.meta);
-            asset = Foundation::makeShared<ShaderAsset>(m_projectPath / meta.fragmentCodePath);
+            asset = F_NEW(m_allocator, ShaderAsset)(m_projectPath / meta.fragmentCodePath);
             LOG_INFO("CREATED SHADER: %u", id);
             break;
         }
@@ -70,13 +68,11 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
                 Rain::Decoder *decoder = &m_jsonDecoder;
                 decoder->decode(file, dataDto);
                 file.close();
-                Foundation::Shared<ShaderAsset> shader;
-                if (meta.shader) {
-                    shader = Foundation::SharedCast<ShaderAsset>(load(meta.shader));
-                }
+                AssetRef<ShaderAsset> shader;
+                if (meta.shader) { shader = makeRef<ShaderAsset>(meta.shader); }
                 MaterialData data;
                 AssetsMapper::toData(data, dataDto);
-                asset = Foundation::makeShared<MaterialAsset>(data, shader);
+                asset = F_NEW(m_allocator, MaterialAsset)(data, shader);
                 LOG_INFO("CREATED MATERIAL: %u", id);
             } else {
                 LOG_INFO("MATERIAL FILE NOT FOUND. MATERIAL IMPORT FAILED");
@@ -85,12 +81,15 @@ Foundation::Shared<Asset> AssetHandlerEditor::load(AssetId id) {
             break;
         }
         case AssetType::CUBE_MAP:
+        case AssetType::MESH:
         case AssetType::NONE: {
             asset = nullptr;
             break;
         }
     }
-    if (asset) { m_cache[id] = asset; }
+    // TODO: Replace with error result
+    PND_ASSERT(asset != nullptr, "ASSET IS NOT LOADED");
+    m_loadedAssets[id] = asset;
     return asset;
 }
 
@@ -193,7 +192,6 @@ void AssetHandlerEditor::openProject(const path_t &path) {
 void AssetHandlerEditor::loadAssetRegistry() {
     m_registry.clear();
     m_registeredAssets.clear();
-    m_cache.clear();
     std::ifstream file(m_assetRegistryPath);
     if (file.is_open()) {
         AssetRegistryDto registryDto;
@@ -267,7 +265,6 @@ void AssetHandlerEditor::closeProject() {
     m_registry.clear();
     m_assetRegistryPath.clear();
     m_projectPath.clear();
-    m_cache.clear();
 }
 
 void AssetHandlerEditor::saveAssetRegistry() {

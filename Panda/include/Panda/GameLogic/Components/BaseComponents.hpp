@@ -75,16 +75,10 @@ struct SpriteRendererComponent final {
     int cols = 1;
     int rows = 1;
     int index = 0;
-    UUID materialId = 0;
+    AssetRef<Asset> material;
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const SpriteRendererComponent &other) = default;
-
-    // Material asset cache
-    Foundation::Shared<MaterialAsset> asset;
-    void resetCache() {
-        asset = nullptr;
-    }
 };
 
 struct MeshComponent final {
@@ -105,14 +99,6 @@ struct ScriptListComponent final {
 
     void add(ExternalScript script) {
         scripts.emplace_back(script);
-    }
-
-    void releaseFields() {
-        for (ExternalScript &script : scripts) {
-            for (ScriptField &field : script.getFields()) {
-                field.value.release();
-            }
-        }
     }
 
     void remove(ExternalScript script) {

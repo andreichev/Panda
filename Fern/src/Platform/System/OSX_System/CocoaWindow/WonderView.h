@@ -6,10 +6,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface WonderView : NSView<NSTextInputClient> {
-    NSMutableAttributedString* markedText;
+@interface WonderView : NSView <NSTextInputClient> {
+    NSMutableAttributedString *markedText;
 }
 
-@property (nonatomic, assign) int ignoreMouseEvents;
+@property(nonatomic, assign) int ignoreMouseEvents;
 
 @end

@@ -239,7 +239,7 @@ void ComponentsDraw::drawComponents(const std::unordered_set<Entity> &entities) 
                         if (world && world->isRunning() && scriptEngine &&
                             scriptEngine->isLoaded() && field.instanceId) {
                             ExternalCalls::setFieldValue(
-                                field.instanceId, field.fieldId, field.value.data
+                                field.instanceId, field.fieldId, &field.value
                             );
                         }
                         modified = true;
@@ -279,14 +279,14 @@ void ComponentsDraw::drawComponents(const std::unordered_set<Entity> &entities) 
                 modified = true;
             }
             // Material
-            bool isInconsistentMaterial = isInconsistentPrimitive<UUID, SpriteRendererComponent>(
-                entities, [](const SpriteRendererComponent &other) { return other.materialId; }
-            );
-            if (propertyMaterial("Material", firstComponent.materialId, isInconsistentMaterial)) {
+            bool isInconsistentMaterial =
+                isInconsistentPrimitive<AssetRef<Asset>, SpriteRendererComponent>(
+                    entities, [](const SpriteRendererComponent &other) { return other.material; }
+                );
+            if (propertyMaterial("Material", firstComponent.material, isInconsistentMaterial)) {
                 for (Entity entity : entities) {
                     auto &component = entity.getComponent<SpriteRendererComponent>();
-                    component.materialId = firstComponent.materialId;
-                    component.resetCache();
+                    component.material = firstComponent.material;
                 }
                 modified = true;
             }

@@ -20,7 +20,7 @@ int startApp(int argc, const char **argv) {
     );
     Miren::initialize(window->getDrawingContext());
     auto application = new Panda::Application();
-    Panda::Application::get()->setMainWindow(window);
+    application->setMainWindow(window);
     application->createImGuiLayer();
     application->pushLayer(new Panda::EditorLayer(window));
     application->loop();

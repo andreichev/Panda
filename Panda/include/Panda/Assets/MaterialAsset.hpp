@@ -4,8 +4,7 @@
 #include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/Assets/TextureAsset.hpp"
 #include "Panda/Renderer/MaterialData.hpp"
-#include "Base/Asset.hpp"
-#include "Base/Path.hpp"
+#include "Base/AssetRef.hpp"
 #include "ShaderAsset.hpp"
 
 #include <Miren/Miren.hpp>
@@ -16,15 +15,16 @@ namespace Panda {
 class MaterialAsset final : public Asset {
 public:
     MaterialAsset()
-        : Asset(AssetType::MATERIAL) {}
-
-    MaterialAsset(const MaterialData &data, Foundation::Shared<ShaderAsset> shader)
         : Asset(AssetType::MATERIAL)
-        , m_shader(shader)
+        , m_shaderRef() {}
+
+    MaterialAsset(const MaterialData &data, AssetRef<ShaderAsset> shader)
+        : Asset(AssetType::MATERIAL)
+        , m_shaderRef(shader)
         , m_fields(data.inputs) {}
 
-    Foundation::Shared<ShaderAsset> getShaderAsset() {
-        return m_shader;
+    AssetRef<ShaderAsset> getShaderAsset() {
+        return m_shaderRef;
     }
 
     const std::vector<MaterialField> &getFields() {
@@ -32,14 +32,14 @@ public:
     }
 
     bool isValid() {
-        return m_shader->getMirenHandle().isValid();
+        return m_shaderRef->getMirenHandle().isValid();
     }
 
     void bindFields();
 
 private:
     std::vector<MaterialField> m_fields;
-    Foundation::Shared<ShaderAsset> m_shader;
+    AssetRef<ShaderAsset> m_shaderRef;
 };
 
 } // namespace Panda
