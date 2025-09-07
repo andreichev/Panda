@@ -1,5 +1,6 @@
 #include "Panda/Serialization/AssetsMapper.hpp"
 #include "Panda/GameLogic/GameContext.hpp"
+#include "Panda/Base/Base.hpp"
 
 namespace Panda {
 
@@ -15,6 +16,10 @@ void AssetsMapper::toData(MaterialData &data, const MaterialDataDto &dto) {
             }
             case MaterialFieldType::FLOAT: {
                 field.value = std::get<float>(fieldDto.value);
+                break;
+            }
+            case MaterialFieldType::VEC4: {
+                field.value = std::get<Vec4>(fieldDto.value);
                 break;
             }
             case MaterialFieldType::TEXTURE: {
@@ -46,6 +51,10 @@ void AssetsMapper::toDto(const MaterialData &data, MaterialDataDto &dto) {
             }
             case MaterialFieldType::FLOAT: {
                 fieldDto.value = std::get<float>(field.value);
+                break;
+            }
+            case MaterialFieldType::VEC4: {
+                fieldDto.value = std::get<Vec4>(field.value);
                 break;
             }
             case MaterialFieldType::TEXTURE: {

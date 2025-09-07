@@ -183,17 +183,14 @@ namespace InternalCalls {
     spriteRendererComponent_SetColor(EntityHandle entityId, float r, float g, float b, float a) {
         Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
-        sr.color.r = r;
-        sr.color.g = g;
-        sr.color.b = b;
-        sr.color.a = a;
+        sr.color = Color(r, g, b, a);
     }
 
-    // TODO: Replace with set material field
-    void spriteRendererComponent_SetTexture(EntityHandle entityId, TextureHandle textureId) {
-        // Entity entity = GameContext::getCurrentWorld()->getById(entityId);
-        // SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
-        // sr.material =
+    void spriteRendererComponent_SetMaterial(EntityHandle entityId, MaterialHandle materialId) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
+        SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
+        sr.material = assetHandler->makeRef(materialId);
     }
 
     void spriteRendererComponent_SetCell(EntityHandle entityId, int cols, int rows, int index) {
@@ -257,6 +254,24 @@ namespace InternalCalls {
         physics2D.setFriction(entity, friction);
     }
 
+    /// MATERIAL
+
+    void material_SetColor(
+        MaterialHandle materialId, const char *name, float r, float g, float b, float a
+    ) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        auto material = assetHandler->makeRef<MaterialAsset>(materialId);
+        Color color(r, g, b, a);
+        material->setFieldValue(name, color);
+    }
+
+    void material_SetTexture(MaterialHandle materialId, const char *name, TextureHandle textureId) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        auto material = assetHandler->makeRef<MaterialAsset>(materialId);
+        auto texture = assetHandler->makeRef(textureId);
+        material->setFieldValue(name, texture);
+    }
+
     /// CONSOLE
 
     void console_Log(int type, const char *message) {
@@ -270,7 +285,6 @@ namespace InternalCalls {
             LOG_ERROR_EDITOR(message);
         }
     }
-
 } // namespace InternalCalls
 
 std::unordered_map<std::string, void *> g_scriptSymbols;
@@ -311,10 +325,10 @@ void initScriptHook() {
         (void *)InternalCalls::spriteRendererComponent_GetColor;
     g_scriptSymbols["spriteRendererComponent_SetColor"] =
         (void *)InternalCalls::spriteRendererComponent_SetColor;
-    g_scriptSymbols["spriteRendererComponent_SetTexture"] =
-        (void *)InternalCalls::spriteRendererComponent_SetTexture;
+    g_scriptSymbols["spriteRendererComponent_SetMaterial"] =
+            (void *) InternalCalls::spriteRendererComponent_SetMaterial;
     g_scriptSymbols["spriteRendererComponent_SetCell"] =
-        (void *)InternalCalls::spriteRendererComponent_SetCell;
+            (void *) InternalCalls::spriteRendererComponent_SetCell;
     /// RIGIDBODY2D COMPONENT
     g_scriptSymbols["rigidbody2DComponent_applyForce"] =
         (void *)InternalCalls::rigidbody2DComponent_applyForce;
@@ -330,6 +344,9 @@ void initScriptHook() {
         (void *)InternalCalls::rigidbody2DComponent_getFriction;
     g_scriptSymbols["rigidbody2DComponent_setFriction"] =
         (void *)InternalCalls::rigidbody2DComponent_setFriction;
+    /// MATERIAL
+    g_scriptSymbols["material_SetColor"] = (void *)InternalCalls::material_SetColor;
+    g_scriptSymbols["material_SetTexture"] = (void *)InternalCalls::material_SetTexture;
     /// CONSOLE
     g_scriptSymbols["console_Log"] = (void *)InternalCalls::console_Log;
 

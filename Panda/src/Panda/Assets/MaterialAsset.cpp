@@ -18,6 +18,11 @@ void MaterialAsset::bindFields() {
                 Miren::setUniform(shaderHandle, field.name.c_str(), &value, Miren::Float);
                 break;
             }
+            case MaterialFieldType::VEC4: {
+                Vec4 value = std::get<Vec4>(field.value);
+                Miren::setUniform(shaderHandle, field.name.c_str(), &value, Miren::Vec4);
+                break;
+            }
             case MaterialFieldType::TEXTURE: {
                 auto asset = std::get<AssetRef<Asset>>(field.value);
                 auto texture = asset.as<TextureAsset>();
@@ -34,6 +39,16 @@ void MaterialAsset::bindFields() {
             }
         }
     }
+}
+
+void MaterialAsset::setFieldValue(const char *name, MaterialFieldData value) {
+    for (auto &field : m_fields) {
+        if (field.name == name) {
+            field.value = value;
+            return;
+        }
+    }
+    LOG_ERROR_EDITOR("MATERIAL FIELD %s NOT FOUND", name);
 }
 
 } // namespace Panda

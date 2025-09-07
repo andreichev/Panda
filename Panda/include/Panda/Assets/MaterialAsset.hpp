@@ -37,6 +37,8 @@ public:
 
     void bindFields();
 
+    void setFieldValue(const char *name, MaterialFieldData value);
+
 private:
     std::vector<MaterialField> m_fields;
     AssetRef<ShaderAsset> m_shaderRef;

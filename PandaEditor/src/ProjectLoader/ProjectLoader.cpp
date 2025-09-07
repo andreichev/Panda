@@ -145,6 +145,11 @@ void ProjectLoader::openCppProject() {
     SystemTools::openCppProject(m_projectPath / "Scripts" / name);
 }
 
+void ProjectLoader::showCppProject() {
+    std::string name = m_projectPath.filename().string();
+    SystemTools::open(m_projectPath / "Scripts" / name);
+}
+
 void ProjectLoader::appendRecentProject() {
     if (m_projectPath.empty()) { return; }
     RecentProject recentProject;

@@ -35,6 +35,10 @@ public:
         return AssetRef<T>(m_handler, m_id);
     }
 
+    AssetRef<Asset> asBaseAsset() const {
+        return AssetRef<Asset>(m_handler, m_id);
+    }
+
 private:
     AssetHandler *m_handler;
     AssetId m_id;

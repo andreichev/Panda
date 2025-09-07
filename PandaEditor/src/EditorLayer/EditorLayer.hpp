@@ -54,6 +54,7 @@ public:
     const path_t &menuBarGetOpenedProjectPath() override;
     void menuBarCloseApp() override;
     void menuBarOpenCppProject() override;
+    void menuBarShowCppProject() override;
     void menuBarSaveWorld() override;
     void menuBarCloseProject() override;
     void menuBarAbout() override;

@@ -1,15 +1,17 @@
 #pragma once
 
+#include "Panda/Base/Base.hpp"
+
 #include <Foundation/Foundation.hpp>
 #include <Rain/Rain.hpp>
 #include <variant>
 
 namespace Panda {
 
-// TODO: Add Vec2, Vec3, Vec4, Mat3, Mat4
-enum class MaterialFieldType : uint32_t { INTEGER, FLOAT, TEXTURE, UNKNOWN };
+// TODO: Add Vec2, Vec3, Mat3, Mat4
+enum class MaterialFieldType : uint32_t { INTEGER, FLOAT, VEC4, TEXTURE, UNKNOWN };
 
-using MaterialFieldDtoData = std::variant<int, float, UUID>;
+using MaterialFieldDtoData = std::variant<int, float, Vec4, UUID>;
 
 struct MaterialFieldDto : public Rain::Codable {
     std::string name;
@@ -28,6 +30,11 @@ struct MaterialFieldDto : public Rain::Codable {
             }
             case MaterialFieldType::FLOAT: {
                 float value = std::get<float>(data.value);
+                encoder->encode("value", value);
+                break;
+            }
+            case MaterialFieldType::VEC4: {
+                Vec4 value = std::get<Vec4>(data.value);
                 encoder->encode("value", value);
                 break;
             }
@@ -57,6 +64,12 @@ struct MaterialFieldDto : public Rain::Codable {
             }
             case MaterialFieldType::FLOAT: {
                 float value = 0;
+                decoder->decode("value", value);
+                data.value = value;
+                break;
+            }
+            case MaterialFieldType::VEC4: {
+                Vec4 value;
                 decoder->decode("value", value);
                 data.value = value;
                 break;

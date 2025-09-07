@@ -756,6 +756,14 @@ bool drawScriptFieldValue(ScriptField &field) {
             field.value = value;
             break;
         }
+        case ScriptFieldType::MATERIAL: {
+            UUID value = std::get<UUID>(field.value);
+            auto asset = AssetRef<Asset>(value);
+            changed |= propertyMaterial(field.name.c_str(), asset, false);
+            value = asset.getId();
+            field.value = value;
+            break;
+        }
         default: {
             ImGui::Text("Unsupported type field: %s", field.name.c_str());
             break;

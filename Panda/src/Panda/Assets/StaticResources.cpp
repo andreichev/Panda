@@ -8,14 +8,28 @@ namespace StaticResources {
     void initStaticResources() {
         AssetHandler *handler = GameContext::getAssetHandler();
         MaterialData materialData;
+        /// WHITE TEXTURE
+        Foundation::Memory whiteTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
+        *(uint32_t *)whiteTextureData.data = 0xffffffff;
+        Miren::TextureCreate whiteTextureCreate;
+        whiteTextureCreate.m_data = whiteTextureData;
+        AssetRef<TextureAsset> whiteTexture =
+            handler->createStaticAsset<TextureAsset>(1, whiteTextureCreate);
+        materialData.inputs = {
+            MaterialField("albedo", MaterialFieldType::TEXTURE, whiteTexture.asBaseAsset())
+        };
+        /// DEFAULT SHADER
         defaultShader =
-            handler->createStaticAsset<ShaderAsset>(1, "default-shaders/default_fragment.glsl");
-        defaultMaterial = handler->createStaticAsset<MaterialAsset>(2, materialData, defaultShader);
+            handler->createStaticAsset<ShaderAsset>(2, "default-shaders/default_fragment.glsl");
+        /// DEFAULT MATERIAL
+        defaultMaterial = handler->createStaticAsset<MaterialAsset>(3, materialData, defaultShader);
+        /// SELECTED GEOMETRY SHADER
         selectedGeometryShader = handler->createStaticAsset<ShaderAsset>(
-            3, "default-shaders/selection_map_fragment.glsl"
+            4, "default-shaders/selection_map_fragment.glsl"
         );
+        /// SELECTED GEOMETRY MATERIAL
         selectedGeometryMaterial =
-            handler->createStaticAsset<MaterialAsset>(4, materialData, selectedGeometryShader);
+            handler->createStaticAsset<MaterialAsset>(5, materialData, selectedGeometryShader);
     }
 
     AssetRef<ShaderAsset> defaultShader;

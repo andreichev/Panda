@@ -128,6 +128,7 @@ void AssetHandlerEditor::registerMaterialAsset(const path_t &path) {
     info.type = AssetType::MATERIAL;
     MaterialAssetMeta meta;
     meta.materialPath = assetPath;
+    meta.shader = 0;
     info.meta = meta;
     m_registry[info.id] = info;
     m_registeredAssets[assetPath] = info.id;

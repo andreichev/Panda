@@ -5,7 +5,7 @@
 
 namespace Panda {
 
-using MaterialFieldData = std::variant<int, float, AssetRef<Asset>>;
+using MaterialFieldData = std::variant<int, float, Vec4, AssetRef<Asset>>;
 
 struct MaterialField {
     std::string name;

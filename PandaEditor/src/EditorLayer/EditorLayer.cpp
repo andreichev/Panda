@@ -284,6 +284,10 @@ void EditorLayer::menuBarOpenCppProject() {
     m_loader.openCppProject();
 }
 
+void EditorLayer::menuBarShowCppProject() {
+    m_loader.showCppProject();
+}
+
 void EditorLayer::menuBarSaveWorld() {
     saveWorld();
 }
@@ -349,7 +353,8 @@ void EditorLayer::addScriptToEntities(const std::unordered_set<Entity> &entities
                             break;
                         }
                         case ScriptFieldType::TEXTURE:
-                        case ScriptFieldType::ENTITY: {
+                        case ScriptFieldType::ENTITY:
+                        case ScriptFieldType::MATERIAL: {
                             value = UUID(0);
                             break;
                         }
