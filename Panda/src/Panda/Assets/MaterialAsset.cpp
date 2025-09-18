@@ -1,36 +1,29 @@
 #include "Panda/Assets/MaterialAsset.hpp"
+#include "Panda/Renderer/Std140Buffer.hpp"
 
 namespace Panda {
 
 void MaterialAsset::bindFields() {
     Miren::ProgramHandle shaderHandle = m_shaderRef->getMirenHandle();
     if (!shaderHandle.isValid()) { return; }
-    int textureSlot = 0;
+    Std140Buffer ubo;
     for (auto &field : m_fields) {
         switch (field.type) {
-            case MaterialFieldType::INTEGER: {
-                float value = std::get<int>(field.value);
-                Miren::setUniform(shaderHandle, field.name.c_str(), &value, Miren::Float);
-                break;
-            }
             case MaterialFieldType::FLOAT: {
                 float value = std::get<float>(field.value);
-                Miren::setUniform(shaderHandle, field.name.c_str(), &value, Miren::Float);
+                ubo.addFloat(value);
                 break;
             }
             case MaterialFieldType::VEC4: {
                 Vec4 value = std::get<Vec4>(field.value);
-                Miren::setUniform(shaderHandle, field.name.c_str(), &value, Miren::Vec4);
+                ubo.addVec4(value.x, value.y, value.z, value.w);
                 break;
             }
             case MaterialFieldType::TEXTURE: {
                 auto asset = std::get<AssetRef<Asset>>(field.value);
                 auto texture = asset.as<TextureAsset>();
-                Miren::setTexture(texture->getMirenHandle(), textureSlot);
-                Miren::setUniform(
-                    shaderHandle, field.name.c_str(), &textureSlot, Miren::UniformType::Sampler
-                );
-                textureSlot++;
+                Miren::TextureHandle handle = texture->getMirenHandle();
+                Miren::addInputTexture(shaderHandle, field.name.c_str(), handle);
                 break;
             }
             default: {
@@ -38,6 +31,9 @@ void MaterialAsset::bindFields() {
                 break;
             }
         }
+    }
+    if (ubo.getSize()) {
+        Miren::addInputUniformBuffer(shaderHandle, "MATERIAL_FIELDS", ubo.getData(), ubo.getSize());
     }
 }
 

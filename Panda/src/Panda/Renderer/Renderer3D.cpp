@@ -1,4 +1,5 @@
 #include "Panda/Renderer/Renderer3D.hpp"
+#include "Panda/Renderer/Std140Buffer.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -37,10 +38,12 @@ void Renderer3D::submit(glm::mat4 &transform, MeshAsset *mesh) {
     Miren::ProgramHandle shaderHandle = material->getShaderAsset()->getMirenHandle();
     Miren::setShader(shaderHandle);
     material->bindFields();
-    Miren::setUniform(shaderHandle, "model", glm::value_ptr(transform), Miren::UniformType::Mat4);
-    Miren::setUniform(
-        shaderHandle, "projViewMtx", glm::value_ptr(m_viewProj), Miren::UniformType::Mat4
-    );
+    Std140Buffer ubo;
+    // model
+    ubo.addMat4(glm::value_ptr(transform));
+    // projViewMtx
+    ubo.addMat4(glm::value_ptr(m_viewProj));
+    Miren::addInputUniformBuffer(shaderHandle, "UBO", ubo.getData(), ubo.getSize());
     Miren::setVertexBuffer(mesh->m_vertexBufferHandle);
     Miren::setIndexBuffer(mesh->m_indexBufferHandle, 0, mesh->m_indicesCount);
     Miren::submit(m_viewId);

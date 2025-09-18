@@ -9,7 +9,7 @@
 namespace Panda {
 
 // TODO: Add Vec2, Vec3, Mat3, Mat4
-enum class MaterialFieldType : uint32_t { INTEGER, FLOAT, VEC4, TEXTURE, UNKNOWN };
+enum class MaterialFieldType : uint32_t { FLOAT, VEC4, TEXTURE, UNKNOWN };
 
 using MaterialFieldDtoData = std::variant<int, float, Vec4, UUID>;
 
@@ -23,11 +23,6 @@ struct MaterialFieldDto : public Rain::Codable {
         encoder->encode("name", data.name);
         encoder->encode("type", data.type);
         switch (data.type) {
-            case MaterialFieldType::INTEGER: {
-                int value = std::get<int>(data.value);
-                encoder->encode("value", value);
-                break;
-            }
             case MaterialFieldType::FLOAT: {
                 float value = std::get<float>(data.value);
                 encoder->encode("value", value);
@@ -56,12 +51,6 @@ struct MaterialFieldDto : public Rain::Codable {
         decoder->decode("name", data.name);
         decoder->decode("type", data.type);
         switch (data.type) {
-            case MaterialFieldType::INTEGER: {
-                int value = 0;
-                decoder->decode("value", value);
-                data.value = value;
-                break;
-            }
             case MaterialFieldType::FLOAT: {
                 float value = 0;
                 decoder->decode("value", value);

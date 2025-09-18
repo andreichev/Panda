@@ -10,10 +10,6 @@ void AssetsMapper::toData(MaterialData &data, const MaterialDataDto &dto) {
         field.name = fieldDto.name;
         field.type = fieldDto.type;
         switch (fieldDto.type) {
-            case MaterialFieldType::INTEGER: {
-                field.value = std::get<int>(fieldDto.value);
-                break;
-            }
             case MaterialFieldType::FLOAT: {
                 field.value = std::get<float>(fieldDto.value);
                 break;
@@ -45,10 +41,6 @@ void AssetsMapper::toDto(const MaterialData &data, MaterialDataDto &dto) {
         fieldDto.name = field.name;
         fieldDto.type = field.type;
         switch (field.type) {
-            case MaterialFieldType::INTEGER: {
-                fieldDto.value = std::get<int>(field.value);
-                break;
-            }
             case MaterialFieldType::FLOAT: {
                 fieldDto.value = std::get<float>(field.value);
                 break;

@@ -117,7 +117,7 @@ struct TextureCreate {
     }
 };
 
-enum UniformType { Sampler, Float, Vec2, Vec3, Vec4, Mat3, Mat4, Count };
+enum class RenderPassInputType { UniformBuffer, ImageSampler2D, ImageSamplerCube, Count };
 
 struct FrameBufferAttachment {
     FrameBufferAttachment()

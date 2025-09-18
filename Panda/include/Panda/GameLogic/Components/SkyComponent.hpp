@@ -4,6 +4,7 @@
 #include "Panda/Assets/Base/AssetImporterBase.hpp"
 #include "Panda/Application/Application.hpp"
 #include "Panda/Assets/TextureAsset.hpp"
+#include "Panda/Renderer/Std140Buffer.hpp"
 
 #include <glm/glm.hpp>
 #include <Miren/Miren.hpp>
@@ -112,9 +113,9 @@ public:
             Miren::createIndexBuffer(indicesMemory, Miren::BufferElementType::UnsignedInt, 36);
 
         Foundation::Memory vertexMem =
-            AssetImporterBase::loadData("default-shaders/sky/sky_vertex_hdr.glsl");
+            AssetImporterBase::loadData("default-shaders/sky/sky_hdr.vert");
         Foundation::Memory fragmentMem =
-            AssetImporterBase::loadData("default-shaders/sky/sky_fragment_hdr.glsl");
+            AssetImporterBase::loadData("default-shaders/sky/sky_hdr.frag");
         m_shader = Miren::createProgram({vertexMem, fragmentMem});
 
         Miren::TextureCreate m_skyHdrTextureConfig =
@@ -130,13 +131,14 @@ public:
     void update(glm::mat4 &viewProjection) {
         m_viewProjection = viewProjection;
         Miren::setShader(m_shader);
-        int samplerCube = 0;
-        Miren::setTexture(m_texture->getMirenHandle(), samplerCube);
-        Miren::setUniform(m_shader, "skyTexture", &samplerCube, Miren::UniformType::Sampler);
-        Miren::setUniform(m_shader, "model", &m_model[0][0], Miren::UniformType::Mat4);
-        Miren::setUniform(
-            m_shader, "projViewMtx", &m_viewProjection[0][0], Miren::UniformType::Mat4
-        );
+        Miren::TextureHandle skyTexture = m_texture->getMirenHandle();
+        Miren::addInputTexture(m_shader, "skyTexture", skyTexture);
+        Std140Buffer ubo;
+        // model
+        ubo.addMat4(&m_model[0][0]);
+        // projViewMtx
+        ubo.addMat4(&m_viewProjection[0][0]);
+        Miren::addInputUniformBuffer(m_shader, "MVP", ubo.getData(), ubo.getSize());
         Miren::setVertexBuffer(m_vertexBuffer);
         Miren::setIndexBuffer(m_indexBuffer, 0, 36);
         Miren::setState(0);

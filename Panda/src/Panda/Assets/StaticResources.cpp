@@ -13,25 +13,23 @@ namespace StaticResources {
         *(uint32_t *)whiteTextureData.data = 0xffffffff;
         Miren::TextureCreate whiteTextureCreate;
         whiteTextureCreate.m_data = whiteTextureData;
-        AssetRef<TextureAsset> whiteTexture =
-            handler->createStaticAsset<TextureAsset>(1, whiteTextureCreate);
+        whiteTexture = handler->createStaticAsset<TextureAsset>(1, whiteTextureCreate);
         materialData.inputs = {
             MaterialField("albedo", MaterialFieldType::TEXTURE, whiteTexture.asBaseAsset())
         };
         /// DEFAULT SHADER
-        defaultShader =
-            handler->createStaticAsset<ShaderAsset>(2, "default-shaders/default_fragment.glsl");
+        defaultShader = handler->createStaticAsset<ShaderAsset>(2, "default-shaders/default.frag");
         /// DEFAULT MATERIAL
         defaultMaterial = handler->createStaticAsset<MaterialAsset>(3, materialData, defaultShader);
         /// SELECTED GEOMETRY SHADER
-        selectedGeometryShader = handler->createStaticAsset<ShaderAsset>(
-            4, "default-shaders/selection_map_fragment.glsl"
-        );
+        selectedGeometryShader =
+            handler->createStaticAsset<ShaderAsset>(4, "default-shaders/selection_map.frag");
         /// SELECTED GEOMETRY MATERIAL
         selectedGeometryMaterial =
             handler->createStaticAsset<MaterialAsset>(5, materialData, selectedGeometryShader);
     }
 
+    AssetRef<TextureAsset> whiteTexture;
     AssetRef<ShaderAsset> defaultShader;
     AssetRef<ShaderAsset> selectedGeometryShader;
     AssetRef<MaterialAsset> defaultMaterial;

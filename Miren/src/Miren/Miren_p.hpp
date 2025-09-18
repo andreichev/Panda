@@ -3,7 +3,7 @@
 #include "Encoder/RendererCommand.hpp"
 #include "Encoder/Frame.hpp"
 #include "Encoder/View.hpp"
-#include "Encoder/RenderDraw.hpp"
+#include "Encoder/RenderPass.hpp"
 #include "HandleAllocator.hpp"
 #include "Miren/MirenStates.hpp"
 #include "Platform/RendererImpl/OpenGL/RendererOpenGL.hpp"
@@ -517,13 +517,14 @@ struct Context {
         m_submit->setShader(handle);
     }
 
-    void
-    setUniform(ProgramHandle handle, const char *name, void *value, UniformType type, int count) {
-        m_submit->setUniform(handle, name, value, type, count);
-    }
-
-    void setTexture(TextureHandle textureHandle, uint32_t slot) {
-        m_submit->setTexture(textureHandle, slot);
+    void addInput(
+        ProgramHandle handle,
+        const char *name,
+        RenderPassInputType type,
+        const void *value,
+        size_t size
+    ) {
+        m_submit->addInput(handle, name, type, value, size);
     }
 
     void setVertexLayout(VertexLayoutHandle handle) {

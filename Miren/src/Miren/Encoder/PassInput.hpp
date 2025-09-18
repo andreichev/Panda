@@ -6,23 +6,23 @@
 
 namespace Miren {
 
-struct Uniform {
+struct PassInput {
     ProgramHandle handle;
     const char *name;
-    UniformType type;
+    RenderPassInputType type;
     void *data;
-    uint16_t count;
     uint16_t alignment;
     uint16_t size;
 
-    Uniform(ProgramHandle handle, const char *name, void *data, UniformType type, uint16_t count)
+    PassInput(
+        ProgramHandle handle, const char *name, RenderPassInputType type, void *data, uint16_t size
+    )
         : handle(handle)
         , name(name)
-        , data(data)
-        , count(count)
         , type(type)
+        , data(data)
         , alignment(0)
-        , size(0) {}
+        , size(size) {}
 };
 
 } // namespace Miren

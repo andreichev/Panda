@@ -28,6 +28,10 @@ struct Vec2 {
     bool operator!=(const Vec2 &l) {
         return !(*this == l);
     }
+
+    Vec2 operator*(const Vec2 other) {
+        return Vec2(x * other.x, y * other.y);
+    }
 };
 
 struct Vec3 {

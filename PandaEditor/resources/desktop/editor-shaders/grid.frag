@@ -5,12 +5,15 @@ in vec3 WorldPos;
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out uint outId;
 
-uniform vec4 gCameraWorldPos;
-uniform float gGridSize = 100.0;
-uniform float gGridMinPixelsBetweenCells = 1.0;
-uniform float gGridCellSize = 0.05;
-uniform vec4 gGridColorThin = vec4(0.5, 0.5, 0.5, 0.3);
-uniform vec4 gGridColorThick = vec4(0.0, 0.0, 0.0, 0.6);
+layout(std140) uniform UBO2 {
+    vec4 gCameraWorldPos;
+} ubo2;
+
+float gGridSize = 100.0;
+float gGridMinPixelsBetweenCells = 1.0;
+float gGridCellSize = 0.05;
+vec4 gGridColorThin = vec4(0.5, 0.5, 0.5, 0.3);
+vec4 gGridColorThick = vec4(0.0, 0.0, 0.0, 0.6);
 
 
 float log10(float x) {
@@ -80,7 +83,7 @@ void main() {
 		}
 	}
 
-	float OpacityFalloff = (1.0 - satf(length(WorldPos.xz - gCameraWorldPos.xz) / gGridSize));
+	float OpacityFalloff = (1.0 - satf(length(WorldPos.xz - ubo2.gCameraWorldPos.xz) / gGridSize));
 	Color.a *= OpacityFalloff;
 	outColor = Color;
 	outId = 0u;

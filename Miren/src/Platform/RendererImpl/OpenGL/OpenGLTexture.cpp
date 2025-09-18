@@ -97,16 +97,6 @@ void OpenGLTexture::terminate() {
     m_id = -1;
 }
 
-void OpenGLTexture::bind(unsigned int slot) {
-    PND_ASSERT(m_id != -1, "TEXTURE IS NOT CREATED");
-    GL_CALL(glActiveTexture(GL_TEXTURE0 + slot));
-    GL_CALL(glBindTexture(m_target, m_id));
-}
-
-void OpenGLTexture::unbind() {
-    GL_CALL(glBindTexture(m_target, 0));
-}
-
 void OpenGLTexture::readPixels(void *data) {
     GL_CALL(glBindTexture(m_target, m_id));
 #ifdef PLATFORM_DESKTOP

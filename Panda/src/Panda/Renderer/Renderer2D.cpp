@@ -1,6 +1,7 @@
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Assets/Base/AssetImporterBase.hpp"
 #include "Panda/Assets/StaticResources.hpp"
+#include "Panda/Renderer/Std140Buffer.hpp"
 
 namespace Panda {
 
@@ -37,14 +38,6 @@ Renderer2D::~Renderer2D() {
 void Renderer2D::begin(Mode mode, Miren::ViewId viewId) {
     m_mode = mode;
     reset();
-    switch (mode) {
-        case Mode::DEFAULT:
-            m_drawData.material = StaticResources::defaultMaterial;
-            break;
-        case Mode::GEOMETRY_ONLY:
-            m_drawData.material = StaticResources::selectedGeometryMaterial;
-            break;
-    }
     m_viewId = viewId;
 }
 
@@ -131,9 +124,28 @@ void Renderer2D::reset() {
 
 void Renderer2D::flush() {
     if (m_drawData.verticesCount == 0) { return; }
-    Miren::ProgramHandle shaderHandle = m_drawData.material->getShaderAsset()->getMirenHandle();
+    AssetRef<MaterialAsset> material;
+    switch (m_mode) {
+        case Mode::DEFAULT: {
+            Miren::setState(MIREN_STATE_DEPTH_TEST);
+            material = m_drawData.material;
+            break;
+        }
+        case Mode::GEOMETRY_ONLY: {
+            Miren::setState(MIREN_STATE_WIREFRAME);
+            material = StaticResources::selectedGeometryMaterial;
+            break;
+        }
+    }
+    Miren::ProgramHandle shaderHandle = material->getShaderAsset()->getMirenHandle();
     Miren::setShader(shaderHandle);
-    Miren::setUniform(shaderHandle, "projViewMtx", (void *)&m_viewProj, Miren::UniformType::Mat4);
+    Std140Buffer uboVert;
+    // projViewMtx
+    uboVert.addMat4(&m_viewProj[0][0]);
+    // modelMtx
+    glm::mat4 model(1.f);
+    uboVert.addMat4(&model[0][0]);
+    Miren::addInputUniformBuffer(shaderHandle, "UBO_VERT", uboVert.getData(), uboVert.getSize());
 
     Miren::TransientVertexBuffer tvb;
     Miren::allocTransientVertexBuffer(&tvb, m_drawData.vbSize);
@@ -144,15 +156,8 @@ void Renderer2D::flush() {
         &tib, m_drawData.indicesCount, Miren::BufferElementType::UnsignedShort
     );
     memcpy(tib.data, m_drawData.indices, m_drawData.ibSize);
-    switch (m_mode) {
-        case Mode::DEFAULT:
-            Miren::setState(MIREN_STATE_DEPTH_TEST);
-            break;
-        case Mode::GEOMETRY_ONLY:
-            Miren::setState(MIREN_STATE_WIREFRAME);
-            break;
-    }
-    m_drawData.material->bindFields();
+
+    material->bindFields();
     Miren::setVertexLayout(m_drawData.layout);
     Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
     Miren::setIndexBuffer(tib.handle, tib.startIndex, m_drawData.indicesCount);

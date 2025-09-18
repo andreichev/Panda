@@ -40,9 +40,7 @@ static void ImGui_ImplMiren_SetProjMat(ImDrawData *draw_data, int fb_width, int 
     float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
 
     projMat = glm::ortho(L, R, B, T);
-    int textureIndex = 0;
-    Miren::setUniform(shader, "Texture", &textureIndex, UniformType::Sampler);
-    Miren::setUniform(shader, "ProjMtx", &projMat[0], UniformType::Mat4);
+    Miren::addInputUniformBuffer(shader, "UBO", &projMat[0], sizeof(glm::mat4));
 }
 
 IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
@@ -101,7 +99,7 @@ IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {
                 Miren::setState(0);
                 Miren::setShader(shader);
                 TextureHandle texture = TextureHandle((intptr_t)cmd->GetTexID());
-                Miren::setTexture(texture, 0);
+                Miren::addInputTexture(shader, "Texture", texture);
                 Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
                 Miren::setVertexLayout(vertexLayout);
                 uint32_t offset = cmd->IdxOffset * sizeof(ImDrawIdx);
@@ -145,9 +143,9 @@ IMGUI_IMPL_API void ImGui_ImplMiren_DestroyFontsTexture() {
 IMGUI_IMPL_API bool ImGui_ImplMiren_CreateDeviceObjects() {
     using namespace Miren;
     Foundation::Memory vertexMem =
-        Panda::AssetImporterBase::loadData("default-shaders/imgui/imgui_vertex.glsl");
+        Panda::AssetImporterBase::loadData("default-shaders/imgui/imgui.vert");
     Foundation::Memory fragmentMem =
-        Panda::AssetImporterBase::loadData("default-shaders/imgui/imgui_fragment.glsl");
+        Panda::AssetImporterBase::loadData("default-shaders/imgui/imgui.frag");
     shader = Miren::createProgram({vertexMem, fragmentMem});
 
     VertexBufferLayoutData layoutData;

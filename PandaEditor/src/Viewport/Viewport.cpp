@@ -106,9 +106,9 @@ void Viewport::initWithSize(Vec2 size) {
     m_indexBuffer = Miren::createIndexBuffer(indices, Miren::BufferElementType::UnsignedInt, 6);
 
     Foundation::Memory vertexMem =
-        AssetImporterBase::loadData("editor-shaders/selection_highlight_vertex.glsl");
+        AssetImporterBase::loadData("editor-shaders/selection_highlight.vert");
     Foundation::Memory fragmentMem =
-        AssetImporterBase::loadData("editor-shaders/selection_highlight_fragment.glsl");
+        AssetImporterBase::loadData("editor-shaders/selection_highlight.frag");
     m_outlineProgram = Miren::createProgram({vertexMem, fragmentMem});
 
     create.m_format = Miren::TextureFormat::RGBA8;
@@ -215,16 +215,9 @@ void Viewport::drawOutline(float dt, const std::unordered_set<UUID> &selection) 
     // RENDERING SELECTION HIGHLIGHT
     Miren::setState(0);
     Miren::setShader(m_outlineProgram);
-    int samplerColor = 0;
-    Miren::setTexture(m_colorAttachment, samplerColor);
-    Miren::setUniform(m_outlineProgram, "colorTexture", &samplerColor, Miren::UniformType::Sampler);
-    int samplerSelectedGeometry = 1;
-    Miren::setTexture(m_selectedGeometryAttachment, samplerSelectedGeometry);
-    Miren::setUniform(
-        m_outlineProgram,
-        "selectedGeometryTexture",
-        &samplerSelectedGeometry,
-        Miren::UniformType::Sampler
+    Miren::addInputTexture(m_outlineProgram, "colorTexture", m_colorAttachment);
+    Miren::addInputTexture(
+        m_outlineProgram, "selectedGeometryTexture", m_selectedGeometryAttachment
     );
     Miren::setVertexBuffer(m_vertexBuffer);
     Miren::setIndexBuffer(m_indexBuffer, 0, 6);

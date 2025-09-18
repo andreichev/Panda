@@ -15,7 +15,11 @@ namespace Miren {
 
 OpenGLShader::OpenGLShader()
     : m_id(-1)
-    , m_uniformLocationCache() {}
+    , m_uniformLocationCache()
+    , m_uboBindings()
+    , m_uboBuffers()
+    , m_uboIndices()
+    , m_textureBindings() {}
 
 void OpenGLShader::create(ProgramCreate create) {
     PND_ASSERT(m_id == -1, "PROGRAM ALREADY CREATED");
@@ -52,6 +56,11 @@ void OpenGLShader::terminate() {
     PND_ASSERT(m_id != -1, "PROGRAM ALREADY DELETED");
     GL_CALL(glDeleteProgram(m_id));
     m_id = -1;
+    m_textureBindings.clear();
+    m_uboIndices.clear();
+    m_uniformLocationCache.clear();
+    m_uboBindings.clear();
+    m_uboBuffers.clear();
 }
 
 void OpenGLShader::checkCompileErrors(unsigned int shader, const std::string &type) {
@@ -71,12 +80,35 @@ void OpenGLShader::checkCompileErrors(unsigned int shader, const std::string &ty
         }
     }
 }
-int OpenGLShader::getUniformLocation(const std::string &name) {
+
+uint32_t OpenGLShader::getUboIndex(const char *name) {
+    if (m_uboIndices.find(name) != m_uboIndices.end()) { return m_uboIndices[name]; }
+    GLuint blockIndex = glGetUniformBlockIndex(m_id, name);
+    if (blockIndex == GL_INVALID_INDEX) { LOG_ERROR("SHADER UBO %s NOT FOUND", name); }
+    m_uboIndices[name] = blockIndex;
+    return blockIndex;
+}
+
+uint32_t OpenGLShader::getUboBinding(const char *name) {
+    if (m_uboBindings.find(name) != m_uboBindings.end()) { return m_uboBindings[name]; }
+    uint32_t binding = m_uboBindings.size();
+    m_uboBindings[name] = binding;
+    return binding;
+}
+
+int OpenGLShader::getTextureBinding(const char *name) {
+    if (m_textureBindings.find(name) != m_textureBindings.end()) { return m_textureBindings[name]; }
+    int binding = m_textureBindings.size();
+    m_textureBindings[name] = binding;
+    return binding;
+}
+
+int OpenGLShader::getUniformLocation(const char *name) {
     if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end()) {
         return m_uniformLocationCache[name];
     }
-    int location = glGetUniformLocation(m_id, name.c_str());
-    if (location == -1) { LOG_ERROR("SHADER UNIFORM %s NOT FOUND", name.c_str()); }
+    int location = glGetUniformLocation(m_id, name);
+    if (location == -1) { LOG_ERROR("SHADER UNIFORM %s NOT FOUND", name); }
     m_uniformLocationCache[name] = location;
     return location;
 }
@@ -135,46 +167,29 @@ void OpenGLShader::unbind() {
     GL_CALL(glUseProgram(0));
 }
 
-void OpenGLShader::setUniformFloat(const char *name, float *value, int count) {
+void OpenGLShader::setTexture(const char *name, uint32_t textureId) {
+    int binding = getTextureBinding(name);
+    GL_CALL(glActiveTexture(GL_TEXTURE0 + binding));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, textureId));
     int location = getUniformLocation(name);
     if (location == -1) { return; }
-    GL_CALL(glUniform1fv(location, count, value));
+    GL_CALL(glUniform1iv(location, 1, &binding));
 }
 
-void OpenGLShader::setUniformVec2(const char *name, float *value, int count) {
-    int location = getUniformLocation(name);
-    if (location == -1) { return; }
-    GL_CALL(glUniform2fv(location, count, value));
-}
-
-void OpenGLShader::setUniformVec3(const char *name, float *value, int count) {
-    int location = getUniformLocation(name);
-    if (location == -1) { return; }
-    GL_CALL(glUniform3fv(location, count, value));
-}
-
-void OpenGLShader::setUniformVec4(const char *name, float *value, int count) {
-    int location = getUniformLocation(name);
-    if (location == -1) { return; }
-    GL_CALL(glUniform4fv(location, count, value));
-}
-
-void OpenGLShader::setUniformMat3(const char *name, float *value, int count) {
-    int location = getUniformLocation(name);
-    if (location == -1) { return; }
-    GL_CALL(glUniformMatrix3fv(location, count, GL_FALSE, value));
-}
-
-void OpenGLShader::setUniformMat4(const char *name, float *value, int count) {
-    int location = getUniformLocation(name);
-    if (location == -1) { return; }
-    GL_CALL(glUniformMatrix4fv(location, count, GL_FALSE, value));
-}
-
-void OpenGLShader::setUniformInt(const char *name, int *value, int count) {
-    int location = getUniformLocation(name);
-    if (location == -1) { return; }
-    GL_CALL(glUniform1iv(location, count, value));
+void OpenGLShader::setUbo(const char *name, void *value, size_t size) {
+    uint32_t index = getUboIndex(name);
+    if (index == GL_INVALID_INDEX) { return; }
+    uint32_t uboId;
+    if (m_uboBuffers.find(name) == m_uboBuffers.end()) {
+        GL_CALL(glGenBuffers(1, &uboId));
+        m_uboBuffers[name] = uboId;
+    }
+    uboId = m_uboBuffers.at(name);
+    uint32_t binding = getUboBinding(name);
+    GL_CALL(glUniformBlockBinding(m_id, index, binding));
+    GL_CALL(glBindBufferBase(GL_UNIFORM_BUFFER, binding, uboId));
+    GL_CALL(glBindBuffer(GL_UNIFORM_BUFFER, uboId));
+    GL_CALL(glBufferData(GL_UNIFORM_BUFFER, size, value, GL_DYNAMIC_DRAW));
 }
 
 } // namespace Miren

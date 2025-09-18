@@ -18,62 +18,57 @@ Frame::Frame()
 
 void Frame::beginDrawCall() {
     m_drawCallsCount++;
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
     draw.reset();
 }
 
 void Frame::setState(uint32_t state) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
     draw.m_state = state;
 }
 
 void Frame::setIndexBuffer(IndexBufferHandle handle, intptr_t offset, uint32_t count) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
     draw.m_indexBuffer = handle;
     draw.m_indicesOffset = offset;
     draw.m_numIndices = count;
 }
 
 void Frame::setVertexBuffer(VertexBufferHandle handle, intptr_t offset) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
     draw.m_vertexBuffer = handle;
     draw.m_verticesOffset = offset;
 }
 
 void Frame::setVertexLayout(VertexLayoutHandle handle) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
     draw.m_vertexLayout = handle;
 }
 
 void Frame::setShader(ProgramHandle handle) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
     draw.m_shader = handle;
 }
 
-void Frame::setUniform(
-    ProgramHandle handle, const char *name, void *value, UniformType type, int count
+void Frame::addInput(
+    ProgramHandle handle, const char *name, RenderPassInputType type, const void *value, size_t size
 ) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
-    draw.addUniform(handle, name, value, type, count);
-}
-
-void Frame::setTexture(TextureHandle textureHandle, uint32_t slot) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
-    draw.setTexture(textureHandle, slot);
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
+    draw.addInput(handle, name, type, value, size);
 }
 
 void Frame::setScissorRect(Rect rect) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
     draw.m_scissorRect = rect;
 }
 
 void Frame::resetCurrentDrawCall() {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
     draw.reset();
 }
 
 void Frame::submitCurrentDrawCall(ViewId id) {
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
     draw.m_viewId = id;
     draw.m_isSubmitted = true;
 }
@@ -150,7 +145,7 @@ void Frame::reset() {
     m_indexBuffersFreeHandle.reset();
     m_preCommandQueue.reset();
     m_postCommandQueue.reset();
-    RenderDraw &draw = m_drawCalls[m_drawCallsCount];
+    RenderPass &draw = m_drawCalls[m_drawCallsCount];
     draw.reset();
 }
 
@@ -166,7 +161,7 @@ void Frame::sort() {
     std::stable_sort(
         m_drawCalls,
         m_drawCalls + m_drawCallsCount,
-        [](const RenderDraw &l, const RenderDraw &r) { return l.m_viewId > r.m_viewId; }
+        [](const RenderPass &l, const RenderPass &r) { return l.m_viewId > r.m_viewId; }
     );
 }
 

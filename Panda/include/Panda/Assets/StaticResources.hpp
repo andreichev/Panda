@@ -12,6 +12,7 @@ namespace StaticResources {
 
     void initStaticResources();
 
+    extern AssetRef<TextureAsset> whiteTexture;
     extern AssetRef<ShaderAsset> defaultShader;
     extern AssetRef<ShaderAsset> selectedGeometryShader;
     extern AssetRef<MaterialAsset> defaultMaterial;

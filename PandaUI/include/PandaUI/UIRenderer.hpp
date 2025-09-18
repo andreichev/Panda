@@ -2,6 +2,7 @@
 
 #include "Base.hpp"
 
+#include <Panda/Assets/Base/AssetRef.hpp>
 #include <Panda/Assets/TextureAsset.hpp>
 #include <Miren/Miren.hpp>
 
@@ -23,7 +24,7 @@ public:
             : center()
             , size()
             , color()
-            , texture(nullptr)
+            , texture()
             , rotation(0)
             , textureCoords(0, 0, 1, 1)
             , transform(1.f) {}
@@ -34,7 +35,7 @@ public:
         Color color;
         float rotation;
         glm::mat4 transform;
-        Foundation::Shared<Panda::Asset> texture;
+        Panda::AssetRef<Panda::TextureAsset> texture;
     };
 
     struct Statistics {
@@ -55,29 +56,23 @@ public:
         )
             : pos(pos)
             , textureCoords(textureCoords)
-            , textureIndex(textureIndex)
             , color(color) {}
 
         Vertex2D()
             : pos()
             , textureCoords()
-            , textureIndex(0)
             , color() {}
 
         glm::vec3 pos;
         glm::vec2 textureCoords;
-        int32_t textureIndex;
         glm::vec4 color;
     };
 
     struct DrawCallData {
         UIRenderer::Statistics stats;
         glm::mat4 projMat;
-        Foundation::Shared<Panda::TextureAsset> whiteTexture;
         Miren::VertexLayoutHandle layout;
-        Foundation::Shared<Panda::TextureAsset> textures[MAX_TEXTURE_SLOTS];
-        int samplers[MAX_TEXTURE_SLOTS];
-        uint32_t textureSlotIndex;
+        Panda::AssetRef<Panda::TextureAsset> texture;
         Vertex2D *vertices;
         uint32_t verticesCount;
         uint16_t *indices;
@@ -100,7 +95,7 @@ private:
     glm::mat4 m_viewProj;
     Miren::ViewId m_viewId;
     DrawCallData m_drawData;
-    Miren::ProgramHandle m_defaultShader;
+    Miren::ProgramHandle m_uiShader;
 
     void reset();
     void flush();

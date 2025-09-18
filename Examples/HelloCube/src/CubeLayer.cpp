@@ -4,19 +4,22 @@
 
 #include "CubeLayer.hpp"
 
+#include <Panda/Renderer/Std140Buffer.hpp>
 #include <Fern/Events/KeyEvents.hpp>
 #include <Fern/Events/WindowEvents.hpp>
 #include <imgui.h>
 
 struct Vertex {
     glm::vec3 pos;
-    glm::vec2 uv;
-    float light;
+    glm::vec2 textureCoords;
+    glm::vec4 color;
+    uint32_t id;
 
     Vertex(float x, float y, float z, float u, float v, float light)
         : pos(x, y, z)
-        , uv(u, v)
-        , light(light) {}
+        , textureCoords(u, v)
+        , color(light, light, light, 1.0f)
+        , id(0) {}
 };
 
 CubeLayer::~CubeLayer() {}
@@ -71,9 +74,14 @@ void CubeLayer::onAttach() {
     // clang-format on
 
     VertexBufferLayoutData layoutData;
+    // Position
     layoutData.pushVec3();
+    // Texture coordinates
     layoutData.pushVec2();
-    layoutData.pushFloat(1);
+    // Color
+    layoutData.pushVec4();
+    // Object id
+    layoutData.pushUInt(1);
     VertexLayoutHandle layoutHandle = createVertexLayout(layoutData);
     vertexBuffer = createVertexBuffer(vertices, 24 * sizeof(Vertex), layoutHandle);
     indexBuffer = createIndexBuffer(indices, BufferElementType::UnsignedInt, 36);
@@ -82,9 +90,9 @@ void CubeLayer::onAttach() {
         Panda::AssetImporterBase::load2DTexture("textures/arbuz1.png");
     texture = createTexture(textureCreate);
     Foundation::Memory vertexMem =
-        Panda::AssetImporterBase::loadData("default-shaders/renderer3d/base_vertex.glsl");
+        Panda::AssetImporterBase::loadData("default-shaders/default.vert");
     Foundation::Memory fragmentMem =
-        Panda::AssetImporterBase::loadData("default-shaders/renderer3d/base_fragment.glsl");
+        Panda::AssetImporterBase::loadData("default-shaders/default.frag");
     shader = createProgram({vertexMem, fragmentMem});
     setShader(shader);
 
@@ -106,7 +114,12 @@ void CubeLayer::onAttach() {
     translate = glm::vec3(0.f, 0.f, 0.f);
     viewProjection = projection * view;
 
-    setUniform(shader, "projViewMtx", &viewProjection[0][0], UniformType::Mat4);
+    Panda::Std140Buffer ubo;
+    // projViewMtx
+    ubo.addMat4(&viewProjection[0][0]);
+    // modelMtx
+    ubo.addMat4(&model[0][0]);
+    Miren::addInputUniformBuffer(shader, "UBO_VERT", ubo.getData(), ubo.getSize());
     time = 0;
 }
 
@@ -121,9 +134,13 @@ void CubeLayer::onUpdate(double deltaTime) {
     viewProjection = projection * view;
 
     Miren::setShader(shader);
-    Miren::setTexture(texture, 0);
-    Miren::setUniform(shader, "model", &model[0][0], Miren::UniformType::Mat4);
-    Miren::setUniform(shader, "projViewMtx", &viewProjection[0][0], Miren::UniformType::Mat4);
+    Miren::addInputTexture(shader, "albedo", texture);
+    Panda::Std140Buffer ubo;
+    // projViewMtx
+    ubo.addMat4(&viewProjection[0][0]);
+    // modelMtx
+    ubo.addMat4(&model[0][0]);
+    Miren::addInputUniformBuffer(shader, "UBO_VERT", ubo.getData(), ubo.getSize());
 
     Miren::setVertexBuffer(vertexBuffer);
     Miren::setIndexBuffer(indexBuffer, 0, 36);

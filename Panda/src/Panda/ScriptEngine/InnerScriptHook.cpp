@@ -326,9 +326,9 @@ void initScriptHook() {
     g_scriptSymbols["spriteRendererComponent_SetColor"] =
         (void *)InternalCalls::spriteRendererComponent_SetColor;
     g_scriptSymbols["spriteRendererComponent_SetMaterial"] =
-            (void *) InternalCalls::spriteRendererComponent_SetMaterial;
+        (void *)InternalCalls::spriteRendererComponent_SetMaterial;
     g_scriptSymbols["spriteRendererComponent_SetCell"] =
-            (void *) InternalCalls::spriteRendererComponent_SetCell;
+        (void *)InternalCalls::spriteRendererComponent_SetCell;
     /// RIGIDBODY2D COMPONENT
     g_scriptSymbols["rigidbody2DComponent_applyForce"] =
         (void *)InternalCalls::rigidbody2DComponent_applyForce;

@@ -57,18 +57,12 @@ void setViewport(ViewId id, Rect rect);
 void setViewFrameBuffer(ViewId id, FrameBufferHandle frameBuffer);
 void setState(uint32_t state);
 void setScissorRect(Rect rect);
-void setUniform(
-    ProgramHandle handle,
-    const char *name,
-    void *value,
-    UniformType type = UniformType::Sampler,
-    int count = 1
-);
+void addInputUniformBuffer(ProgramHandle program, const char *name, const void *value, size_t size);
+void addInputTexture(ProgramHandle program, const char *name, TextureHandle handle);
 void setVertexBuffer(VertexBufferHandle handle, intptr_t offset = 0);
 void setIndexBuffer(IndexBufferHandle handle, intptr_t offset, size_t count);
 void setVertexLayout(VertexLayoutHandle handle);
 void setShader(ProgramHandle handle);
-void setTexture(TextureHandle textureHandle, uint32_t slot);
 /// Cancel all encoder settings
 void discard();
 /// Submit draw call
