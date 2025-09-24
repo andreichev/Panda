@@ -435,17 +435,17 @@ struct Context {
 
     void destroyTransientVertexBuffer(TransientVertexBuffer &tvb) {
         deleteVertexBuffer(tvb.handle);
-        F_ALIGNED_FREE(Foundation::getAllocator(), tvb.data, 16);
+        F_FREE(Foundation::getAllocator(), tvb.data);
     }
 
     void destroyTransientIndexBuffer(TransientIndexBuffer &tib) {
         deleteIndexBuffer(tib.handle);
-        F_ALIGNED_FREE(Foundation::getAllocator(), tib.data, 16);
+        F_FREE(Foundation::getAllocator(), tib.data);
     }
 
     TransientIndexBuffer createTransientIndexBuffer(uint32_t size) {
         TransientIndexBuffer tib;
-        tib.data = (uint8_t *)F_ALIGNED_ALLOC(Foundation::getAllocator(), size, 16);
+        tib.data = (uint8_t *)F_ALLOC(Foundation::getAllocator(), size);
         tib.size = size;
         tib.startIndex = 0;
         tib.handle = createDynamicIndexBuffer(nullptr, BufferElementType::UnsignedShort, size / 2);
@@ -455,7 +455,7 @@ struct Context {
 
     TransientVertexBuffer createTransientVertexBuffer(uint32_t size) {
         TransientVertexBuffer tvb;
-        tvb.data = (uint8_t *)F_ALIGNED_ALLOC(Foundation::getAllocator(), size, 16);
+        tvb.data = (uint8_t *)F_ALLOC(Foundation::getAllocator(), size);
         tvb.size = size;
         tvb.startVertex = 0;
         tvb.handle = createDynamicVertexBuffer(nullptr, size);

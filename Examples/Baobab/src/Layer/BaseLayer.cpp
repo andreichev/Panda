@@ -10,6 +10,7 @@
 #include "Components/FullScreenToggle.hpp"
 #include "Components/UI/RootView.hpp"
 #include "Panda/GameLogic/Components/SkyComponent.hpp"
+#include "Panda/Assets/StaticResources.hpp"
 
 #include <Panda.hpp>
 #include <Fern/Events/KeyEvents.hpp>
@@ -21,19 +22,22 @@ BaseLayer::BaseLayer(Fern::Window *window)
     : m_window(window)
     , m_blocksCreation(&m_transform)
     , m_cameraMove(&m_transform)
-    , m_groundShader() {}
+    , m_groundShader()
+    , m_assetHandler() {}
 
 void BaseLayer::onAttach() {
     Miren::setViewClear(0, 0x3D75C9FF);
-    m_groundShader = Foundation::makeShared<Panda::ShaderAsset>(
-        "shaders/ground/ground_vertex.glsl", "shaders/ground/ground_fragment.glsl"
+    Panda::GameContext::setAssetHandler(&m_assetHandler);
+    Panda::StaticResources::initStaticResources();
+    m_groundShader = m_assetHandler.createStaticAsset<Panda::ShaderAsset>(
+        UUID(), "shaders/ground/ground.vert", "shaders/ground/ground.frag"
     );
     Miren::TextureCreate textureCreate =
         Panda::AssetImporterBase::load2DTexture("textures/BlocksTile.png");
     textureCreate.m_numMips = 4;
     textureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
     textureCreate.m_magFiltering = Miren::NEAREST;
-    m_blocksTileTexture = Foundation::makeShared<Panda::TextureAsset>(textureCreate);
+    m_blocksTileTexture = m_assetHandler.createStaticAsset<Panda::TextureAsset>(UUID(), textureCreate);
     Miren::VertexLayoutHandle layoutHandle =
         Miren::createVertexLayout(Vertex::createBufferLayout());
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
@@ -48,9 +52,12 @@ void BaseLayer::onAttach() {
                             [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                              indexX * ChunksStorage::SIZE_X + indexZ]
                         .getMesh();
-                std::vector<Panda::TextureBinding> bindings = {{"texture1", m_blocksTileTexture}};
-                Foundation::Shared<Panda::MaterialAsset> material =
-                    Foundation::makeShared<Panda::MaterialAsset>(m_groundShader, bindings);
+                Panda::MaterialData materialData;
+                materialData.inputs = {
+                    Panda::MaterialField("texture1", Panda::MaterialFieldType::TEXTURE, m_blocksTileTexture.asBaseAsset())
+                };
+                auto material =
+                    m_assetHandler.createStaticAsset<Panda::MaterialAsset>(UUID(), materialData, m_groundShader);
                 dynamicMesh.create(meshData, material);
             }
         }

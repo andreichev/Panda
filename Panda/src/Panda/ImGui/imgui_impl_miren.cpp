@@ -40,7 +40,7 @@ static void ImGui_ImplMiren_SetProjMat(ImDrawData *draw_data, int fb_width, int 
     float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
 
     projMat = glm::ortho(L, R, B, T);
-    Miren::addInputUniformBuffer(shader, "UBO", &projMat[0], sizeof(glm::mat4));
+    Miren::addInputUniformBuffer(shader, "UBO_IMGUI", &projMat[0], sizeof(glm::mat4));
 }
 
 IMGUI_IMPL_API void ImGui_ImplMiren_RenderDrawData(ImDrawData *draw_data) {

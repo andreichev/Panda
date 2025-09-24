@@ -286,6 +286,7 @@ void RendererOpenGL::viewChanged(View &view) {
 void RendererOpenGL::submit(RenderPass *draw) {
     // TODO: Capture time
     if (!draw->m_shader.isValid()) { return; }
+    GL_CALL(glBindVertexArray(m_uselessVao));
     m_shaders[draw->m_shader.id].bind();
     draw->m_inputs.finishWriting();
     PassInput *input;
@@ -325,7 +326,6 @@ void RendererOpenGL::submit(RenderPass *draw) {
             : m_vertexBuffers[draw->m_vertexBuffer.id].getLayoutHandle();
     PND_ASSERT(layoutHandle.id != MIREN_INVALID_HANDLE, "Invalid handle");
     VertexBufferLayoutData &layout = m_vertexLayouts[layoutHandle.id];
-    GL_CALL(glBindVertexArray(m_uselessVao));
     m_shaders[draw->m_shader.id].bindAttributes(layout, draw->m_verticesOffset);
     m_indexBuffers[draw->m_indexBuffer.id].bind();
     GL_CALL(glDrawElements(

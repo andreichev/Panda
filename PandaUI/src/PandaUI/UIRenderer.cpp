@@ -19,8 +19,8 @@ UIRenderer::UIRenderer()
         (uint16_t *)F_ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
     Foundation::Memory vertexMem;
     Foundation::Memory fragmentMem;
-    vertexMem = Panda::AssetImporterBase::loadData("panda-ui/ui_vertex.glsl");
-    fragmentMem = Panda::AssetImporterBase::loadData("panda-ui/ui_fragment.glsl");
+    vertexMem = Panda::AssetImporterBase::loadData("panda-ui/ui.vert");
+    fragmentMem = Panda::AssetImporterBase::loadData("panda-ui/ui.frag");
     m_uiShader = Miren::createProgram({vertexMem, fragmentMem});
     Miren::VertexBufferLayoutData layoutData;
     // Position
@@ -119,11 +119,18 @@ void UIRenderer::reset() {
     m_drawData.vbSize = 0;
     m_drawData.indicesCount = 0;
     m_drawData.ibSize = 0;
+    m_drawData.texture = Panda::StaticResources::whiteTexture;
 }
 
 void UIRenderer::flush() {
-    if (m_drawData.verticesCount == 0) { return; }
+    if (m_drawData.verticesCount == 0) {
+        return;
+    }
     Miren::setShader(m_uiShader);
+    Miren::addInputUniformBuffer(m_uiShader, "UBO", &m_viewProj[0][0], sizeof(glm::mat4));
+    Miren::TextureHandle texture = m_drawData.texture->getMirenHandle();
+    Miren::addInputTexture(m_uiShader, "u_texture", texture);
+
     Miren::TransientVertexBuffer tvb;
     Miren::allocTransientVertexBuffer(&tvb, m_drawData.vbSize);
     memcpy(tvb.data, m_drawData.vertices, m_drawData.vbSize);
@@ -134,9 +141,6 @@ void UIRenderer::flush() {
     );
     memcpy(tib.data, m_drawData.indices, m_drawData.ibSize);
     Miren::setState(MIREN_STATE_DEPTH_TEST);
-    Miren::TextureHandle texture = m_drawData.texture->getMirenHandle();
-    Miren::addInputUniformBuffer(m_uiShader, "UBO", (void *)&m_viewProj, sizeof(glm::mat4));
-    Miren::addInputTexture(m_uiShader, "u_texture", texture);
     Miren::setVertexLayout(m_drawData.layout);
     Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
     Miren::setIndexBuffer(tib.handle, tib.startIndex, m_drawData.indicesCount);

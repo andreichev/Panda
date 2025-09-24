@@ -7,6 +7,7 @@
 #include "Model/ChunksStorage.hpp"
 #include "Components/BlocksCreation.hpp"
 #include "Components/CameraMove.hpp"
+#include "AssetHandler/GameAssetHandler.hpp"
 
 #include <Panda/GameLogic/Components/TransformComponent.hpp>
 #include <Panda/GameLogic/Components/SkyComponent.hpp>
@@ -30,8 +31,9 @@ private:
     Panda::SkyComponent m_skyComponent;
     ChunksStorage m_chunksStorage;
     BlocksCreation m_blocksCreation;
-    Foundation::Shared<Panda::ShaderAsset> m_groundShader;
-    Foundation::Shared<Panda::TextureAsset> m_blocksTileTexture;
+    Panda::AssetRef<Panda::ShaderAsset> m_groundShader;
+    Panda::AssetRef<Panda::TextureAsset> m_blocksTileTexture;
+    GameAssetHandler m_assetHandler;
     Panda::Renderer2D m_renderer2d;
     Panda::Renderer3D m_renderer3d;
 };

@@ -10,7 +10,6 @@ namespace PandaUI {
 
 #define MAX_VERTICES_COUNT 100000
 #define MAX_INDICES_COUNT 160000
-#define MAX_TEXTURE_SLOTS 8
 
 /// UIRenderer отвечает за то, чтобы рисовать примитивные двумерные фигуры.
 /// Для этого UIRenderer создает шейдер и буферы с вершинами, текстурами, индексами.
