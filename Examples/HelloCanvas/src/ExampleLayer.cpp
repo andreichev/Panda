@@ -7,6 +7,7 @@
 
 #include <Panda.hpp>
 #include <Panda/GameLogic/Components/ParticleSystem.hpp>
+#include <Panda/Assets/StaticResources.hpp>
 #include <Fern/Events/KeyEvents.hpp>
 #include <Fern/Events/WindowEvents.hpp>
 #include <PandaUI/PandaUI.hpp>
@@ -16,10 +17,14 @@
 ExampleLayer::ExampleLayer(Fern::Window *window)
     : m_window(window)
     , m_cameraMove(&m_cameraTransform)
-    , m_emitter(&m_cameraTransform, &m_camera, &m_renderer2d) {}
+    , m_emitter(&m_cameraTransform, &m_camera, &m_renderer2d)
+    , m_assetHandler() {}
 
 void ExampleLayer::onAttach() {
     Miren::setViewClear(0, 0x000000FF);
+    Panda::GameContext::setAssetHandler(&m_assetHandler);
+    Panda::StaticResources::initStaticResources();
+    m_emitter.initializeMaterial();
     PandaUI::initialize();
     m_cameraTransform.translate({0.f, 0.f, 10.f});
     auto size = m_window->getSize();

@@ -37,7 +37,8 @@ void BaseLayer::onAttach() {
     textureCreate.m_numMips = 4;
     textureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
     textureCreate.m_magFiltering = Miren::NEAREST;
-    m_blocksTileTexture = m_assetHandler.createStaticAsset<Panda::TextureAsset>(UUID(), textureCreate);
+    m_blocksTileTexture =
+        m_assetHandler.createStaticAsset<Panda::TextureAsset>(UUID(), textureCreate);
     Miren::VertexLayoutHandle layoutHandle =
         Miren::createVertexLayout(Vertex::createBufferLayout());
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
@@ -53,11 +54,12 @@ void BaseLayer::onAttach() {
                              indexX * ChunksStorage::SIZE_X + indexZ]
                         .getMesh();
                 Panda::MaterialData materialData;
-                materialData.inputs = {
-                    Panda::MaterialField("texture1", Panda::MaterialFieldType::TEXTURE, m_blocksTileTexture.asBaseAsset())
-                };
-                auto material =
-                    m_assetHandler.createStaticAsset<Panda::MaterialAsset>(UUID(), materialData, m_groundShader);
+                materialData.inputs = {Panda::MaterialField(
+                    "texture1", Panda::MaterialFieldType::TEXTURE, m_blocksTileTexture.asBaseAsset()
+                )};
+                auto material = m_assetHandler.createStaticAsset<Panda::MaterialAsset>(
+                    UUID(), materialData, m_groundShader
+                );
                 dynamicMesh.create(meshData, material);
             }
         }

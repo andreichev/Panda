@@ -123,9 +123,7 @@ void UIRenderer::reset() {
 }
 
 void UIRenderer::flush() {
-    if (m_drawData.verticesCount == 0) {
-        return;
-    }
+    if (m_drawData.verticesCount == 0) { return; }
     Miren::setShader(m_uiShader);
     Miren::addInputUniformBuffer(m_uiShader, "UBO", &m_viewProj[0][0], sizeof(glm::mat4));
     Miren::TextureHandle texture = m_drawData.texture->getMirenHandle();

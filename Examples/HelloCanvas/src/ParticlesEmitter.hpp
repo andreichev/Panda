@@ -14,6 +14,7 @@ public:
         Panda::WorldCamera *camera,
         Panda::Renderer2D *renderer2D
     );
+    void initializeMaterial();
     void update(double deltaTime);
     void onImGuiRender();
 
@@ -24,7 +25,7 @@ private:
     Panda::ParticleSystem m_particleSystem;
     Panda::WorldCamera *m_camera;
     Panda::TransformComponent *m_cameraTransform;
-    Foundation::Shared<Panda::TextureAsset> m_texture;
+    Panda::AssetRef<Panda::MaterialAsset> m_material;
     float degree = 0.f;
     float colorFactor = 0.f;
 };
