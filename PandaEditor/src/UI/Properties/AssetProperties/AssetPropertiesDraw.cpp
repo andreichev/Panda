@@ -100,7 +100,7 @@ void AssetPropertiesDraw::drawProperties(const path_t &assetPath) {
         case AssetType::NONE:
             break;
     }
-    if (ImGui::Button("Reimport")) { assetHandler->registerAsset(assetPath); }
+    if (ImGui::Button("Reimport")) { assetHandler->reload(assetId); }
 }
 
 } // namespace Panda

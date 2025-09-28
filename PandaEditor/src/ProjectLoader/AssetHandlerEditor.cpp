@@ -1,8 +1,8 @@
 #include "AssetHandlerEditor.hpp"
+#include "Assets/EditorShaderAsset.hpp"
 
 #include <Panda/Assets/Base/AssetImporterBase.hpp>
 #include <Panda/Assets/TextureAsset.hpp>
-#include <Panda/Assets/ShaderAsset.hpp>
 #include <Panda/Renderer/MaterialData.hpp>
 #include <Panda/Assets/MaterialAsset.hpp>
 #include <Panda/Serialization/AssetsMapper.hpp>
@@ -22,8 +22,13 @@ AssetHandlerEditor::AssetHandlerEditor()
     , AssetHandler(Foundation::getAllocator()) {
     m_registerAssetFunc.emplace(".png", &AssetHandlerEditor::registerTextureAsset);
     m_registerAssetFunc.emplace(".jpeg", &AssetHandlerEditor::registerTextureAsset);
-    m_registerAssetFunc.emplace(".glsl", &AssetHandlerEditor::registerShaderAsset);
+    m_registerAssetFunc.emplace(".hlsl", &AssetHandlerEditor::registerShaderAsset);
     m_registerAssetFunc.emplace(".mat", &AssetHandlerEditor::registerMaterialAsset);
+}
+
+void AssetHandlerEditor::reload(AssetId id) {
+    m_loadedAssets.erase(id);
+    loadInternal(id);
 }
 
 Asset *AssetHandlerEditor::loadInternal(AssetId id) {
@@ -56,7 +61,9 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id) {
         }
         case AssetType::SHADER: {
             auto meta = std::get<ShaderAssetMeta>(assetInfo.meta);
-            asset = F_NEW(m_allocator, ShaderAsset)(m_projectPath / meta.fragmentCodePath);
+            asset = F_NEW(m_allocator, EditorShaderAsset)(
+                m_projectPath / meta.vertexCodePath, m_projectPath / meta.fragmentCodePath
+            );
             LOG_INFO("CREATED SHADER: %u", id);
             break;
         }
@@ -114,7 +121,8 @@ void AssetHandlerEditor::registerShaderAsset(const path_t &path) {
     info.id = UUID();
     info.type = AssetType::SHADER;
     ShaderAssetMeta meta;
-    meta.fragmentCodePath = assetPath;
+    meta.vertexCodePath = replaceLastChars(assetPath, "vert.hlsl");
+    meta.fragmentCodePath = replaceLastChars(assetPath, "frag.hlsl");
     info.meta = meta;
     m_registry[info.id] = info;
     m_registeredAssets[assetPath] = info.id;
@@ -224,6 +232,11 @@ void AssetHandlerEditor::loadAssetRegistry() {
                             meta.fragmentCodePath.string().c_str()
                         );
                         break;
+                    }
+                    if (!std::filesystem::exists(m_projectPath / meta.vertexCodePath)) {
+                        LOG_ERROR_EDITOR(
+                            "Shader asset %s not found.", meta.vertexCodePath.string().c_str()
+                        );
                     }
                     if (!std::filesystem::exists(m_projectPath / meta.fragmentCodePath)) {
                         LOG_ERROR_EDITOR(

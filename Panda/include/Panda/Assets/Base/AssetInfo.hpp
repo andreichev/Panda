@@ -25,9 +25,11 @@ struct TextureAssetMeta : public Rain::Codable {
 };
 
 struct ShaderAssetMeta : public Rain::Codable {
+    path_t vertexCodePath;
     path_t fragmentCodePath;
 
     RAIN_FIELDS_BEGIN(ShaderAssetMeta)
+    RAIN_FIELD(vertexCodePath)
     RAIN_FIELD(fragmentCodePath)
     RAIN_FIELDS_END
 };

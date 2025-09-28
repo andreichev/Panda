@@ -145,7 +145,9 @@ void Renderer2D::flush() {
     // modelMtx
     glm::mat4 model(1.f);
     uboVert.addMat4(&model[0][0]);
-    Miren::addInputUniformBuffer(shaderHandle, "UBO_VERT", uboVert.getData(), uboVert.getSize());
+    Miren::addInputUniformBuffer(
+        shaderHandle, "type_UBO_VERT", uboVert.getData(), uboVert.getSize()
+    );
 
     Miren::TransientVertexBuffer tvb;
     Miren::allocTransientVertexBuffer(&tvb, m_drawData.vbSize);

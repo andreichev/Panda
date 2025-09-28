@@ -10,14 +10,18 @@
 
 namespace Panda {
 
+/// Takes only compiled binaries as inputs
 class ShaderAsset : public Asset {
 public:
     ShaderAsset();
-    ShaderAsset(const path_t &fragmentCodePath);
-    ShaderAsset(const path_t &vertexCodePath, const path_t &fragmentCodePath);
+    ShaderAsset(const path_t &fragmentBinPath);
+    ShaderAsset(const path_t &vertexBinPath, const path_t &fragmentBinPath);
     ShaderAsset(ShaderAsset &&other);
     ~ShaderAsset();
     Miren::ProgramHandle getMirenHandle();
+
+protected:
+    void create(const path_t &vertexBinPath, const path_t &fragmentBinPath);
 
 private:
     Miren::ProgramHandle m_handle;

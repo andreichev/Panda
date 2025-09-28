@@ -6,22 +6,24 @@ namespace Panda {
 ShaderAsset::ShaderAsset()
     : m_handle(MIREN_INVALID_HANDLE) {}
 
-ShaderAsset::ShaderAsset(const path_t &fragmentCodePath) {
-    path_t vertexCodePath = "default-shaders/default.vert";
-    Foundation::Memory vertexMem = Panda::AssetImporterBase::loadData(vertexCodePath);
-    Foundation::Memory fragmentMem = Panda::AssetImporterBase::loadData(fragmentCodePath);
-    m_handle = Miren::createProgram({vertexMem, fragmentMem});
+ShaderAsset::ShaderAsset(const path_t &fragmentBinPath) {
+    path_t vertexBinPath = "default-shaders/default.vert";
+    create(vertexBinPath, fragmentBinPath);
 }
 
-ShaderAsset::ShaderAsset(const path_t &vertexCodePath, const path_t &fragmentCodePath) {
-    Foundation::Memory vertexMem = Panda::AssetImporterBase::loadData(vertexCodePath);
-    Foundation::Memory fragmentMem = Panda::AssetImporterBase::loadData(fragmentCodePath);
-    m_handle = Miren::createProgram({vertexMem, fragmentMem});
+ShaderAsset::ShaderAsset(const path_t &vertexBinPath, const path_t &fragmentBinPath) {
+    create(vertexBinPath, fragmentBinPath);
 }
 
 ShaderAsset::ShaderAsset(ShaderAsset &&other) {
     m_handle = other.m_handle;
     other.m_handle = MIREN_INVALID_HANDLE;
+}
+
+void ShaderAsset::create(const path_t &vertexBinPath, const path_t &fragmentBinPath) {
+    Foundation::Memory vertexMem = Panda::AssetImporterBase::loadData(vertexBinPath);
+    Foundation::Memory fragmentMem = Panda::AssetImporterBase::loadData(fragmentBinPath);
+    m_handle = Miren::createProgram({vertexMem, fragmentMem});
 }
 
 ShaderAsset::~ShaderAsset() {

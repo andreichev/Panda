@@ -5,7 +5,7 @@ layout (location = 1) in vec2 texCoord;
 layout (location = 2) in vec4 color;
 layout (location = 3) in uint id;
 
-layout(std140) uniform UBO_VERT {
+layout(std140) uniform type_UBO_VERT {
     mat4 projViewMtx;
     mat4 modelMtx;
 } ubo_vert;

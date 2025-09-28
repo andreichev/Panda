@@ -18,6 +18,7 @@ public:
     AssetHandlerEditor();
     void registerAsset(const path_t &path);
     bool canImport(const path_t &path);
+    void reload(AssetId id);
     AssetInfo getInfo(AssetId id);
     void updateInfo(AssetId assetId, const AssetInfo &assetInfo);
     UUID getAssetId(path_t path);
