@@ -5,6 +5,7 @@
 #include "Viewport.hpp"
 
 #include <Panda/Application/Application.hpp>
+#include <Panda/Renderer/MirenViewDistribution.hpp>
 #include <PandaUI/PandaUI.hpp>
 
 namespace Panda {
@@ -13,17 +14,14 @@ Viewport::Viewport()
     : m_frame()
     , m_sceneFB()
     , m_sceneFbSpecification()
-    , m_sceneView(1)
     , m_colorAttachment()
     , m_outlineProgram()
     , m_outputFB()
     , m_resultAttachment()
-    , m_outputView(2)
     , m_outputFbSpecification()
     , m_selectedGeometryFB()
     , m_selectedGeometryAttachment()
-    , m_selectedFbSpecification()
-    , m_selectedGeometryView(3) {}
+    , m_selectedFbSpecification() {}
 
 Viewport::~Viewport() {
     Miren::deleteFrameBuffer(m_sceneFB);
@@ -48,7 +46,7 @@ void Viewport::initWithSize(Vec2 size) {
     m_frame.size = size;
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     PandaUI::initialize();
-    PandaUI::Context::shared().updateViewId(m_sceneView);
+    PandaUI::Context::shared().updateViewId(Views::SCENE_VIEW);
 
     // -------------------------------------------
     //              SCENE RENDERING
@@ -72,12 +70,12 @@ void Viewport::initWithSize(Vec2 size) {
     m_sceneFbSpecification = Miren::FrameBufferSpecification(sceneAttachments, 3);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
     Miren::setViewport(
-        m_sceneView,
+        Views::SCENE_VIEW,
         Miren::Rect(0, 0, m_frame.size.width * dpi.width, m_frame.size.height * dpi.height)
     );
-    Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
-    Miren::setViewClear(m_sceneView, 0x000000cff);
-    Miren::setViewClearAttachments(m_sceneView, {Miren::Clear(1, 0), Miren::Clear(2, 0)});
+    Miren::setViewFrameBuffer(Views::SCENE_VIEW, m_sceneFB);
+    Miren::setViewClear(Views::SCENE_VIEW, 0x000000cff);
+    Miren::setViewClearAttachments(Views::SCENE_VIEW, {Miren::Clear(1, 0), Miren::Clear(2, 0)});
 
     // -------------------------------------------
     // SELECTED OBJECT HIGHLIGHT OUTLINE RENDERING
@@ -118,11 +116,11 @@ void Viewport::initWithSize(Vec2 size) {
     m_outputFB = Miren::createFrameBuffer(m_outputFbSpecification);
 
     Miren::setViewport(
-        m_outputView,
+        Views::EDITOR_VIEWPORT_VIEW,
         Miren::Rect(0, 0, m_frame.size.width * dpi.width, m_frame.size.height * dpi.height)
     );
-    Miren::setViewClear(m_outputView, 0x000000ff);
-    Miren::setViewFrameBuffer(m_outputView, m_outputFB);
+    Miren::setViewClear(Views::EDITOR_VIEWPORT_VIEW, 0x000000ff);
+    Miren::setViewFrameBuffer(Views::EDITOR_VIEWPORT_VIEW, m_outputFB);
 
     // -------------------------------------------
     //  SELECTED GEOMETRY ISOLATION FRAME BUFFER
@@ -136,10 +134,10 @@ void Viewport::initWithSize(Vec2 size) {
     m_selectedFbSpecification = Miren::FrameBufferSpecification(selectedGeometryFBAttachments, 1);
     m_selectedGeometryFB = Miren::createFrameBuffer(m_selectedFbSpecification);
     Miren::setViewport(
-        m_selectedGeometryView, Miren::Rect(0, 0, m_frame.size.width, m_frame.size.height)
+        Views::SELECTED_GEOMETRY_VIEW, Miren::Rect(0, 0, m_frame.size.width, m_frame.size.height)
     );
-    Miren::setViewClear(m_selectedGeometryView, 0);
-    Miren::setViewFrameBuffer(m_selectedGeometryView, m_selectedGeometryFB);
+    Miren::setViewClear(Views::SELECTED_GEOMETRY_VIEW, 0);
+    Miren::setViewFrameBuffer(Views::SELECTED_GEOMETRY_VIEW, m_selectedGeometryFB);
 }
 
 void Viewport::updateOrigin(Vec2 origin) {
@@ -151,7 +149,7 @@ void Viewport::updateSize(Size size) {
     PandaUI::Context::shared().updateViewportSize({size.width, size.height});
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     Miren::setViewport(
-        m_sceneView, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
+        Views::SCENE_VIEW, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
     );
     // COLOR ATTACHMENT
     Miren::resizeTexture(
@@ -173,10 +171,11 @@ void Viewport::updateSize(Size size) {
     );
     Miren::deleteFrameBuffer(m_sceneFB);
     m_sceneFB = Miren::createFrameBuffer(m_sceneFbSpecification);
-    Miren::setViewFrameBuffer(m_sceneView, m_sceneFB);
+    Miren::setViewFrameBuffer(Views::SCENE_VIEW, m_sceneFB);
     // HIGHLIGHT FRAME BUFFER
     Miren::setViewport(
-        m_outputView, Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
+        Views::EDITOR_VIEWPORT_VIEW,
+        Miren::Rect(0, 0, size.width * dpi.width, size.height * dpi.height)
     );
     Miren::resizeTexture(
         m_outputFbSpecification.attachments[0].handle,
@@ -185,26 +184,18 @@ void Viewport::updateSize(Size size) {
     );
     Miren::deleteFrameBuffer(m_outputFB);
     m_outputFB = Miren::createFrameBuffer(m_outputFbSpecification);
-    Miren::setViewFrameBuffer(m_outputView, m_outputFB);
+    Miren::setViewFrameBuffer(Views::EDITOR_VIEWPORT_VIEW, m_outputFB);
     // SELECTED GEOMETRY FRAME BUFFER
-    Miren::setViewport(m_selectedGeometryView, Miren::Rect(0, 0, size.width, size.height));
+    Miren::setViewport(Views::SELECTED_GEOMETRY_VIEW, Miren::Rect(0, 0, size.width, size.height));
     // SELECTED GEOMETRY ATTACHMENT
     Miren::resizeTexture(m_selectedFbSpecification.attachments[0].handle, size.width, size.height);
     Miren::deleteFrameBuffer(m_selectedGeometryFB);
     m_selectedGeometryFB = Miren::createFrameBuffer(m_selectedFbSpecification);
-    Miren::setViewFrameBuffer(m_selectedGeometryView, m_selectedGeometryFB);
+    Miren::setViewFrameBuffer(Views::SELECTED_GEOMETRY_VIEW, m_selectedGeometryFB);
 }
 
 Miren::TextureHandle Viewport::getResultTexture() {
     return m_resultAttachment;
-}
-
-Miren::ViewId Viewport::getRenderingView() {
-    return m_sceneView;
-}
-
-Miren::ViewId Viewport::getSelectionRenderingView() {
-    return m_selectedGeometryView;
 }
 
 Miren::FrameBufferHandle Viewport::getSceneFrameBuffer() {
@@ -221,7 +212,7 @@ void Viewport::drawOutline(float dt, const std::unordered_set<UUID> &selection) 
     );
     Miren::setVertexBuffer(m_vertexBuffer);
     Miren::setIndexBuffer(m_indexBuffer, 0, 6);
-    Miren::submit(m_outputView);
+    Miren::submit(Views::EDITOR_VIEWPORT_VIEW);
 }
 
 Rect Viewport::getFrame() {

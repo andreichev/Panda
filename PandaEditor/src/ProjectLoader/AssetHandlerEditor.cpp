@@ -2,8 +2,7 @@
 #include "Assets/EditorShaderAsset.hpp"
 
 #include <Panda/Assets/Base/AssetImporterBase.hpp>
-#include <Panda/Assets/TextureAsset.hpp>
-#include <Panda/Renderer/MaterialData.hpp>
+#include <Panda/Assets/Fallback/FallbackAssets.hpp>
 #include <Panda/Assets/MaterialAsset.hpp>
 #include <Panda/Serialization/AssetsMapper.hpp>
 
@@ -27,14 +26,15 @@ AssetHandlerEditor::AssetHandlerEditor()
 }
 
 void AssetHandlerEditor::reload(AssetId id) {
-    m_loadedAssets.erase(id);
-    loadInternal(id);
+    loadInternal(id, true);
 }
 
-Asset *AssetHandlerEditor::loadInternal(AssetId id) {
-    if (m_loadedAssets.find(id) != m_loadedAssets.end()) { return m_loadedAssets.at(id); }
+Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
+    if (!forcedReload) {
+        if (m_loadedAssets.find(id) != m_loadedAssets.end()) { return m_loadedAssets.at(id).asset; }
+    }
     if (m_registry.find(id) == m_registry.end()) {
-        PND_ASSERT(false, "UNKNOWN ASSET ID");
+        PND_ASSERT_F(false, "UNKNOWN ASSET ID %u", id);
         return nullptr;
     }
     auto assetInfo = m_registry.at(id);
@@ -49,22 +49,56 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id) {
                 create.m_magFiltering = meta.magFiltering;
                 create.m_numMips = meta.numMips;
                 asset = F_NEW(m_allocator, TextureAsset)(create);
-                LOG_INFO("CREATED TEXTURE: %u", id);
+                LOG_INFO("CREATED TEXTURE %u AT PATH %s", id, meta.path.string().c_str());
+                LOG_INFO_EDITOR("CREATED TEXTURE %u AT PATH %s", id, meta.path.string().c_str());
             } else {
-                Foundation::Memory violetTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
-                *(uint32_t *)violetTextureData.data = 0xFFFF008F;
-                Miren::TextureCreate violetTextureCreate;
-                violetTextureCreate.m_data = violetTextureData;
-                asset = F_NEW(m_allocator, TextureAsset)(violetTextureCreate);
+                asset = F_NEW(m_allocator, FallbackTextureAsset)();
+                LOG_ERROR(
+                    "TEXTURE ASSET %u NOT FOUND AT PATH %s: ", id, meta.path.string().c_str()
+                );
+                LOG_ERROR_EDITOR(
+                    "TEXTURE ASSET %u NOT FOUND AT PATH %s: ", id, meta.path.string().c_str()
+                );
             }
             break;
         }
         case AssetType::SHADER: {
             auto meta = std::get<ShaderAssetMeta>(assetInfo.meta);
-            asset = F_NEW(m_allocator, EditorShaderAsset)(
-                m_projectPath / meta.vertexCodePath, m_projectPath / meta.fragmentCodePath
-            );
-            LOG_INFO("CREATED SHADER: %u", id);
+            path_t vertPath = m_projectPath / meta.vertexCodePath;
+            path_t fragPath = m_projectPath / meta.fragmentCodePath;
+            if (std::filesystem::exists(vertPath) && std::filesystem::exists(fragPath)) {
+                asset = F_NEW(m_allocator, EditorShaderAsset)(vertPath, fragPath);
+                LOG_INFO(
+                    "CREATED SHADER %u. VERT: %s, FRAG: %s",
+                    id,
+                    vertPath.string().c_str(),
+                    fragPath.string().c_str()
+                );
+                LOG_INFO_EDITOR(
+                    "CREATED SHADER %u. VERT: %s, FRAG: %s",
+                    id,
+                    vertPath.string().c_str(),
+                    fragPath.string().c_str()
+                );
+            } else {
+                asset = F_NEW(m_allocator, ShaderAsset)();
+                if (!std::filesystem::exists(vertPath)) {
+                    LOG_ERROR(
+                        "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, vertPath.string().c_str()
+                    );
+                    LOG_ERROR_EDITOR(
+                        "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, vertPath.string().c_str()
+                    );
+                }
+                if (!std::filesystem::exists(fragPath)) {
+                    LOG_ERROR(
+                        "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, fragPath.string().c_str()
+                    );
+                    LOG_ERROR_EDITOR(
+                        "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, fragPath.string().c_str()
+                    );
+                }
+            }
             break;
         }
         case AssetType::MATERIAL: {
@@ -80,9 +114,15 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id) {
                 MaterialData data;
                 AssetsMapper::toData(data, dataDto);
                 asset = F_NEW(m_allocator, MaterialAsset)(data, shader);
-                LOG_INFO("CREATED MATERIAL: %u", id);
+                LOG_INFO("CREATED MATERIAL %u AT PATH %s", id, meta.materialPath.string().c_str());
+                LOG_INFO_EDITOR(
+                    "CREATED MATERIAL %u AT PATH %s", id, meta.materialPath.string().c_str()
+                );
             } else {
-                LOG_INFO("MATERIAL FILE NOT FOUND. MATERIAL IMPORT FAILED");
+                LOG_ERROR("MATERIAL %u FILE %s NOT FOUND", id, meta.materialPath.string().c_str());
+                LOG_ERROR_EDITOR(
+                    "MATERIAL %u FILE %s NOT FOUND", id, meta.materialPath.string().c_str()
+                );
                 asset = nullptr;
             }
             break;
@@ -94,9 +134,14 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id) {
             break;
         }
     }
-    // TODO: Replace with error result
     PND_ASSERT(asset != nullptr, "ASSET IS NOT LOADED");
-    m_loadedAssets[id] = asset;
+    if (forcedReload && m_loadedAssets.find(id) != m_loadedAssets.end()) {
+        Asset *prevAsset = m_loadedAssets.at(id).asset;
+        F_FREE(m_allocator, prevAsset);
+    }
+    AssetEntry entry;
+    entry.asset = asset;
+    m_loadedAssets[id] = entry;
     return asset;
 }
 
@@ -125,7 +170,8 @@ void AssetHandlerEditor::registerShaderAsset(const path_t &path) {
     meta.fragmentCodePath = replaceLastChars(assetPath, "frag.hlsl");
     info.meta = meta;
     m_registry[info.id] = info;
-    m_registeredAssets[assetPath] = info.id;
+    m_registeredAssets[meta.vertexCodePath] = info.id;
+    m_registeredAssets[meta.fragmentCodePath] = info.id;
     saveAssetRegistry();
 }
 
@@ -243,6 +289,7 @@ void AssetHandlerEditor::loadAssetRegistry() {
                             "Shader asset %s not found.", meta.fragmentCodePath.string().c_str()
                         );
                     }
+                    m_registeredAssets[meta.vertexCodePath] = info.id;
                     m_registeredAssets[meta.fragmentCodePath] = info.id;
                     m_registry[info.id] = info;
                     break;
@@ -291,9 +338,11 @@ void AssetHandlerEditor::saveAssetRegistry() {
         Rain::Encoder *encoder = &m_jsonEncoder;
         encoder->encode(file, registryDto);
         file.close();
+        LOG_INFO("Asset registry saved.");
         LOG_INFO_EDITOR("Asset registry saved.");
     } else {
-        LOG_INFO("ASSET REGISTRY SAVING ERROR");
+        LOG_ERROR("ASSET REGISTRY SAVING ERROR");
+        LOG_ERROR_EDITOR("ASSET REGISTRY SAVING ERROR");
     }
 }
 

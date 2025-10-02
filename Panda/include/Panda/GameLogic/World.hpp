@@ -44,8 +44,6 @@ public:
     Renderer3D &getRenderer3D() {
         return m_renderer3d;
     }
-    void setViewId(Miren::ViewId id);
-    void setSelectionViewId(Miren::ViewId id);
     glm::mat4 getWorldSpaceTransformMatrix(Entity entity);
     void convertToWorldSpace(Entity entity);
     void convertToLocalSpace(Entity entity);
@@ -97,8 +95,6 @@ private:
     Physics2D m_physics2D;
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;
-    Miren::ViewId m_renderingViewId;
-    Miren::ViewId m_selectionViewId;
 
     friend class Entity;
     friend class WorldHierarchyPanel;

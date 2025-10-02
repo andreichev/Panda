@@ -29,6 +29,14 @@ namespace StaticResources {
             handler->createStaticAsset<MaterialAsset>(5, materialData, selectedGeometryShader);
     }
 
+    void deinitStaticResources() {
+        whiteTexture.reset();
+        defaultShader.reset();
+        selectedGeometryShader.reset();
+        defaultMaterial.reset();
+        selectedGeometryMaterial.reset();
+    }
+
     AssetRef<TextureAsset> whiteTexture;
     AssetRef<ShaderAsset> defaultShader;
     AssetRef<ShaderAsset> selectedGeometryShader;

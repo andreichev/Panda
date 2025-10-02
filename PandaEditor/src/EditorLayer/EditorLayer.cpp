@@ -1,13 +1,14 @@
 #include "EditorLayer.hpp"
 
-#include "Panda/GameLogic/GameContext.hpp"
 #include "UI/Common/ImGuiHelper.hpp"
 #include "UI/Popups/EditorYesNoPopup.hpp"
 #include "UI/Popups/PickScriptPopup.hpp"
 #include "UI/Popups/EnterNamePopup.hpp"
 #include "UI/Popups/EditorAboutPopup.hpp"
-#include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
 
+#include <Panda/Renderer/MirenViewDistribution.hpp>
+#include <Panda/GameLogic/GameContext.hpp>
+#include <Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp>
 #include <Foundation/PlatformDetection.hpp>
 #include <Fern/Fern.hpp>
 #include <Fern/Events/WindowEvents.hpp>
@@ -39,10 +40,6 @@ void EditorLayer::onAttach() {
         0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
     );
     m_panelsContainer.viewport.initWithSize(Size(100.f, 100.f));
-    m_editingWorld.setViewId(m_panelsContainer.viewport.getRenderingView());
-    m_editingWorld.setSelectionViewId(m_panelsContainer.viewport.getSelectionRenderingView());
-    m_playingWorld.setViewId(m_panelsContainer.viewport.getRenderingView());
-    m_grid.setViewId(m_panelsContainer.viewport.getRenderingView());
     m_panelsContainer.viewport.setCamera(&m_editorCamera);
     m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_cameraController.setPosition({0.f, 0.f, 4.f});

@@ -44,8 +44,6 @@ public:
     void focus();
     bool isFocused();
     bool isHovered();
-    Miren::ViewId getRenderingView();
-    Miren::ViewId getSelectionRenderingView();
 
 private:
     void updateViewportSize(Size size);

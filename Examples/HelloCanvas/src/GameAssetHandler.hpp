@@ -7,8 +7,8 @@ public:
     GameAssetHandler()
         : AssetHandler(Foundation::getAllocator()) {}
 
-    Panda::Asset *loadInternal(Panda::AssetId id) override {
-        if (m_loadedAssets.find(id) != m_loadedAssets.end()) { return m_loadedAssets.at(id); }
+    Panda::Asset *loadInternal(Panda::AssetId id, bool _) override {
+        if (m_loadedAssets.find(id) != m_loadedAssets.end()) { return m_loadedAssets.at(id).asset; }
         return nullptr;
     }
 };

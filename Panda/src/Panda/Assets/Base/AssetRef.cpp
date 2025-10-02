@@ -58,6 +58,13 @@ AssetId AssetRef<AssetType>::getId() const {
 }
 
 template<typename AssetType>
+void AssetRef<AssetType>::reset() {
+    if (m_handler && m_id) { m_handler->decrementRefCount(m_id); }
+    m_handler = nullptr;
+    m_id = 0;
+}
+
+template<typename AssetType>
 AssetRef<AssetType>::operator bool() const {
     return m_id;
 }

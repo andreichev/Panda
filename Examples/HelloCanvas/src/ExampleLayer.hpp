@@ -24,7 +24,6 @@ private:
     Panda::WorldCamera m_camera;
     Panda::Renderer2D m_renderer2d;
     Panda::TransformComponent m_cameraTransform;
-    GameAssetHandler m_assetHandler;
     ParticlesEmitter m_emitter;
     OrthographicCameraMove m_cameraMove;
 };

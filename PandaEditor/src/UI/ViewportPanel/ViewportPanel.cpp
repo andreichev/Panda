@@ -285,12 +285,4 @@ void ViewportPanel::focus() {
     m_focusNextFrame = true;
 }
 
-Miren::ViewId ViewportPanel::getRenderingView() {
-    return m_viewport.getRenderingView();
-}
-
-Miren::ViewId ViewportPanel::getSelectionRenderingView() {
-    return m_viewport.getSelectionRenderingView();
-}
-
 } // namespace Panda

@@ -5,6 +5,7 @@
 #include "Panda/Application/Application.hpp"
 #include "Panda/Assets/TextureAsset.hpp"
 #include "Panda/Renderer/Std140Buffer.hpp"
+#include "Panda/Renderer/MirenViewDistribution.hpp"
 
 #include <glm/glm.hpp>
 #include <Miren/Miren.hpp>
@@ -20,8 +21,7 @@ struct SkyVertex {
 
 class SkyComponent final {
 public:
-    SkyComponent(SkyComponent &other)
-        : m_sceneViewId(other.m_sceneViewId) {
+    SkyComponent(SkyComponent &other) {
         // TODO: Добавить переиспользование ресурсов между мирами при помощи AssetManager
         // https://ru.yougile.com/team/91006f9f80d3/#PANDA-34
         initResources();
@@ -29,8 +29,7 @@ public:
 
     SkyComponent(SkyComponent &&other) = default;
 
-    SkyComponent()
-        : m_sceneViewId(0) {
+    SkyComponent() {
         initResources();
     }
 
@@ -39,7 +38,6 @@ public:
     }
 
     SkyComponent &operator=(SkyComponent &other) {
-        m_sceneViewId = other.m_sceneViewId;
         initResources();
         return *this;
     }
@@ -142,17 +140,12 @@ public:
         Miren::setVertexBuffer(m_vertexBuffer);
         Miren::setIndexBuffer(m_indexBuffer, 0, 36);
         Miren::setState(0);
-        Miren::submit(m_sceneViewId);
-    }
-
-    void setViewId(Miren::ViewId viewId) {
-        m_sceneViewId = viewId;
+        Miren::submit(Views::SCENE_VIEW);
     }
 
 private:
     glm::mat4 m_model;
     glm::mat4 m_viewProjection;
-    Miren::ViewId m_sceneViewId;
 
     Foundation::Shared<Panda::TextureAsset> m_texture;
     Miren::ProgramHandle m_shader;

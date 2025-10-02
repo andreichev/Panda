@@ -2,6 +2,7 @@
 #include "Panda/Serialization/WorldMapper.hpp"
 #include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/Assets/StaticResources.hpp"
+#include "AssetHandlerEditor.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -22,18 +23,18 @@ ProjectLoader::ProjectLoader(World *world, ProjectLoaderOutput *output)
     , m_projectSettings()
     , m_projectPath()
     , m_worldPath()
-    , m_assetHandler() {
+    , m_assetHandler(nullptr) {
     GameContext::setScriptEngine(&m_scriptEngine);
-    GameContext::setAssetHandler(&m_assetHandler);
+    m_assetHandler = static_cast<AssetHandlerEditor *>(GameContext::getAssetHandler());
     StaticResources::initStaticResources();
 }
 
 ProjectLoader::~ProjectLoader() {
     saveAppSettings();
     saveProjectSettings();
-    m_assetHandler.closeProject();
+    m_assetHandler->closeProject();
+    Panda::StaticResources::deinitStaticResources();
     GameContext::setScriptEngine(nullptr);
-    GameContext::setAssetHandler(nullptr);
 }
 
 void ProjectLoader::loadInitialData() {
@@ -108,7 +109,7 @@ void ProjectLoader::openProject(const path_t &path) {
         return;
     }
     // Load asset registry
-    { m_assetHandler.openProject(m_projectPath); }
+    { m_assetHandler->openProject(m_projectPath); }
     m_worldPath = m_projectPath;
     m_worldPath.append(m_projectSettings.worldPath);
     loadWorld();
@@ -221,7 +222,7 @@ void ProjectLoader::saveWorldAs() {
 void ProjectLoader::closeProject() {
     saveAppSettings();
     saveProjectSettings();
-    m_assetHandler.closeProject();
+    m_assetHandler->closeProject();
     m_projectSettings.clear();
     m_worldPath.clear();
     m_projectPath.clear();
@@ -240,10 +241,6 @@ const ProjectSettings &ProjectLoader::getProjectSettings() {
 
 LastOpenedProjectWindowState ProjectLoader::getLastWindowState() {
     return m_editorSettings.windowState;
-}
-
-AssetHandlerEditor &ProjectLoader::getAssetHandler() {
-    return m_assetHandler;
 }
 
 void ProjectLoader::saveProjectSettings() {

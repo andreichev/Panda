@@ -286,6 +286,7 @@ void RendererOpenGL::viewChanged(View &view) {
 void RendererOpenGL::submit(RenderPass *draw) {
     // TODO: Capture time
     if (!draw->m_shader.isValid()) { return; }
+    if (!m_shaders[draw->m_shader.id].isValid()) { return; }
     GL_CALL(glBindVertexArray(m_uselessVao));
     m_shaders[draw->m_shader.id].bind();
     draw->m_inputs.finishWriting();

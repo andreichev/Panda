@@ -45,7 +45,6 @@ public:
     void removeRecentProject(int index);
     const ProjectSettings &getProjectSettings();
     LastOpenedProjectWindowState getLastWindowState();
-    AssetHandlerEditor &getAssetHandler();
 
 private:
     void saveWorldAs();
@@ -62,7 +61,7 @@ private:
     World *m_world;
     ProjectLoaderOutput *m_output;
     ScriptEngine m_scriptEngine;
-    AssetHandlerEditor m_assetHandler;
+    AssetHandlerEditor *m_assetHandler;
 };
 
 } // namespace Panda

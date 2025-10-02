@@ -11,6 +11,7 @@ namespace Panda {
 namespace StaticResources {
 
     void initStaticResources();
+    void deinitStaticResources();
 
     extern AssetRef<TextureAsset> whiteTexture;
     extern AssetRef<ShaderAsset> defaultShader;

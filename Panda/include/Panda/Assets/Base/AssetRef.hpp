@@ -22,6 +22,7 @@ public:
     AssetRef(AssetHandler *handler, AssetId id);
     Asset *get() const;
     AssetId getId() const;
+    void reset();
 
     explicit operator bool() const;
     AssetType *operator->() const;

@@ -17,12 +17,10 @@
 ExampleLayer::ExampleLayer(Fern::Window *window)
     : m_window(window)
     , m_cameraMove(&m_cameraTransform)
-    , m_emitter(&m_cameraTransform, &m_camera, &m_renderer2d)
-    , m_assetHandler() {}
+    , m_emitter(&m_cameraTransform, &m_camera, &m_renderer2d) {}
 
 void ExampleLayer::onAttach() {
     Miren::setViewClear(0, 0x000000FF);
-    Panda::GameContext::setAssetHandler(&m_assetHandler);
     Panda::StaticResources::initStaticResources();
     m_emitter.initializeMaterial();
     PandaUI::initialize();
@@ -36,7 +34,9 @@ void ExampleLayer::onAttach() {
     PandaUI::Context::shared().updateViewportSize({size.width, size.height});
 }
 
-void ExampleLayer::onDetach() {}
+void ExampleLayer::onDetach() {
+    Panda::StaticResources::deinitStaticResources();
+}
 
 void ExampleLayer::onUpdate(double deltaTime) {
     m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, 0);

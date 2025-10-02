@@ -2,6 +2,7 @@
 
 #include "Camera/CameraController.hpp"
 
+#include <Panda/Renderer/MirenViewDistribution.hpp>
 #include <Panda/Assets/Base/AssetHandler.hpp>
 #include <Panda/Renderer/Std140Buffer.hpp>
 #include <glm/glm.hpp>
@@ -12,14 +13,12 @@ namespace Panda {
 class SceneGrid final {
 public:
     SceneGrid(SceneGrid &other)
-        : m_cameraController(other.m_cameraController)
-        , m_sceneViewId(other.m_sceneViewId) {
+        : m_cameraController(other.m_cameraController) {
         initResources();
     }
 
     SceneGrid(CameraController *cameraController)
-        : m_cameraController(cameraController)
-        , m_sceneViewId(0) {
+        : m_cameraController(cameraController) {
         initResources();
     }
 
@@ -28,7 +27,6 @@ public:
     }
 
     SceneGrid &operator=(SceneGrid &other) {
-        m_sceneViewId = other.m_sceneViewId;
         m_cameraController = other.m_cameraController;
         initResources();
         return *this;
@@ -84,16 +82,11 @@ public:
         Miren::setVertexBuffer(m_vertexBuffer);
         Miren::setIndexBuffer(m_indexBuffer, 0, 6);
         Miren::setState(MIREN_STATE_DEPTH_TEST);
-        Miren::submit(m_sceneViewId);
-    }
-
-    void setViewId(Miren::ViewId viewId) {
-        m_sceneViewId = viewId;
+        Miren::submit(Views::SCENE_VIEW);
     }
 
 private:
     glm::mat4 m_viewProjection;
-    Miren::ViewId m_sceneViewId;
 
     Miren::ProgramHandle m_shader;
     Miren::IndexBufferHandle m_indexBuffer;

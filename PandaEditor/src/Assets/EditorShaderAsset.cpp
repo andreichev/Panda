@@ -19,7 +19,7 @@ EditorShaderAsset::EditorShaderAsset(const path_t &vertexCodePath, const path_t 
     path_t vertexGlslPath = vertexCodePath;
     vertexGlslPath.replace_extension(".vert");
     MirenTools::compileSpvShaderToGlsl(vertexSpvPath, vertexGlslPath, MirenTools::VERTEX);
-    path_t fragmentGlslPath = vertexCodePath;
+    path_t fragmentGlslPath = fragmentCodePath;
     fragmentGlslPath.replace_extension(".frag");
     MirenTools::compileSpvShaderToGlsl(fragmentSpvPath, fragmentGlslPath, MirenTools::FRAGMENT);
     create(vertexGlslPath, fragmentGlslPath);

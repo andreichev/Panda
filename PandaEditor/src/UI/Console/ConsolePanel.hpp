@@ -145,7 +145,7 @@ struct ConsolePanel {
 
 private:
     static constexpr int32_t MAX_LINES = 100;
-    static constexpr int32_t MAX_LINE_SYMBOLS = 100;
+    static constexpr int32_t MAX_LINE_SYMBOLS = 256;
     static ConsolePanel *s_instance;
 
     static std::string getTimeToString(time_t &time) {

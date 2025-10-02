@@ -27,7 +27,7 @@ public:
     const path_t &getProjectPath();
 
 private:
-    Asset *loadInternal(AssetId id) override;
+    Asset *loadInternal(AssetId id, bool forcedReload = false) override;
     void registerTextureAsset(const path_t &path);
     void registerShaderAsset(const path_t &path);
     void registerMaterialAsset(const path_t &path);

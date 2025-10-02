@@ -4,9 +4,9 @@
 
 #include "OpenGLShader.hpp"
 #include "Miren/Base.hpp"
-
 #include "OpenGLBase.hpp"
 
+#include <Foundation/Defer.hpp>
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -22,6 +22,10 @@ OpenGLShader::OpenGLShader()
     , m_textureBindings() {}
 
 void OpenGLShader::create(ProgramCreate create) {
+    DEFER({
+        create.m_vertexBinary.release();
+        create.m_fragmentBinary.release();
+    });
     PND_ASSERT(m_id == -1, "PROGRAM ALREADY CREATED");
     unsigned int vertex, fragment;
     // vertex shader
@@ -31,30 +35,38 @@ void OpenGLShader::create(ProgramCreate create) {
     const char *vertexSource = reinterpret_cast<const char *>(create.m_vertexBinary.data);
     GL_CALL(glShaderSource(vertex, 1, &vertexSource, nullptr));
     GL_CALL(glCompileShader(vertex));
-    checkCompileErrors(vertex, "VERTEX");
+    if (!checkCompileErrors(vertex, "VERTEX")) {
+        m_id = -1;
+        return;
+    }
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     const char *fragmentSource = reinterpret_cast<const char *>(create.m_fragmentBinary.data);
     GL_CALL(glShaderSource(fragment, 1, &fragmentSource, nullptr));
     GL_CALL(glCompileShader(fragment));
-    checkCompileErrors(fragment, "FRAGMENT");
+    if (!checkCompileErrors(fragment, "FRAGMENT")) {
+        GL_CALL(glDeleteShader(vertex));
+        m_id = -1;
+        return;
+    }
     // shader Program
     m_id = glCreateProgram();
     GL_CALL(glAttachShader(m_id, vertex));
     GL_CALL(glAttachShader(m_id, fragment));
     GL_CALL(glLinkProgram(m_id));
-    checkCompileErrors(m_id, "PROGRAM");
-    // delete the shaders as they're linked into our program now and no longer necessery
+    if (!checkCompileErrors(m_id, "PROGRAM")) {
+        GL_CALL(glDeleteShader(vertex));
+        GL_CALL(glDeleteShader(fragment));
+        m_id = -1;
+        return;
+    }
+    // delete the shaders as they're linked into our program now and no longer necessary
     GL_CALL(glDeleteShader(vertex));
     GL_CALL(glDeleteShader(fragment));
-
-    create.m_vertexBinary.release();
-    create.m_fragmentBinary.release();
 }
 
 void OpenGLShader::terminate() {
-    PND_ASSERT(m_id != -1, "PROGRAM ALREADY DELETED");
-    GL_CALL(glDeleteProgram(m_id));
+    if (m_id != -1) { GL_CALL(glDeleteProgram(m_id)); }
     m_id = -1;
     m_textureBindings.clear();
     m_uboIndices.clear();
@@ -63,22 +75,25 @@ void OpenGLShader::terminate() {
     m_uboBuffers.clear();
 }
 
-void OpenGLShader::checkCompileErrors(unsigned int shader, const std::string &type) {
+bool OpenGLShader::checkCompileErrors(unsigned int shader, const std::string &type) {
     GLint success;
     GLchar infoLog[1024];
     if (type != "PROGRAM") {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            PND_ASSERT_F(false, "SHADER_COMPILATION_ERROR of type: %s\n%s", type.c_str(), infoLog);
+            LOG_ERROR("SHADER COMPILATION ERROR of type: %s\n%s", type.c_str(), infoLog);
+            LOG_ERROR_EDITOR("SHADER COMPILATION ERROR of type: %s\n%s", type.c_str(), infoLog);
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            PND_ASSERT_F(false, "PROGRAM_LINKING_ERROR of type: %s\n%s", type.c_str(), infoLog);
+            LOG_ERROR("PROGRAM_LINKING_ERROR of type: %s\n%s", type.c_str(), infoLog);
+            LOG_ERROR_EDITOR("PROGRAM_LINKING_ERROR of type: %s\n%s", type.c_str(), infoLog);
         }
     }
+    return success;
 }
 
 uint32_t OpenGLShader::getUboIndex(const char *name) {
@@ -157,6 +172,10 @@ void OpenGLShader::bindAttributes(VertexBufferLayoutData &layout, intptr_t baseV
         pointer += layout.m_elements[i].count *
                    VertexBufferElement::getSizeOfType(layout.m_elements[i].type);
     }
+}
+
+bool OpenGLShader::isValid() {
+    return m_id != -1;
 }
 
 void OpenGLShader::bind() {

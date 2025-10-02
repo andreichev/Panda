@@ -22,14 +22,13 @@ BaseLayer::BaseLayer(Fern::Window *window)
     : m_window(window)
     , m_blocksCreation(&m_transform)
     , m_cameraMove(&m_transform)
-    , m_groundShader()
-    , m_assetHandler() {}
+    , m_groundShader() {}
 
 void BaseLayer::onAttach() {
     Miren::setViewClear(0, 0x3D75C9FF);
-    Panda::GameContext::setAssetHandler(&m_assetHandler);
     Panda::StaticResources::initStaticResources();
-    m_groundShader = m_assetHandler.createStaticAsset<Panda::ShaderAsset>(
+    Panda::AssetHandler *assetHandler = Panda::GameContext::getAssetHandler();
+    m_groundShader = assetHandler->createStaticAsset<Panda::ShaderAsset>(
         UUID(), "shaders/ground/ground.vert", "shaders/ground/ground.frag"
     );
     Miren::TextureCreate textureCreate =
@@ -38,7 +37,7 @@ void BaseLayer::onAttach() {
     textureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
     textureCreate.m_magFiltering = Miren::NEAREST;
     m_blocksTileTexture =
-        m_assetHandler.createStaticAsset<Panda::TextureAsset>(UUID(), textureCreate);
+        assetHandler->createStaticAsset<Panda::TextureAsset>(UUID(), textureCreate);
     Miren::VertexLayoutHandle layoutHandle =
         Miren::createVertexLayout(Vertex::createBufferLayout());
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
@@ -57,7 +56,7 @@ void BaseLayer::onAttach() {
                 materialData.inputs = {Panda::MaterialField(
                     "texture1", Panda::MaterialFieldType::TEXTURE, m_blocksTileTexture.asBaseAsset()
                 )};
-                auto material = m_assetHandler.createStaticAsset<Panda::MaterialAsset>(
+                auto material = assetHandler->createStaticAsset<Panda::MaterialAsset>(
                     UUID(), materialData, m_groundShader
                 );
                 dynamicMesh.create(meshData, material);
@@ -94,7 +93,9 @@ void BaseLayer::onAttach() {
     LOG_INFO("GAME INITIALIZED!");
 }
 
-void BaseLayer::onDetach() {}
+void BaseLayer::onDetach() {
+    Panda::StaticResources::deinitStaticResources();
+}
 
 void BaseLayer::onUpdate(double deltaTime) {
     m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, 0);
