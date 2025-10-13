@@ -2,7 +2,9 @@
 
 namespace Panda {
 
-PanelsContainer::PanelsContainer(EditorLayer *layer, CameraController *cameraController)
+PanelsContainer::PanelsContainer(
+    EditorLayer *layer, ProjectLoader *projectLoader, CameraController *cameraController
+)
     : toolbar(layer)
     , dockspace()
     , viewport(cameraController)
@@ -11,7 +13,8 @@ PanelsContainer::PanelsContainer(EditorLayer *layer, CameraController *cameraCon
     , statisticsPanel(nullptr)
     , consolePanel()
     , menuBar(layer)
-    , contentBrowser(layer) {}
+    , contentBrowser(layer)
+    , assetManagerPanel(projectLoader) {}
 
 void PanelsContainer::onImGuiRender(bool isViewportFullScreen, SceneState sceneState) {
     menuBar.onImGuiRender();
@@ -27,6 +30,7 @@ void PanelsContainer::onImGuiRender(bool isViewportFullScreen, SceneState sceneS
         propertiesPanel.onImGuiRender();
         contentBrowser.onImGuiRender();
         consolePanel.onImGuiRender();
+        assetManagerPanel.onImGuiRender();
         dockspace.endImGuiDockspace();
     }
 }

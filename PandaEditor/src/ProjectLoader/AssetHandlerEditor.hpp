@@ -13,7 +13,7 @@ class AssetHandlerEditor;
 
 using RegisterAssetFunc = void (AssetHandlerEditor::*)(const path_t &path);
 
-class AssetHandlerEditor : public AssetHandler {
+class AssetHandlerEditor final : public AssetHandler {
 public:
     AssetHandlerEditor();
     void registerAsset(const path_t &path);
@@ -21,10 +21,12 @@ public:
     void reload(AssetId id);
     AssetInfo getInfo(AssetId id);
     void updateInfo(AssetId assetId, const AssetInfo &assetInfo);
-    UUID getAssetId(path_t path);
     void openProject(const path_t &path);
     void closeProject();
     const path_t &getProjectPath();
+    const std::unordered_map<AssetId, AssetInfo> &getRegistry();
+    UUID getAssetId(path_t path) override;
+    std::unordered_set<path_t> getAssetPaths(AssetId id) override;
 
 private:
     Asset *loadInternal(AssetId id, bool forcedReload = false) override;

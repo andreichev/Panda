@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "UI/Properties/AssetProperties/AssetPropertiesDraw.hpp"
 #include "UI/Properties/EntityComponents/ComponentsDraw.hpp"
 
 namespace Panda {
@@ -16,7 +15,6 @@ public:
 
 private:
     ComponentsDraw m_componentsDraw;
-    AssetPropertiesDraw m_assetPropertiesDraw;
 };
 
 } // namespace Panda

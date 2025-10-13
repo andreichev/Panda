@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Entity.hpp"
-#include "World.hpp"
+#ifdef PND_EDITOR
 
-#include <unordered_set>
+#    include "Entity.hpp"
+#    include "World.hpp"
+
+#    include <unordered_set>
 
 namespace Panda {
 
@@ -15,33 +17,54 @@ public:
         return s_selectedEntities;
     }
 
-    static std::unordered_set<path_t> getSelectedAssets() {
-        return s_selectedAssets;
+    static std::unordered_set<path_t> getSelectedFiles() {
+        return s_selectedFiles;
     }
 
     static std::unordered_set<UUID> getManipulatingEntities() {
         return s_manipulatingEntities;
     }
 
-    static bool isSelected(UUID id) {
+    static bool isEntitySelected(UUID id) {
         return s_selectedEntities.contains(id);
     }
 
-    static bool isSelected(path_t path) {
-        return s_selectedAssets.contains(path);
+    static bool isFileSelected(const path_t &path) {
+        return s_selectedFiles.contains(path);
     }
 
-    static void addSelectedAsset(path_t path) {
-        s_selectedAssets.emplace(path);
+    static bool isAssetSelected(AssetId assetId) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        PND_ASSERT(assetHandler != nullptr, "ASSET HANDLER IS NOT INITIALIZED");
+        if (assetId) {
+            std::unordered_set<path_t> assetPaths = assetHandler->getAssetPaths(assetId);
+            for (auto &assetPath : assetPaths) {
+                if (s_selectedFiles.contains(assetPath)) { return true; }
+            }
+        }
+        return false;
+    }
+
+    static void addSelectedFile(const path_t &path) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        PND_ASSERT(assetHandler != nullptr, "ASSET HANDLER IS NOT INITIALIZED");
+        AssetId assetId = assetHandler->getAssetId(path);
+        if (assetId && !isAssetSelected(assetId)) { s_selectedAssetsCount++; }
+        s_selectedFiles.emplace(path);
+    }
+
+    static void addSelectedFiles(const std::unordered_set<path_t> &paths) {
+        for (auto &path : paths) {
+            addSelectedFile(path);
+        }
     }
 
     static void addSelectedEntity(UUID id, bool needToCalculateMedian = true) {
-        if (isSelected(id)) { return; }
+        if (isEntitySelected(id)) { return; }
         s_selectedEntities.insert(id);
         World *world = GameContext::getCurrentWorld();
         if (!world) { return; }
         Entity entity = world->getById(id);
-        for (auto childId : entity.getChildEntities()) {}
         //  Далее избегаем того, что при перемещении родителя трансформация будет применяться и к
         //  детям.
         std::unordered_set<UUID> manipulating;
@@ -82,17 +105,27 @@ public:
     }
 
     static void unselectAll() {
-        s_selectedAssets.clear();
+        s_selectedAssetsCount = 0;
+        s_selectedFiles.clear();
         s_selectedEntities.clear();
         s_manipulatingEntities.clear();
         resetValues();
     }
 
-    static void unselectAllAssets() {
-        s_selectedAssets.clear();
+    static void unselectAllFiles() {
+        s_selectedAssetsCount = 0;
+        s_selectedFiles.clear();
     }
 
-    static int selectedCount() {
+    static int selectedFilesCount() {
+        return s_selectedFiles.size();
+    }
+
+    static int selectedAssetsCount() {
+        return s_selectedAssetsCount;
+    }
+
+    static int selectedEntitiesCount() {
         return s_selectedEntities.size();
     }
 
@@ -151,7 +184,8 @@ public:
     }
 
 private:
-    static std::unordered_set<path_t> s_selectedAssets;
+    static int s_selectedAssetsCount;
+    static std::unordered_set<path_t> s_selectedFiles;
     static std::unordered_set<UUID> s_selectedEntities;
     static std::unordered_set<UUID> s_manipulatingEntities;
     static glm::vec3 s_medianPosition;
@@ -161,3 +195,5 @@ private:
 };
 
 } // namespace Panda
+
+#endif

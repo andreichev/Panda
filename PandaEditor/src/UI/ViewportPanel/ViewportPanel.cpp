@@ -202,7 +202,7 @@ void ViewportPanel::readIdsMemoryIfNeed() {
     }
     SelectionContext::addSelectedEntities(select);
     SelectionContext::removeSelectedEntities(unselect);
-    if (!m_rectSelection.appendSelection) { SelectionContext::unselectAllAssets(); }
+    if (!m_rectSelection.appendSelection) { SelectionContext::unselectAllFiles(); }
 }
 
 void ViewportPanel::beginRectSelection(bool append) {

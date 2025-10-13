@@ -6,6 +6,10 @@
 #include <Miren/Base.hpp>
 #include <string>
 
+#ifdef PND_EDITOR
+#    include <unordered_set>
+#endif
+
 namespace Panda {
 
 /// AssetHandler отвечает за загрузку Asset.
@@ -34,7 +38,6 @@ public:
     AssetRef<T> createStaticAsset(AssetId id, Args &&...args) {
         AssetEntry entry;
         entry.asset = F_NEW(m_allocator, T)(std::forward<Args>(args)...);
-        ;
         m_loadedAssets[id] = entry;
         return AssetRef<T>(this, id);
     }
@@ -51,6 +54,16 @@ public:
             }
         }
     }
+
+#ifdef PND_EDITOR
+    virtual UUID getAssetId(path_t path) {
+        return 0;
+    }
+
+    virtual std::unordered_set<path_t> getAssetPaths(AssetId assetId) {
+        return {};
+    }
+#endif
 
 protected:
     virtual Asset *loadInternal(AssetId id, bool forcedReload = false) = 0;

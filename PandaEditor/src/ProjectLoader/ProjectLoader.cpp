@@ -110,8 +110,7 @@ void ProjectLoader::openProject(const path_t &path) {
     }
     // Load asset registry
     { m_assetHandler->openProject(m_projectPath); }
-    m_worldPath = m_projectPath;
-    m_worldPath.append(m_projectSettings.worldPath);
+    m_worldPath = m_projectPath / m_projectSettings.worldPath;
     loadWorld();
     reloadScriptsDll();
     appendRecentProject();

@@ -36,7 +36,7 @@ public:
             EditorMetadataComponent &metadata = entity.getComponent<EditorMetadataComponent>();
             metadata.isDeleted = !metadata.isDeleted;
             UUID id = entity.getId();
-            if (metadata.isDeleted && SelectionContext::isSelected(id)) {
+            if (metadata.isDeleted && SelectionContext::isEntitySelected(id)) {
                 SelectionContext::removeSelectedEntity(id);
             }
         }

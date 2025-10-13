@@ -123,7 +123,7 @@ void ContentBrowser::onImGuiRender() {
                 }
             }
         }
-        if (SelectionContext::isSelected(path)) {
+        if (SelectionContext::isFileSelected(path)) {
             const ImU32 col = ImGui::GetColorU32(ImGuiCol_ButtonActive);
             ImGui::PushStyleColor(ImGuiCol_Button, col);
         } else {
@@ -137,9 +137,10 @@ void ContentBrowser::onImGuiRender() {
         float width = height * aspect;
         if (ImGui::ImageButton(
                 filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {width, height}
-            )) {
+            ) &&
+            !directoryEntry.is_directory()) {
             if (!shift && !ctrl) { SelectionContext::unselectAll(); }
-            SelectionContext::addSelectedAsset(path);
+            SelectionContext::addSelectedFile(path);
         }
         if (asset) {
             AssetInfo assetInfo = assetHandler->getInfo(asset.getId());

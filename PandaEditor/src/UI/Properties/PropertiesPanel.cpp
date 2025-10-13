@@ -3,6 +3,7 @@
 //
 
 #include "PropertiesPanel.hpp"
+#include "UI/Properties/AssetProperties/AssetPropertiesDraw.hpp"
 
 #include <Panda/Base/Base.hpp>
 #include <Panda/GameLogic/SelectionContext.hpp>
@@ -12,30 +13,30 @@
 namespace Panda {
 
 PropertiesPanel::PropertiesPanel(ComponentsDrawOutput *componentsDrawOutput)
-    : m_componentsDraw(componentsDrawOutput)
-    , m_assetPropertiesDraw() {}
+    : m_componentsDraw(componentsDrawOutput) {}
 
 void PropertiesPanel::onImGuiRender() {
     ImGui::Begin("Properties");
     std::unordered_set<UUID> selectedIds = SelectionContext::getSelectedEntities();
-    std::unordered_set<path_t> selectedAssets = SelectionContext::getSelectedAssets();
+    int selectedAssetsCount = SelectionContext::selectedAssetsCount();
     World *world = GameContext::getCurrentWorld();
-    if (selectedIds.empty() && selectedAssets.empty() || !world) {
+    if (selectedIds.empty() && selectedAssetsCount == 0 || !world) {
         ImGui::Text("No selection");
         ImGui::End();
         return;
     }
-    if (!selectedIds.empty() && !selectedAssets.empty()) {
+    if (!selectedIds.empty() && selectedAssetsCount != 0) {
         ImGui::Text(
-            "Selected %ld entities and %ld assets", selectedIds.size(), selectedAssets.size()
+            "Selected %ld entities and %ld assets", selectedIds.size(), selectedAssetsCount
         );
     } else if (!selectedIds.empty()) {
         std::unordered_set<Entity> selected = world->getById(selectedIds);
         m_componentsDraw.drawComponents(selected);
-    } else if (selectedAssets.size() > 1) {
-        ImGui::Text("Selected %ld assets", selectedAssets.size());
+    } else if (selectedAssetsCount > 1) {
+        ImGui::Text("Selected %ld assets", selectedAssetsCount);
     } else {
-        m_assetPropertiesDraw.drawProperties(*selectedAssets.begin());
+        std::unordered_set<path_t> selectedFiles = SelectionContext::getSelectedFiles();
+        AssetPropertiesDraw::drawProperties(*selectedFiles.begin());
     }
 
     ImGui::End();

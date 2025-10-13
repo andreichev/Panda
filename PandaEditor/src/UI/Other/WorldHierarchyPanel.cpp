@@ -101,7 +101,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     WorldCommandManager &cmd = m_world->getCommandManger();
     auto &tag = entity.getComponent<TagComponent>().tag;
     ImGuiTreeNodeFlags flags =
-        (SelectionContext::isSelected(entityId) ? ImGuiTreeNodeFlags_Selected : 0);
+        (SelectionContext::isEntitySelected(entityId) ? ImGuiTreeNodeFlags_Selected : 0);
     flags |= ImGuiTreeNodeFlags_OpenOnArrow;
     flags |= ImGuiTreeNodeFlags_SpanFullWidth;
     flags |= ImGuiTreeNodeFlags_FramePadding;
@@ -114,9 +114,10 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     bool opened = ImGui::TreeNodeCustom(ImGui::GetID(id), flags, tag.c_str(), nullptr, &isClicked);
     ImGui::PopStyleVar(2);
     if (m_rowIndex >= m_firstSelectedRow && m_rowIndex <= m_lastSelectedRow &&
-        !SelectionContext::isSelected(entityId) && m_shiftSelectionRunning) {
+        !SelectionContext::isEntitySelected(entityId) && m_shiftSelectionRunning) {
         SelectionContext::addSelectedEntity(entityId);
-        if (SelectionContext::selectedCount() == (m_lastSelectedRow - m_firstSelectedRow) + 1) {
+        if (SelectionContext::selectedEntitiesCount() ==
+            (m_lastSelectedRow - m_firstSelectedRow) + 1) {
             m_shiftSelectionRunning = false;
         }
     }
@@ -124,7 +125,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
         if (ImGui::GetDragDropPayload() == nullptr) {
             DragDropItem item;
             item.type = DragDropItemType::ENTITY;
-            if (SelectionContext::isSelected(entityId)) {
+            if (SelectionContext::isEntitySelected(entityId)) {
                 std::vector<UUID> selectedIds;
                 for (auto selected : SelectionContext::getSelectedEntities()) {
                     selectedIds.push_back(selected);
@@ -135,7 +136,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
                     sizeof(UUID) * selectedIds.size()
                 );
                 memcpy(item.data, selectedIds.data(), sizeof(UUID) * selectedIds.size());
-                item.count = SelectionContext::selectedCount();
+                item.count = SelectionContext::selectedEntitiesCount();
             } else {
                 SelectionContext::unselectAll();
                 SelectionContext::addSelectedEntity(entityId);
@@ -181,7 +182,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     if (isClicked && !ImGui::IsItemToggledOpen()) {
         bool ctrl = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
         bool shift = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
-        if (shift && SelectionContext::selectedCount() > 0) {
+        if (shift && SelectionContext::selectedEntitiesCount() > 0) {
             SelectionContext::unselectAll();
             if (m_rowIndex < m_firstSelectedRow) {
                 m_lastSelectedRow = m_firstSelectedRow;
@@ -196,7 +197,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
             m_firstSelectedRow = m_rowIndex;
             m_lastSelectedRow = -1;
         } else {
-            if (SelectionContext::isSelected(entityId)) {
+            if (SelectionContext::isEntitySelected(entityId)) {
                 SelectionContext::removeSelectedEntity(entityId);
             } else {
                 SelectionContext::addSelectedEntity(entityId);
@@ -206,7 +207,7 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
     }
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
     if (ImGui::BeginPopupContextItem()) {
-        if (!SelectionContext::isSelected(entityId)) {
+        if (!SelectionContext::isEntitySelected(entityId)) {
             SelectionContext::unselectAll();
             SelectionContext::addSelectedEntity(entityId);
         }

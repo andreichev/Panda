@@ -4,13 +4,15 @@
 
 #include <unordered_set>
 
+#include <Panda/Assets/Base/Asset.hpp>
 #include <Panda/Assets/Base/Path.hpp>
 
 namespace Panda {
 
 class AssetPropertiesDraw final {
 public:
-    void drawProperties(const path_t &assetPath);
+    static void drawProperties(const path_t &assetPath);
+    static void drawProperties(AssetId assetId);
 };
 
 } // namespace Panda

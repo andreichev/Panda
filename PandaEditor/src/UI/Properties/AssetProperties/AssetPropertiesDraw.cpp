@@ -13,27 +13,17 @@
 
 namespace Panda {
 
-void AssetPropertiesDraw::drawProperties(const path_t &assetPath) {
+void AssetPropertiesDraw::drawProperties(AssetId assetId) {
     AssetHandler *handler = GameContext::getAssetHandler();
     PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
     AssetHandlerEditor *assetHandler = static_cast<AssetHandlerEditor *>(handler);
-    AssetId assetId = assetHandler->getAssetId(assetPath);
-    if (!assetId) {
-        if (assetHandler->canImport(assetPath)) {
-            ImGui::Text("Asset %s is not imported", assetPath.filename().string().c_str());
-            if (ImGui::Button("Import")) { assetHandler->registerAsset(assetPath); }
-        } else {
-            ImGui::Text("Extension %s is not supported", assetPath.extension().string().c_str());
-        }
-        return;
-    }
     AssetInfo info = assetHandler->getInfo(assetId);
     switch (info.type) {
         case AssetType::TEXTURE: {
-            Fonts::pushFont("Bold");
-            ImGui::Text("Texture %s", assetPath.filename().string().c_str());
-            Fonts::popFont();
             TextureAssetMeta meta = std::get<TextureAssetMeta>(info.meta);
+            Fonts::pushFont("Bold");
+            ImGui::Text("Texture %s", meta.path.filename().string().c_str());
+            Fonts::popFont();
             bool changed = false;
             const std::vector<std::string> filteringList = {
                 "NEAREST",
@@ -65,18 +55,18 @@ void AssetPropertiesDraw::drawProperties(const path_t &assetPath) {
             break;
         }
         case AssetType::SHADER: {
-            Fonts::pushFont("Bold");
-            ImGui::Text("Shader %s", assetPath.filename().string().c_str());
-            Fonts::popFont();
             ShaderAssetMeta meta = std::get<ShaderAssetMeta>(info.meta);
+            Fonts::pushFont("Bold");
+            ImGui::Text("Shader %s", meta.fragmentCodePath.filename().string().c_str());
+            Fonts::popFont();
             ImGui::Text("Path: %s", meta.fragmentCodePath.string().c_str());
             break;
         }
         case AssetType::MATERIAL: {
-            Fonts::pushFont("Bold");
-            ImGui::Text("Material %s", assetPath.filename().string().c_str());
-            Fonts::popFont();
             MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
+            Fonts::pushFont("Bold");
+            ImGui::Text("Material %s", meta.materialPath.filename().string().c_str());
+            Fonts::popFont();
             bool changed = false;
             path_t shaderPath;
             if (meta.shader) {
@@ -101,6 +91,23 @@ void AssetPropertiesDraw::drawProperties(const path_t &assetPath) {
             break;
     }
     if (ImGui::Button("Reimport")) { assetHandler->reload(assetId); }
+}
+
+void AssetPropertiesDraw::drawProperties(const path_t &assetPath) {
+    AssetHandler *handler = GameContext::getAssetHandler();
+    PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
+    AssetHandlerEditor *assetHandler = static_cast<AssetHandlerEditor *>(handler);
+    AssetId assetId = assetHandler->getAssetId(assetPath);
+    if (!assetId) {
+        if (assetHandler->canImport(assetPath)) {
+            ImGui::Text("Asset %s is not imported", assetPath.filename().string().c_str());
+            if (ImGui::Button("Import")) { assetHandler->registerAsset(assetPath); }
+        } else {
+            ImGui::Text("Extension %s is not supported", assetPath.extension().string().c_str());
+        }
+        return;
+    }
+    drawProperties(assetId);
 }
 
 } // namespace Panda

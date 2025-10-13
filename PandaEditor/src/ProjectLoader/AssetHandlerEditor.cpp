@@ -350,4 +350,38 @@ const path_t &AssetHandlerEditor::getProjectPath() {
     return m_projectPath;
 }
 
+std::unordered_set<path_t> AssetHandlerEditor::getAssetPaths(AssetId id) {
+    if (m_registry.find(id) == m_registry.end()) { return {}; }
+    AssetInfo info = getInfo(id);
+    std::unordered_set<path_t> result;
+    switch (info.type) {
+        case AssetType::TEXTURE: {
+            TextureAssetMeta meta = std::get<TextureAssetMeta>(info.meta);
+            result.emplace(m_projectPath / meta.path);
+            break;
+        }
+        case AssetType::SHADER: {
+            ShaderAssetMeta meta = std::get<ShaderAssetMeta>(info.meta);
+            result.emplace(m_projectPath / meta.vertexCodePath);
+            result.emplace(m_projectPath / meta.fragmentCodePath);
+            break;
+        }
+        case AssetType::MATERIAL: {
+            MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
+            result.emplace(m_projectPath / meta.materialPath);
+            break;
+        }
+        case AssetType::CUBE_MAP:
+        case AssetType::MESH:
+        case AssetType::NONE: {
+            break;
+        }
+    }
+    return result;
+}
+
+const std::unordered_map<AssetId, AssetInfo> &AssetHandlerEditor::getRegistry() {
+    return m_registry;
+}
+
 } // namespace Panda

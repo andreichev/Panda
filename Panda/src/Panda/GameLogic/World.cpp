@@ -380,7 +380,7 @@ void World::destroy(Entity entity) {
     m_registry.destroy(entity.m_handle);
 #ifdef PND_EDITOR
     m_isChanged = true;
-    if (SelectionContext::isSelected(entityId)) {
+    if (SelectionContext::isEntitySelected(entityId)) {
         SelectionContext::removeSelectedEntity(entityId);
     }
 #endif
