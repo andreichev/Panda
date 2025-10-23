@@ -18,6 +18,7 @@ AssetHandlerEditor::AssetHandlerEditor()
     , m_jsonDecoder()
     , m_registeredAssets()
     , m_registerAssetFunc()
+    , m_missingFiles()
     , AssetHandler(Foundation::getAllocator()) {
     m_registerAssetFunc.emplace(".png", &AssetHandlerEditor::registerTextureAsset);
     m_registerAssetFunc.emplace(".jpeg", &AssetHandlerEditor::registerTextureAsset);
@@ -31,9 +32,9 @@ void AssetHandlerEditor::reload(AssetId id) {
 
 Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
     if (!forcedReload) {
-        if (m_loadedAssets.find(id) != m_loadedAssets.end()) { return m_loadedAssets.at(id).asset; }
+        if (m_loadedAssets.contains(id)) { return m_loadedAssets.at(id).asset; }
     }
-    if (m_registry.find(id) == m_registry.end()) {
+    if (!m_registry.contains(id)) {
         PND_ASSERT_F(false, "UNKNOWN ASSET ID %u", id);
         return nullptr;
     }
@@ -51,6 +52,7 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
                 asset = F_NEW(m_allocator, TextureAsset)(create);
                 LOG_INFO("CREATED TEXTURE %u AT PATH %s", id, meta.path.string().c_str());
                 LOG_INFO_EDITOR("CREATED TEXTURE %u AT PATH %s", id, meta.path.string().c_str());
+                removeMissingFiles(id);
             } else {
                 asset = F_NEW(m_allocator, FallbackTextureAsset)();
                 LOG_ERROR(
@@ -59,6 +61,7 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
                 LOG_ERROR_EDITOR(
                     "TEXTURE ASSET %u NOT FOUND AT PATH %s: ", id, meta.path.string().c_str()
                 );
+                addMissingFile(id, 0, meta.path);
             }
             break;
         }
@@ -66,7 +69,9 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
             auto meta = std::get<ShaderAssetMeta>(assetInfo.meta);
             path_t vertPath = m_projectPath / meta.vertexCodePath;
             path_t fragPath = m_projectPath / meta.fragmentCodePath;
-            if (std::filesystem::exists(vertPath) && std::filesystem::exists(fragPath)) {
+            bool vertExists = std::filesystem::exists(vertPath);
+            bool fragExists = std::filesystem::exists(fragPath);
+            if (vertExists && fragExists) {
                 asset = F_NEW(m_allocator, EditorShaderAsset)(vertPath, fragPath);
                 LOG_INFO(
                     "CREATED SHADER %u. VERT: %s, FRAG: %s",
@@ -80,23 +85,26 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
                     vertPath.string().c_str(),
                     fragPath.string().c_str()
                 );
+                removeMissingFiles(id);
             } else {
                 asset = F_NEW(m_allocator, ShaderAsset)();
-                if (!std::filesystem::exists(vertPath)) {
+                if (!vertExists) {
                     LOG_ERROR(
                         "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, vertPath.string().c_str()
                     );
                     LOG_ERROR_EDITOR(
                         "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, vertPath.string().c_str()
                     );
+                    addMissingFile(id, 0, meta.vertexCodePath);
                 }
-                if (!std::filesystem::exists(fragPath)) {
+                if (!fragExists) {
                     LOG_ERROR(
                         "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, fragPath.string().c_str()
                     );
                     LOG_ERROR_EDITOR(
                         "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, fragPath.string().c_str()
                     );
+                    addMissingFile(id, 1, meta.fragmentCodePath);
                 }
             }
             break;
@@ -118,12 +126,15 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
                 LOG_INFO_EDITOR(
                     "CREATED MATERIAL %u AT PATH %s", id, meta.materialPath.string().c_str()
                 );
+                removeMissingFiles(id);
             } else {
                 LOG_ERROR("MATERIAL %u FILE %s NOT FOUND", id, meta.materialPath.string().c_str());
                 LOG_ERROR_EDITOR(
                     "MATERIAL %u FILE %s NOT FOUND", id, meta.materialPath.string().c_str()
                 );
+                // TODO: Create fallback material
                 asset = nullptr;
+                addMissingFile(id, 0, meta.materialPath);
             }
             break;
         }
@@ -135,7 +146,7 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
         }
     }
     PND_ASSERT(asset != nullptr, "ASSET IS NOT LOADED");
-    if (forcedReload && m_loadedAssets.find(id) != m_loadedAssets.end()) {
+    if (forcedReload && m_loadedAssets.contains(id)) {
         Asset *prevAsset = m_loadedAssets.at(id).asset;
         F_FREE(m_allocator, prevAsset);
     }
@@ -202,19 +213,24 @@ void AssetHandlerEditor::registerAsset(const path_t &path) {
 bool AssetHandlerEditor::canImport(const path_t &path) {
     PND_ASSERT(!getAssetId(path), "ASSET ALREADY IMPORTED");
     path_t extension = path.extension();
-    return m_registerAssetFunc.find(extension) != m_registerAssetFunc.end();
+    return m_registerAssetFunc.contains(extension);
 }
 
 AssetInfo AssetHandlerEditor::getInfo(AssetId id) {
-    if (m_registry.find(id) == m_registry.end()) {
+    if (!m_registry.contains(id)) {
         PND_ASSERT(false, "UNKNOWN ASSET ID");
         return {};
     }
     return m_registry.at(id);
 }
 
+AssetInfo &AssetHandlerEditor::getInfoRef(AssetId id) {
+    PND_ASSERT(m_registry.contains(id), "UNKNOWN ASSET ID");
+    return m_registry.at(id);
+}
+
 void AssetHandlerEditor::updateInfo(AssetId id, const AssetInfo &assetInfo) {
-    if (m_registry.find(id) == m_registry.end()) {
+    if (!m_registry.contains(id)) {
         PND_ASSERT(false, "UNKNOWN ASSET ID");
         return;
     }
@@ -227,7 +243,7 @@ void AssetHandlerEditor::updateInfo(AssetId id, const AssetInfo &assetInfo) {
 
 UUID AssetHandlerEditor::getAssetId(path_t path) {
     path_t assetPath = std::filesystem::relative(path, m_projectPath);
-    if (m_registeredAssets.find(assetPath) == m_registeredAssets.end()) { return 0; }
+    if (!m_registeredAssets.contains(assetPath)) { return 0; }
     return m_registeredAssets[assetPath];
 }
 
@@ -245,79 +261,64 @@ void AssetHandlerEditor::openProject(const path_t &path) {
 }
 
 void AssetHandlerEditor::loadAssetRegistry() {
+    m_missingFiles.clear();
     m_registry.clear();
     m_registeredAssets.clear();
     std::ifstream file(m_assetRegistryPath);
-    if (file.is_open()) {
-        AssetRegistryDto registryDto;
-        Rain::Decoder *decoder = &m_jsonDecoder;
-        decoder->decode(file, registryDto);
-        file.close();
-        for (auto &info : registryDto.assets) {
-            switch (info.type) {
-                case AssetType::TEXTURE: {
-                    auto meta = std::get<TextureAssetMeta>(info.meta);
-                    if (meta.path.empty()) {
-                        LOG_ERROR_EDITOR(
-                            "Empty asset path. Skipping broken asset", meta.path.string().c_str()
-                        );
-                        break;
-                    }
-                    if (!std::filesystem::exists(m_projectPath / meta.path)) {
-                        LOG_ERROR_EDITOR("Texture asset %s not found.", meta.path.string().c_str());
-                    }
-                    m_registeredAssets[meta.path] = info.id;
-                    m_registry[info.id] = info;
-                    break;
-                }
-                case AssetType::SHADER: {
-                    auto meta = std::get<ShaderAssetMeta>(info.meta);
-                    if (meta.fragmentCodePath.empty()) {
-                        LOG_ERROR_EDITOR(
-                            "Empty asset path. Skipping broken asset",
-                            meta.fragmentCodePath.string().c_str()
-                        );
-                        break;
-                    }
-                    if (!std::filesystem::exists(m_projectPath / meta.vertexCodePath)) {
-                        LOG_ERROR_EDITOR(
-                            "Shader asset %s not found.", meta.vertexCodePath.string().c_str()
-                        );
-                    }
-                    if (!std::filesystem::exists(m_projectPath / meta.fragmentCodePath)) {
-                        LOG_ERROR_EDITOR(
-                            "Shader asset %s not found.", meta.fragmentCodePath.string().c_str()
-                        );
-                    }
-                    m_registeredAssets[meta.vertexCodePath] = info.id;
-                    m_registeredAssets[meta.fragmentCodePath] = info.id;
-                    m_registry[info.id] = info;
-                    break;
-                }
-                case AssetType::MATERIAL: {
-                    auto meta = std::get<MaterialAssetMeta>(info.meta);
-                    if (meta.materialPath.empty()) {
-                        LOG_ERROR_EDITOR(
-                            "Empty asset path. Skipping broken asset",
-                            meta.materialPath.string().c_str()
-                        );
-                        break;
-                    }
-                    if (!std::filesystem::exists(m_projectPath / meta.materialPath)) {
-                        LOG_ERROR_EDITOR(
-                            "Material asset %s not found.", meta.materialPath.string().c_str()
-                        );
-                    }
-                    m_registeredAssets[meta.materialPath] = info.id;
-                    m_registry[info.id] = info;
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-    } else {
+    if (!file.is_open()) {
         LOG_INFO("ASSET REGISTRY NOT FOUND");
+        return;
+    }
+    AssetRegistryDto registryDto;
+    Rain::Decoder *decoder = &m_jsonDecoder;
+    decoder->decode(file, registryDto);
+    file.close();
+    for (auto &info : registryDto.assets) {
+        switch (info.type) {
+            case AssetType::TEXTURE: {
+                auto meta = std::get<TextureAssetMeta>(info.meta);
+                if (!std::filesystem::exists(m_projectPath / meta.path)) {
+                    LOG_ERROR_EDITOR("Texture asset %s not found.", meta.path.string().c_str());
+                    addMissingFile(info.id, 0, meta.path);
+                }
+                m_registeredAssets[meta.path] = info.id;
+                m_registry[info.id] = info;
+                break;
+            }
+            case AssetType::SHADER: {
+                auto meta = std::get<ShaderAssetMeta>(info.meta);
+                if (!std::filesystem::exists(m_projectPath / meta.vertexCodePath)) {
+                    LOG_ERROR_EDITOR(
+                        "Shader asset %s not found.", meta.vertexCodePath.string().c_str()
+                    );
+                    addMissingFile(info.id, 0, meta.vertexCodePath);
+                }
+                if (!std::filesystem::exists(m_projectPath / meta.fragmentCodePath)) {
+                    LOG_ERROR_EDITOR(
+                        "Shader asset %s not found.", meta.fragmentCodePath.string().c_str()
+                    );
+                    addMissingFile(info.id, 1, meta.fragmentCodePath);
+                }
+                m_registeredAssets[meta.vertexCodePath] = info.id;
+                m_registeredAssets[meta.fragmentCodePath] = info.id;
+                m_registry[info.id] = info;
+                break;
+            }
+            case AssetType::MATERIAL: {
+                auto meta = std::get<MaterialAssetMeta>(info.meta);
+                if (!std::filesystem::exists(m_projectPath / meta.materialPath)) {
+                    LOG_ERROR_EDITOR(
+                        "Material asset %s not found.", meta.materialPath.string().c_str()
+                    );
+                    addMissingFile(info.id, 0, meta.materialPath);
+                }
+                m_registeredAssets[meta.materialPath] = info.id;
+                m_registry[info.id] = info;
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
 
@@ -351,7 +352,7 @@ const path_t &AssetHandlerEditor::getProjectPath() {
 }
 
 std::unordered_set<path_t> AssetHandlerEditor::getAssetPaths(AssetId id) {
-    if (m_registry.find(id) == m_registry.end()) { return {}; }
+    if (!m_registry.contains(id)) { return {}; }
     AssetInfo info = getInfo(id);
     std::unordered_set<path_t> result;
     switch (info.type) {
@@ -382,6 +383,62 @@ std::unordered_set<path_t> AssetHandlerEditor::getAssetPaths(AssetId id) {
 
 const std::unordered_map<AssetId, AssetInfo> &AssetHandlerEditor::getRegistry() {
     return m_registry;
+}
+
+bool AssetHandlerEditor::isLoaded(AssetId id) {
+    return m_loadedAssets.contains(id);
+}
+
+bool AssetHandlerEditor::assetFilesExist(AssetId id) {
+    return !m_missingFiles.contains(id);
+}
+
+void AssetHandlerEditor::removeMissingFiles(AssetId id) {
+    m_missingFiles.erase(id);
+}
+
+void AssetHandlerEditor::addMissingFile(AssetId id, int index, const path_t &path) {
+    m_missingFiles[id][index] = path.string();
+}
+
+MissingFiles AssetHandlerEditor::getMissingAssetFiles(AssetId id) {
+    return m_missingFiles.at(id);
+}
+
+void AssetHandlerEditor::locateMissingFiles(AssetId id, MissingFiles missingFiles) {
+    AssetInfo &info = getInfoRef(id);
+    switch (info.type) {
+        case AssetType::TEXTURE: {
+            TextureAssetMeta &meta = std::get<TextureAssetMeta>(info.meta);
+            m_registeredAssets.erase(meta.path);
+            meta.path = missingFiles[0];
+            m_registeredAssets[meta.path] = id;
+            break;
+        }
+        case AssetType::SHADER: {
+            ShaderAssetMeta &meta = std::get<ShaderAssetMeta>(info.meta);
+            m_registeredAssets.erase(meta.vertexCodePath);
+            m_registeredAssets.erase(meta.fragmentCodePath);
+            meta.vertexCodePath = missingFiles[0];
+            meta.fragmentCodePath = missingFiles[1];
+            m_registeredAssets[meta.vertexCodePath] = id;
+            m_registeredAssets[meta.fragmentCodePath] = id;
+            break;
+        }
+        case AssetType::MATERIAL: {
+            MaterialAssetMeta &meta = std::get<MaterialAssetMeta>(info.meta);
+            m_registeredAssets.erase(meta.materialPath);
+            meta.materialPath = missingFiles[0];
+            m_registeredAssets[meta.materialPath] = id;
+            break;
+        }
+        case AssetType::CUBE_MAP:
+        case AssetType::MESH:
+        case AssetType::NONE: {
+            break;
+        }
+    }
+    reload(id);
 }
 
 } // namespace Panda

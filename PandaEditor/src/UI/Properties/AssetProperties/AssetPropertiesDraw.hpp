@@ -2,6 +2,8 @@
 // Created by Andreichev Mikhail on 27.07.2025.
 //
 
+#pragma once
+
 #include <unordered_set>
 
 #include <Panda/Assets/Base/Asset.hpp>
@@ -9,10 +11,20 @@
 
 namespace Panda {
 
+class AssetPropertiesDrawOutput {
+public:
+    virtual ~AssetPropertiesDrawOutput() = default;
+    virtual void locateMissingAsset(AssetId id) = 0;
+};
+
 class AssetPropertiesDraw final {
 public:
-    static void drawProperties(const path_t &assetPath);
-    static void drawProperties(AssetId assetId);
+    AssetPropertiesDraw(AssetPropertiesDrawOutput *output);
+    void drawProperties(const path_t &assetPath);
+    void drawProperties(AssetId assetId);
+
+private:
+    AssetPropertiesDrawOutput *m_output;
 };
 
 } // namespace Panda

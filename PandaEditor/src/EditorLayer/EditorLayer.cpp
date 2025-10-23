@@ -5,6 +5,7 @@
 #include "UI/Popups/PickScriptPopup.hpp"
 #include "UI/Popups/EnterNamePopup.hpp"
 #include "UI/Popups/EditorAboutPopup.hpp"
+#include "UI/Popups/LocateAssetPopup.hpp"
 
 #include <Panda/Renderer/MirenViewDistribution.hpp>
 #include <Panda/GameLogic/GameContext.hpp>
@@ -314,10 +315,7 @@ void EditorLayer::menuBarCloseProject() {
 
 void EditorLayer::menuBarAbout() {
     EditorAboutPopup *popup = F_NEW(Foundation::getAllocator(), EditorAboutPopup);
-    popup->closeAction = [this, popup]() {
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
-    };
+    popup->closeAction = [popup]() { popup->isDeleted = true; };
     popup->title = "About";
     m_popups.emplace_back(popup);
 }
@@ -328,52 +326,70 @@ void EditorLayer::menuBarAbout() {
 
 void EditorLayer::addScriptToEntities(const std::unordered_set<Entity> &entities) {
     PickScriptPopup *popup = F_NEW(Foundation::getAllocator(), PickScriptPopup);
-    popup->closeAction = [this, popup]() {
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
-    };
-    popup->selectAction = [&](const std::unordered_set<Entity> &entities,
-                              ScriptClassManifest clazz) {
-        if (clazz.name) {
-            for (Entity entity : entities) {
-                // Map manifest fields to internal ScriptField type
-                std::vector<ScriptField> fields;
-                for (auto manifestField : clazz.fields) {
-                    ScriptFieldValue value;
-                    switch (manifestField.type) {
-                        case ScriptFieldType::INTEGER: {
-                            value = int32_t(0);
-                            break;
+    popup->closeAction = [popup]() { popup->isDeleted = true; };
+    popup->selectAction =
+        [this, popup](const std::unordered_set<Entity> &entities, ScriptClassManifest clazz) {
+            if (clazz.name) {
+                for (Entity entity : entities) {
+                    // Map manifest fields to internal ScriptField type
+                    std::vector<ScriptField> fields;
+                    for (auto manifestField : clazz.fields) {
+                        ScriptFieldValue value;
+                        switch (manifestField.type) {
+                            case ScriptFieldType::INTEGER: {
+                                value = int32_t(0);
+                                break;
+                            }
+                            case ScriptFieldType::FLOAT: {
+                                value = float(0.f);
+                                break;
+                            }
+                            case ScriptFieldType::TEXTURE:
+                            case ScriptFieldType::ENTITY:
+                            case ScriptFieldType::MATERIAL: {
+                                value = UUID(0);
+                                break;
+                            }
+                            default: {
+                                PND_ASSERT(false, "Unknown field type");
+                            }
                         }
-                        case ScriptFieldType::FLOAT: {
-                            value = float(0.f);
-                            break;
-                        }
-                        case ScriptFieldType::TEXTURE:
-                        case ScriptFieldType::ENTITY:
-                        case ScriptFieldType::MATERIAL: {
-                            value = UUID(0);
-                            break;
-                        }
-                        default: {
-                            PND_ASSERT(false, "Unknown field type");
-                        }
+                        ScriptField field(
+                            0, manifestField.handle, manifestField.name, manifestField.type, value
+                        );
+                        fields.emplace_back(field);
                     }
-                    ScriptField field(
-                        0, manifestField.handle, manifestField.name, manifestField.type, value
-                    );
-                    fields.emplace_back(field);
+                    // TODO: Bind previously picked values
+                    entity.addScript(Panda::ExternalScript(0, clazz.name, fields));
                 }
-                // TODO: Bind previously picked values
-                entity.addScript(Panda::ExternalScript(0, clazz.name, fields));
             }
-        }
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
-    };
+            popup->isDeleted = true;
+        };
     popup->entities = entities;
     popup->title = "Add Script";
     popup->subtitle = "Pick a script from available Script classes list.";
+    m_popups.emplace_back(popup);
+}
+
+#pragma endregion
+
+#pragma region Asset properties draw output
+
+void EditorLayer::locateMissingAsset(AssetId id) {
+    AssetHandlerEditor *assetHandler =
+        static_cast<AssetHandlerEditor *>(GameContext::getAssetHandler());
+    PND_ASSERT(assetHandler != nullptr, "ASSET HANDLER IS NOT INITIALIZED");
+    MissingFiles missingFiles = assetHandler->getMissingAssetFiles(id);
+    LocateAssetPopup *popup = F_NEW(Foundation::getAllocator(), LocateAssetPopup);
+    popup->closeAction = [popup]() { popup->isDeleted = true; };
+    popup->doneAction = [id, assetHandler, popup]() {
+        assetHandler->locateMissingFiles(id, popup->missingFiles);
+        popup->isDeleted = true;
+    };
+    popup->missingFiles = missingFiles;
+    popup->projectPath = assetHandler->getProjectPath();
+    popup->title = "Locate missing asset";
+    popup->subtitle = "Asset location:";
     m_popups.emplace_back(popup);
 }
 
@@ -383,14 +399,10 @@ void EditorLayer::addScriptToEntities(const std::unordered_set<Entity> &entities
 
 void EditorLayer::showCreateFolderPopup() {
     EnterNamePopup *popup = F_NEW(Foundation::getAllocator(), EnterNamePopup);
-    popup->closeAction = [this, popup]() {
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
-    };
-    popup->doneAction = [&](std::string text) {
+    popup->closeAction = [popup]() { popup->isDeleted = true; };
+    popup->doneAction = [this, popup](std::string text) {
         if (!text.empty()) { m_panelsContainer.contentBrowser.createFolder(text); }
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
+        popup->isDeleted = true;
     };
     popup->title = "Create folder";
     popup->subtitle = "Enter folder name:";
@@ -401,13 +413,9 @@ void EditorLayer::deleteFileShowPopup(path_t path) {
     EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
     popup->yesAction = [this, popup]() {
         m_panelsContainer.contentBrowser.confirmDeletion();
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
+        popup->isDeleted = true;
     };
-    popup->noAction = [this, popup]() {
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
-    };
+    popup->noAction = [popup]() { popup->isDeleted = true; };
     popup->closeAction = popup->noAction;
     popup->title = "Delete";
     popup->subtitle = "Delete \"" + path.filename().string() + "\"?";

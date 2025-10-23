@@ -560,7 +560,7 @@ bool propertyEntity(const char *label, UUID *value) {
     ImGui::PushID(label);
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label);
+    ImGui::TextUnformatted(label);
     ImGui::NextColumn();
     ImGui::Spacing();
 
@@ -568,9 +568,9 @@ bool propertyEntity(const char *label, UUID *value) {
     World *currentWorld = GameContext::getCurrentWorld();
     if (value && *value && currentWorld) {
         Entity entity = currentWorld->getById(*value);
-        ImGui::Text("%s", entity.getName().c_str());
+        ImGui::TextUnformatted(entity.getName().c_str());
     } else {
-        ImGui::Text("%s", "nil");
+        ImGui::TextUnformatted("nil");
     }
     ImGui::PopItemWidth();
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {

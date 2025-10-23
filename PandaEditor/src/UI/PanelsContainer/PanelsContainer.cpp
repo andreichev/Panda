@@ -9,7 +9,7 @@ PanelsContainer::PanelsContainer(
     , dockspace()
     , viewport(cameraController)
     , hierarchyPanel(nullptr)
-    , propertiesPanel(layer)
+    , propertiesPanel(layer, layer)
     , statisticsPanel(nullptr)
     , consolePanel()
     , menuBar(layer)

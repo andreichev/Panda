@@ -15,7 +15,7 @@ public:
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 3.0f);
         if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("%s", subtitle.c_str());
+            ImGui::TextUnformatted(subtitle.c_str());
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
             if (ImGui::Button(yesText.c_str(), {ImGui::GetContentRegionAvail().x, 24}) ||
                 Input::isKeyPressed(Fern::Key::ENTER)) {

@@ -13,6 +13,8 @@ class AssetHandlerEditor;
 
 using RegisterAssetFunc = void (AssetHandlerEditor::*)(const path_t &path);
 
+using MissingFiles = std::array<std::string, 5>;
+
 class AssetHandlerEditor final : public AssetHandler {
 public:
     AssetHandlerEditor();
@@ -25,24 +27,35 @@ public:
     void closeProject();
     const path_t &getProjectPath();
     const std::unordered_map<AssetId, AssetInfo> &getRegistry();
+    bool isLoaded(AssetId id);
+    bool assetFilesExist(AssetId id);
+    MissingFiles getMissingAssetFiles(AssetId id);
+    void locateMissingFiles(AssetId id, MissingFiles missingFiles);
+
     UUID getAssetId(path_t path) override;
     std::unordered_set<path_t> getAssetPaths(AssetId id) override;
 
 private:
-    Asset *loadInternal(AssetId id, bool forcedReload = false) override;
+    AssetInfo &getInfoRef(AssetId id);
     void registerTextureAsset(const path_t &path);
     void registerShaderAsset(const path_t &path);
     void registerMaterialAsset(const path_t &path);
     void loadAssetRegistry();
     void saveAssetRegistry();
+    void removeMissingFiles(AssetId id);
+    void addMissingFile(AssetId id, int index, const path_t &path);
+
+    Asset *loadInternal(AssetId id, bool forcedReload = false) override;
 
     path_t m_projectPath;
     path_t m_assetRegistryPath;
     Rain::JsonEncoder m_jsonEncoder;
     Rain::JsonDecoder m_jsonDecoder;
     std::unordered_map<AssetId, AssetInfo> m_registry;
+    // Получение assetId по пути. Нужно для функции getAssetId
     std::unordered_map<path_t, AssetId> m_registeredAssets;
     std::map<path_t, RegisterAssetFunc> m_registerAssetFunc;
+    std::unordered_map<AssetId, MissingFiles> m_missingFiles;
 };
 
 } // namespace Panda

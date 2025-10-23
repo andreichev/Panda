@@ -109,6 +109,23 @@ struct AssetInfo : public Rain::Codable {
         decoder->endObject();
         return true;
     }
+
+    const char *getTypeStr() {
+        switch (type) {
+            case AssetType::TEXTURE: {
+                return "Texture";
+            }
+            case AssetType::SHADER: {
+                return "Shader";
+            }
+            case AssetType::MATERIAL: {
+                return "Material";
+            }
+            default: {
+                return "Unknown";
+            }
+        }
+    }
 };
 
 struct AssetRegistryDto : public Rain::Codable {

@@ -13,11 +13,19 @@
 
 namespace Panda {
 
+AssetPropertiesDraw::AssetPropertiesDraw(AssetPropertiesDrawOutput *output)
+    : m_output(output) {}
+
 void AssetPropertiesDraw::drawProperties(AssetId assetId) {
     AssetHandler *handler = GameContext::getAssetHandler();
     PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
     AssetHandlerEditor *assetHandler = static_cast<AssetHandlerEditor *>(handler);
     AssetInfo info = assetHandler->getInfo(assetId);
+    if (!assetHandler->assetFilesExist(assetId)) {
+        ImGui::Text("Asset is missing");
+        if (ImGui::Button("Locate")) { m_output->locateMissingAsset(assetId); }
+        return;
+    }
     switch (info.type) {
         case AssetType::TEXTURE: {
             TextureAssetMeta meta = std::get<TextureAssetMeta>(info.meta);

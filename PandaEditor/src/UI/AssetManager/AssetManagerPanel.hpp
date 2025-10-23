@@ -17,7 +17,7 @@ public:
 
 private:
     void drawAssetRow(AssetInfo asset);
-    bool isAssetValid(const AssetInfo &info);
+    std::string getAssetName(const AssetInfo &info);
     bool isAssetSelected(const AssetInfo &info);
 
     ProjectLoader *m_projectLoader;

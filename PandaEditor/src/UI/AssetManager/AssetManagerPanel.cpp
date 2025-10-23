@@ -24,10 +24,11 @@ void AssetManagerPanel::drawAssetRow(AssetInfo assetInfo) {
     bool shift = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
     uint32_t id = assetInfo.id;
     char label[32];
-    sprintf(label, "%u", id);
+    snprintf(label, 30, "%u", id);
     ImGui::PushID(id);
     ImGui::TableNextRow();
-    bool isValid = isAssetValid(assetInfo);
+    bool isValid = assetHandler->assetFilesExist(id);
+    bool isLoaded = assetHandler->isLoaded(id);
     bool isSelected = isAssetSelected(assetInfo);
     if (!isValid) { ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF); }
     // ID
@@ -41,16 +42,16 @@ void AssetManagerPanel::drawAssetRow(AssetInfo assetInfo) {
     }
     // TYPE
     ImGui::TableNextColumn();
-    ImGui::Text("%d", assetInfo.type);
+    ImGui::TextUnformatted(assetInfo.getTypeStr());
     // NAME
     ImGui::TableNextColumn();
-    ImGui::Text("Name");
+    ImGui::TextUnformatted(getAssetName(assetInfo).c_str());
     // IS VALID
     ImGui::TableNextColumn();
     ImGui::Text("%d", isValid);
     // IS LOADED
     ImGui::TableNextColumn();
-    ImGui::Text("%d", false);
+    ImGui::Text("%d", isLoaded);
     if (!isValid) { ImGui::PopStyleColor(); }
     ImGui::PopID();
 }
@@ -61,12 +62,11 @@ void AssetManagerPanel::onImGuiRender() {
     auto registry = assetHandler->getRegistry();
 
     ImGui::Begin("Asset Manager", nullptr);
-    ImGuiTableFlags flags = ImGuiTableFlags_Sortable | ImGuiTableFlags_Borders;
+    ImGuiTableFlags flags = ImGuiTableFlags_Borders;
     // 1) ID
     // 2) TYPE
     // 3) NAME
     // 4) IS_VALID
-    // *) [CREATION_DATE]
     // 5) IS_LOADED
     if (ImGui::BeginTable("Asset Manager", 5, flags)) {
         ImGui::TableSetupColumn("ID");
@@ -88,34 +88,6 @@ void AssetManagerPanel::onImGuiRender() {
     ImGui::End();
 }
 
-bool AssetManagerPanel::isAssetValid(const AssetInfo &info) {
-    const path_t &projectPath = m_projectLoader->getOpenedProjectPath();
-    switch (info.type) {
-        case AssetType::TEXTURE: {
-            TextureAssetMeta meta = std::get<TextureAssetMeta>(info.meta);
-            if (!std::filesystem::exists(projectPath / meta.path)) { return false; }
-            break;
-        }
-        case AssetType::SHADER: {
-            ShaderAssetMeta meta = std::get<ShaderAssetMeta>(info.meta);
-            if (!std::filesystem::exists(projectPath / meta.vertexCodePath)) { return false; }
-            if (!std::filesystem::exists(projectPath / meta.fragmentCodePath)) { return false; }
-            break;
-        }
-        case AssetType::MATERIAL: {
-            MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
-            if (!std::filesystem::exists(projectPath / meta.materialPath)) { return false; }
-            break;
-        }
-        case AssetType::CUBE_MAP:
-        case AssetType::MESH:
-        case AssetType::NONE: {
-            break;
-        }
-    }
-    return true;
-}
-
 bool AssetManagerPanel::isAssetSelected(const AssetInfo &info) {
     AssetHandlerEditor *assetHandler =
         static_cast<AssetHandlerEditor *>(GameContext::getAssetHandler());
@@ -124,6 +96,32 @@ bool AssetManagerPanel::isAssetSelected(const AssetInfo &info) {
         if (SelectionContext::isFileSelected(path)) { return true; }
     }
     return false;
+}
+
+std::string AssetManagerPanel::getAssetName(const AssetInfo &info) {
+    switch (info.type) {
+        case AssetType::TEXTURE: {
+            TextureAssetMeta meta = std::get<TextureAssetMeta>(info.meta);
+            return meta.path.filename().string();
+        }
+        case AssetType::SHADER: {
+            ShaderAssetMeta meta = std::get<ShaderAssetMeta>(info.meta);
+            std::string filename = meta.vertexCodePath.filename().string() + " " +
+                                   meta.fragmentCodePath.filename().string();
+            return filename;
+            break;
+        }
+        case AssetType::MATERIAL: {
+            MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
+            return meta.materialPath.filename().string();
+            break;
+        }
+        case AssetType::CUBE_MAP:
+        case AssetType::MESH:
+        case AssetType::NONE: {
+            return {};
+        }
+    }
 }
 
 } // namespace Panda
