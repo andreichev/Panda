@@ -12,6 +12,9 @@ namespace Panda {
 class EditorShaderAsset final : public ShaderAsset {
 public:
     EditorShaderAsset(const path_t &vertexCodePath, const path_t &fragmentCodePath);
+
+private:
+    bool isInputNewer(const path_t &inputPath, const path_t &outputPath);
 };
 
 } // namespace Panda
