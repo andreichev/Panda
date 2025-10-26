@@ -31,6 +31,8 @@ public:
     bool assetFilesExist(AssetId id);
     MissingFiles getMissingAssetFiles(AssetId id);
     void locateMissingFiles(AssetId id, MissingFiles missingFiles);
+    void removeAsset(AssetId id);
+    void removeAsset(const path_t &path);
 
     UUID getAssetId(path_t path) override;
     std::unordered_set<path_t> getAssetPaths(AssetId id) override;

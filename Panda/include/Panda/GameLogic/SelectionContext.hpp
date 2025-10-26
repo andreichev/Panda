@@ -91,6 +91,19 @@ public:
         updateValues();
     }
 
+    static void removeSelectedAsset(UUID assetId) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        PND_ASSERT(assetHandler != nullptr, "ASSET HANDLER IS NOT INITIALIZED");
+        bool wasSelected = false;
+        if (assetId) {
+            std::unordered_set<path_t> assetPaths = assetHandler->getAssetPaths(assetId);
+            for (auto &assetPath : assetPaths) {
+                wasSelected |= s_selectedFiles.erase(assetPath);
+            }
+        }
+        if (wasSelected) { s_selectedAssetsCount--; }
+    }
+
     static void removeSelectedEntity(UUID id, bool needToCalculateMedian = true) {
         s_selectedEntities.erase(id);
         s_manipulatingEntities.erase(id);

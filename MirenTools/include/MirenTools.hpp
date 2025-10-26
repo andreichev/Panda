@@ -10,8 +10,10 @@ namespace MirenTools {
 enum ShaderType { VERTEX, FRAGMENT };
 
 /// For use with Vulkan. Recommended
-void compileHlslShaderToSpv(const path_t &input, const path_t &output, ShaderType shaderType);
+bool compileHlslShaderToSpv(const path_t &input, const path_t &output, ShaderType shaderType);
 /// Converting SpirV to OpenGL shader language for old v 330
-void compileSpvShaderToGlsl(const path_t &input, const path_t &output, ShaderType shaderType);
+bool compileSpvShaderToGlsl(const path_t &input, const path_t &output, ShaderType shaderType);
+/// Reflect SpirV shader
+bool reflect(const path_t &input, const path_t &output);
 
 } // namespace MirenTools

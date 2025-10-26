@@ -20,11 +20,7 @@ std::string getSpirvShaderType(ShaderType shaderType) {
     return "frag";
 };
 
-void compileHlslShaderToSpv(const path_t &input, const path_t &output, ShaderType shaderType) {
-    if (!std::filesystem::exists(input)) {
-        LOG_ERROR_EDITOR("Error: input file doesn't exist: %s", input.c_str());
-        return;
-    }
+bool compileHlslShaderToSpv(const path_t &input, const path_t &output, ShaderType shaderType) {
     std::string compileCmd = DXC + " -spirv -fspv-target-env=vulkan1.1 -T " +
                              getDXCShaderType(shaderType) + " \"" + input.string() + "\" -Fo \"" +
                              output.string() + "\"";
@@ -35,7 +31,7 @@ void compileHlslShaderToSpv(const path_t &input, const path_t &output, ShaderTyp
     if (result != 0) {
         LOG_ERROR_EDITOR("Error compiling HLSL to SPIR-V (code: %d)", result);
         if (std::filesystem::exists(output)) { std::filesystem::remove(output); }
-        return;
+        return false;
     }
 
     if (std::filesystem::exists(output)) {
@@ -43,9 +39,10 @@ void compileHlslShaderToSpv(const path_t &input, const path_t &output, ShaderTyp
     } else {
         LOG_ERROR_EDITOR("Error: SPIR-V file was not created");
     }
+    return true;
 }
 
-void compileSpvShaderToGlsl(const path_t &input, const path_t &output, ShaderType shaderType) {
+bool compileSpvShaderToGlsl(const path_t &input, const path_t &output, ShaderType shaderType) {
     std::string interfaceVarType;
     if (shaderType == ShaderType::VERTEX) {
         interfaceVarType = "out";
@@ -66,13 +63,34 @@ void compileSpvShaderToGlsl(const path_t &input, const path_t &output, ShaderTyp
     LOG_INFO("EXECUTING: %s", convertCmd.c_str());
     int result = system(convertCmd.c_str());
 
-    if (result != 0) { LOG_ERROR_EDITOR("Error compiling SPIR-V to GLSL (code: %d)", result); }
-
-    if (std::filesystem::exists(output)) {
-        LOG_INFO_EDITOR("Successfully created %s", output.c_str());
-    } else {
-        LOG_ERROR_EDITOR("Error: glsl file was not created");
+    if (result != 0) {
+        LOG_ERROR_EDITOR("Error compiling SPIR-V to GLSL (code: %d)", result);
+        return false;
     }
+
+    if (!std::filesystem::exists(output)) {
+        LOG_ERROR_EDITOR("Error: glsl file was not created");
+        return false;
+    }
+    LOG_INFO_EDITOR("Successfully created %s", output.c_str());
+    return true;
+}
+
+bool reflect(const path_t &input, const path_t &output) {
+    std::string convertCmd =
+        SPIRV_CROSS + " \"" + input.string() + "\" --reflect --output \"" + output.string() + "\"";
+    LOG_INFO("EXECUTING: %s", convertCmd.c_str());
+    int result = system(convertCmd.c_str());
+    if (result != 0) {
+        LOG_ERROR_EDITOR("Error reflecting SPIR-V (code: %d)", result);
+        return false;
+    }
+    if (!std::filesystem::exists(output)) {
+        LOG_ERROR_EDITOR("Error: json reflection file was not created");
+        return false;
+    }
+    LOG_INFO_EDITOR("Successfully created %s", output.c_str());
+    return true;
 }
 
 } // namespace MirenTools

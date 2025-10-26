@@ -12,23 +12,44 @@ EditorShaderAsset::EditorShaderAsset(const path_t &vertexCodePath, const path_t 
     path_t vertexSpvPath = vertexCodePath;
     vertexSpvPath.replace_extension(".spv");
     if (isInputNewer(vertexCodePath, vertexSpvPath)) {
-        MirenTools::compileHlslShaderToSpv(vertexCodePath, vertexSpvPath, MirenTools::VERTEX);
+        if (!MirenTools::compileHlslShaderToSpv(
+                vertexCodePath, vertexSpvPath, MirenTools::VERTEX
+            )) {
+            return;
+        }
     }
     path_t fragmentSpvPath = fragmentCodePath;
     fragmentSpvPath.replace_extension(".spv");
     if (isInputNewer(fragmentCodePath, fragmentSpvPath)) {
-        MirenTools::compileHlslShaderToSpv(fragmentCodePath, fragmentSpvPath, MirenTools::FRAGMENT);
+        if (!MirenTools::compileHlslShaderToSpv(
+                fragmentCodePath, fragmentSpvPath, MirenTools::FRAGMENT
+            )) {
+            return;
+        }
+    }
+    path_t fragmentReflectPath = fragmentCodePath;
+    fragmentReflectPath.replace_extension(".json");
+    if (isInputNewer(fragmentSpvPath, fragmentReflectPath)) {
+        if (!MirenTools::reflect(fragmentSpvPath, fragmentReflectPath)) { return; }
     }
     /// TODO: Add check if renderer is OpenGL or Vulkan. If Vulkan, return here
     path_t vertexGlslPath = vertexCodePath;
     vertexGlslPath.replace_extension(".vert");
     if (isInputNewer(vertexSpvPath, vertexGlslPath)) {
-        MirenTools::compileSpvShaderToGlsl(vertexSpvPath, vertexGlslPath, MirenTools::VERTEX);
+        if (!MirenTools::compileSpvShaderToGlsl(
+                vertexSpvPath, vertexGlslPath, MirenTools::VERTEX
+            )) {
+            return;
+        }
     }
     path_t fragmentGlslPath = fragmentCodePath;
     fragmentGlslPath.replace_extension(".frag");
     if (isInputNewer(fragmentSpvPath, fragmentGlslPath)) {
-        MirenTools::compileSpvShaderToGlsl(fragmentSpvPath, fragmentGlslPath, MirenTools::FRAGMENT);
+        if (!MirenTools::compileSpvShaderToGlsl(
+                fragmentSpvPath, fragmentGlslPath, MirenTools::FRAGMENT
+            )) {
+            return;
+        }
     }
     create(vertexGlslPath, fragmentGlslPath);
 }

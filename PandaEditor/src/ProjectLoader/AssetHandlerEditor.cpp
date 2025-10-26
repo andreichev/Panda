@@ -441,4 +441,14 @@ void AssetHandlerEditor::locateMissingFiles(AssetId id, MissingFiles missingFile
     reload(id);
 }
 
+void AssetHandlerEditor::removeAsset(AssetId id) {
+    auto files = getAssetPaths(id);
+    for (auto &file : files) {
+        m_registeredAssets.erase(file);
+    }
+    m_registry.erase(id);
+    m_missingFiles.erase(id);
+    saveAssetRegistry();
+}
+
 } // namespace Panda
