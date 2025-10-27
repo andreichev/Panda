@@ -21,6 +21,7 @@ void AssetPropertiesDraw::drawProperties(AssetId assetId) {
     PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
     AssetHandlerEditor *assetHandler = static_cast<AssetHandlerEditor *>(handler);
     AssetInfo info = assetHandler->getInfo(assetId);
+    std::string name = assetHandler->getAssetName(info);
     if (!assetHandler->assetFilesExist(assetId)) {
         ImGui::Text("Asset is missing");
         if (ImGui::Button("Locate")) { m_output->locateMissingAsset(assetId); }
@@ -30,7 +31,7 @@ void AssetPropertiesDraw::drawProperties(AssetId assetId) {
         case AssetType::TEXTURE: {
             TextureAssetMeta meta = std::get<TextureAssetMeta>(info.meta);
             Fonts::pushFont("Bold");
-            ImGui::Text("Texture %s", meta.path.filename().string().c_str());
+            ImGui::Text("Texture %s", name.c_str());
             Fonts::popFont();
             bool changed = false;
             const std::vector<std::string> filteringList = {
@@ -65,15 +66,16 @@ void AssetPropertiesDraw::drawProperties(AssetId assetId) {
         case AssetType::SHADER: {
             ShaderAssetMeta meta = std::get<ShaderAssetMeta>(info.meta);
             Fonts::pushFont("Bold");
-            ImGui::Text("Shader %s", meta.fragmentCodePath.filename().string().c_str());
+            ImGui::Text("Shader %s", name.c_str());
             Fonts::popFont();
-            ImGui::Text("Path: %s", meta.fragmentCodePath.string().c_str());
+            ImGui::Text("Vertex: %s", meta.vertexCodePath.string().c_str());
+            ImGui::Text("Fragment: %s", meta.fragmentCodePath.string().c_str());
             break;
         }
         case AssetType::MATERIAL: {
             MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
             Fonts::pushFont("Bold");
-            ImGui::Text("Material %s", meta.materialPath.filename().string().c_str());
+            ImGui::Text("Material %s", name.c_str());
             Fonts::popFont();
             bool changed = false;
             path_t shaderPath;

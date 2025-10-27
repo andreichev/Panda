@@ -84,7 +84,7 @@ void WorldHierarchyPanel::onImGuiRender() {
     if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) ||
         ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
         if (ImGui::IsMouseHoveringRect(windowRect.Min, windowRect.Max, false) &&
-            !ImGui::IsAnyItemHovered()) {
+            !ImGui::IsAnyItemHovered() && !ImGui::IsDragDropActive()) {
             m_firstSelectedRow = -1;
             m_lastSelectedRow = -1;
             SelectionContext::unselectAll();

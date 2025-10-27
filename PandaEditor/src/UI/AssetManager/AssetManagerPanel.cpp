@@ -67,7 +67,8 @@ void AssetManagerPanel::drawAssetRow(AssetInfo assetInfo) {
     ImGui::TextUnformatted(assetInfo.getTypeStr());
     // NAME
     ImGui::TableNextColumn();
-    ImGui::TextUnformatted(getAssetName(assetInfo).c_str());
+    std::string name = assetHandler->getAssetName(assetInfo);
+    ImGui::TextUnformatted(name.c_str());
     // IS VALID
     ImGui::TableNextColumn();
     ImGui::Text("%d", isValid);
@@ -164,32 +165,6 @@ void AssetManagerPanel::deleteSelectedAssets() {
     for (auto &file : selectedFiles) {
         AssetId assetId = assetHandler->getAssetId(file);
         if (assetId) { assetHandler->removeAsset(assetId); }
-    }
-}
-
-std::string AssetManagerPanel::getAssetName(const AssetInfo &info) {
-    switch (info.type) {
-        case AssetType::TEXTURE: {
-            TextureAssetMeta meta = std::get<TextureAssetMeta>(info.meta);
-            return meta.path.filename().string();
-        }
-        case AssetType::SHADER: {
-            ShaderAssetMeta meta = std::get<ShaderAssetMeta>(info.meta);
-            std::string filename = meta.vertexCodePath.filename().string() + " " +
-                                   meta.fragmentCodePath.filename().string();
-            return filename;
-            break;
-        }
-        case AssetType::MATERIAL: {
-            MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
-            return meta.materialPath.filename().string();
-            break;
-        }
-        case AssetType::CUBE_MAP:
-        case AssetType::MESH:
-        case AssetType::NONE: {
-            return {};
-        }
     }
 }
 

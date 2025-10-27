@@ -28,11 +28,11 @@ public:
     const path_t &getProjectPath();
     const std::unordered_map<AssetId, AssetInfo> &getRegistry();
     bool isLoaded(AssetId id);
+    std::string getAssetName(const AssetInfo &info);
     bool assetFilesExist(AssetId id);
     MissingFiles getMissingAssetFiles(AssetId id);
     void locateMissingFiles(AssetId id, MissingFiles missingFiles);
     void removeAsset(AssetId id);
-    void removeAsset(const path_t &path);
 
     UUID getAssetId(path_t path) override;
     std::unordered_set<path_t> getAssetPaths(AssetId id) override;

@@ -242,7 +242,7 @@ void ContentBrowser::onImGuiRender() {
     if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) ||
         ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
         if (ImGui::IsMouseHoveringRect(windowRect.Min, windowRect.Max, false) &&
-            !ImGui::IsAnyItemHovered()) {
+            !ImGui::IsAnyItemHovered() && !ImGui::IsDragDropActive()) {
             SelectionContext::unselectAll();
         }
     }

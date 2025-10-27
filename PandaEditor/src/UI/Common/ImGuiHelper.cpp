@@ -620,13 +620,14 @@ bool propertyShader(const char *label, path_t path, AssetRef<Asset> &asset, bool
     ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text(isInconsistent ? "*%s" : "%s", label);
     ImGui::NextColumn();
-    path_t filename = path.filename();
+    std::string name;
     if (asset) {
-        if (!filename.empty()) {
-            if (ImGui::Button(filename.string().c_str(), {100, 55})) { SystemTools::open(path); }
-        } else {
-            if (ImGui::Button("Shader Asset", {100, 55})) { SystemTools::open(path); }
-        }
+        AssetHandler *handler = GameContext::getAssetHandler();
+        PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
+        AssetHandlerEditor *assetHandler = static_cast<AssetHandlerEditor *>(handler);
+        AssetInfo info = assetHandler->getInfo(asset.getId());
+        name = assetHandler->getAssetName(info);
+        if (ImGui::Button(name.c_str(), {100, 55})) { SystemTools::open(path); }
     } else {
         ImGui::Button("No shader", {100, 55});
     }
@@ -639,7 +640,7 @@ bool propertyShader(const char *label, path_t path, AssetRef<Asset> &asset, bool
             item.count = 1;
             ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
         }
-        ImGui::Text("Shader");
+        ImGui::Text("Shader %s", name.c_str());
         ImGui::EndDragDropSource();
     }
     if (ImGui::BeginDragDropTarget()) {
@@ -674,6 +675,7 @@ bool propertyMaterial(const char *label, AssetRef<Asset> &asset, bool isInconsis
     ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text(isInconsistent ? "*%s" : "%s", label);
     ImGui::NextColumn();
+    std::string name;
     if (asset) {
         AssetHandler *handler = GameContext::getAssetHandler();
         PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
@@ -681,12 +683,8 @@ bool propertyMaterial(const char *label, AssetRef<Asset> &asset, bool isInconsis
         AssetInfo info = assetHandler->getInfo(asset.getId());
         MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
         path_t path = meta.materialPath;
-        path_t filename = path.filename();
-        if (!filename.empty()) {
-            if (ImGui::Button(filename.string().c_str(), {100, 55})) { SystemTools::open(path); }
-        } else {
-            if (ImGui::Button("Material Asset", {100, 55})) { SystemTools::open(path); }
-        }
+        name = assetHandler->getAssetName(info);
+        if (ImGui::Button(name.c_str(), {100, 55})) { SystemTools::open(path); }
     } else {
         ImGui::Button("No material", {100, 55});
     }
@@ -699,7 +697,7 @@ bool propertyMaterial(const char *label, AssetRef<Asset> &asset, bool isInconsis
             item.count = 1;
             ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
         }
-        ImGui::Text("Material");
+        ImGui::Text("Material %s", name.c_str());
         ImGui::EndDragDropSource();
     }
     if (ImGui::BeginDragDropTarget()) {

@@ -34,7 +34,7 @@ EditorShaderAsset::EditorShaderAsset(const path_t &vertexCodePath, const path_t 
     }
     /// TODO: Add check if renderer is OpenGL or Vulkan. If Vulkan, return here
     path_t vertexGlslPath = vertexCodePath;
-    vertexGlslPath.replace_extension(".vert");
+    vertexGlslPath.replace_extension(".glsl");
     if (isInputNewer(vertexSpvPath, vertexGlslPath)) {
         if (!MirenTools::compileSpvShaderToGlsl(
                 vertexSpvPath, vertexGlslPath, MirenTools::VERTEX
@@ -43,7 +43,7 @@ EditorShaderAsset::EditorShaderAsset(const path_t &vertexCodePath, const path_t 
         }
     }
     path_t fragmentGlslPath = fragmentCodePath;
-    fragmentGlslPath.replace_extension(".frag");
+    fragmentGlslPath.replace_extension(".glsl");
     if (isInputNewer(fragmentSpvPath, fragmentGlslPath)) {
         if (!MirenTools::compileSpvShaderToGlsl(
                 fragmentSpvPath, fragmentGlslPath, MirenTools::FRAGMENT

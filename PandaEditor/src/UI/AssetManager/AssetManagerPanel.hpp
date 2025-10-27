@@ -17,7 +17,6 @@ public:
 
 private:
     void drawAssetRow(AssetInfo asset);
-    std::string getAssetName(const AssetInfo &info);
     bool isAssetSelected(const AssetInfo &info);
     void selectAsset(AssetId id);
     void unselectAsset(AssetId id);

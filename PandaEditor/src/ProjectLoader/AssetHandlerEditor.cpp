@@ -451,4 +451,31 @@ void AssetHandlerEditor::removeAsset(AssetId id) {
     saveAssetRegistry();
 }
 
+std::string AssetHandlerEditor::getAssetName(const AssetInfo &info) {
+    switch (info.type) {
+        case AssetType::TEXTURE: {
+            TextureAssetMeta meta = std::get<TextureAssetMeta>(info.meta);
+            return meta.path.filename().string();
+        }
+        case AssetType::SHADER: {
+            ShaderAssetMeta meta = std::get<ShaderAssetMeta>(info.meta);
+            std::string filename = meta.vertexCodePath.filename().string();
+            std::string suffix = "_vert.hlsl";
+            if (suffix.length() > filename.length()) { return "Incorrect name"; }
+            return filename.erase(filename.length() - suffix.length());
+            break;
+        }
+        case AssetType::MATERIAL: {
+            MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
+            return meta.materialPath.filename().string();
+            break;
+        }
+        case AssetType::CUBE_MAP:
+        case AssetType::MESH:
+        case AssetType::NONE: {
+            return {};
+        }
+    }
+}
+
 } // namespace Panda
