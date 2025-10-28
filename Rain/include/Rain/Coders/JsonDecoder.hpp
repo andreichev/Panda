@@ -20,6 +20,7 @@ public:
     ~JsonDecoder() override = default;
 
     bool decode(std::istream &istream, void *data, TypeInfo info) override;
+    std::vector<std::string> getMemberKeys() override;
     bool beginObject(const char *key) override;
     bool decode(const char *key, bool &data) override;
     bool decode(const char *key, int &data) override;

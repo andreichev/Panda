@@ -405,6 +405,33 @@ struct TypeDecoder<std::vector<T, Alloc>> {
     }
 };
 
+/** UNORDERED_MAP */
+template<typename V, typename Alloc>
+struct TypeDecoder<std::unordered_map<std::string, V, Alloc>> {
+    static bool decode(
+        const char *key,
+        Decoder *decoder,
+        const TypeInfo &info,
+        std::unordered_map<std::string, V, Alloc> &data
+    ) {
+        data.clear();
+        if (!decoder->beginObject(key)) {
+            return false;
+        }
+        auto memberInfo = getTypeRegistry()->findOrCreateType<V>();
+        std::vector<std::string> keys = decoder->getMemberKeys();
+        for (auto &key : keys) {
+            V value;
+            if (!memberInfo.decoderFunc(key.c_str(), decoder, memberInfo, &value)) {
+                return false;
+            }
+            data[key] = value;
+        }
+        decoder->endObject();
+        return true;
+    }
+};
+
 // ------------------------------------------------------------
 // ---------- PRIMITIVES ENCODING IMPLEMENTATION --------------
 // ------------------------------------------------------------
@@ -556,6 +583,24 @@ struct TypeEncoder<std::vector<T, Alloc>> {
             memberInfo.encoderFunc(nullptr, encoder, memberInfo, &item);
         }
         encoder->endArray();
+    }
+};
+
+/** UNORDERED_MAP */
+template<typename V, typename Alloc>
+struct TypeEncoder<std::unordered_map<std::string, V, Alloc>> {
+    static void encode(
+        const char *key,
+        Encoder *encoder,
+        const TypeInfo &info,
+        const std::unordered_map<std::string, V, Alloc> &data
+    ) {
+        encoder->beginObject(key);
+        auto memberInfo = getTypeRegistry()->findOrCreateType<V>();
+        for (auto &item : data) {
+            memberInfo.encoderFunc(item.first.c_str(), encoder, memberInfo, &item.second);
+        }
+        encoder->endObject();
     }
 };
 

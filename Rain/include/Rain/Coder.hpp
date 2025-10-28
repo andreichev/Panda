@@ -77,6 +77,8 @@ public:
 
     /// General decode
     virtual bool decode(std::istream &, void *data, TypeInfo info) = 0;
+    /// Get all keys on current level
+    virtual std::vector<std::string> getMemberKeys() = 0;
     /// Begin decoding object
     virtual bool beginObject(const char *key) = 0;
     /// Decode bool
