@@ -29,7 +29,7 @@ void ParticlesEmitter::initializeMaterial() {
         assetHandler->createStaticAsset<Panda::ShaderAsset>(UUID(), "default-shaders/default.frag");
     Panda::MaterialData materialData;
     materialData.inputs = {
-        Panda::MaterialField("albedo", Panda::MaterialFieldType::TEXTURE, texture.asBaseAsset())
+        Panda::MaterialField("albedo", Panda::MaterialFieldType::TEXTURE, texture.getId())
     };
     m_material =
         assetHandler->createStaticAsset<Panda::MaterialAsset>(UUID(), materialData, shader);

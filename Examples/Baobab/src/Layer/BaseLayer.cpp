@@ -54,7 +54,7 @@ void BaseLayer::onAttach() {
                         .getMesh();
                 Panda::MaterialData materialData;
                 materialData.inputs = {Panda::MaterialField(
-                    "texture1", Panda::MaterialFieldType::TEXTURE, m_blocksTileTexture.asBaseAsset()
+                    "texture1", Panda::MaterialFieldType::TEXTURE, m_blocksTileTexture.getId()
                 )};
                 auto material = assetHandler->createStaticAsset<Panda::MaterialAsset>(
                     UUID(), materialData, m_groundShader

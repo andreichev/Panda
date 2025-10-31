@@ -53,7 +53,7 @@ void MaterialAsset::setFieldValue(const char *name, MaterialFieldValue value) {
 
 #ifdef PND_EDITOR
 
-const MaterialData &MaterialAsset::getInputs() {
+MaterialData &MaterialAsset::getInputs() {
     return m_data;
 }
 

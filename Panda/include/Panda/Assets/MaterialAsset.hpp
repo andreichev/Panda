@@ -33,11 +33,10 @@ public:
     }
 
     void bindFields();
-
     void setFieldValue(const char *name, MaterialFieldValue value);
 
 #ifdef PND_EDITOR
-    const MaterialData &getInputs();
+    MaterialData &getInputs();
     void updateFields();
 #endif
 

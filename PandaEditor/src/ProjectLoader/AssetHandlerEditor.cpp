@@ -126,6 +126,8 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
                 LOG_INFO_EDITOR(
                     "CREATED MATERIAL %u AT PATH %s", id, meta.materialPath.string().c_str()
                 );
+                // Updating fields is only for editor. In runtime no shader reflection used, only
+                // loading material data
                 material->updateFields();
                 asset = material;
                 removeMissingFiles(id);

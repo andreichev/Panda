@@ -89,6 +89,30 @@ void AssetPropertiesDraw::drawProperties(AssetId assetId) {
                 meta.shader = asset.getId();
                 changed = true;
             }
+            if (assetHandler->isLoaded(assetId)) {
+                AssetRef<MaterialAsset> material = assetHandler->makeRef<MaterialAsset>(assetId);
+                MaterialData &materialData = material->getInputs();
+                for (auto &input : materialData.inputs) {
+                    switch (input.type) {
+                        case MaterialFieldType::FLOAT: {
+                            float value = std::get<float>(input.value);
+                            dragFloat(input.name.c_str(), &value, 0.005f);
+                            input.value = value;
+                            break;
+                        }
+                        case MaterialFieldType::VEC4:
+                        case MaterialFieldType::TEXTURE:
+                        case MaterialFieldType::UNKNOWN: {
+                            ImGui::TextUnformatted(input.name.c_str());
+                            break;
+                        }
+                    }
+                }
+            } else {
+                ImGui::Text(
+                    "Asset is not loaded. Editing fields is available only for loaded assets."
+                );
+            }
             if (changed) {
                 info.meta = meta;
                 assetHandler->updateInfo(assetId, info);
