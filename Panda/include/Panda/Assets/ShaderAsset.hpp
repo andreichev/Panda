@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Base/AssetHandler.hpp"
+#include "Panda/Renderer/ShaderSpirvReflectionData.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -19,6 +20,9 @@ public:
     ShaderAsset(ShaderAsset &&other);
     ~ShaderAsset();
     Miren::ProgramHandle getMirenHandle();
+#ifdef PND_EDITOR
+    virtual ShaderSpirvReflectionData getReflectionData();
+#endif
 
 protected:
     void create(const path_t &vertexBinPath, const path_t &fragmentBinPath);

@@ -44,8 +44,7 @@ struct MaterialAssetMeta : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-using AssetMeta =
-    std::variant<std::monostate, TextureAssetMeta, ShaderAssetMeta, MaterialAssetMeta>;
+using AssetMeta = std::variant<TextureAssetMeta, ShaderAssetMeta, MaterialAssetMeta>;
 
 struct AssetInfo : public Rain::Codable {
     AssetId id;

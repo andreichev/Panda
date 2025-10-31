@@ -17,6 +17,3 @@ target_include_directories(MirenTools PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Dependencies - Foundation
 target_link_libraries(MirenTools Foundation)
-
-# Dependencies - Rain
-target_link_libraries(MirenTools Rain)

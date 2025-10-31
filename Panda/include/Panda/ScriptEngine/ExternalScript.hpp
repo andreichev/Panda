@@ -7,7 +7,7 @@
 
 namespace Panda {
 
-using ScriptFieldValue = std::variant<std::monostate, int32_t, float, UUID>;
+using ScriptFieldValue = std::variant<int32_t, float, UUID>;
 
 struct ScriptField {
     ScriptInstanceHandle instanceId;
@@ -28,10 +28,6 @@ struct ScriptField {
         , name(name)
         , type(type)
         , value(value) {}
-
-    operator bool() {
-        return !std::holds_alternative<std::monostate>(value);
-    }
 
     bool operator==(const ScriptField &other) const {
         return instanceId == other.instanceId && fieldId == other.fieldId;

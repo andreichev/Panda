@@ -121,11 +121,13 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
                 if (meta.shader) { shader = makeRef<ShaderAsset>(meta.shader); }
                 MaterialData data;
                 AssetsMapper::toData(data, dataDto);
-                asset = F_NEW(m_allocator, MaterialAsset)(data, shader);
+                MaterialAsset *material = F_NEW(m_allocator, MaterialAsset)(data, shader);
                 LOG_INFO("CREATED MATERIAL %u AT PATH %s", id, meta.materialPath.string().c_str());
                 LOG_INFO_EDITOR(
                     "CREATED MATERIAL %u AT PATH %s", id, meta.materialPath.string().c_str()
                 );
+                material->updateFields();
+                asset = material;
                 removeMissingFiles(id);
             } else {
                 LOG_ERROR("MATERIAL %u FILE %s NOT FOUND", id, meta.materialPath.string().c_str());

@@ -15,7 +15,7 @@ namespace StaticResources {
         whiteTextureCreate.m_data = whiteTextureData;
         whiteTexture = handler->createStaticAsset<TextureAsset>(1, whiteTextureCreate);
         materialData.inputs = {
-            MaterialField("albedo", MaterialFieldType::TEXTURE, whiteTexture.asBaseAsset())
+            MaterialField("albedo", MaterialFieldType::TEXTURE, whiteTexture.getId())
         };
         /// DEFAULT SHADER
         defaultShader = handler->createStaticAsset<ShaderAsset>(2, "default-shaders/default.frag");

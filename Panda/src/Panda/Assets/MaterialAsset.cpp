@@ -1,5 +1,6 @@
 #include "Panda/Assets/MaterialAsset.hpp"
 #include "Panda/Renderer/Std140Buffer.hpp"
+#include "Panda/Serialization/ShaderReflectionDataTransformer.hpp"
 
 namespace Panda {
 
@@ -7,7 +8,7 @@ void MaterialAsset::bindFields() {
     Miren::ProgramHandle shaderHandle = m_shaderRef->getMirenHandle();
     if (!shaderHandle.isValid()) { return; }
     Std140Buffer ubo;
-    for (auto &field : m_fields) {
+    for (auto &field : m_data.inputs) {
         switch (field.type) {
             case MaterialFieldType::FLOAT: {
                 float value = std::get<float>(field.value);
@@ -20,8 +21,9 @@ void MaterialAsset::bindFields() {
                 break;
             }
             case MaterialFieldType::TEXTURE: {
-                auto asset = std::get<AssetRef<Asset>>(field.value);
-                auto texture = asset.as<TextureAsset>();
+                UUID assetId = std::get<UUID>(field.value);
+                auto handler = GameContext::getAssetHandler();
+                AssetRef<TextureAsset> texture = handler->makeRef<TextureAsset>(assetId);
                 Miren::TextureHandle handle = texture->getMirenHandle();
                 Miren::addInputTexture(shaderHandle, field.name.c_str(), handle);
                 break;
@@ -33,12 +35,14 @@ void MaterialAsset::bindFields() {
         }
     }
     if (ubo.getSize()) {
-        Miren::addInputUniformBuffer(shaderHandle, "MATERIAL_FIELDS", ubo.getData(), ubo.getSize());
+        Miren::addInputUniformBuffer(
+            shaderHandle, "type_MATERIAL_FIELDS", ubo.getData(), ubo.getSize()
+        );
     }
 }
 
-void MaterialAsset::setFieldValue(const char *name, MaterialFieldData value) {
-    for (auto &field : m_fields) {
+void MaterialAsset::setFieldValue(const char *name, MaterialFieldValue value) {
+    for (auto &field : m_data.inputs) {
         if (field.name == name) {
             field.value = value;
             return;
@@ -46,5 +50,40 @@ void MaterialAsset::setFieldValue(const char *name, MaterialFieldData value) {
     }
     LOG_ERROR_EDITOR("MATERIAL FIELD %s NOT FOUND", name);
 }
+
+#ifdef PND_EDITOR
+
+const MaterialData &MaterialAsset::getInputs() {
+    return m_data;
+}
+
+void MaterialAsset::updateFields() {
+    ShaderSpirvReflectionData reflection = m_shaderRef->getReflectionData();
+    MaterialData shaderData = ShaderReflectionDataTransformer::transformToMaterialData(reflection);
+    for (auto &field : m_data.inputs) {
+        const MaterialField &shaderField = shaderData.getField(field.name);
+        if (!shaderField) {
+            LOG_INFO_EDITOR("MATERIAL FIELD %s NOT FOUND.", field.name.c_str());
+            m_data.removeField(field);
+            continue;
+        }
+    }
+    for (const auto &shaderField : shaderData.inputs) {
+        // Check if field is new
+        if (!m_data.hasField(shaderField.name)) {
+            MaterialField field =
+                MaterialField(shaderField.name, shaderField.type, shaderField.value);
+            m_data.addField(field);
+            continue;
+        }
+        MaterialField &field = m_data.getField(shaderField.name);
+        if (field.type != shaderField.type) {
+            field.type = shaderField.type;
+            field.value = shaderField.value;
+        }
+    }
+}
+
+#endif
 
 } // namespace Panda

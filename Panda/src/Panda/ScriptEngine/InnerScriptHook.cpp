@@ -268,8 +268,7 @@ namespace InternalCalls {
     void material_SetTexture(MaterialHandle materialId, const char *name, TextureHandle textureId) {
         AssetHandler *assetHandler = GameContext::getAssetHandler();
         auto material = assetHandler->makeRef<MaterialAsset>(materialId);
-        auto texture = assetHandler->makeRef(textureId);
-        material->setFieldValue(name, texture);
+        material->setFieldValue(name, UUID(textureId));
     }
 
     /// CONSOLE

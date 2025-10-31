@@ -16,19 +16,16 @@ class MaterialAsset final : public Asset {
 public:
     MaterialAsset()
         : Asset(AssetType::MATERIAL)
-        , m_shaderRef() {}
+        , m_shaderRef()
+        , m_data() {}
 
     MaterialAsset(const MaterialData &data, AssetRef<ShaderAsset> shader)
         : Asset(AssetType::MATERIAL)
         , m_shaderRef(shader)
-        , m_fields(data.inputs) {}
+        , m_data(data) {}
 
     AssetRef<ShaderAsset> getShaderAsset() {
         return m_shaderRef;
-    }
-
-    const std::vector<MaterialField> &getFields() {
-        return m_fields;
     }
 
     bool isValid() {
@@ -37,10 +34,15 @@ public:
 
     void bindFields();
 
-    void setFieldValue(const char *name, MaterialFieldData value);
+    void setFieldValue(const char *name, MaterialFieldValue value);
+
+#ifdef PND_EDITOR
+    const MaterialData &getInputs();
+    void updateFields();
+#endif
 
 private:
-    std::vector<MaterialField> m_fields;
+    MaterialData m_data;
     AssetRef<ShaderAsset> m_shaderRef;
 };
 

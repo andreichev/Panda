@@ -13,6 +13,22 @@
 
 namespace Panda {
 
+ScriptFieldValue getDefaultValueFor(ScriptFieldType type) {
+    switch (type) {
+        case ScriptFieldType::INTEGER:
+            return int(0);
+        case ScriptFieldType::FLOAT:
+            return float(0.f);
+        case ScriptFieldType::ENTITY:
+        case ScriptFieldType::TEXTURE:
+        case ScriptFieldType::MATERIAL:
+            return UUID(0);
+        case ScriptFieldType::UNKNOWN:
+            break;
+    }
+    return int(0);
+}
+
 World::World()
     : m_entityIdMap(100)
     , m_isRunning(false)
@@ -290,13 +306,16 @@ void World::updateScriptsAndFields() {
                         fieldManifest.handle,
                         fieldManifest.name,
                         fieldManifest.type,
-                        std::monostate()
+                        getDefaultValueFor(fieldManifest.type)
                     );
                     container.addField(field);
                     continue;
                 }
                 ScriptField &field = container.getField(fieldManifest.name);
-                field.type = fieldManifest.type;
+                if (field.type != fieldManifest.type) {
+                    field.type = fieldManifest.type;
+                    field.value = getDefaultValueFor(fieldManifest.type);
+                }
             }
         }
     }

@@ -5,6 +5,8 @@
 #include "EditorShaderAsset.hpp"
 
 #include <MirenTools.hpp>
+#include <Rain/Coders/JsonDecoder.hpp>
+#include <fstream>
 
 namespace Panda {
 
@@ -32,6 +34,14 @@ EditorShaderAsset::EditorShaderAsset(const path_t &vertexCodePath, const path_t 
     if (isInputNewer(fragmentSpvPath, fragmentReflectPath)) {
         if (!MirenTools::reflect(fragmentSpvPath, fragmentReflectPath)) { return; }
     }
+    std::ifstream file(fragmentReflectPath);
+    if (!file.is_open()) {
+        LOG_ERROR_EDITOR("Error reading reflection file %s", fragmentReflectPath.string().c_str());
+        return;
+    }
+    Rain::Decoder *decoder = new Rain::JsonDecoder;
+    decoder->decode(file, m_reflection);
+    delete decoder;
     /// TODO: Add check if renderer is OpenGL or Vulkan. If Vulkan, return here
     path_t vertexGlslPath = vertexCodePath;
     vertexGlslPath.replace_extension(".glsl");
@@ -52,6 +62,10 @@ EditorShaderAsset::EditorShaderAsset(const path_t &vertexCodePath, const path_t 
         }
     }
     create(vertexGlslPath, fragmentGlslPath);
+}
+
+ShaderSpirvReflectionData EditorShaderAsset::getReflectionData() {
+    return m_reflection;
 }
 
 bool EditorShaderAsset::isInputNewer(const path_t &inputPath, const path_t &outputPath) {

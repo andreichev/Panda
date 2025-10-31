@@ -34,4 +34,10 @@ Miren::ProgramHandle ShaderAsset::getMirenHandle() {
     return m_handle;
 }
 
+#ifdef PND_EDITOR
+ShaderSpirvReflectionData ShaderAsset::getReflectionData() {
+    return ShaderSpirvReflectionData();
+}
+#endif
+
 } // namespace Panda

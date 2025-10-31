@@ -11,12 +11,12 @@ namespace Panda {
 // TODO: Add Vec2, Vec3, Mat3, Mat4
 enum class MaterialFieldType : uint32_t { FLOAT, VEC4, TEXTURE, UNKNOWN };
 
-using MaterialFieldDtoData = std::variant<int, float, Vec4, UUID>;
+using MaterialFieldValue = std::variant<int, float, Vec4, UUID>;
 
 struct MaterialFieldDto : public Rain::Codable {
     std::string name;
     MaterialFieldType type;
-    MaterialFieldDtoData value;
+    MaterialFieldValue value;
 
     static void encode(const char *key, Rain::Encoder *encoder, const MaterialFieldDto &data) {
         encoder->beginObject(key);
