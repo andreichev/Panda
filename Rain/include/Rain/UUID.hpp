@@ -19,6 +19,11 @@ public:
     bool operator<(const UUID &rhs) const {
         return m_UUID < rhs.m_UUID;
     }
+    UUID operator++(int) {
+        UUID uuid = *this;
+        ++m_UUID;
+        return uuid;
+    }
 
 private:
     uint32_t m_UUID;

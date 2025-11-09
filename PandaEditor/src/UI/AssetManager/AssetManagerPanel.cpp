@@ -123,11 +123,6 @@ void AssetManagerPanel::onImGuiRender() {
         ImGui::TableSetupColumn("IS VALID");
         ImGui::TableSetupColumn("IS LOADED");
         ImGui::TableHeadersRow();
-        // if (ImGuiTableSortSpecs* sortSpecs = ImGui::TableGetSortSpecs())
-        //     if (sortSpecs->SpecsDirty || RequestSort) {
-        //         ExampleAsset::SortWithSortSpecs(sort_specs, Items.Data, Items.Size);
-        //         sort_specs->SpecsDirty = RequestSort = false;
-        //     }
         m_rowIndex = 0;
         for (auto [_, assetInfo] : registry) {
             drawAssetRow(assetInfo);

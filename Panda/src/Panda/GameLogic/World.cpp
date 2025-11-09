@@ -4,9 +4,10 @@
 
 #include "Panda/GameLogic/World.hpp"
 #include "Panda/GameLogic/GameContext.hpp"
-#include "Panda/GameLogic/Components/SkyComponent.hpp"
 #include "Panda/Physics/Physics2D.hpp"
 #include "Panda/GameLogic/SelectionContext.hpp"
+#include "Panda/Renderer/MirenViewDistribution.hpp"
+#include "Panda/Assets/StaticResources.hpp"
 
 #include <Rain/Rain.hpp>
 #include <entt/entt.hpp>
@@ -159,8 +160,9 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
         auto view = m_registry.view<SkyComponent>();
         for (auto &entityHandle : view) {
             if (!isValidEntt(entityHandle)) { continue; }
-            auto &sky = view.get<SkyComponent>(entityHandle);
-            sky.update(skyViewProjMtx);
+            AssetRef<MeshAsset> skyMesh = StaticResources::defaultSkyMesh;
+            m_renderer3d.submitSky(skyViewProjMtx, skyMesh);
+            break;
         }
     }
     // Render Sprites
@@ -197,9 +199,7 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
             if (!isValidEntt(entityHandle)) { continue; }
             auto &staticMeshComponent = view.get<MeshComponent>(entityHandle);
             auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
-            for (auto &mesh : staticMeshComponent.meshes) {
-                m_renderer3d.submit(transform, &mesh);
-            }
+            m_renderer3d.submit(transform, staticMeshComponent.mesh);
         }
     }
 }
@@ -224,9 +224,7 @@ void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
             if (!entity.hasComponent<MeshComponent>()) { continue; }
             auto &dynamicMeshComponent = entity.getComponent<MeshComponent>();
             auto transform = getWorldSpaceTransformMatrix(entity);
-            for (auto &mesh : dynamicMeshComponent.meshes) {
-                m_renderer3d.submit(transform, &mesh);
-            }
+            m_renderer3d.submit(transform, dynamicMeshComponent.mesh);
         }
     }
     // TOUCH SELECTION VIEW ID TO CLEAN

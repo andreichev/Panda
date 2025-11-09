@@ -15,11 +15,11 @@ public:
 
     Chunk();
     ~Chunk();
-    Panda::MeshAsset &getMesh();
+    Panda::AssetRef<Panda::MeshAsset> getMesh();
     void set(int x, int y, int z, VoxelType type);
     Voxel *get(int x, int y, int z);
     Voxel *m_data;
 
 private:
-    Panda::MeshAsset m_mesh;
+    Panda::AssetRef<Panda::MeshAsset> m_mesh;
 };

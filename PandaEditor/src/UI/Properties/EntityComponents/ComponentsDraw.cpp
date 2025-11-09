@@ -11,7 +11,6 @@
 #include <Panda/WorldCommands/Impl/UpdateRigidbody2DCommand.hpp>
 #include <Panda/WorldCommands/Impl/UpdateBoxCollider2DCommand.hpp>
 #include <Panda/WorldCommands/Impl/AddRemoveComponentCommand.hpp>
-#include <Panda/GameLogic/Components/SkyComponent.hpp>
 #include <Panda/GameLogic/GameContext.hpp>
 #include <Panda/ImGui/FontAwesome.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -341,7 +340,7 @@ void ComponentsDraw::drawComponents(const std::unordered_set<Entity> &entities) 
                 ImGui::Text("Multi edit not supported");
                 return;
             }
-            ImGui::Text("Meshes count: %d", (int)component.meshes.size());
+            ImGui::Text("Mesh ID: %u", (uint32_t)component.mesh.getId());
         }
     );
     drawComponent<CameraComponent>(

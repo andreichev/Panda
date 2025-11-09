@@ -9,7 +9,6 @@
 #include "Components/BlocksCreation.hpp"
 #include "Components/FullScreenToggle.hpp"
 #include "Components/UI/RootView.hpp"
-#include "Panda/GameLogic/Components/SkyComponent.hpp"
 #include "Panda/Assets/StaticResources.hpp"
 
 #include <Panda.hpp>
@@ -46,7 +45,7 @@ void BaseLayer::onAttach() {
                 Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(
                     layoutHandle, m_chunksStorage, indexX, indexY, indexZ, true
                 );
-                Panda::MeshAsset &dynamicMesh =
+                Panda::AssetRef<Panda::MeshAsset> dynamicMesh =
                     m_chunksStorage
                         .chunks
                             [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
@@ -59,7 +58,7 @@ void BaseLayer::onAttach() {
                 auto material = assetHandler->createStaticAsset<Panda::MaterialAsset>(
                     UUID(), materialData, m_groundShader
                 );
-                dynamicMesh.create(meshData, material);
+                dynamicMesh->create(meshData, material);
             }
         }
     }
@@ -113,20 +112,23 @@ void BaseLayer::onUpdate(double deltaTime) {
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
 
-    m_skyComponent.update(skyViewProjMtx);
+    Panda::AssetRef<Panda::MeshAsset> skyMesh = Panda::StaticResources::defaultSkyMesh;
+    m_renderer3d.submitSky(skyViewProjMtx, skyMesh);
+
     m_blocksCreation.update(deltaTime);
     m_cameraMove.update(deltaTime);
 
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
         for (int indexY = 0; indexY < ChunksStorage::SIZE_Y; indexY++) {
             for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {
-                auto &mesh = m_chunksStorage
-                                 .chunks
-                                     [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
-                                      indexX * ChunksStorage::SIZE_X + indexZ]
-                                 .getMesh();
+                Panda::AssetRef<Panda::MeshAsset> mesh =
+                    m_chunksStorage
+                        .chunks
+                            [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+                             indexX * ChunksStorage::SIZE_X + indexZ]
+                        .getMesh();
                 glm::mat4 transform(1.f);
-                m_renderer3d.submit(transform, &mesh);
+                m_renderer3d.submit(transform, mesh);
             }
         }
     }

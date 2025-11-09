@@ -4,6 +4,7 @@
 
 #include "CameraMove.hpp"
 
+#include <Panda/Renderer/Std140Buffer.hpp>
 #include <Fern/Fern.hpp>
 #include <glm/glm.hpp>
 #include <imgui.h>
@@ -37,7 +38,10 @@ void CameraMove::update(double deltaTime) {
     ImGui::SetNextFrameWantCaptureMouse(!Fern::isCursorLocked());
     static glm::vec3 cameraPos;
     cameraPos = m_transform->getPosition();
-    Miren::setUniform(m_programHandle, "cameraPos", &cameraPos, Miren::UniformType::Vec4);
+    Panda::Std140Buffer ubo;
+    // cameraPos
+    ubo.addVec3(cameraPos.x, cameraPos.y, cameraPos.z);
+    Miren::addInputUniformBuffer(m_programHandle, "type_UBO_FRAG", ubo.getData(), ubo.getSize());
 }
 
 void CameraMove::updateVectors() {

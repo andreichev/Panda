@@ -1,6 +1,6 @@
 #version 330 core
 
-layout(std140) uniform UBO_VERT {
+layout(std140) uniform type_UBO_VERT {
     mat4 projViewMtx;
     mat4 modelMtx;
 } ubo_vert;

@@ -5,13 +5,11 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-
 #include "Panda/Assets/MeshAsset.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
 #include "Panda/ScriptEngine/ExternalScript.hpp"
 
 #include <Foundation/Foundation.hpp>
-#include <Rain/Rain.hpp>
 
 namespace Panda {
 
@@ -82,7 +80,7 @@ struct SpriteRendererComponent final {
 };
 
 struct MeshComponent final {
-    std::vector<MeshAsset> meshes;
+    AssetRef<MeshAsset> mesh;
 
     MeshComponent() = default;
     MeshComponent(const MeshComponent &other) = default;
@@ -123,6 +121,11 @@ struct BoxCollider2DComponent final {
 
     // Storage for runtime
     uint8_t runtimeData[8];
+};
+
+struct SkyComponent final {
+    // TODO: Add sky parameters.
+    AssetRef<Asset> material;
 };
 
 } // namespace Panda

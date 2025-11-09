@@ -26,7 +26,7 @@ public:
     void openProject(const path_t &path);
     void closeProject();
     const path_t &getProjectPath();
-    const std::unordered_map<AssetId, AssetInfo> &getRegistry();
+    const std::map<AssetId, AssetInfo> &getRegistry();
     bool isLoaded(AssetId id);
     std::string getAssetName(const AssetInfo &info);
     bool assetFilesExist(AssetId id);
@@ -53,7 +53,7 @@ private:
     path_t m_assetRegistryPath;
     Rain::JsonEncoder m_jsonEncoder;
     Rain::JsonDecoder m_jsonDecoder;
-    std::unordered_map<AssetId, AssetInfo> m_registry;
+    std::map<AssetId, AssetInfo> m_registry;
     // Получение assetId по пути. Нужно для функции getAssetId
     std::unordered_map<path_t, AssetId> m_registeredAssets;
     std::map<path_t, RegisterAssetFunc> m_registerAssetFunc;

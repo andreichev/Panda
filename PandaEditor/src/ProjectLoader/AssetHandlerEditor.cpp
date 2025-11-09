@@ -385,7 +385,7 @@ std::unordered_set<path_t> AssetHandlerEditor::getAssetPaths(AssetId id) {
     return result;
 }
 
-const std::unordered_map<AssetId, AssetInfo> &AssetHandlerEditor::getRegistry() {
+const std::map<AssetId, AssetInfo> &AssetHandlerEditor::getRegistry() {
     return m_registry;
 }
 

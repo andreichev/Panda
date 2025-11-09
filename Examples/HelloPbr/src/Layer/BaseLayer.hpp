@@ -9,7 +9,6 @@
 #include "Components/FullScreenToggle.hpp"
 
 #include <Panda/GameLogic/Components/TransformComponent.hpp>
-#include <Panda/GameLogic/Components/SkyComponent.hpp>
 #include <Panda.hpp>
 
 class BaseLayer : public Panda::Layer {
@@ -27,14 +26,13 @@ private:
     Panda::WorldCamera m_camera;
     CameraMove m_cameraMove;
     Panda::TransformComponent m_transform;
-    Panda::SkyComponent m_skyComponent;
     TerrainMeshGenerator m_meshGenerator;
-    Panda::MeshAsset m_mesh;
 
-    Foundation::Shared<Panda::ShaderAsset> m_shader;
-    Foundation::Shared<Panda::TextureAsset> m_heightMapTexture;
-    Foundation::Shared<Panda::TextureAsset> m_colorTexture;
-    Foundation::Shared<Panda::TextureAsset> m_patternTexture;
+    Panda::AssetRef<Panda::MeshAsset> m_mesh;
+    Panda::AssetRef<Panda::ShaderAsset> m_shader;
+    Panda::AssetRef<Panda::TextureAsset> m_heightMapTexture;
+    Panda::AssetRef<Panda::TextureAsset> m_colorTexture;
+    Panda::AssetRef<Panda::TextureAsset> m_patternTexture;
     Panda::Renderer2D m_renderer2d;
     Panda::Renderer3D m_renderer3d;
 };

@@ -8,6 +8,7 @@
 #include "Model/PerlinNoise.hpp"
 
 #include <Panda.hpp>
+#include <Panda/Assets/StaticResources.hpp>
 #include <Fern/Events/KeyEvents.hpp>
 #include <Fern/Events/WindowEvents.hpp>
 #include <PandaUI/PandaUI.hpp>
@@ -19,8 +20,10 @@ BaseLayer::BaseLayer(Fern::Window *window)
 
 void BaseLayer::onAttach() {
     Miren::setViewClear(0, 0x3D75C9FF);
-    m_shader = Foundation::makeShared<Panda::ShaderAsset>(
-        "shaders/ground/ground_vertex.glsl", "shaders/ground/ground_fragment.glsl"
+    Panda::StaticResources::initStaticResources();
+    Panda::AssetHandler *assetHandler = Panda::GameContext::getAssetHandler();
+    m_shader = assetHandler->createStaticAsset<Panda::ShaderAsset>(
+        UUID(), "shaders/ground/ground.vert", "shaders/ground/ground.frag"
     );
     m_cameraMove.setShader(m_shader->getMirenHandle());
     LOG_INFO("MESH GENERATION STARTED");
@@ -29,7 +32,8 @@ void BaseLayer::onAttach() {
         Panda::AssetImporterBase::load2DTexture("textures/grass1.png");
     colorTextureCreate.m_numMips = 4;
     colorTextureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
-    m_colorTexture = Foundation::makeShared<Panda::TextureAsset>(colorTextureCreate);
+    m_colorTexture =
+        assetHandler->createStaticAsset<Panda::TextureAsset>(UUID(), colorTextureCreate);
 
 #ifdef HEIGHT_MAP
     Panda::TextureAsset heightTextureAsset = Panda::AssetLoader::loadTexture("textures/map2.png");
@@ -55,11 +59,19 @@ void BaseLayer::onAttach() {
     Panda::MeshData meshData = m_meshGenerator.makeMesh(layoutHandle, width, height, heightMap);
     F_FREE(Foundation::getAllocator(), heightMap);
 
-    std::vector<Panda::TextureBinding> bindings = {
-        {"texture1", m_colorTexture}, {"iSky", m_skyComponent.getSkyTextureAsset()}
+    Panda::MaterialField skyField =
+        Panda::StaticResources::defaultSkyMesh->getMaterialAsset()->getInputs().getField(
+            "skyTexture"
+        );
+    Panda::MaterialData materialData;
+    materialData.inputs = {
+        Panda::MaterialField("texture1", Panda::MaterialFieldType::TEXTURE, m_colorTexture.getId()),
+        skyField
     };
-    auto material = Foundation::makeShared<Panda::MaterialAsset>(m_shader, bindings);
-    m_mesh.create(meshData, material);
+    auto material =
+        assetHandler->createStaticAsset<Panda::MaterialAsset>(UUID(), materialData, m_shader);
+    m_mesh = assetHandler->createStaticAsset<Panda::MeshAsset>(UUID());
+    m_mesh->create(meshData, material);
 
     auto windowSize = m_window->getSize();
     m_camera.setViewportSize({windowSize.width, windowSize.height});
@@ -97,10 +109,11 @@ void BaseLayer::onUpdate(double deltaTime) {
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
 
-    m_skyComponent.update(skyViewProjMtx);
+    Panda::AssetRef<Panda::MeshAsset> skyMesh = Panda::StaticResources::defaultSkyMesh;
+    m_renderer3d.submitSky(skyViewProjMtx, skyMesh);
 
     glm::mat4 transform(1.f);
-    m_renderer3d.submit(transform, &m_mesh);
+    m_renderer3d.submit(transform, m_mesh);
 
     m_cameraMove.update(deltaTime);
 

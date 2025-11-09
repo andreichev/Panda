@@ -12,6 +12,8 @@ Chunk::~Chunk() {
 
 Chunk::Chunk() {
     m_data = new Voxel[SIZE_X * SIZE_Y * SIZE_Z];
+    Panda::AssetHandler *handler = Panda::GameContext::getAssetHandler();
+    m_mesh = handler->createStaticAsset<Panda::MeshAsset>(UUID());
 }
 
 void Chunk::set(int x, int y, int z, VoxelType type) {
@@ -24,6 +26,6 @@ Voxel *Chunk::get(int x, int y, int z) {
     return &m_data[y * Chunk::SIZE_X * Chunk::SIZE_Z + x * Chunk::SIZE_X + z];
 }
 
-Panda::MeshAsset &Chunk::getMesh() {
+Panda::AssetRef<Panda::MeshAsset> Chunk::getMesh() {
     return m_mesh;
 }

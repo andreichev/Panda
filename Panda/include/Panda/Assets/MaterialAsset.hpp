@@ -3,9 +3,9 @@
 #include "Panda/Base/Base.hpp"
 #include "Panda/GameLogic/GameContext.hpp"
 #include "Panda/Assets/TextureAsset.hpp"
+#include "Panda/Assets/ShaderAsset.hpp"
 #include "Panda/Renderer/MaterialData.hpp"
 #include "Base/AssetRef.hpp"
-#include "ShaderAsset.hpp"
 
 #include <Miren/Miren.hpp>
 #include <cstdlib>

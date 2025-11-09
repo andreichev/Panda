@@ -1,8 +1,8 @@
 #version 330 core
 
-layout(std140) uniform MVP {
-    mat4 model;
+layout(std140) uniform type_UBO_VERT {
     mat4 projViewMtx;
+    mat4 model;
 } mvp;
 
 layout (location = 0) in vec3 aPos;

@@ -9,7 +9,6 @@
 #include "Components/CameraMove.hpp"
 
 #include <Panda/GameLogic/Components/TransformComponent.hpp>
-#include <Panda/GameLogic/Components/SkyComponent.hpp>
 #include <Panda.hpp>
 
 class BaseLayer : public Panda::Layer {
@@ -27,7 +26,6 @@ private:
     Panda::WorldCamera m_camera;
     CameraMove m_cameraMove;
     Panda::TransformComponent m_transform;
-    Panda::SkyComponent m_skyComponent;
     ChunksStorage m_chunksStorage;
     BlocksCreation m_blocksCreation;
     Panda::AssetRef<Panda::ShaderAsset> m_groundShader;

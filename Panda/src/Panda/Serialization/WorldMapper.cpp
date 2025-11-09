@@ -1,5 +1,4 @@
 #include "Panda/Serialization/WorldMapper.hpp"
-#include "Panda/GameLogic/Components/SkyComponent.hpp"
 
 namespace Panda {
 

@@ -29,7 +29,8 @@ public:
     Renderer3D(Renderer3D &&other);
     ~Renderer3D() = default;
     void begin(Miren::ViewId id);
-    void submit(glm::mat4 &transform, MeshAsset *mesh);
+    void submitSky(glm::mat4 &skyViewProj, AssetRef<MeshAsset> skyMesh);
+    void submit(glm::mat4 &model, AssetRef<MeshAsset> mesh);
     void end();
     Statistics getStats();
     void setViewProj(glm::mat4 viewProj);
@@ -37,6 +38,8 @@ public:
     Renderer3D &operator=(Renderer3D &&other);
 
 private:
+    void flush();
+
     DrawData m_drawData;
     Miren::ViewId m_viewId;
     glm::mat4 m_viewProj;
