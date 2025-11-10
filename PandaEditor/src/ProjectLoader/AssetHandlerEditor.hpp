@@ -5,6 +5,7 @@
 #include <Rain/Coders/JsonDecoder.hpp>
 #include <Rain/Coders/JsonEncoder.hpp>
 #include <Panda/Assets/Base/AssetHandler.hpp>
+#include <Panda/Renderer/MaterialData.hpp>
 #include <map>
 
 namespace Panda {
@@ -33,6 +34,7 @@ public:
     MissingFiles getMissingAssetFiles(AssetId id);
     void locateMissingFiles(AssetId id, MissingFiles missingFiles);
     void removeAsset(AssetId id);
+    bool saveMaterial(const AssetInfo &info, const MaterialData &materialData);
 
     UUID getAssetId(path_t path) override;
     std::unordered_set<path_t> getAssetPaths(AssetId id) override;

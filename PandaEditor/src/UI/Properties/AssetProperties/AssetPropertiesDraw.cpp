@@ -77,7 +77,6 @@ void AssetPropertiesDraw::drawProperties(AssetId assetId) {
             Fonts::pushFont("Bold");
             ImGui::Text("Material %s", name.c_str());
             Fonts::popFont();
-            bool changed = false;
             path_t shaderPath;
             if (meta.shader) {
                 AssetInfo shaderInfo = assetHandler->getInfo(meta.shader);
@@ -85,18 +84,20 @@ void AssetPropertiesDraw::drawProperties(AssetId assetId) {
                 shaderPath = assetHandler->getProjectPath() / shaderMeta.fragmentCodePath;
             }
             AssetRef<Asset> asset = AssetRef<Asset>(meta.shader);
-            if (propertyShader("Shader", shaderPath, asset, false)) {
-                meta.shader = asset.getId();
-                changed = true;
-            }
             if (assetHandler->isLoaded(assetId)) {
                 AssetRef<MaterialAsset> material = assetHandler->makeRef<MaterialAsset>(assetId);
+                if (propertyShader("Shader", shaderPath, asset, false)) {
+                    meta.shader = asset.getId();
+                    info.meta = meta;
+                    assetHandler->updateInfo(assetId, info);
+                }
+                bool fieldsChanged = false;
                 MaterialData &materialData = material->getInputs();
                 for (auto &input : materialData.inputs) {
                     switch (input.type) {
                         case MaterialFieldType::FLOAT: {
                             float value = std::get<float>(input.value);
-                            dragFloat(input.name.c_str(), &value, 0.005f);
+                            fieldsChanged |= dragFloat(input.name.c_str(), &value, 0.005f);
                             input.value = value;
                             break;
                         }
@@ -108,14 +109,18 @@ void AssetPropertiesDraw::drawProperties(AssetId assetId) {
                         }
                     }
                 }
+                if (fieldsChanged) { material->setChanged(true); }
+                if (material->isChanged()) {
+                    if (ImGui::Button("Save")) {
+                        if (assetHandler->saveMaterial(info, materialData)) {
+                            material->setChanged(false);
+                        }
+                    }
+                }
             } else {
                 ImGui::Text(
                     "Asset is not loaded. Editing fields is available only for loaded assets."
                 );
-            }
-            if (changed) {
-                info.meta = meta;
-                assetHandler->updateInfo(assetId, info);
             }
             break;
         }

@@ -84,6 +84,14 @@ void MaterialAsset::updateFields() {
     }
 }
 
+void MaterialAsset::setChanged(bool value) {
+    m_isChanged = value;
+}
+
+bool MaterialAsset::isChanged() {
+    return m_isChanged;
+}
+
 #endif
 
 } // namespace Panda

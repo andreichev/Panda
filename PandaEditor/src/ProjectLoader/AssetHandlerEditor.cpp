@@ -76,33 +76,41 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
                 LOG_INFO(
                     "CREATED SHADER %u. VERT: %s, FRAG: %s",
                     id,
-                    vertPath.string().c_str(),
-                    fragPath.string().c_str()
+                    meta.vertexCodePath.string().c_str(),
+                    meta.fragmentCodePath.string().c_str()
                 );
                 LOG_INFO_EDITOR(
                     "CREATED SHADER %u. VERT: %s, FRAG: %s",
                     id,
-                    vertPath.string().c_str(),
-                    fragPath.string().c_str()
+                    meta.vertexCodePath.string().c_str(),
+                    meta.fragmentCodePath.string().c_str()
                 );
                 removeMissingFiles(id);
             } else {
                 asset = F_NEW(m_allocator, ShaderAsset)();
                 if (!vertExists) {
                     LOG_ERROR(
-                        "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, vertPath.string().c_str()
+                        "SHADER ASSET %u NOT FOUND AT PATH %s: ",
+                        id,
+                        meta.vertexCodePath.string().c_str()
                     );
                     LOG_ERROR_EDITOR(
-                        "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, vertPath.string().c_str()
+                        "SHADER ASSET %u NOT FOUND AT PATH %s: ",
+                        id,
+                        meta.fragmentCodePath.string().c_str()
                     );
                     addMissingFile(id, 0, meta.vertexCodePath);
                 }
                 if (!fragExists) {
                     LOG_ERROR(
-                        "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, fragPath.string().c_str()
+                        "SHADER ASSET %u NOT FOUND AT PATH %s: ",
+                        id,
+                        meta.vertexCodePath.string().c_str()
                     );
                     LOG_ERROR_EDITOR(
-                        "SHADER ASSET %u NOT FOUND AT PATH %s: ", id, fragPath.string().c_str()
+                        "SHADER ASSET %u NOT FOUND AT PATH %s: ",
+                        id,
+                        meta.fragmentCodePath.string().c_str()
                     );
                     addMissingFile(id, 1, meta.fragmentCodePath);
                 }
@@ -453,6 +461,29 @@ void AssetHandlerEditor::removeAsset(AssetId id) {
     m_registry.erase(id);
     m_missingFiles.erase(id);
     saveAssetRegistry();
+}
+
+bool AssetHandlerEditor::saveMaterial(const AssetInfo &info, const MaterialData &materialData) {
+    auto meta = std::get<MaterialAssetMeta>(info.meta);
+    MaterialDataDto dataDto;
+    AssetsMapper::toDto(materialData, dataDto);
+    std::ofstream file(m_projectPath / meta.materialPath);
+    if (file.is_open()) {
+        Rain::Encoder *encoder = &m_jsonEncoder;
+        encoder->encode(file, dataDto);
+        file.close();
+        LOG_INFO("SAVED MATERIAL %u AT PATH %s", info.id, meta.materialPath.string().c_str());
+        LOG_INFO_EDITOR(
+            "SAVED MATERIAL %u AT PATH %s", info.id, meta.materialPath.string().c_str()
+        );
+        return true;
+    } else {
+        LOG_ERROR("MATERIAL %u FILE %s SAVING ERROR", info.id, meta.materialPath.string().c_str());
+        LOG_ERROR_EDITOR(
+            "MATERIAL %u FILE %s SAVING ERROR", info.id, meta.materialPath.string().c_str()
+        );
+        return false;
+    }
 }
 
 std::string AssetHandlerEditor::getAssetName(const AssetInfo &info) {

@@ -38,9 +38,14 @@ public:
 #ifdef PND_EDITOR
     MaterialData &getInputs();
     void updateFields();
+    void setChanged(bool value);
+    bool isChanged();
 #endif
 
 private:
+#ifdef PND_EDITOR
+    bool m_isChanged = false;
+#endif
     MaterialData m_data;
     AssetRef<ShaderAsset> m_shaderRef;
 };
