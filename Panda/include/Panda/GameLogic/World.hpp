@@ -9,9 +9,6 @@
 #include "Panda/Renderer/Renderer3D.hpp"
 #include "Panda/WorldCommands/WorldCommandManager.hpp"
 #include "Panda/Physics/Physics2D.hpp"
-#ifdef PND_EDITOR
-#    include "Panda/GameLogic/SelectionContext.hpp"
-#endif
 
 #include <Miren/Miren.hpp>
 
@@ -37,6 +34,7 @@ public:
     bool isEmpty();
     Entity findByTag(const char *tag);
     Entity getById(UUID id);
+    std::unordered_set<Entity> getById(std::unordered_set<UUID> ids);
     inline bool isRunning() {
         return m_isRunning;
     }
@@ -46,8 +44,6 @@ public:
     Renderer3D &getRenderer3D() {
         return m_renderer3d;
     }
-    void setViewId(Miren::ViewId id);
-    void setSelectionViewId(Miren::ViewId id);
     glm::mat4 getWorldSpaceTransformMatrix(Entity entity);
     void convertToWorldSpace(Entity entity);
     void convertToLocalSpace(Entity entity);
@@ -69,9 +65,6 @@ public:
     inline WorldCommandManager &getCommandManger() {
         return m_commandManager;
     }
-    inline SelectionContext &getSelectionContext() {
-        return m_selectionContext;
-    }
     bool isChanged();
     bool needToDestroy(Entity entity);
     bool isDeleted(entt::entity handle);
@@ -87,10 +80,8 @@ private:
     void debugPrint();
     bool m_isChanged;
     WorldCommandManager m_commandManager;
-    SelectionContext m_selectionContext;
 #endif
 
-    void releaseAllScriptingFields();
     void renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx);
     void renderSelectedGeometry(glm::mat4 &viewProjMtx);
     Entity instantiateEntity(UUID id);
@@ -104,8 +95,6 @@ private:
     Physics2D m_physics2D;
     Renderer2D m_renderer2d;
     Renderer3D m_renderer3d;
-    Miren::ViewId m_renderingViewId;
-    Miren::ViewId m_selectionViewId;
 
     friend class Entity;
     friend class WorldHierarchyPanel;

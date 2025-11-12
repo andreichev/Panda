@@ -9,7 +9,7 @@
 #include "Components/BlocksCreation.hpp"
 #include "Components/FullScreenToggle.hpp"
 #include "Components/UI/RootView.hpp"
-#include "Panda/GameLogic/Components/SkyComponent.hpp"
+#include "Panda/Assets/StaticResources.hpp"
 
 #include <Panda.hpp>
 #include <Fern/Events/KeyEvents.hpp>
@@ -17,29 +17,26 @@
 #include <PandaUI/PandaUI.hpp>
 #include <Miren/Miren.hpp>
 
-BaseLayer::~BaseLayer() {
-    Miren::deleteProgram(m_groundShader);
-    Miren::deleteTexture(m_blocksTileTexture);
-}
-
 BaseLayer::BaseLayer(Fern::Window *window)
     : m_window(window)
     , m_blocksCreation(&m_transform)
-    , m_cameraMove(&m_transform) {}
+    , m_cameraMove(&m_transform)
+    , m_groundShader() {}
 
 void BaseLayer::onAttach() {
     Miren::setViewClear(0, 0x3D75C9FF);
-    Foundation::Memory vertexMem =
-        Panda::AssetImporterBase::loadData("shaders/ground/ground_vertex.glsl");
-    Foundation::Memory fragmentMem =
-        Panda::AssetImporterBase::loadData("shaders/ground/ground_fragment.glsl");
-    m_groundShader = Miren::createProgram({vertexMem, fragmentMem});
+    Panda::StaticResources::initStaticResources();
+    Panda::AssetHandler *assetHandler = Panda::GameContext::getAssetHandler();
+    m_groundShader = assetHandler->createStaticAsset<Panda::ShaderAsset>(
+        UUID(), "shaders/ground/ground.vert", "shaders/ground/ground.frag"
+    );
     Miren::TextureCreate textureCreate =
         Panda::AssetImporterBase::load2DTexture("textures/BlocksTile.png");
     textureCreate.m_numMips = 4;
     textureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
     textureCreate.m_magFiltering = Miren::NEAREST;
-    m_blocksTileTexture = Miren::createTexture(textureCreate);
+    m_blocksTileTexture =
+        assetHandler->createStaticAsset<Panda::TextureAsset>(UUID(), textureCreate);
     Miren::VertexLayoutHandle layoutHandle =
         Miren::createVertexLayout(Vertex::createBufferLayout());
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
@@ -48,13 +45,20 @@ void BaseLayer::onAttach() {
                 Panda::MeshData meshData = VoxelMeshGenerator::makeOneChunkMesh(
                     layoutHandle, m_chunksStorage, indexX, indexY, indexZ, true
                 );
-                Panda::DynamicMeshAsset &dynamicMesh =
+                Panda::AssetRef<Panda::MeshAsset> dynamicMesh =
                     m_chunksStorage
                         .chunks
                             [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
                              indexX * ChunksStorage::SIZE_X + indexZ]
                         .getMesh();
-                dynamicMesh.create(meshData, {{"texture1", m_blocksTileTexture}}, m_groundShader);
+                Panda::MaterialData materialData;
+                materialData.inputs = {Panda::MaterialField(
+                    "texture1", Panda::MaterialFieldType::TEXTURE, m_blocksTileTexture.getId()
+                )};
+                auto material = assetHandler->createStaticAsset<Panda::MaterialAsset>(
+                    UUID(), materialData, m_groundShader
+                );
+                dynamicMesh->create(meshData, material);
             }
         }
     }
@@ -88,7 +92,9 @@ void BaseLayer::onAttach() {
     LOG_INFO("GAME INITIALIZED!");
 }
 
-void BaseLayer::onDetach() {}
+void BaseLayer::onDetach() {
+    Panda::StaticResources::deinitStaticResources();
+}
 
 void BaseLayer::onUpdate(double deltaTime) {
     m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, 0);
@@ -106,20 +112,23 @@ void BaseLayer::onUpdate(double deltaTime) {
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
 
-    m_skyComponent.update(skyViewProjMtx);
+    Panda::AssetRef<Panda::MeshAsset> skyMesh = Panda::StaticResources::defaultSkyMesh;
+    m_renderer3d.submitSky(skyViewProjMtx, skyMesh);
+
     m_blocksCreation.update(deltaTime);
     m_cameraMove.update(deltaTime);
 
     for (int indexX = 0; indexX < ChunksStorage::SIZE_X; indexX++) {
         for (int indexY = 0; indexY < ChunksStorage::SIZE_Y; indexY++) {
             for (int indexZ = 0; indexZ < ChunksStorage::SIZE_Z; indexZ++) {
-                auto &mesh = m_chunksStorage
-                                 .chunks
-                                     [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
-                                      indexX * ChunksStorage::SIZE_X + indexZ]
-                                 .getMesh();
+                Panda::AssetRef<Panda::MeshAsset> mesh =
+                    m_chunksStorage
+                        .chunks
+                            [indexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
+                             indexX * ChunksStorage::SIZE_X + indexZ]
+                        .getMesh();
                 glm::mat4 transform(1.f);
-                m_renderer3d.submit(transform, &mesh);
+                m_renderer3d.submit(transform, mesh);
             }
         }
     }

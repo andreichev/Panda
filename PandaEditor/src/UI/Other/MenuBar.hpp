@@ -19,6 +19,7 @@ public:
     virtual void menuBarOpenProject(const RecentProject &project) = 0;
     virtual void menuBarSaveWorld() = 0;
     virtual void menuBarOpenCppProject() = 0;
+    virtual void menuBarShowCppProject() = 0;
     virtual void menuBarCloseProject() = 0;
     virtual void menuBarCloseApp() = 0;
     virtual bool menuBarCanUndo() = 0;

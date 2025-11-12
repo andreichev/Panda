@@ -11,8 +11,28 @@ ParticlesEmitter::ParticlesEmitter(
 )
     : m_cameraTransform(transform)
     , m_camera(camera)
-    , m_renderer2D(renderer2D) {
-    m_texture = Foundation::makeShared<Panda::TextureAsset>("textures/arbuz1.png");
+    , m_renderer2D(renderer2D)
+    , m_material() {}
+
+void ParticlesEmitter::initializeMaterial() {
+    Panda::AssetHandler *assetHandler = Panda::GameContext::getAssetHandler();
+
+    Miren::TextureCreate textureCreate =
+        Panda::AssetImporterBase::load2DTexture("textures/arbuz1.png");
+    textureCreate.m_numMips = 4;
+    textureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
+    textureCreate.m_magFiltering = Miren::NEAREST;
+    Panda::AssetRef<Panda::TextureAsset> texture =
+        assetHandler->createStaticAsset<Panda::TextureAsset>(UUID(), textureCreate);
+    ;
+    Panda::AssetRef<Panda::ShaderAsset> shader =
+        assetHandler->createStaticAsset<Panda::ShaderAsset>(UUID(), "default-shaders/default.frag");
+    Panda::MaterialData materialData;
+    materialData.inputs = {
+        Panda::MaterialField("albedo", Panda::MaterialFieldType::TEXTURE, texture.getId())
+    };
+    m_material =
+        assetHandler->createStaticAsset<Panda::MaterialAsset>(UUID(), materialData, shader);
 }
 
 void ParticlesEmitter::update(double deltaTime) {
@@ -24,7 +44,7 @@ void ParticlesEmitter::update(double deltaTime) {
     rect1.center = Panda::Vec3(0.3f, -0.5f, 0.f);
     rect1.size = Panda::Size(0.4f, 0.4f);
     rect1.rotation = degree;
-    rect1.texture = m_texture;
+    rect1.material = m_material;
     m_renderer2D->drawRect(rect1);
 
     Panda::Renderer2D::RectData rect2;

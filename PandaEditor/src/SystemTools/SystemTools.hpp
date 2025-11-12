@@ -7,7 +7,7 @@ namespace Panda {
 
 class SystemTools {
 public:
-    static std::optional<path_t> openFileDialog(const char *filter = "All\0*.*\0");
+    static std::optional<path_t> openFileDialog();
     static std::optional<path_t> openFolderDialog(const char *initialFolder = "");
     static std::optional<path_t> saveFileDialog(
         const char *filter = "All\0*.*\0",

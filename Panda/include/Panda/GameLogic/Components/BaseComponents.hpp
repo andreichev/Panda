@@ -5,14 +5,11 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-
-#include "Panda/Assets/StaticMeshAsset.hpp"
-#include "Panda/Assets/DynamicMeshAsset.hpp"
+#include "Panda/Assets/MeshAsset.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
 #include "Panda/ScriptEngine/ExternalScript.hpp"
 
 #include <Foundation/Foundation.hpp>
-#include <Rain/Rain.hpp>
 
 namespace Panda {
 
@@ -76,28 +73,18 @@ struct SpriteRendererComponent final {
     int cols = 1;
     int rows = 1;
     int index = 0;
-    UUID textureId = 0;
+    AssetRef<Asset> material;
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const SpriteRendererComponent &other) = default;
-
-    // Cache
-    Foundation::Shared<Asset> asset;
-    void resetCache() {
-        asset = nullptr;
-    }
 };
 
-struct StaticMeshComponent final {
-    std::vector<StaticMeshAsset> meshes;
-};
+struct MeshComponent final {
+    AssetRef<MeshAsset> mesh;
 
-struct DynamicMeshComponent final {
-    std::vector<DynamicMeshAsset> meshes;
-
-    DynamicMeshComponent() = default;
-    DynamicMeshComponent(const DynamicMeshComponent &other) = default;
-    DynamicMeshComponent &operator=(DynamicMeshComponent &other) = default;
+    MeshComponent() = default;
+    MeshComponent(const MeshComponent &other) = default;
+    MeshComponent &operator=(MeshComponent &other) = default;
 };
 
 struct CameraComponent final {
@@ -110,14 +97,6 @@ struct ScriptListComponent final {
 
     void add(ExternalScript script) {
         scripts.emplace_back(script);
-    }
-
-    void releaseFields() {
-        for (ExternalScript &script : scripts) {
-            for (ScriptField &field : script.getFields()) {
-                field.value.release();
-            }
-        }
     }
 
     void remove(ExternalScript script) {
@@ -142,6 +121,11 @@ struct BoxCollider2DComponent final {
 
     // Storage for runtime
     uint8_t runtimeData[8];
+};
+
+struct SkyComponent final {
+    // TODO: Add sky parameters.
+    AssetRef<Asset> material;
 };
 
 } // namespace Panda

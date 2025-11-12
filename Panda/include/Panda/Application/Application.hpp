@@ -22,6 +22,7 @@ public:
     ImGuiLayer *getImGuiLayer();
     Fern::Window *getMainWindow();
     void close();
+    float getTime();
     static Application *get();
 
     int fps;
@@ -29,6 +30,9 @@ public:
 private:
     bool m_isApplicationShouldClose;
     uint64_t m_timeMillis;
+    uint64_t m_startTimeMillis;
+    // Вспомогательное значение для игры
+    float m_gameTime;
     // Таймер до 1 секундны для подсчета FPS (в миллисекундах)
     uint64_t m_oneSecondTimeCount;
     // Время после отрисовки предыдущего кадра

@@ -10,6 +10,8 @@
 #include "UI/Console/ConsolePanel.hpp"
 #include "UI/Toolbar/Toolbar.hpp"
 #include "UI/ContentBrowser/ContentBrowser.hpp"
+#include "UI/Properties/PropertiesPanel.hpp"
+#include "UI/AssetManager/AssetManagerPanel.hpp"
 
 namespace Panda {
 
@@ -19,7 +21,9 @@ class ProjectLoader;
 
 class PanelsContainer final {
 public:
-    PanelsContainer(EditorLayer *layer, CameraController *cameraController);
+    PanelsContainer(
+        EditorLayer *layer, ProjectLoader *projectLoader, CameraController *cameraController
+    );
     void onImGuiRender(bool isViewportFullScreen, SceneState sceneState);
     void setCurrentWorld(World *world);
 
@@ -31,6 +35,8 @@ public:
     ConsolePanel consolePanel;
     WorldHierarchyPanel hierarchyPanel;
     ContentBrowser contentBrowser;
+    PropertiesPanel propertiesPanel;
+    AssetManagerPanel assetManagerPanel;
 };
 
 } // namespace Panda

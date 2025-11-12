@@ -2,7 +2,9 @@
 
 #include "Camera/CameraController.hpp"
 
+#include <Panda/Renderer/MirenViewDistribution.hpp>
 #include <Panda/Assets/Base/AssetHandler.hpp>
+#include <Panda/Renderer/Std140Buffer.hpp>
 #include <glm/glm.hpp>
 #include <Miren/Miren.hpp>
 
@@ -11,14 +13,12 @@ namespace Panda {
 class SceneGrid final {
 public:
     SceneGrid(SceneGrid &other)
-        : m_cameraController(other.m_cameraController)
-        , m_sceneViewId(other.m_sceneViewId) {
+        : m_cameraController(other.m_cameraController) {
         initResources();
     }
 
     SceneGrid(CameraController *cameraController)
-        : m_cameraController(cameraController)
-        , m_sceneViewId(0) {
+        : m_cameraController(cameraController) {
         initResources();
     }
 
@@ -27,7 +27,6 @@ public:
     }
 
     SceneGrid &operator=(SceneGrid &other) {
-        m_sceneViewId = other.m_sceneViewId;
         m_cameraController = other.m_cameraController;
         initResources();
         return *this;
@@ -60,9 +59,9 @@ public:
         m_indexBuffer =
             Miren::createIndexBuffer(indicesMemory, Miren::BufferElementType::UnsignedInt, 6);
         Foundation::Memory vertexMem =
-            Panda::AssetImporterBase::loadData("editor-shaders/grid_vertex.glsl");
+            Panda::AssetImporterBase::loadData("editor-shaders/grid.vert");
         Foundation::Memory fragmentMem =
-            Panda::AssetImporterBase::loadData("editor-shaders/grid_fragment.glsl");
+            Panda::AssetImporterBase::loadData("editor-shaders/grid.frag");
         m_shader = Miren::createProgram({vertexMem, fragmentMem});
     }
 
@@ -70,23 +69,24 @@ public:
         m_viewProjection = viewProjection;
         Miren::setShader(m_shader);
         glm::vec4 pos = glm::vec4(m_cameraController->getPosition(), 1.0);
-        Miren::setUniform(m_shader, "gCameraWorldPos", &pos, Miren::UniformType::Vec4);
-        Miren::setUniform(
-            m_shader, "projViewMtx", &m_viewProjection[0][0], Miren::UniformType::Mat4
-        );
+        Std140Buffer ubo1;
+        // gCameraWorldPos
+        ubo1.addVec4(pos.x, pos.y, pos.z, pos.w);
+        // projViewMtx
+        ubo1.addMat4(&m_viewProjection[0][0]);
+        Miren::addInputUniformBuffer(m_shader, "UBO1", ubo1.getData(), ubo1.getSize());
+        Std140Buffer ubo2;
+        // gCameraWorldPos
+        ubo2.addVec4(pos.x, pos.y, pos.z, pos.w);
+        Miren::addInputUniformBuffer(m_shader, "UBO2", ubo2.getData(), ubo2.getSize());
         Miren::setVertexBuffer(m_vertexBuffer);
         Miren::setIndexBuffer(m_indexBuffer, 0, 6);
         Miren::setState(MIREN_STATE_DEPTH_TEST);
-        Miren::submit(m_sceneViewId);
-    }
-
-    void setViewId(Miren::ViewId viewId) {
-        m_sceneViewId = viewId;
+        Miren::submit(Views::SCENE_VIEW);
     }
 
 private:
     glm::mat4 m_viewProjection;
-    Miren::ViewId m_sceneViewId;
 
     Miren::ProgramHandle m_shader;
     Miren::IndexBufferHandle m_indexBuffer;

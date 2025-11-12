@@ -22,7 +22,7 @@ void BlocksCreation::updateChunk(int chunkIndexX, int chunkIndexY, int chunkInde
             [chunkIndexY * ChunksStorage::SIZE_X * ChunksStorage::SIZE_Z +
              chunkIndexX * ChunksStorage::SIZE_X + chunkIndexZ]
         .getMesh()
-        .update(data);
+        ->update(data);
 }
 
 void BlocksCreation::setVoxel(int x, int y, int z, VoxelType type) {

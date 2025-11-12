@@ -107,6 +107,10 @@ struct Color {
         b = (_b) / 255.f;
         a = (_a) / 255.f;
     }
+
+    operator glm::vec4() {
+        return {r, g, b, a};
+    }
 };
 
 struct EdgeInsets {

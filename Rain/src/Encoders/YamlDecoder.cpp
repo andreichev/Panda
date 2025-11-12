@@ -20,6 +20,15 @@ bool YamlDecoder::decode(std::istream &istream, void *data, TypeInfo info) {
     return true;
 }
 
+std::vector<std::string> YamlDecoder::getMemberKeys() {
+    std::vector<std::string> result;
+    const YAML::Node &object = currentObject();
+    for (auto &member : object) {
+        result.emplace_back(member.first.as<std::string>());
+    }
+    return result;
+}
+
 bool YamlDecoder::beginObject(const char *key) {
     if (m_isArray) {
         // std::cout << "BEGIN OBJECT IN ARRAY" << std::endl;

@@ -7,7 +7,7 @@ namespace Panda {
 
 static const char *PANDA_DRAGDROP_NAME = "PANDA_DRAGDROP";
 
-enum class DragDropItemType { TEXTURE, ENTITY };
+enum class DragDropItemType { TEXTURE, ENTITY, SHADER, MATERIAL };
 
 struct DragDropItem {
     DragDropItemType type;

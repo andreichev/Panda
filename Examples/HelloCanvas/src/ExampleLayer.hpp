@@ -6,6 +6,7 @@
 
 #include "OrthographicCameraMove.hpp"
 #include "ParticlesEmitter.hpp"
+#include "GameAssetHandler.hpp"
 
 #include <Panda.hpp>
 

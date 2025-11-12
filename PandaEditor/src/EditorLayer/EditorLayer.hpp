@@ -17,6 +17,7 @@ class EditorLayer : public Layer,
                     public ProjectLoaderOutput,
                     public MenuBarOutput,
                     public ComponentsDrawOutput,
+                    public AssetPropertiesDrawOutput,
                     public ContentBrowserOutput,
                     public ToolbarOutput {
 public:
@@ -54,6 +55,7 @@ public:
     const path_t &menuBarGetOpenedProjectPath() override;
     void menuBarCloseApp() override;
     void menuBarOpenCppProject() override;
+    void menuBarShowCppProject() override;
     void menuBarSaveWorld() override;
     void menuBarCloseProject() override;
     void menuBarAbout() override;
@@ -63,11 +65,13 @@ public:
     void addScriptToEntities(const std::unordered_set<Entity> &entities) override;
 #pragma endregion
 
+#pragma region Asset properties draw output
+    void locateMissingAsset(AssetId id) override;
+#pragma endregion
+
 #pragma region Content browser output
     void showCreateFolderPopup() override;
     void deleteFileShowPopup(path_t path) override;
-    void importAsset(const path_t &path) override;
-    UUID getAssetId(const path_t &path) override;
 #pragma endregion
 
 #pragma region Toolbar output

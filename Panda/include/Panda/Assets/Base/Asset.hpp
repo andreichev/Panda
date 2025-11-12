@@ -7,12 +7,7 @@
 
 namespace Panda {
 
-enum class AssetType {
-    NONE = 0,
-    TEXTURE,
-    CUBE_MAP,
-    PROGRAM,
-};
+enum class AssetType { NONE = 0, TEXTURE, CUBE_MAP, SHADER, MATERIAL, MESH };
 
 using AssetId = UUID;
 

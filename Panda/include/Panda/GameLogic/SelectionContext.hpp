@@ -1,138 +1,212 @@
 #pragma once
 
-#include "Entity.hpp"
+#ifdef PND_EDITOR
 
-#include <unordered_set>
+#    include "Entity.hpp"
+#    include "World.hpp"
+
+#    include <unordered_set>
 
 namespace Panda {
 
 class SelectionContext final {
 public:
-    SelectionContext() {
-        unselectAll();
+    SelectionContext() = delete;
+
+    static std::unordered_set<UUID> getSelectedEntities() {
+        return s_selectedEntities;
     }
 
-    std::unordered_set<Entity> getSelectedEntities() {
-        return m_selectedEntities;
+    static std::unordered_set<path_t> getSelectedFiles() {
+        return s_selectedFiles;
     }
 
-    std::unordered_set<Entity> getManipulatingEntities() {
-        return m_manipulatingEntities;
+    static std::unordered_set<UUID> getManipulatingEntities() {
+        return s_manipulatingEntities;
     }
 
-    bool isSelected(Entity entity) {
-        return m_selectedEntities.contains(entity);
+    static bool isEntitySelected(UUID id) {
+        return s_selectedEntities.contains(id);
     }
 
-    void addSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
-        if (isSelected(entity)) { return; }
-        m_selectedEntities.insert(entity);
-        for (auto childId : entity.getChildEntities()) {}
+    static bool isFileSelected(const path_t &path) {
+        return s_selectedFiles.contains(path);
+    }
+
+    static bool isAssetSelected(AssetId assetId) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        PND_ASSERT(assetHandler != nullptr, "ASSET HANDLER IS NOT INITIALIZED");
+        if (assetId) {
+            std::unordered_set<path_t> assetPaths = assetHandler->getAssetPaths(assetId);
+            for (auto &assetPath : assetPaths) {
+                if (s_selectedFiles.contains(assetPath)) { return true; }
+            }
+        }
+        return false;
+    }
+
+    static void addSelectedFile(const path_t &path) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        PND_ASSERT(assetHandler != nullptr, "ASSET HANDLER IS NOT INITIALIZED");
+        AssetId assetId = assetHandler->getAssetId(path);
+        if (assetId && !isAssetSelected(assetId)) { s_selectedAssetsCount++; }
+        s_selectedFiles.emplace(path);
+    }
+
+    static void addSelectedFiles(const std::unordered_set<path_t> &paths) {
+        for (auto &path : paths) {
+            addSelectedFile(path);
+        }
+    }
+
+    static void addSelectedEntity(UUID id, bool needToCalculateMedian = true) {
+        if (isEntitySelected(id)) { return; }
+        s_selectedEntities.insert(id);
+        World *world = GameContext::getCurrentWorld();
+        if (!world) { return; }
+        Entity entity = world->getById(id);
         //  Далее избегаем того, что при перемещении родителя трансформация будет применяться и к
         //  детям.
-        std::unordered_set<Entity> manipulating;
-        for (auto item : m_manipulatingEntities) {
-            if (entity.isDescendantOf(item)) {
+        std::unordered_set<UUID> manipulating;
+        for (auto manipulatingId : s_manipulatingEntities) {
+            Entity manipulatingEntity = world->getById(manipulatingId);
+            if (entity.isDescendantOf(manipulatingEntity)) {
                 // Если выбранный элемент находится в иерархии уже выбранных - ничего не делаем.
                 return;
-            } else if (entity.isAncestorOf(item)) {
+            } else if (entity.isAncestorOf(manipulatingEntity)) {
                 // Если выбранный элемент является родителем - теперь он будет манипулировать.
                 continue;
             }
-            manipulating.insert(item);
+            manipulating.insert(manipulatingId);
         }
-        manipulating.insert(entity);
-        m_manipulatingEntities = manipulating;
+        manipulating.insert(id);
+        s_manipulatingEntities = manipulating;
         if (needToCalculateMedian) { updateValues(); }
     }
 
-    void addSelectedEntities(const std::unordered_set<Entity> &entities) {
-        for (auto entity : entities) {
-            addSelectedEntity(entity, false);
+    static void addSelectedEntities(const std::unordered_set<UUID> &ids) {
+        for (auto id : ids) {
+            addSelectedEntity(id, false);
         }
         updateValues();
     }
 
-    void removeSelectedEntity(Entity entity, bool needToCalculateMedian = true) {
-        m_selectedEntities.erase(entity);
-        m_manipulatingEntities.erase(entity);
+    static void removeSelectedAsset(UUID assetId) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        PND_ASSERT(assetHandler != nullptr, "ASSET HANDLER IS NOT INITIALIZED");
+        bool wasSelected = false;
+        if (assetId) {
+            std::unordered_set<path_t> assetPaths = assetHandler->getAssetPaths(assetId);
+            for (auto &assetPath : assetPaths) {
+                wasSelected |= s_selectedFiles.erase(assetPath);
+            }
+        }
+        if (wasSelected) { s_selectedAssetsCount--; }
+    }
+
+    static void removeSelectedEntity(UUID id, bool needToCalculateMedian = true) {
+        s_selectedEntities.erase(id);
+        s_manipulatingEntities.erase(id);
         if (needToCalculateMedian) { updateValues(); }
     }
 
-    void removeSelectedEntities(const std::vector<Entity> &entities) {
-        for (auto entity : entities) {
-            removeSelectedEntity(entity, false);
+    static void removeSelectedEntities(const std::unordered_set<UUID> &ids) {
+        for (auto id : ids) {
+            removeSelectedEntity(id, false);
         }
         updateValues();
     }
 
-    void unselectAll() {
-        m_selectedEntities.clear();
-        m_manipulatingEntities.clear();
+    static void unselectAll() {
+        s_selectedAssetsCount = 0;
+        s_selectedFiles.clear();
+        s_selectedEntities.clear();
+        s_manipulatingEntities.clear();
         resetValues();
     }
 
-    int selectedCount() {
-        return m_selectedEntities.size();
+    static void unselectAllFiles() {
+        s_selectedAssetsCount = 0;
+        s_selectedFiles.clear();
     }
 
-    bool empty() {
-        return m_selectedEntities.empty();
+    static int selectedFilesCount() {
+        return s_selectedFiles.size();
     }
 
-    glm::mat4 getMedianMatrix() {
-        return m_medianMatrix;
+    static int selectedAssetsCount() {
+        return s_selectedAssetsCount;
     }
 
-    glm::vec3 getMedianPosition() {
-        return m_medianPosition;
+    static int selectedEntitiesCount() {
+        return s_selectedEntities.size();
     }
 
-    void resetValues() {
-        m_medianPosition = glm::vec3(0.0f);
-        m_medianScale = glm::vec3(1.0f);
-        m_medianRotation = glm::quat();
-        m_medianMatrix = glm::mat4(1.f);
+    static bool isEmpty() {
+        return s_selectedEntities.empty();
     }
 
-    void updateValues() {
+    static glm::mat4 getMedianMatrix() {
+        return s_medianMatrix;
+    }
+
+    static glm::vec3 getMedianPosition() {
+        return s_medianPosition;
+    }
+
+    static void resetValues() {
+        s_medianPosition = glm::vec3(0.0f);
+        s_medianScale = glm::vec3(1.0f);
+        s_medianRotation = glm::quat();
+        s_medianMatrix = glm::mat4(1.f);
+    }
+
+    static void updateValues() {
         resetValues();
-        if (m_selectedEntities.empty()) { return; }
-        auto it = m_selectedEntities.begin();
-        Entity entity = *it;
+        if (s_selectedEntities.empty()) { return; }
+        World *world = GameContext::getCurrentWorld();
+        if (!world) { return; }
+        auto it = s_selectedEntities.begin();
+        UUID id = *it;
+        Entity entity = world->getById(id);
         auto transformComponent = entity.calculateWorldSpaceTransform();
-        m_medianPosition = transformComponent.getPosition();
-        m_medianScale = transformComponent.getScale();
-        m_medianRotation = transformComponent.getRotation();
+        s_medianPosition = transformComponent.getPosition();
+        s_medianScale = transformComponent.getScale();
+        s_medianRotation = transformComponent.getRotation();
         ++it;
-        while (it != m_selectedEntities.end()) {
-            entity = *it;
+        while (it != s_selectedEntities.end()) {
+            id = *it;
+            entity = world->getById(id);
             transformComponent = entity.calculateWorldSpaceTransform();
             // auto transformComponent = entity.getTransform();
-            m_medianPosition += transformComponent.getPosition();
-            m_medianScale += transformComponent.getScale();
-            m_medianRotation = glm::slerp(m_medianRotation, transformComponent.getRotation(), 0.5f);
-            // if (glm::dot(m_medianRotation, transformComponent.getRotation()) < 0.0f) {
-            //     m_medianRotation -= transformComponent.getRotation();
+            s_medianPosition += transformComponent.getPosition();
+            s_medianScale += transformComponent.getScale();
+            s_medianRotation = glm::slerp(s_medianRotation, transformComponent.getRotation(), 0.5f);
+            // if (glm::dot(s_medianRotation, transformComponent.getRotation()) < 0.0f) {
+            //     s_medianRotation -= transformComponent.getRotation();
             // } else {
-            //     m_medianRotation += transformComponent.getRotation();
+            //     s_medianRotation += transformComponent.getRotation();
             // }
-            m_medianRotation = glm::normalize(m_medianRotation);
+            s_medianRotation = glm::normalize(s_medianRotation);
             ++it;
         }
-        m_medianPosition /= m_selectedEntities.size();
-        m_medianScale /= m_selectedEntities.size();
-        m_medianMatrix = glm::translate(glm::mat4(1.0f), m_medianPosition) *
-                         glm::toMat4(m_medianRotation) * glm::scale(glm::mat4(1.0f), m_medianScale);
+        s_medianPosition /= s_selectedEntities.size();
+        s_medianScale /= s_selectedEntities.size();
+        s_medianMatrix = glm::translate(glm::mat4(1.0f), s_medianPosition) *
+                         glm::toMat4(s_medianRotation) * glm::scale(glm::mat4(1.0f), s_medianScale);
     }
 
 private:
-    std::unordered_set<Entity> m_selectedEntities;
-    std::unordered_set<Entity> m_manipulatingEntities;
-    glm::vec3 m_medianPosition;
-    glm::vec3 m_medianScale;
-    glm::quat m_medianRotation;
-    glm::mat4 m_medianMatrix;
+    static int s_selectedAssetsCount;
+    static std::unordered_set<path_t> s_selectedFiles;
+    static std::unordered_set<UUID> s_selectedEntities;
+    static std::unordered_set<UUID> s_manipulatingEntities;
+    static glm::vec3 s_medianPosition;
+    static glm::vec3 s_medianScale;
+    static glm::quat s_medianRotation;
+    static glm::mat4 s_medianMatrix;
 };
 
 } // namespace Panda
+
+#endif

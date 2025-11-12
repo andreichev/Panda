@@ -20,5 +20,4 @@
 #include "Panda/Renderer/Renderer3D.hpp"
 #include "Panda/Renderer/MeshData.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
-#include "Panda/Assets/DynamicMeshAsset.hpp"
-#include "Panda/Assets/StaticMeshAsset.hpp"
+#include "Panda/Assets/MeshAsset.hpp"

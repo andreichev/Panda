@@ -1,10 +1,11 @@
 #include "ProjectLoader.hpp"
 #include "Panda/Serialization/WorldMapper.hpp"
+#include "Panda/GameLogic/GameContext.hpp"
+#include "Panda/Assets/StaticResources.hpp"
+#include "AssetHandlerEditor.hpp"
 
 #include <fstream>
 #include <sstream>
-
-#include "Panda/GameLogic/GameContext.hpp"
 
 namespace Panda {
 
@@ -22,17 +23,18 @@ ProjectLoader::ProjectLoader(World *world, ProjectLoaderOutput *output)
     , m_projectSettings()
     , m_projectPath()
     , m_worldPath()
-    , m_assetHandler() {
-    GameContext::s_scriptEngine = &m_scriptEngine;
-    GameContext::s_assetHandler = &m_assetHandler;
+    , m_assetHandler(nullptr) {
+    GameContext::setScriptEngine(&m_scriptEngine);
+    m_assetHandler = static_cast<AssetHandlerEditor *>(GameContext::getAssetHandler());
+    StaticResources::initStaticResources();
 }
 
 ProjectLoader::~ProjectLoader() {
     saveAppSettings();
     saveProjectSettings();
-    m_assetHandler.closeProject();
-    GameContext::s_scriptEngine = nullptr;
-    GameContext::s_assetHandler = nullptr;
+    m_assetHandler->closeProject();
+    Panda::StaticResources::deinitStaticResources();
+    GameContext::setScriptEngine(nullptr);
 }
 
 void ProjectLoader::loadInitialData() {
@@ -107,9 +109,8 @@ void ProjectLoader::openProject(const path_t &path) {
         return;
     }
     // Load asset registry
-    { m_assetHandler.openProject(m_projectPath); }
-    m_worldPath = m_projectPath;
-    m_worldPath.append(m_projectSettings.worldPath);
+    { m_assetHandler->openProject(m_projectPath); }
+    m_worldPath = m_projectPath / m_projectSettings.worldPath;
     loadWorld();
     reloadScriptsDll();
     appendRecentProject();
@@ -142,6 +143,11 @@ void ProjectLoader::createProject(const std::string &name, const path_t &path) {
 void ProjectLoader::openCppProject() {
     std::string name = m_projectPath.filename().string();
     SystemTools::openCppProject(m_projectPath / "Scripts" / name);
+}
+
+void ProjectLoader::showCppProject() {
+    std::string name = m_projectPath.filename().string();
+    SystemTools::open(m_projectPath / "Scripts" / name);
 }
 
 void ProjectLoader::appendRecentProject() {
@@ -215,7 +221,7 @@ void ProjectLoader::saveWorldAs() {
 void ProjectLoader::closeProject() {
     saveAppSettings();
     saveProjectSettings();
-    m_assetHandler.closeProject();
+    m_assetHandler->closeProject();
     m_projectSettings.clear();
     m_worldPath.clear();
     m_projectPath.clear();
@@ -234,10 +240,6 @@ const ProjectSettings &ProjectLoader::getProjectSettings() {
 
 LastOpenedProjectWindowState ProjectLoader::getLastWindowState() {
     return m_editorSettings.windowState;
-}
-
-AssetHandlerEditor &ProjectLoader::getAssetHandler() {
-    return m_assetHandler;
 }
 
 void ProjectLoader::saveProjectSettings() {

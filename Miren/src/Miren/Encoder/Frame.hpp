@@ -7,7 +7,7 @@
 #include "Miren/Base.hpp"
 #include "Miren/HandleAllocator.hpp"
 #include "Miren/VertexBufferLayoutData.hpp"
-#include "Miren/Encoder/RenderDraw.hpp"
+#include "Miren/Encoder/RenderPass.hpp"
 #include "Miren/Encoder/View.hpp"
 
 #include <Foundation/CommandBuffer.hpp>
@@ -26,9 +26,13 @@ public:
     void setShader(ProgramHandle handle);
     void setVertexLayout(VertexLayoutHandle handle);
     void setScissorRect(Rect rect);
-    void
-    setUniform(ProgramHandle handle, const char *name, void *value, UniformType type, int count);
-    void setTexture(TextureHandle textureHandle, uint32_t slot);
+    void addInput(
+        ProgramHandle handle,
+        const char *name,
+        RenderPassInputType type,
+        const void *value,
+        size_t size
+    );
     void resetCurrentDrawCall();
     void submitCurrentDrawCall(ViewId id);
     void queueFree(FrameBufferHandle handle);
@@ -53,7 +57,7 @@ public:
     uint32_t m_transientVbSize;
     uint32_t m_transientIbSize;
     int m_drawCallsCount;
-    RenderDraw m_drawCalls[MAX_DRAW_CALLS];
+    RenderPass m_drawCalls[MAX_DRAW_CALLS];
     View m_views[MAX_VIEWS];
 
 private:

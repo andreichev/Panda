@@ -25,7 +25,7 @@ Context::Context()
     m_viewportSize = Size(window->getSize().width, window->getSize().height);
     m_camera.setViewportSize(m_viewportSize);
     // View matrix is identity
-    m_renderer2d.setViewProj(m_camera.getProjection());
+    m_renderer.setViewProj(m_camera.getProjection());
     // Make background view transparent
     if (m_rootView) { m_rootView->setBackgroundColor(Color(0x00000000)); }
     // YGConfigRef config = YGConfigNew();
@@ -34,9 +34,9 @@ Context::Context()
 
 void Context::update(double deltaTime) {
     if (m_rootView) {
-        m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_mirenViewId);
+        m_renderer.begin(m_mirenViewId);
         m_rootView->render(0, 0);
-        m_renderer2d.end();
+        m_renderer.end();
     }
 }
 
@@ -45,7 +45,7 @@ void Context::updateViewportSize(Size size) {
         m_viewportSize = size;
         m_camera.setViewportSize(size);
         // View matrix is identity
-        m_renderer2d.setViewProj(m_camera.getProjection());
+        m_renderer.setViewProj(m_camera.getProjection());
 
         // m_rootView->styleSetAbsolute();
         // m_rootView->styleSetOrigin({0, 0});

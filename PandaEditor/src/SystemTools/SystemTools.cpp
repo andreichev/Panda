@@ -24,8 +24,21 @@ std::optional<path_t> SystemTools::openFolderDialog(const char *initialFolder) {
     return res;
 }
 
-std::optional<path_t> SystemTools::openFileDialog(const char *filter) {
-    return {};
+std::optional<path_t> SystemTools::openFileDialog() {
+    NFD::Init();
+    nfdu8char_t *outPath;
+    nfdresult_t result = NFD::OpenDialog(outPath);
+    std::optional<std::filesystem::path> res;
+    if (result == NFD_OKAY) {
+        res = outPath;
+        NFD::FreePath(outPath);
+    } else if (result == NFD_CANCEL) {
+        LOG_INFO("User pressed cancel.");
+    } else {
+        LOG_ERROR("Error: %s", NFD::GetError());
+    }
+    NFD::Quit();
+    return res;
 }
 
 std::optional<path_t>
@@ -60,7 +73,7 @@ void SystemTools::copyFolder(const path_t &sourcePath, const path_t &newPath) {
 
 void SystemTools::open(const path_t &path) {
 #ifdef PLATFORM_POSIX
-    std::string command = "open " + path.string();
+    std::string command = "open -R " + path.string();
     system(command.c_str());
 #elif defined(PLATFORM_WINDOWS)
     std::string command = "start " + path.string();
@@ -89,8 +102,8 @@ void SystemTools::openCppProject(const Panda::path_t &path) {
             "/Applications/CLion.app/Contents/MacOS/clion \"" + path.string() + "\"";
         system(command.c_str());
     } else if (std::filesystem::exists("/Applications/Visual Studio Code.app")) {
-        std::string command =
-            "/Applications/Visual Studio Code.app/Contents/MacOS/clion \"" + path.string() + "\"";
+        std::string command = "/Applications/Visual Studio Code.app/Contents/MacOS/Electron \"" +
+                              path.string() + "\"";
         system(command.c_str());
     }
 #endif

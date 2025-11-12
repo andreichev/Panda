@@ -2,8 +2,8 @@
 #include "Panda/Application/Application.hpp"
 #include "Panda/GameLogic/Input.hpp"
 #include "Panda/GameLogic/GameContext.hpp"
-#include "Panda/GameLogic/Components/SkyComponent.hpp"
 #include "Rain/TypeName.hpp"
+#include "Panda/GameLogic/World.hpp"
 
 #include <unordered_map>
 
@@ -57,11 +57,11 @@ namespace InternalCalls {
     }
 
     EntityHandle world_FindByTag(const char *tag) {
-        return GameContext::s_currentWorld->findByTag(tag).getId();
+        return GameContext::getCurrentWorld()->findByTag(tag).getId();
     }
 
     EntityHandle world_CreateEntity(const char *tag) {
-        Entity entity = GameContext::s_currentWorld->instantiateEntity();
+        Entity entity = GameContext::getCurrentWorld()->instantiateEntity();
         entity.setName(tag);
 #ifdef PND_EDITOR
         entity.sortWorld();
@@ -70,14 +70,14 @@ namespace InternalCalls {
     }
 
     void world_DestroyEntity(EntityHandle id) {
-        Entity entity = GameContext::s_currentWorld->getById(id);
-        GameContext::s_currentWorld->destroy(entity);
+        Entity entity = GameContext::getCurrentWorld()->getById(id);
+        GameContext::getCurrentWorld()->destroy(entity);
     }
 
     /// ENTITY
 
     void entity_CreateComponent(EntityHandle entityId, const char *type) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         PND_ASSERT(type != nullptr, "TYPE IS NULL");
         if (s_createComponentFuncs.find(type) == s_createComponentFuncs.end()) {
             PND_ASSERT_F(false, "UNKNOWN TYPE %s", type);
@@ -87,7 +87,7 @@ namespace InternalCalls {
     }
 
     bool entity_HasComponent(EntityHandle entityId, const char *type) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         PND_ASSERT(type != nullptr, "TYPE IS NULL");
         if (s_hasComponentFuncs.find(type) == s_hasComponentFuncs.end()) {
             PND_ASSERT_F(false, "UNKNOWN TYPE %s", type);
@@ -97,7 +97,7 @@ namespace InternalCalls {
     }
 
     void entity_RemoveComponent(EntityHandle entityId, const char *type) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         PND_ASSERT(type != nullptr, "TYPE IS NULL");
         if (s_removeComponentFuncs.find(type) == s_removeComponentFuncs.end()) {
             PND_ASSERT_F(false, "UNKNOWN TYPE %s", type);
@@ -111,14 +111,14 @@ namespace InternalCalls {
     }
 
     const char *entity_GetName(EntityHandle entityId) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         return entity.getName().c_str();
     }
 
     /// TRANSFORM COMPONENT
 
     void transformComponent_GetPosition(EntityHandle entityId, float *x, float *y, float *z) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         glm::vec3 position = transformComponent.getPosition();
         *x = position.x;
@@ -127,14 +127,14 @@ namespace InternalCalls {
     }
 
     void transformComponent_SetPosition(EntityHandle entityId, float x, float y, float z) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         transformComponent.setPosition({x, y, z});
         entity.physics2DPropertiesUpdated();
     }
 
     void transformComponent_GetRotationEuler(EntityHandle entityId, float *x, float *y, float *z) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         glm::vec3 rotation = transformComponent.getRotationEuler();
         *x = rotation.x;
@@ -143,14 +143,14 @@ namespace InternalCalls {
     }
 
     void transformComponent_SetRotationEuler(EntityHandle entityId, float x, float y, float z) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         transformComponent.setRotationEuler({x, y, z});
         entity.physics2DPropertiesUpdated();
     }
 
     void transformComponent_GetScale(EntityHandle entityId, float *x, float *y, float *z) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         glm::vec3 scale = transformComponent.getScale();
         *x = scale.x;
@@ -159,7 +159,7 @@ namespace InternalCalls {
     }
 
     void transformComponent_SetScale(EntityHandle entityId, float x, float y, float z) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         TransformComponent &transformComponent = entity.getTransform();
         transformComponent.setScale({x, y, z});
         entity.physics2DPropertiesUpdated();
@@ -170,7 +170,7 @@ namespace InternalCalls {
     void spriteRendererComponent_GetColor(
         EntityHandle entityId, float *r, float *g, float *b, float *a
     ) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
         *r = sr.color.r;
         *g = sr.color.g;
@@ -180,23 +180,20 @@ namespace InternalCalls {
 
     void
     spriteRendererComponent_SetColor(EntityHandle entityId, float r, float g, float b, float a) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
-        sr.color.r = r;
-        sr.color.g = g;
-        sr.color.b = b;
-        sr.color.a = a;
+        sr.color = Color(r, g, b, a);
     }
 
-    void spriteRendererComponent_SetTexture(EntityHandle entityId, TextureHandle textureId) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+    void spriteRendererComponent_SetMaterial(EntityHandle entityId, MaterialHandle materialId) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
-        sr.textureId = textureId;
-        sr.resetCache();
+        sr.material = assetHandler->makeRef(materialId);
     }
 
     void spriteRendererComponent_SetCell(EntityHandle entityId, int cols, int rows, int index) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
         sr.cols = cols;
         sr.rows = rows;
@@ -206,21 +203,21 @@ namespace InternalCalls {
     /// RIGIDBODY2D COMPONENT
 
     void rigidbody2DComponent_applyForce(EntityHandle entityId, float x, float y) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         World *world = entity.getWorld();
         Physics2D &physics2D = world->getPhysics2D();
         physics2D.applyForce(entity, {x, y});
     }
 
     void rigidbody2DComponent_applyLinearImpulse(EntityHandle entityId, float x, float y) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         World *world = entity.getWorld();
         Physics2D &physics2D = world->getPhysics2D();
         physics2D.applyLinearImpulse(entity, {x, y});
     }
 
     void rigidbody2DComponent_getLinearVelocity(EntityHandle entityId, float *x, float *y) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         World *world = entity.getWorld();
         Physics2D &physics2D = world->getPhysics2D();
         Vec2 velocity = physics2D.getLinearVelocity(entity);
@@ -229,31 +226,48 @@ namespace InternalCalls {
     }
 
     void rigidbody2DComponent_setLinearVelocity(EntityHandle entityId, float x, float y) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         World *world = entity.getWorld();
         Physics2D &physics2D = world->getPhysics2D();
         physics2D.setLinearVelocity(entity, {x, y});
     }
 
     void rigidbody2DComponent_getMass(EntityHandle entityId, float *mass) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         World *world = entity.getWorld();
         Physics2D &physics2D = world->getPhysics2D();
         *mass = physics2D.getMass(entity);
     }
 
     void rigidbody2DComponent_getFriction(EntityHandle entityId, float *friction) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         World *world = entity.getWorld();
         Physics2D &physics2D = world->getPhysics2D();
         *friction = physics2D.getFriction(entity);
     }
 
     void rigidbody2DComponent_setFriction(EntityHandle entityId, float friction) {
-        Entity entity = GameContext::s_currentWorld->getById(entityId);
+        Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         World *world = entity.getWorld();
         Physics2D &physics2D = world->getPhysics2D();
         physics2D.setFriction(entity, friction);
+    }
+
+    /// MATERIAL
+
+    void material_SetColor(
+        MaterialHandle materialId, const char *name, float r, float g, float b, float a
+    ) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        auto material = assetHandler->makeRef<MaterialAsset>(materialId);
+        Color color(r, g, b, a);
+        material->setFieldValue(name, color);
+    }
+
+    void material_SetTexture(MaterialHandle materialId, const char *name, TextureHandle textureId) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        auto material = assetHandler->makeRef<MaterialAsset>(materialId);
+        material->setFieldValue(name, UUID(textureId));
     }
 
     /// CONSOLE
@@ -269,7 +283,6 @@ namespace InternalCalls {
             LOG_ERROR_EDITOR(message);
         }
     }
-
 } // namespace InternalCalls
 
 std::unordered_map<std::string, void *> g_scriptSymbols;
@@ -310,8 +323,8 @@ void initScriptHook() {
         (void *)InternalCalls::spriteRendererComponent_GetColor;
     g_scriptSymbols["spriteRendererComponent_SetColor"] =
         (void *)InternalCalls::spriteRendererComponent_SetColor;
-    g_scriptSymbols["spriteRendererComponent_SetTexture"] =
-        (void *)InternalCalls::spriteRendererComponent_SetTexture;
+    g_scriptSymbols["spriteRendererComponent_SetMaterial"] =
+        (void *)InternalCalls::spriteRendererComponent_SetMaterial;
     g_scriptSymbols["spriteRendererComponent_SetCell"] =
         (void *)InternalCalls::spriteRendererComponent_SetCell;
     /// RIGIDBODY2D COMPONENT
@@ -329,6 +342,9 @@ void initScriptHook() {
         (void *)InternalCalls::rigidbody2DComponent_getFriction;
     g_scriptSymbols["rigidbody2DComponent_setFriction"] =
         (void *)InternalCalls::rigidbody2DComponent_setFriction;
+    /// MATERIAL
+    g_scriptSymbols["material_SetColor"] = (void *)InternalCalls::material_SetColor;
+    g_scriptSymbols["material_SetTexture"] = (void *)InternalCalls::material_SetTexture;
     /// CONSOLE
     g_scriptSymbols["console_Log"] = (void *)InternalCalls::console_Log;
 

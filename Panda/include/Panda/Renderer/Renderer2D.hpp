@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-#include "Panda/Assets/TextureAsset.hpp"
+#include "Panda/Assets/MaterialAsset.hpp"
 
 #include <Miren/Miren.hpp>
 
@@ -9,13 +9,12 @@ namespace Panda {
 
 #define MAX_VERTICES_COUNT 100000
 #define MAX_INDICES_COUNT 160000
-#define MAX_TEXTURE_SLOTS 8
 
 /// Renderer2D отвечает за то, чтобы рисовать примитивные двумерные фигуры.
-/// Для этого Renderer2D создает шейдер и буферы с вершинами, текстурами, индексами.
-/// Renderer2D вызывает отрисовку после вызова end();
+/// Для этого Renderer2D создает шейдер и буферы с вершинами, индексами.
+/// Renderer2D вызывает отрисовку после вызова flush();
 /// Если требуется не стандартный framebuffer, его требуется создать вне Renderer2D
-/// и передать viewId.
+/// и передать Miren::ViewId.
 class Renderer2D {
 public:
     enum class Mode { DEFAULT, GEOMETRY_ONLY };
@@ -25,7 +24,7 @@ public:
             : center()
             , size()
             , color()
-            , texture(nullptr)
+            , material()
             , rotation(0)
             , id(-1)
             , textureCoords(0, 0, 1, 1)
@@ -38,7 +37,7 @@ public:
         uint32_t id;
         float rotation;
         glm::mat4 transform;
-        Foundation::Shared<Asset> texture;
+        AssetRef<MaterialAsset> material;
     };
 
     struct Statistics {
@@ -54,30 +53,20 @@ public:
     };
 
     struct Vertex2D {
-        Vertex2D(
-            glm::vec3 pos,
-            glm::vec2 textureCoords,
-            float textureIndex,
-            int32_t id,
-            bool isSelected,
-            Color color
-        )
+        Vertex2D(glm::vec3 pos, glm::vec2 textureCoords, int32_t id, bool isSelected, Color color)
             : pos(pos)
             , textureCoords(textureCoords)
-            , textureIndex(textureIndex)
             , color(color)
             , id(id) {}
 
         Vertex2D()
             : pos()
             , textureCoords()
-            , textureIndex(0)
             , color()
             , id(-1) {}
 
         glm::vec3 pos;
         glm::vec2 textureCoords;
-        int32_t textureIndex;
         glm::vec4 color;
         uint32_t id;
     };
@@ -85,12 +74,8 @@ public:
     struct DrawCallData {
         Renderer2D::Statistics stats;
         glm::mat4 projMat;
-        Miren::ProgramHandle shader;
-        Foundation::Shared<TextureAsset> whiteTexture;
         Miren::VertexLayoutHandle layout;
-        Foundation::Shared<TextureAsset> textures[MAX_TEXTURE_SLOTS];
-        int samplers[MAX_TEXTURE_SLOTS];
-        uint32_t textureSlotIndex;
+        AssetRef<MaterialAsset> material;
         Vertex2D *vertices;
         uint32_t verticesCount;
         uint16_t *indices;
@@ -114,8 +99,6 @@ private:
     Mode m_mode;
     Miren::ViewId m_viewId;
     DrawCallData m_drawData;
-    Miren::ProgramHandle m_defaultShader;
-    Miren::ProgramHandle m_selectedGeometryShader;
 
     void reset();
     void flush();

@@ -1,5 +1,7 @@
 #include "Panda/Renderer/Renderer2D.hpp"
 #include "Panda/Assets/Base/AssetImporterBase.hpp"
+#include "Panda/Assets/StaticResources.hpp"
+#include "Panda/Renderer/Std140Buffer.hpp"
 
 namespace Panda {
 
@@ -7,8 +9,6 @@ Renderer2D::Renderer2D()
     : m_viewId(0)
     , m_viewProj(1.f)
     , m_drawData()
-    , m_defaultShader()
-    , m_selectedGeometryShader()
     , m_mode(Mode::DEFAULT) {
     m_drawData.vbSize = 0;
     m_drawData.indicesCount = 0;
@@ -16,55 +16,21 @@ Renderer2D::Renderer2D()
         (Vertex2D *)F_ALLOC(Foundation::getAllocator(), sizeof(Vertex2D) * MAX_VERTICES_COUNT);
     m_drawData.indices =
         (uint16_t *)F_ALLOC(Foundation::getAllocator(), sizeof(uint16_t) * MAX_INDICES_COUNT);
-    Foundation::Memory vertexMem;
-    Foundation::Memory fragmentMem;
-    vertexMem = AssetImporterBase::loadData("default-shaders/renderer2d/renderer2d_vertex.glsl");
-    fragmentMem =
-        Panda::AssetImporterBase::loadData("default-shaders/renderer2d/renderer2d_fragment.glsl");
-    m_defaultShader = Miren::createProgram({vertexMem, fragmentMem});
-    vertexMem = AssetImporterBase::loadData("default-shaders/selection_map_vertex.glsl");
-    fragmentMem = Panda::AssetImporterBase::loadData("default-shaders/selection_map_fragment.glsl");
-    m_selectedGeometryShader = Miren::createProgram({vertexMem, fragmentMem});
     Miren::VertexBufferLayoutData layoutData;
     // Position
     layoutData.pushVec3();
     // Texture coordinates
     layoutData.pushVec2();
-    // Texture Index
-    layoutData.pushInt(1);
     // Color
     layoutData.pushVec4();
     // Object id
     layoutData.pushUInt(1);
     m_drawData.layout = Miren::createVertexLayout(layoutData);
-    m_drawData.textureSlotIndex = 1;
-    Foundation::Memory whiteTextureData = Foundation::Memory::alloc(sizeof(uint32_t));
-    *(uint32_t *)whiteTextureData.data = 0xffffffff;
-    Miren::TextureCreate whiteTextureCreate;
-    whiteTextureCreate.m_data = whiteTextureData;
-    m_drawData.whiteTexture = Foundation::makeShared<TextureAsset>(whiteTextureCreate);
-    m_drawData.textures[0] = m_drawData.whiteTexture;
-    for (uint32_t i = 0; i < MAX_TEXTURE_SLOTS; i++) {
-        m_drawData.samplers[i] = i;
-    }
-    Miren::setUniform(
-        m_defaultShader,
-        "u_textures",
-        m_drawData.samplers,
-        Miren::UniformType::Sampler,
-        MAX_TEXTURE_SLOTS
-    );
     reset();
 }
 
 Renderer2D::~Renderer2D() {
-    if (m_defaultShader.isValid()) { Miren::deleteProgram(m_defaultShader); }
-    if (m_selectedGeometryShader.isValid()) { Miren::deleteProgram(m_selectedGeometryShader); }
     if (m_drawData.layout.isValid()) { Miren::deleteVertexLayout(m_drawData.layout); }
-    for (int i = 0; i < MAX_TEXTURE_SLOTS; ++i) {
-        m_drawData.textures[i] = nullptr;
-    }
-    m_drawData.whiteTexture = nullptr;
     if (m_drawData.vertices) { F_FREE(Foundation::getAllocator(), m_drawData.vertices); }
     if (m_drawData.indices) { F_FREE(Foundation::getAllocator(), m_drawData.indices); }
 }
@@ -72,14 +38,6 @@ Renderer2D::~Renderer2D() {
 void Renderer2D::begin(Mode mode, Miren::ViewId viewId) {
     m_mode = mode;
     reset();
-    switch (mode) {
-        case Mode::DEFAULT:
-            m_drawData.shader = m_defaultShader;
-            break;
-        case Mode::GEOMETRY_ONLY:
-            m_drawData.shader = m_selectedGeometryShader;
-            break;
-    }
     m_viewId = viewId;
 }
 
@@ -95,27 +53,15 @@ void Renderer2D::drawRect(RectData rect) {
 }
 
 void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
-    int textureIndex = -1;
-    if (rect.texture != nullptr) {
-        for (uint32_t i = 1; i < m_drawData.textureSlotIndex; i++) {
-            auto texture = Foundation::SharedCast<TextureAsset>(rect.texture);
-            if (texture->getMirenHandle().id == (*m_drawData.textures[i]).getMirenHandle().id) {
-                textureIndex = i;
-                break;
-            }
-        }
-        if (textureIndex == -1) {
-            textureIndex = m_drawData.textureSlotIndex;
-            if (textureIndex == MAX_TEXTURE_SLOTS) {
-                flush();
-                textureIndex = m_drawData.textureSlotIndex;
-            }
-            m_drawData.textures[m_drawData.textureSlotIndex] =
-                Foundation::SharedCast<TextureAsset>(rect.texture);
-            m_drawData.textureSlotIndex++;
-        }
+    if (!rect.material) { rect.material = StaticResources::defaultMaterial; }
+    if (rect.material != m_drawData.material) {
+        flush();
+        m_drawData.material = rect.material;
     }
-
+    if (!m_drawData.material) {
+        PND_ASSERT(false, "Invalid material for rect");
+        return;
+    }
     // TODO: Check if next batch is needed
     uint16_t indicesOffset = m_drawData.verticesCount;
     uint32_t &verticesCount = m_drawData.verticesCount;
@@ -140,7 +86,6 @@ void Renderer2D::drawRect(glm::mat4 &transform, RectData rect) {
     for (int i = 0; i < 4; i++) {
         m_drawData.vertices[verticesCount].pos = rect.transform * transform * positions[i];
         m_drawData.vertices[verticesCount].textureCoords = textureCoords[i];
-        m_drawData.vertices[verticesCount].textureIndex = textureIndex;
         m_drawData.vertices[verticesCount].color = rect.color;
         m_drawData.vertices[verticesCount].id = rect.id;
         verticesCount++;
@@ -175,14 +120,33 @@ void Renderer2D::reset() {
     m_drawData.vbSize = 0;
     m_drawData.indicesCount = 0;
     m_drawData.ibSize = 0;
-    m_drawData.textureSlotIndex = 1;
 }
 
 void Renderer2D::flush() {
     if (m_drawData.verticesCount == 0) { return; }
-    Miren::setShader(m_drawData.shader);
-    Miren::setUniform(
-        m_drawData.shader, "projViewMtx", (void *)&m_viewProj, Miren::UniformType::Mat4
+    AssetRef<MaterialAsset> material;
+    switch (m_mode) {
+        case Mode::DEFAULT: {
+            Miren::setState(MIREN_STATE_DEPTH_TEST);
+            material = m_drawData.material;
+            break;
+        }
+        case Mode::GEOMETRY_ONLY: {
+            Miren::setState(MIREN_STATE_WIREFRAME);
+            material = StaticResources::selectedGeometryMaterial;
+            break;
+        }
+    }
+    Miren::ProgramHandle shaderHandle = material->getShaderAsset()->getMirenHandle();
+    Miren::setShader(shaderHandle);
+    Std140Buffer uboVert;
+    // projViewMtx
+    uboVert.addMat4(&m_viewProj[0][0]);
+    // modelMtx
+    glm::mat4 model(1.f);
+    uboVert.addMat4(&model[0][0]);
+    Miren::addInputUniformBuffer(
+        shaderHandle, "type_UBO_VERT", uboVert.getData(), uboVert.getSize()
     );
 
     Miren::TransientVertexBuffer tvb;
@@ -194,17 +158,8 @@ void Renderer2D::flush() {
         &tib, m_drawData.indicesCount, Miren::BufferElementType::UnsignedShort
     );
     memcpy(tib.data, m_drawData.indices, m_drawData.ibSize);
-    switch (m_mode) {
-        case Mode::DEFAULT:
-            Miren::setState(MIREN_STATE_DEPTH_TEST);
-            break;
-        case Mode::GEOMETRY_ONLY:
-            Miren::setState(MIREN_STATE_WIREFRAME);
-            break;
-    }
-    for (int i = 0; i < m_drawData.textureSlotIndex; i++) {
-        Miren::setTexture(m_drawData.textures[i]->getMirenHandle(), i);
-    }
+
+    material->bindFields();
     Miren::setVertexLayout(m_drawData.layout);
     Miren::setVertexBuffer(tvb.handle, tvb.startVertex);
     Miren::setIndexBuffer(tib.handle, tib.startIndex, m_drawData.indicesCount);

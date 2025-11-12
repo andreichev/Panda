@@ -1,9 +1,12 @@
 #include "ImGuiHelper.hpp"
 #include "Model/DragDropItem.hpp"
+#include "SystemTools/SystemTools.hpp"
+#include "ProjectLoader/AssetHandlerEditor.hpp"
 
 #include <Panda/GameLogic/GameContext.hpp>
 #include <Panda/ImGui/FontAwesome.h>
 #include <Panda/ImGui/ImGui+DragScalar.hpp>
+#include <Panda/GameLogic/World.hpp>
 #include <string>
 
 namespace Panda {
@@ -492,9 +495,7 @@ bool propertyColor(const char *label, Color &value, bool isInconsistent) {
     return modified;
 }
 
-bool propertyTexture(
-    const char *label, UUID &textureId, Foundation::Shared<Asset> asset, bool isInconsistent
-) {
+bool propertyTexture(const char *label, AssetRef<Asset> &asset, bool isInconsistent) {
     bool changed = false;
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
     shiftCursorY(6.0f);
@@ -502,17 +503,13 @@ bool propertyTexture(
     ImGui::SetColumnWidth(0, firstColumnWidth);
     ImGui::Text(isInconsistent ? "*%s" : "%s", label);
     ImGui::NextColumn();
-    if (textureId) {
-        if (asset) {
-            auto texture = Foundation::SharedCast<TextureAsset>(asset);
-            float height = 55;
-            float aspect = texture->getSize().width / texture->getSize().height;
-            aspect = Foundation::min(aspect, 4.f);
-            float width = height * aspect;
-            ImGui::Image((ImTextureID)(intptr_t)texture->getMirenHandle().id, {width, height});
-        } else {
-            ImGui::Button("Texture Asset", {100, 55});
-        }
+    if (asset) {
+        auto texture = asset.as<TextureAsset>();
+        float height = 55;
+        float aspect = texture->getSize().width / texture->getSize().height;
+        aspect = Foundation::min(aspect, 4.f);
+        float width = height * aspect;
+        ImGui::Image((ImTextureID)(intptr_t)texture->getMirenHandle().id, {width, height});
     } else {
         ImGui::Button("No image", {100, 55});
     }
@@ -520,6 +517,7 @@ bool propertyTexture(
         if (ImGui::GetDragDropPayload() == nullptr) {
             DragDropItem item;
             item.type = DragDropItemType::TEXTURE;
+            UUID textureId = asset.getId();
             PND_STATIC_ASSERT(sizeof(textureId) <= sizeof(DragDropItem::data));
             memcpy(item.data, &textureId, sizeof(textureId));
             item.count = 1;
@@ -533,17 +531,19 @@ bool propertyTexture(
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
             if (item.type == DragDropItemType::TEXTURE) {
+                UUID textureId;
                 memcpy(&textureId, item.data, sizeof(textureId));
+                asset = AssetRef<Asset>(textureId);
                 changed = true;
             }
         }
         ImGui::EndDragDropTarget();
     }
-    if (textureId) {
+    if (asset) {
         ImGui::SameLine();
         if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
             changed = true;
-            textureId = 0;
+            asset = {};
         }
     }
     ImGui::NextColumn();
@@ -560,17 +560,17 @@ bool propertyEntity(const char *label, UUID *value) {
     ImGui::PushID(label);
     ImGui::Columns(2, nullptr, false);
     ImGui::SetColumnWidth(0, firstColumnWidth);
-    ImGui::Text("%s", label);
+    ImGui::TextUnformatted(label);
     ImGui::NextColumn();
     ImGui::Spacing();
 
     ImGui::PushItemWidth(-1);
-    World *currentWorld = GameContext::s_currentWorld;
+    World *currentWorld = GameContext::getCurrentWorld();
     if (value && *value && currentWorld) {
         Entity entity = currentWorld->getById(*value);
-        ImGui::Text("%s", entity.getName().c_str());
+        ImGui::TextUnformatted(entity.getName().c_str());
     } else {
-        ImGui::Text("%s", "nil");
+        ImGui::TextUnformatted("nil");
     }
     ImGui::PopItemWidth();
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
@@ -612,35 +612,154 @@ bool propertyEntity(const char *label, UUID *value) {
     return changed;
 }
 
+bool propertyShader(const char *label, path_t path, AssetRef<Asset> &asset, bool isInconsistent) {
+    bool changed = false;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    shiftCursorY(6.0f);
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label);
+    ImGui::NextColumn();
+    std::string name;
+    if (asset) {
+        AssetHandler *handler = GameContext::getAssetHandler();
+        PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
+        AssetHandlerEditor *assetHandler = static_cast<AssetHandlerEditor *>(handler);
+        AssetInfo info = assetHandler->getInfo(asset.getId());
+        name = assetHandler->getAssetName(info);
+        if (ImGui::Button(name.c_str(), {100, 55})) { SystemTools::open(path); }
+    } else {
+        ImGui::Button("No shader", {100, 55});
+    }
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        if (ImGui::GetDragDropPayload() == nullptr) {
+            DragDropItem item;
+            item.type = DragDropItemType::SHADER;
+            PND_STATIC_ASSERT(sizeof(AssetRef<Asset>) <= sizeof(DragDropItem::data));
+            memcpy(item.data, &asset, sizeof(AssetRef<Asset>));
+            item.count = 1;
+            ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        }
+        ImGui::Text("Shader %s", name.c_str());
+        ImGui::EndDragDropSource();
+    }
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
+            PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
+            DragDropItem &item = *(DragDropItem *)payload->Data;
+            if (item.type == DragDropItemType::SHADER) {
+                memcpy(&asset, item.data, sizeof(AssetRef<Asset>));
+                changed = true;
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+    if (asset) {
+        ImGui::SameLine();
+        if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+            changed = true;
+            asset = {};
+        }
+    }
+    ImGui::NextColumn();
+    ImGui::PopStyleVar();
+    ImGui::Columns(1);
+    return changed;
+}
+
+bool propertyMaterial(const char *label, AssetRef<Asset> &asset, bool isInconsistent) {
+    bool changed = false;
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, coefficientRounding);
+    shiftCursorY(6.0f);
+    ImGui::Columns(2, nullptr, false);
+    ImGui::SetColumnWidth(0, firstColumnWidth);
+    ImGui::Text(isInconsistent ? "*%s" : "%s", label);
+    ImGui::NextColumn();
+    std::string name;
+    if (asset) {
+        AssetHandler *handler = GameContext::getAssetHandler();
+        PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
+        AssetHandlerEditor *assetHandler = static_cast<AssetHandlerEditor *>(handler);
+        AssetInfo info = assetHandler->getInfo(asset.getId());
+        MaterialAssetMeta meta = std::get<MaterialAssetMeta>(info.meta);
+        path_t path = meta.materialPath;
+        name = assetHandler->getAssetName(info);
+        if (ImGui::Button(name.c_str(), {100, 55})) { SystemTools::open(path); }
+    } else {
+        ImGui::Button("No material", {100, 55});
+    }
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        if (ImGui::GetDragDropPayload() == nullptr) {
+            DragDropItem item;
+            item.type = DragDropItemType::MATERIAL;
+            PND_STATIC_ASSERT(sizeof(AssetRef<Asset>) <= sizeof(DragDropItem::data));
+            memcpy(item.data, &asset, sizeof(AssetRef<Asset>));
+            item.count = 1;
+            ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        }
+        ImGui::Text("Material %s", name.c_str());
+        ImGui::EndDragDropSource();
+    }
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PANDA_DRAGDROP_NAME)) {
+            PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
+            DragDropItem &item = *(DragDropItem *)payload->Data;
+            if (item.type == DragDropItemType::MATERIAL) {
+                memcpy(&asset, item.data, sizeof(AssetRef<Asset>));
+                changed = true;
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+    if (asset) {
+        ImGui::SameLine();
+        if (ImGui::Button(getString(ICON_TRASH_O).c_str())) {
+            changed = true;
+            asset = {};
+        }
+    }
+    ImGui::NextColumn();
+    ImGui::PopStyleVar();
+    ImGui::Columns(1);
+    return changed;
+}
+
 bool drawScriptFieldValue(ScriptField &field) {
     bool changed = false;
     ImGui::PushID(field.fieldId);
     switch (field.type) {
         case ScriptFieldType::INTEGER: {
-            changed |= dragInt(field.name.c_str(), (int *)field.value.data);
+            int32_t value = std::get<int32_t>(field.value);
+            changed |= dragInt(field.name.c_str(), &value);
+            field.value = value;
             break;
         }
         case ScriptFieldType::FLOAT: {
-            changed |= dragFloat(field.name.c_str(), (float *)field.value.data, 0.2f);
+            float value = std::get<float>(field.value);
+            changed |= dragFloat(field.name.c_str(), &value, 0.2f);
+            field.value = value;
             break;
         }
         case ScriptFieldType::ENTITY: {
-            changed |= propertyEntity(field.name.c_str(), (UUID *)field.value.data);
+            UUID value = std::get<UUID>(field.value);
+            changed |= propertyEntity(field.name.c_str(), &value);
+            field.value = value;
             break;
         }
         case ScriptFieldType::TEXTURE: {
-            // Load texture if it needs.
-            AssetHandler *assetHandler = GameContext::s_assetHandler;
-            UUID textureId = *(UUID *)field.value.data;
-            if (textureId && !field.asset && assetHandler) {
-                field.asset = assetHandler->load(textureId);
-            }
-            if (propertyTexture(
-                    field.name.c_str(), *(UUID *)field.value.data, field.asset, false
-                )) {
-                field.resetCache();
-                changed = true;
-            }
+            UUID value = std::get<UUID>(field.value);
+            auto asset = AssetRef<Asset>(value);
+            changed |= propertyTexture(field.name.c_str(), asset, false);
+            value = asset.getId();
+            field.value = value;
+            break;
+        }
+        case ScriptFieldType::MATERIAL: {
+            UUID value = std::get<UUID>(field.value);
+            auto asset = AssetRef<Asset>(value);
+            changed |= propertyMaterial(field.name.c_str(), asset, false);
+            value = asset.getId();
+            field.value = value;
             break;
         }
         default: {

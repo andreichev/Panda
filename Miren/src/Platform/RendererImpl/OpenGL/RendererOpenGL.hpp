@@ -73,8 +73,7 @@ public:
     void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) override;
     void deleteVertexLayout(VertexLayoutHandle handle) override;
     void readTexture(Miren::TextureHandle handle, void *data) override;
-    void setUniform(const Uniform &uniform) override;
-    void setTexture(TextureHandle handle, uint32_t slot) override;
+    void addInput(const PassInput &input) override;
     void submit(Frame *frame) override;
     OpenGLTexture &getTexture(TextureHandle handle) {
         return m_textures[handle.id];
@@ -82,7 +81,7 @@ public:
 
 private:
     void viewChanged(View &view);
-    void submit(RenderDraw *draw);
+    void submit(RenderPass *draw);
 
     Fern::GraphicsContext *m_ctx;
     uint32_t m_uselessVao;

@@ -18,8 +18,7 @@ Gizmos::Gizmos(Camera *camera, CameraController *cameraController)
 void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
     if (sceneState == SceneState::PLAY) { return; }
     if (!m_camera || !m_world) { return; }
-    SelectionContext &selectionContext = m_world->getSelectionContext();
-    if (selectionContext.empty()) { return; }
+    if (SelectionContext::isEmpty()) { return; }
     ImGuizmo::SetOrthographic(false);
     ImGuizmo::SetDrawlist();
 
@@ -32,7 +31,7 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
 
     glm::mat4 view = m_cameraController->getViewMatrix();
     glm::mat4 projection = m_camera->getProjection();
-    glm::mat4 transform = selectionContext.getMedianMatrix();
+    glm::mat4 transform = SelectionContext::getMedianMatrix();
     glm::mat4 delta = glm::mat4(1.0f);
     if (!ImGuizmo::Manipulate(
             glm::value_ptr(view),
@@ -60,7 +59,8 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
     LOG_INFO_EDITOR("%.3f, %.3f, %.3f", deltaPosition.x, deltaPosition.y, deltaPosition.z);
      */
 
-    auto entities = selectionContext.getManipulatingEntities();
+    auto ids = SelectionContext::getManipulatingEntities();
+    std::unordered_set<Entity> entities = m_world->getById(ids);
     EntityTransformCommand move(entities);
     move.saveBeforeEdit();
     for (auto entity : entities) {
@@ -73,7 +73,7 @@ void Gizmos::onImGuiRender(SceneState sceneState, Rect viewportRect) {
     move.saveAfterEdit();
     WorldCommandManager &cmd = m_world->getCommandManger();
     cmd.SAVE(move, false);
-    selectionContext.updateValues();
+    SelectionContext::updateValues();
     m_world->setChanged();
 }
 

@@ -2,6 +2,7 @@
 
 #include "Panda/Assets/Base/Path.hpp"
 #include "Panda/Assets/Base/Asset.hpp"
+#include "Panda/Serialization/AssetsDtos.hpp"
 
 #include <Rain/Rain.hpp>
 #include <Miren/Miren.hpp>
@@ -23,17 +24,27 @@ struct TextureAssetMeta : public Rain::Codable {
     RAIN_FIELDS_END
 };
 
-struct GpuProgramAssetMeta : public Rain::Codable {
+struct ShaderAssetMeta : public Rain::Codable {
     path_t vertexCodePath;
     path_t fragmentCodePath;
 
-    RAIN_FIELDS_BEGIN(GpuProgramAssetMeta)
+    RAIN_FIELDS_BEGIN(ShaderAssetMeta)
     RAIN_FIELD(vertexCodePath)
     RAIN_FIELD(fragmentCodePath)
     RAIN_FIELDS_END
 };
 
-using AssetMeta = std::variant<std::monostate, TextureAssetMeta, GpuProgramAssetMeta>;
+struct MaterialAssetMeta : public Rain::Codable {
+    path_t materialPath;
+    UUID shader;
+
+    RAIN_FIELDS_BEGIN(MaterialAssetMeta)
+    RAIN_FIELD(materialPath)
+    RAIN_FIELD(shader)
+    RAIN_FIELDS_END
+};
+
+using AssetMeta = std::variant<TextureAssetMeta, ShaderAssetMeta, MaterialAssetMeta>;
 
 struct AssetInfo : public Rain::Codable {
     AssetId id;
@@ -50,8 +61,13 @@ struct AssetInfo : public Rain::Codable {
                 encoder->encode("meta", meta);
                 break;
             }
-            case AssetType::PROGRAM: {
-                GpuProgramAssetMeta meta = std::get<GpuProgramAssetMeta>(data.meta);
+            case AssetType::SHADER: {
+                ShaderAssetMeta meta = std::get<ShaderAssetMeta>(data.meta);
+                encoder->encode("meta", meta);
+                break;
+            }
+            case AssetType::MATERIAL: {
+                MaterialAssetMeta meta = std::get<MaterialAssetMeta>(data.meta);
                 encoder->encode("meta", meta);
                 break;
             }
@@ -73,8 +89,14 @@ struct AssetInfo : public Rain::Codable {
                 data.meta = meta;
                 break;
             }
-            case AssetType::PROGRAM: {
-                GpuProgramAssetMeta meta;
+            case AssetType::SHADER: {
+                ShaderAssetMeta meta;
+                decoder->decode("meta", meta);
+                data.meta = meta;
+                break;
+            }
+            case AssetType::MATERIAL: {
+                MaterialAssetMeta meta;
                 decoder->decode("meta", meta);
                 data.meta = meta;
                 break;
@@ -85,6 +107,23 @@ struct AssetInfo : public Rain::Codable {
         }
         decoder->endObject();
         return true;
+    }
+
+    const char *getTypeStr() {
+        switch (type) {
+            case AssetType::TEXTURE: {
+                return "Texture";
+            }
+            case AssetType::SHADER: {
+                return "Shader";
+            }
+            case AssetType::MATERIAL: {
+                return "Material";
+            }
+            default: {
+                return "Unknown";
+            }
+        }
     }
 };
 

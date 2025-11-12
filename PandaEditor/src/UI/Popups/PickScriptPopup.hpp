@@ -15,7 +15,8 @@ public:
     void onImGuiRender() override {
         static int selectedClassIndex = -1;
         static ScriptClassManifest selectedClass;
-        if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) {
+        ScriptEngine *scriptEngine = GameContext::getScriptEngine();
+        if (!scriptEngine || !scriptEngine->isLoaded()) {
             PND_ASSERT(false, "SCRIPT ENGINE IS NOT INITIALIZED");
             return;
         }
@@ -24,9 +25,9 @@ public:
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 3.0f);
         if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("%s", subtitle);
+            ImGui::TextUnformatted(subtitle);
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-            auto manifest = GameContext::s_scriptEngine->getManifest();
+            auto manifest = scriptEngine->getManifest();
             // SCRIPT LIST
             for (int i = 0; i < manifest.classes.size(); i++) {
                 if (ImGui::Selectable(manifest.classes[i].name, selectedClassIndex == i)) {

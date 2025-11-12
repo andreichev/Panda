@@ -58,6 +58,9 @@ target_link_libraries(PandaEditor Panda)
 # Dependencies - PandaUI
 target_link_libraries(PandaEditor PandaUI)
 
+# Dependencies - MirenTools
+target_link_libraries(PandaEditor MirenTools)
+
 # Dependencies - nfd
 add_subdirectory(Vendor/nfd)
 set_target_properties(nfd PROPERTIES LINKER_LANGUAGE CXX)

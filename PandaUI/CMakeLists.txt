@@ -18,5 +18,5 @@ target_link_libraries(PandaUI Miren)
 # Dependencies - Panda
 target_link_libraries(PandaUI Panda)
 
-# Dependencies - Panda
+# Dependencies - Yoga
 target_link_libraries(PandaUI yogacore)

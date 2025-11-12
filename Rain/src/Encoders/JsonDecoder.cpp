@@ -31,6 +31,15 @@ bool JsonDecoder::decode(std::istream &istream, void *data, TypeInfo info) {
     return result;
 }
 
+std::vector<std::string> JsonDecoder::getMemberKeys() {
+    std::vector<std::string> result;
+    const rapidjson::Value &object = currentObject();
+    for (auto it = object.MemberBegin(); it != object.MemberEnd(); ++it) {
+        result.emplace_back((*it).name.GetString());
+    }
+    return result;
+}
+
 bool JsonDecoder::beginObject(const char *key) {
     if (m_isArray) {
         // std::cout << "BEGIN OBJECT IN ARRAY" << std::endl;

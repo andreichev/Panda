@@ -218,14 +218,18 @@ void setShader(ProgramHandle handle) {
     s_context->setShader(handle);
 }
 
-void setUniform(ProgramHandle handle, const char *name, void *value, UniformType type, int count) {
+void addInputUniformBuffer(
+    ProgramHandle program, const char *name, const void *value, size_t size
+) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
-    s_context->setUniform(handle, name, value, type, count);
+    s_context->addInput(program, name, RenderPassInputType::UniformBuffer, value, size);
 }
 
-void setTexture(TextureHandle textureHandle, uint32_t slot) {
+void addInputTexture(ProgramHandle program, const char *name, TextureHandle handle) {
     PND_ASSERT(s_context != nullptr, "MIREN NOT INITIALIZED");
-    s_context->setTexture(textureHandle, slot);
+    s_context->addInput(
+        program, name, RenderPassInputType::ImageSampler2D, &handle, sizeof(TextureHandle)
+    );
 }
 
 void setVertexLayout(VertexLayoutHandle handle) {

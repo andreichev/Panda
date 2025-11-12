@@ -1,9 +1,12 @@
 
 #include "ContentBrowser.hpp"
+#include "ProjectLoader/AssetHandlerEditor.hpp"
 #include "Model/DragDropItem.hpp"
-#include "Panda/ImGui/FontAwesome.h"
 
+#include <Panda/ImGui/FontAwesome.h>
+#include <Panda/GameLogic/SelectionContext.hpp>
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Panda {
 
@@ -37,16 +40,15 @@ ContentBrowser::ContentBrowser(ContentBrowserOutput *output)
     m_fileIcons.emplace(".zip", TextureAsset("ui/icons/zip.png"));
 }
 
-bool isMouseInsideWindow(ImVec2 windowPos, ImVec2 windowSize) {
-    ImVec2 maxSize = windowPos;
-    maxSize.x += windowSize.x;
-    maxSize.y += windowSize.y;
-    return ImGui::IsMouseHoveringRect(windowPos, maxSize);
-}
-
 void ContentBrowser::onImGuiRender() {
     if (m_currentDirectory.empty()) { return; }
+    if (!GameContext::getAssetHandler()) { return; }
+    AssetHandlerEditor *assetHandler =
+        static_cast<AssetHandlerEditor *>(GameContext::getAssetHandler());
+    bool ctrl = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+    bool shift = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
     ImGui::Begin("Content Browser");
+    ImRect windowRect = ImGui::GetCurrentWindow()->Rect();
     if (m_currentDirectory != m_baseDirectory) {
         if (ImGui::Button(getString(ICON_ARROW_LEFT).c_str())) {
             m_currentDirectory = m_currentDirectory.parent_path();
@@ -93,20 +95,22 @@ void ContentBrowser::onImGuiRender() {
     ImGui::Columns(columnCount, 0, false);
     for (auto &directoryEntry : std::filesystem::directory_iterator(m_currentDirectory)) {
         const path_t &path = directoryEntry.path();
-        UUID assetId = m_output->getAssetId(path);
+        UUID assetId = assetHandler->getAssetId(path);
+        AssetRef<Asset> asset = AssetRef<Asset>(assetHandler, assetId);
         std::string filenameString = path.filename().string();
 
         if (!showHiddenFiles && filenameString[0] == '.') { continue; }
 
         ImGui::PushID(filenameString.c_str());
         TextureAsset *icon;
-        Foundation::Shared<TextureAsset> thumbnail;
+        Foundation::Shared<Thumbnail> thumbnail;
         if (directoryEntry.is_directory()) {
             icon = &m_directoryIcon;
         } else {
-            if (assetId) {
-                thumbnail =
-                    m_thumbnailProvider.getThumbnailOrNull(assetId, {thumbnailSize, thumbnailSize});
+            if (asset) {
+                thumbnail = m_thumbnailProvider.getThumbnailOrNull(
+                    asset.getId(), {thumbnailSize, thumbnailSize}
+                );
             }
             if (!thumbnail) {
                 if (m_fileIcons.find(path.extension().string()) != m_fileIcons.end()) {
@@ -116,29 +120,81 @@ void ContentBrowser::onImGuiRender() {
                 }
             }
         }
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        if (SelectionContext::isFileSelected(path)) {
+            const ImU32 col = ImGui::GetColorU32(ImGuiCol_ButtonActive);
+            ImGui::PushStyleColor(ImGuiCol_Button, col);
+        } else {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        }
         ImVec2 thumbnailPos = ImGui::GetCursorPos();
-        Miren::TextureHandle handle =
-            thumbnail ? thumbnail->getMirenHandle() : icon->getMirenHandle();
+        Miren::TextureHandle handle = thumbnail ? thumbnail->getHandle() : icon->getMirenHandle();
         float height = thumbnailSize;
         float aspect = 1.f;
         if (thumbnail) { aspect = thumbnail->getSize().width / thumbnail->getSize().height; }
         float width = height * aspect;
-        ImGui::ImageButton(
-            filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {width, height}
-        );
-        if (assetId) {
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                if (ImGui::GetDragDropPayload() == nullptr) {
-                    DragDropItem item;
-                    item.type = DragDropItemType::TEXTURE;
-                    item.count = 1;
-                    PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
-                    memcpy(item.data, &assetId, sizeof(UUID));
-                    ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        if (ImGui::ImageButton(
+                filenameString.c_str(), (ImTextureID)(intptr_t)handle.id, {width, height}
+            ) &&
+            !directoryEntry.is_directory()) {
+            if (!shift && !ctrl) { SelectionContext::unselectAll(); }
+            SelectionContext::addSelectedFile(path);
+        }
+        if (asset) {
+            AssetInfo assetInfo = assetHandler->getInfo(asset.getId());
+            switch (assetInfo.type) {
+                case AssetType::TEXTURE: {
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                        if (ImGui::GetDragDropPayload() == nullptr) {
+                            DragDropItem item;
+                            item.type = DragDropItemType::TEXTURE;
+                            item.count = 1;
+                            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
+                            memcpy(item.data, &assetId, sizeof(UUID));
+                            ImGui::SetDragDropPayload(
+                                PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
+                            );
+                        }
+                        ImGui::Text("Texture");
+                        ImGui::EndDragDropSource();
+                    }
+                    break;
                 }
-                ImGui::Text("Texture");
-                ImGui::EndDragDropSource();
+                case AssetType::SHADER: {
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                        if (ImGui::GetDragDropPayload() == nullptr) {
+                            DragDropItem item;
+                            item.type = DragDropItemType::SHADER;
+                            item.count = 1;
+                            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
+                            memcpy(item.data, &assetId, sizeof(UUID));
+                            ImGui::SetDragDropPayload(
+                                PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
+                            );
+                        }
+                        ImGui::Text("Shader");
+                        ImGui::EndDragDropSource();
+                    }
+                    break;
+                }
+                case AssetType::MATERIAL: {
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                        if (ImGui::GetDragDropPayload() == nullptr) {
+                            DragDropItem item;
+                            item.type = DragDropItemType::MATERIAL;
+                            item.count = 1;
+                            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
+                            memcpy(item.data, &asset, sizeof(UUID));
+                            ImGui::SetDragDropPayload(
+                                PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
+                            );
+                        }
+                        ImGui::Text("Material");
+                        ImGui::EndDragDropSource();
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
 
             ImVec2 nextThumbnailPos = ImGui::GetCursorPos();
@@ -159,8 +215,8 @@ void ContentBrowser::onImGuiRender() {
                 m_deletingDirectory = path;
                 m_output->deleteFileShowPopup(path);
             }
-            if (!assetId) {
-                if (ImGui::MenuItem("Import Asset")) { m_output->importAsset(path); }
+            if (!asset && assetHandler->canImport(path)) {
+                if (ImGui::MenuItem("Import Asset")) { assetHandler->registerAsset(path); }
             }
             ImGui::EndPopup();
         }
@@ -177,6 +233,14 @@ void ContentBrowser::onImGuiRender() {
     // ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
     // ImGui::SliderFloat("Padding", &padding, 0, 32);
     ImGui::End();
+
+    if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) ||
+        ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+        if (ImGui::IsMouseHoveringRect(windowRect.Min, windowRect.Max, false) &&
+            !ImGui::IsAnyItemHovered() && !ImGui::IsDragDropActive()) {
+            SelectionContext::unselectAll();
+        }
+    }
 }
 
 void ContentBrowser::setBaseDirectory(const path_t &path) {

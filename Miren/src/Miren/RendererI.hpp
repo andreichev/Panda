@@ -7,7 +7,7 @@
 #include "Miren/Base.hpp"
 #include "Miren/Encoder/View.hpp"
 #include "Miren/Encoder/Frame.hpp"
-#include "Miren/Encoder/Uniform.hpp"
+#include "Miren/Encoder/PassInput.hpp"
 #include "Miren/VertexBufferLayoutData.hpp"
 
 namespace Miren {
@@ -73,8 +73,7 @@ public:
     virtual void createVertexLayout(VertexLayoutHandle handle, VertexBufferLayoutData layout) = 0;
     virtual void deleteVertexLayout(VertexLayoutHandle handle) = 0;
     virtual void readTexture(TextureHandle handle, void *data) = 0;
-    virtual void setUniform(const Uniform &uniform) = 0;
-    virtual void setTexture(TextureHandle handle, uint32_t slot) = 0;
+    virtual void addInput(const PassInput &input) = 0;
     virtual void submit(Frame *frame) = 0;
 };
 

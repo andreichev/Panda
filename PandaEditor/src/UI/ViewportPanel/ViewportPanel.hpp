@@ -44,8 +44,6 @@ public:
     void focus();
     bool isFocused();
     bool isHovered();
-    Miren::ViewId getRenderingView();
-    Miren::ViewId getSelectionRenderingView();
 
 private:
     void updateViewportSize(Size size);
@@ -54,9 +52,6 @@ private:
     void beginRectSelection(bool appendSelection);
     void updateRectSelection();
     void endRectSelection();
-    std::unordered_set<UUID> getSelectedIds();
-    void pickEntitiesWithId(std::unordered_set<UUID> ids);
-    void unselectEntitiesWithId(std::unordered_set<UUID> ids);
     void unselectAll();
 
     Viewport m_viewport;

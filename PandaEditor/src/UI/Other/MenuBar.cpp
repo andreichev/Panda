@@ -49,7 +49,7 @@ void MenuBar::onImGuiRender() {
                 }
             }
 #ifdef PLATFORM_MACOS
-            if (ImGui::MenuItem("Open C++ Project", NULL)) { m_output->menuBarOpenCppProject(); }
+            if (ImGui::MenuItem("Show C++ Project", NULL)) { m_output->menuBarShowCppProject(); }
 #endif
             if (ImGui::MenuItem("Close Project", NULL)) { m_output->menuBarCloseProject(); }
             ImGui::Separator();

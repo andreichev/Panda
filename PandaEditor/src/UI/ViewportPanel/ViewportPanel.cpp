@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <Panda/ImGui/FontAwesome.h>
 #include <Panda/GameLogic/GameContext.hpp>
+#include <Panda/GameLogic/SelectionContext.hpp>
 
 namespace Panda {
 
@@ -34,7 +35,7 @@ void ViewportPanel::updateViewportSize(Size size) {
 }
 
 void ViewportPanel::drawOutline(float dt) {
-    std::unordered_set<UUID> selection = getSelectedIds();
+    std::unordered_set<UUID> selection = SelectionContext::getSelectedEntities();
     m_viewport.drawOutline(dt, selection);
 }
 
@@ -199,8 +200,9 @@ void ViewportPanel::readIdsMemoryIfNeed() {
             }
         }
     }
-    pickEntitiesWithId(select);
-    unselectEntitiesWithId(unselect);
+    SelectionContext::addSelectedEntities(select);
+    SelectionContext::removeSelectedEntities(unselect);
+    if (!m_rectSelection.appendSelection) { SelectionContext::unselectAllFiles(); }
 }
 
 void ViewportPanel::beginRectSelection(bool append) {
@@ -208,7 +210,7 @@ void ViewportPanel::beginRectSelection(bool append) {
     m_rectSelection.appendSelection = append;
     m_rectSelection.rect =
         IRect(Input::getMouseViewportPositionX(), Input::getMouseViewportPositionY(), 0, 0);
-    m_rectSelection.currentSelection = getSelectedIds();
+    m_rectSelection.currentSelection = SelectionContext::getSelectedEntities();
     m_rectSelection.initialSelection = m_rectSelection.currentSelection;
 }
 
@@ -257,46 +259,8 @@ void ViewportPanel::endRectSelection() {
     m_rectSelection.rect = IRect(0, 0, 0, 0);
 }
 
-std::unordered_set<UUID> ViewportPanel::getSelectedIds() {
-    World *currentWorld = GameContext::s_currentWorld;
-    if (!currentWorld) { return {}; }
-    SelectionContext &selectionContext = currentWorld->getSelectionContext();
-    auto entities = selectionContext.getSelectedEntities();
-    std::unordered_set<UUID> ids;
-    for (auto entity : entities) {
-        ids.insert(entity.getId());
-    }
-    return ids;
-}
-
-void ViewportPanel::pickEntitiesWithId(std::unordered_set<UUID> ids) {
-    World *currentWorld = GameContext::s_currentWorld;
-    if (!currentWorld) { return; }
-    SelectionContext &selectionContext = currentWorld->getSelectionContext();
-    std::unordered_set<Entity> entities;
-    for (UUID id : ids) {
-        Entity selected = currentWorld->getById(id);
-        entities.insert(selected);
-    }
-    selectionContext.addSelectedEntities(entities);
-}
-
-void ViewportPanel::unselectEntitiesWithId(std::unordered_set<UUID> ids) {
-    World *currentWorld = GameContext::s_currentWorld;
-    if (!currentWorld) { return; }
-    SelectionContext &selectionContext = currentWorld->getSelectionContext();
-    std::vector<Entity> entities;
-    for (UUID id : ids) {
-        Entity selected = currentWorld->getById(id);
-        entities.push_back(selected);
-    }
-    selectionContext.removeSelectedEntities(entities);
-}
-
 void ViewportPanel::unselectAll() {
-    World *currentWorld = GameContext::s_currentWorld;
-    if (!currentWorld) { return; }
-    currentWorld->getSelectionContext().unselectAll();
+    SelectionContext::unselectAll();
 }
 
 void ViewportPanel::setCamera(Camera *camera) {
@@ -319,14 +283,6 @@ bool ViewportPanel::isHovered() {
 
 void ViewportPanel::focus() {
     m_focusNextFrame = true;
-}
-
-Miren::ViewId ViewportPanel::getRenderingView() {
-    return m_viewport.getRenderingView();
-}
-
-Miren::ViewId ViewportPanel::getSelectionRenderingView() {
-    return m_viewport.getSelectionRenderingView();
 }
 
 } // namespace Panda

@@ -47,11 +47,13 @@ Application::Application()
     , m_maximumFps(120)
     , m_oneSecondTimeCount(0)
     , m_deltaTimeMillis(0)
+    , m_gameTime(0)
     , m_thisSecondFramesCount(0)
     , m_mainWindow(nullptr)
     , m_ImGuiLayer(nullptr) {
     s_instance = this;
     m_timeMillis = getMillis();
+    m_startTimeMillis = m_timeMillis;
     m_layerStack = F_NEW(Foundation::getAllocator(), LayerStack);
     Random::init();
 }
@@ -85,6 +87,8 @@ void Application::loop() {
             m_thisSecondFramesCount = 0;
             m_oneSecondTimeCount = 0;
         }
+        uint64_t gameTime = m_timeMillis - m_startTimeMillis;
+        m_gameTime = gameTime / 1000.f;
         double deltaTime = m_deltaTimeMillis / 1000.0;
         if (deltaTime == 0) { deltaTime = 0.00000001; }
         m_deltaTimeMillis = 0;
@@ -127,6 +131,10 @@ void Application::processFernEvents() {
 
 void Application::close() {
     m_isApplicationShouldClose = true;
+}
+
+float Application::getTime() {
+    return m_gameTime;
 }
 
 } // namespace Panda

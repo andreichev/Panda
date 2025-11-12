@@ -4,6 +4,7 @@
 
 #include "TriangleLayer.hpp"
 
+#include <Panda/Renderer/Std140Buffer.hpp>
 #include <Fern/Events/KeyEvents.hpp>
 #include <Fern/Events/WindowEvents.hpp>
 
@@ -17,16 +18,14 @@ TriangleLayer::TriangleLayer()
 void TriangleLayer::onAttach() {
     using namespace Miren;
 
-    Foundation::Memory vertexMem =
-        Panda::AssetImporterBase::loadData("default-shaders/checker/checker_vertex.glsl");
-    Foundation::Memory fragmentMem =
-        Panda::AssetImporterBase::loadData("default-shaders/checker/checker_fragment.glsl");
+    Foundation::Memory vertexMem = Panda::AssetImporterBase::loadData("base.vert");
+    Foundation::Memory fragmentMem = Panda::AssetImporterBase::loadData("base.frag");
     m_shader = Miren::createProgram({vertexMem, fragmentMem});
 
-    float rightEdge = 0.5f;
-    float topEdge = 0.5f;
-    float leftEdge = -0.5f;
-    float bottomEdge = -0.5f;
+    float rightEdge = 1.0f;
+    float topEdge = 1.0f;
+    float leftEdge = -1.0f;
+    float bottomEdge = -1.0f;
     float *data = new float[8]{
         rightEdge, topEdge, leftEdge, topEdge, leftEdge, bottomEdge, rightEdge, bottomEdge
     };
@@ -73,7 +72,17 @@ void TriangleLayer::onEvent(Fern::Event *event) {
 void TriangleLayer::onImGuiRender() {}
 
 void TriangleLayer::onUpdate(double deltaTime) {
+    Panda::Std140Buffer ubo;
     Miren::setShader(m_shader);
+    static float time = 0.f;
+    time += (float)deltaTime;
+    Fern::Window *window = Panda::Application::get()->getMainWindow();
+    auto resolution = window->getSize() * window->getDpi();
+    // iTime
+    ubo.addFloat(time);
+    // iResolution
+    ubo.addVec2(resolution.x, resolution.y);
+    Miren::addInputUniformBuffer(m_shader, "UniformBuffer", ubo.getData(), ubo.getSize());
     Miren::setVertexBuffer(m_vertexBuffer);
     Miren::setIndexBuffer(m_indexBuffer, 0, 6);
     Miren::submit(0);

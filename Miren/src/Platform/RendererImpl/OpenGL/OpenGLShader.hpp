@@ -19,20 +19,23 @@ public:
     void terminate();
     void bind();
     void unbind();
-    void setUniformFloat(const char *name, float *value, int count);
-    void setUniformVec2(const char *name, float *value, int count);
-    void setUniformVec3(const char *name, float *value, int count);
-    void setUniformVec4(const char *name, float *value, int count);
-    void setUniformMat3(const char *name, float *value, int count);
-    void setUniformMat4(const char *name, float *value, int count);
-    void setUniformInt(const char *name, int *value, int count);
+    void setUbo(const char *name, void *value, size_t size);
+    void setTexture(const char *name, uint32_t textureId);
     void bindAttributes(VertexBufferLayoutData &layout, intptr_t baseVertex);
+    bool isValid();
 
 private:
     uint32_t m_id;
+    std::unordered_map<std::string, uint32_t> m_uboIndices;
+    std::unordered_map<std::string, uint32_t> m_uboBindings;
+    std::unordered_map<std::string, uint32_t> m_textureBindings;
     std::unordered_map<std::string, int> m_uniformLocationCache;
-    static void checkCompileErrors(uint32_t shader, const std::string &type);
-    int getUniformLocation(const std::string &name);
+    std::unordered_map<std::string, uint32_t> m_uboBuffers;
+    static bool checkCompileErrors(uint32_t shader, const std::string &type);
+    uint32_t getUboIndex(const char *name);
+    uint32_t getUboBinding(const char *name);
+    int getTextureBinding(const char *name);
+    int getUniformLocation(const char *name);
 };
 
 } // namespace Miren

@@ -7,6 +7,7 @@
 
 #include <Panda.hpp>
 #include <Panda/GameLogic/Components/ParticleSystem.hpp>
+#include <Panda/Assets/StaticResources.hpp>
 #include <Fern/Events/KeyEvents.hpp>
 #include <Fern/Events/WindowEvents.hpp>
 #include <PandaUI/PandaUI.hpp>
@@ -20,6 +21,8 @@ ExampleLayer::ExampleLayer(Fern::Window *window)
 
 void ExampleLayer::onAttach() {
     Miren::setViewClear(0, 0x000000FF);
+    Panda::StaticResources::initStaticResources();
+    m_emitter.initializeMaterial();
     PandaUI::initialize();
     m_cameraTransform.translate({0.f, 0.f, 10.f});
     auto size = m_window->getSize();
@@ -31,7 +34,9 @@ void ExampleLayer::onAttach() {
     PandaUI::Context::shared().updateViewportSize({size.width, size.height});
 }
 
-void ExampleLayer::onDetach() {}
+void ExampleLayer::onDetach() {
+    Panda::StaticResources::deinitStaticResources();
+}
 
 void ExampleLayer::onUpdate(double deltaTime) {
     m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, 0);

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-#include "Base/AssetHandler.hpp"
+#include "Base/Asset.hpp"
+#include "Base/Path.hpp"
 #include "Base/AssetImporterBase.hpp"
 
 #include <Miren/Miren.hpp>
@@ -18,18 +19,16 @@ public:
     explicit TextureAsset(const path_t &path)
         : Asset(AssetType::TEXTURE) {
         auto textureCreate = AssetImporterBase::load2DTexture(path);
-        m_size = {(float)textureCreate.m_width, (float)textureCreate.m_height};
         textureCreate.m_wrap = Miren::CLAMP;
         textureCreate.m_magFiltering = Miren::NEAREST;
         textureCreate.m_minFiltering = Miren::NEAREST_MIPMAP_LINEAR;
         textureCreate.m_numMips = 3;
-        m_mirenHandle = Miren::createTexture(textureCreate);
+        create(textureCreate);
     }
 
-    TextureAsset(Miren::TextureCreate create)
+    TextureAsset(Miren::TextureCreate textureCreate)
         : Asset(AssetType::TEXTURE) {
-        m_mirenHandle = Miren::createTexture(create);
-        m_size = Size(create.m_width, create.m_height);
+        create(textureCreate);
     }
 
     TextureAsset(TextureAsset &&other) {
@@ -41,6 +40,11 @@ public:
 
     ~TextureAsset() {
         if (m_mirenHandle.isValid()) { Miren::deleteTexture(m_mirenHandle); }
+    }
+
+    void create(const Miren::TextureCreate &create) {
+        m_mirenHandle = Miren::createTexture(create);
+        m_size = Size(create.m_width, create.m_height);
     }
 
     Size getSize() const {

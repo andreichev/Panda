@@ -201,52 +201,27 @@ void RendererOpenGL::readTexture(Miren::TextureHandle handle, void *data) {
     m_textures[handle.id].readPixels(data);
 }
 
-void RendererOpenGL::setUniform(const Uniform &uniform) {
-    m_shaders[uniform.handle.id].bind();
-    switch (uniform.type) {
-        case UniformType::Sampler:
-            m_shaders[uniform.handle.id].setUniformInt(
-                uniform.name, static_cast<int *>(uniform.data), uniform.count
-            );
+void RendererOpenGL::addInput(const PassInput &input) {
+    m_shaders[input.handle.id].bind();
+    switch (input.type) {
+        case RenderPassInputType::UniformBuffer: {
+            MIREN_LOG("ADD UBO INPUT %s", input.name);
+            m_shaders[input.handle.id].setUbo(input.name, input.data, input.size);
             return;
-        case UniformType::Mat3:
-            m_shaders[uniform.handle.id].setUniformMat3(
-                uniform.name, static_cast<float *>(uniform.data), uniform.count
-            );
+        }
+        case RenderPassInputType::ImageSampler2D:
+        case RenderPassInputType::ImageSamplerCube: {
+            MIREN_LOG("ADD TEXTURE INPUT %s", input.name);
+            TextureHandle textureHandle = *static_cast<TextureHandle *>(input.data);
+            uint32_t textureId = m_textures[textureHandle.id].getId();
+            m_shaders[input.handle.id].setTexture(input.name, textureId);
             return;
-        case UniformType::Mat4:
-            m_shaders[uniform.handle.id].setUniformMat4(
-                uniform.name, static_cast<float *>(uniform.data), uniform.count
-            );
+        }
+        case RenderPassInputType::Count: {
             return;
-        case UniformType::Float:
-            m_shaders[uniform.handle.id].setUniformFloat(
-                uniform.name, static_cast<float *>(uniform.data), uniform.count
-            );
-            return;
-        case UniformType::Vec2:
-            m_shaders[uniform.handle.id].setUniformVec2(
-                uniform.name, static_cast<float *>(uniform.data), uniform.count
-            );
-            return;
-        case UniformType::Vec3:
-            m_shaders[uniform.handle.id].setUniformVec3(
-                uniform.name, static_cast<float *>(uniform.data), uniform.count
-            );
-            return;
-        case UniformType::Vec4:
-            m_shaders[uniform.handle.id].setUniformVec4(
-                uniform.name, static_cast<float *>(uniform.data), uniform.count
-            );
-            return;
-        case UniformType::Count:
-            return;
+        }
     }
-    LOG_ERROR("UNIFORM TYPE IS UNDEFINED");
-}
-
-void RendererOpenGL::setTexture(TextureHandle handle, uint32_t slot) {
-    m_textures[handle.id].bind(slot);
+    LOG_ERROR("PASS INPUT TYPE IS UNDEFINED");
 }
 
 void RendererOpenGL::submit(Frame *frame) {
@@ -268,7 +243,7 @@ void RendererOpenGL::submit(Frame *frame) {
     }
     ViewId viewId = -1;
     for (int i = 0; i < frame->m_drawCallsCount; i++) {
-        RenderDraw &draw = frame->m_drawCalls[i];
+        RenderPass &draw = frame->m_drawCalls[i];
         if (!draw.m_isSubmitted) { continue; }
         if (draw.m_viewId != viewId) {
             viewId = draw.m_viewId;
@@ -308,18 +283,16 @@ void RendererOpenGL::viewChanged(View &view) {
     }
 }
 
-void RendererOpenGL::submit(RenderDraw *draw) {
+void RendererOpenGL::submit(RenderPass *draw) {
     // TODO: Capture time
     if (!draw->m_shader.isValid()) { return; }
+    if (!m_shaders[draw->m_shader.id].isValid()) { return; }
+    GL_CALL(glBindVertexArray(m_uselessVao));
     m_shaders[draw->m_shader.id].bind();
-    draw->m_uniformBuffer.finishWriting();
-    Uniform *uniform;
-    while ((uniform = draw->m_uniformBuffer.readUniform()) != nullptr) {
-        setUniform(*uniform);
-    }
-    for (size_t t = 0; t < draw->m_textureBindingsCount; t++) {
-        TextureBinding &textureBinding = draw->m_textureBindings[t];
-        setTexture(textureBinding.m_handle, textureBinding.m_slot);
+    draw->m_inputs.finishWriting();
+    PassInput *input;
+    while ((input = draw->m_inputs.readInput()) != nullptr) {
+        addInput(*input);
     }
     if (draw->m_state & MIREN_STATE_CULL_FACE) {
         GL_CALL(glEnable(GL_CULL_FACE));
@@ -354,7 +327,6 @@ void RendererOpenGL::submit(RenderDraw *draw) {
             : m_vertexBuffers[draw->m_vertexBuffer.id].getLayoutHandle();
     PND_ASSERT(layoutHandle.id != MIREN_INVALID_HANDLE, "Invalid handle");
     VertexBufferLayoutData &layout = m_vertexLayouts[layoutHandle.id];
-    GL_CALL(glBindVertexArray(m_uselessVao));
     m_shaders[draw->m_shader.id].bindAttributes(layout, draw->m_verticesOffset);
     m_indexBuffers[draw->m_indexBuffer.id].bind();
     GL_CALL(glDrawElements(

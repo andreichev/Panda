@@ -4,13 +4,31 @@
 
 #include "Panda/GameLogic/World.hpp"
 #include "Panda/GameLogic/GameContext.hpp"
-#include "Panda/GameLogic/Components/SkyComponent.hpp"
 #include "Panda/Physics/Physics2D.hpp"
+#include "Panda/GameLogic/SelectionContext.hpp"
+#include "Panda/Renderer/MirenViewDistribution.hpp"
+#include "Panda/Assets/StaticResources.hpp"
 
 #include <Rain/Rain.hpp>
 #include <entt/entt.hpp>
 
 namespace Panda {
+
+ScriptFieldValue getDefaultValueFor(ScriptFieldType type) {
+    switch (type) {
+        case ScriptFieldType::INTEGER:
+            return int(0);
+        case ScriptFieldType::FLOAT:
+            return float(0.f);
+        case ScriptFieldType::ENTITY:
+        case ScriptFieldType::TEXTURE:
+        case ScriptFieldType::MATERIAL:
+            return UUID(0);
+        case ScriptFieldType::UNKNOWN:
+            break;
+    }
+    return int(0);
+}
 
 World::World()
     : m_entityIdMap(100)
@@ -19,14 +37,12 @@ World::World()
 #ifdef PND_EDITOR
     , m_isChanged(false)
     , m_commandManager()
-    , m_selectionContext()
 #endif
     , m_physics2D() {
 }
 
 World::~World() {
     m_physics2D.shutdown();
-    releaseAllScriptingFields();
 }
 
 void World::startRunning() {
@@ -56,8 +72,8 @@ void World::finishRunning() {
 
 void World::updateRuntime(double deltaTime) {
     if (!m_isRunning) { return; }
-    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_renderingViewId);
-    m_renderer3d.begin(m_renderingViewId);
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, Views::SCENE_VIEW);
+    m_renderer3d.begin(Views::SCENE_VIEW);
 
     m_physics2D.update(this, deltaTime);
     glm::mat4 viewProjMtx;
@@ -95,8 +111,8 @@ void World::updateRuntime(double deltaTime) {
 }
 
 void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
-    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_renderingViewId);
-    m_renderer3d.begin(m_renderingViewId);
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, Views::SCENE_VIEW);
+    m_renderer3d.begin(Views::SCENE_VIEW);
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
     m_physics2D.update(this, deltaTime);
@@ -116,23 +132,23 @@ void World::updateSimulation(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4
     renderWorld(viewProjMtx, skyViewProjMtx);
     m_renderer2d.end();
     m_renderer3d.end();
-    m_renderer2d.begin(Panda::Renderer2D::Mode::GEOMETRY_ONLY, m_selectionViewId);
-    m_renderer3d.begin(m_selectionViewId);
+    m_renderer2d.begin(Panda::Renderer2D::Mode::GEOMETRY_ONLY, Views::SELECTED_GEOMETRY_VIEW);
+    m_renderer3d.begin(Views::SELECTED_GEOMETRY_VIEW);
     renderSelectedGeometry(viewProjMtx);
     m_renderer2d.end();
     m_renderer3d.end();
 }
 
 void World::updateEditor(double deltaTime, glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
-    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, m_renderingViewId);
-    m_renderer3d.begin(m_renderingViewId);
+    m_renderer2d.begin(Panda::Renderer2D::Mode::DEFAULT, Views::SCENE_VIEW);
+    m_renderer3d.begin(Views::SCENE_VIEW);
     m_renderer2d.setViewProj(viewProjMtx);
     m_renderer3d.setViewProj(viewProjMtx);
     renderWorld(viewProjMtx, skyViewProjMtx);
     m_renderer2d.end();
     m_renderer3d.end();
-    m_renderer2d.begin(Panda::Renderer2D::Mode::GEOMETRY_ONLY, m_selectionViewId);
-    m_renderer3d.begin(m_selectionViewId);
+    m_renderer2d.begin(Panda::Renderer2D::Mode::GEOMETRY_ONLY, Views::SELECTED_GEOMETRY_VIEW);
+    m_renderer3d.begin(Views::SELECTED_GEOMETRY_VIEW);
     renderSelectedGeometry(viewProjMtx);
     m_renderer2d.end();
     m_renderer3d.end();
@@ -144,9 +160,9 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
         auto view = m_registry.view<SkyComponent>();
         for (auto &entityHandle : view) {
             if (!isValidEntt(entityHandle)) { continue; }
-            auto &sky = view.get<SkyComponent>(entityHandle);
-            sky.setViewId(m_renderingViewId);
-            sky.update(skyViewProjMtx);
+            AssetRef<MeshAsset> skyMesh = StaticResources::defaultSkyMesh;
+            m_renderer3d.submitSky(skyViewProjMtx, skyMesh);
+            break;
         }
     }
     // Render Sprites
@@ -161,12 +177,9 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
             Panda::Renderer2D::RectData rect;
             rect.transform = getWorldSpaceTransformMatrix(entity);
             rect.color = spriteComponent.color;
-            // Load texture if it needs.
-            AssetHandler *assetHandler = GameContext::s_assetHandler;
-            if (spriteComponent.textureId && !spriteComponent.asset && assetHandler) {
-                spriteComponent.asset = assetHandler->load(spriteComponent.textureId);
+            if (spriteComponent.material) {
+                rect.material = spriteComponent.material.as<MaterialAsset>();
             }
-            rect.texture = spriteComponent.asset;
             rect.size = {1.f, 1.f};
             rect.id = id.id;
             int xTileIndex = spriteComponent.index % spriteComponent.cols;
@@ -179,34 +192,21 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
             m_renderer2d.drawRect(rect);
         }
     }
-    // Render static meshes
+    // Render meshes
     {
-        auto view = m_registry.view<StaticMeshComponent, TransformComponent>();
+        auto view = m_registry.view<MeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
             if (!isValidEntt(entityHandle)) { continue; }
-            auto &staticMeshComponent = view.get<StaticMeshComponent>(entityHandle);
+            auto &staticMeshComponent = view.get<MeshComponent>(entityHandle);
             auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
-            for (auto &mesh : staticMeshComponent.meshes) {
-                m_renderer3d.submit(transform, &mesh);
-            }
-        }
-    }
-    // Render dynamic meshes
-    {
-        auto view = m_registry.view<DynamicMeshComponent, TransformComponent>();
-        for (auto entityHandle : view) {
-            if (!isValidEntt(entityHandle)) { continue; }
-            auto &dynamicMeshComponent = view.get<DynamicMeshComponent>(entityHandle);
-            auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
-            for (auto &mesh : dynamicMeshComponent.meshes) {
-                m_renderer3d.submit(transform, &mesh);
-            }
+            m_renderer3d.submit(transform, staticMeshComponent.mesh);
         }
     }
 }
 
 void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
-    auto selected = m_selectionContext.getSelectedEntities();
+    auto selectedIds = SelectionContext::getSelectedEntities();
+    auto selected = getById(selectedIds);
     // Render Sprites
     {
         for (auto entity : selected) {
@@ -218,31 +218,18 @@ void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
             m_renderer2d.drawRect(rect);
         }
     }
-    // Render static meshes
-    {
-        for (auto entity : selected) {
-            if (!entity.hasComponent<StaticMeshComponent>()) { continue; }
-            auto &staticMeshComponent = entity.getComponent<StaticMeshComponent>();
-            auto transform = getWorldSpaceTransformMatrix(entity);
-            for (auto &mesh : staticMeshComponent.meshes) {
-                m_renderer3d.submit(transform, &mesh);
-            }
-        }
-    }
     // Render dynamic meshes
     {
         for (auto entity : selected) {
-            if (!entity.hasComponent<DynamicMeshComponent>()) { continue; }
-            auto &dynamicMeshComponent = entity.getComponent<DynamicMeshComponent>();
+            if (!entity.hasComponent<MeshComponent>()) { continue; }
+            auto &dynamicMeshComponent = entity.getComponent<MeshComponent>();
             auto transform = getWorldSpaceTransformMatrix(entity);
-            for (auto &mesh : dynamicMeshComponent.meshes) {
-                m_renderer3d.submit(transform, &mesh);
-            }
+            m_renderer3d.submit(transform, dynamicMeshComponent.mesh);
         }
     }
     // TOUCH SELECTION VIEW ID TO CLEAN
     Miren::discard();
-    Miren::submit(m_selectionViewId);
+    Miren::submit(Views::SELECTED_GEOMETRY_VIEW);
 }
 
 Entity World::instantiateEntity() {
@@ -268,9 +255,10 @@ Entity World::instantiateEntity(UUID id) {
 }
 
 void World::updateScriptsAndFields() {
-    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) { return; }
+    ScriptEngine *scriptEngine = GameContext::getScriptEngine();
+    if (!scriptEngine || !scriptEngine->isLoaded()) { return; }
     auto view = m_registry.view<ScriptListComponent>();
-    auto manifest = GameContext::s_scriptEngine->getManifest();
+    auto manifest = scriptEngine->getManifest();
     for (auto entityHandle : view) {
         if (!isValidEntt(entityHandle)) { continue; }
         auto &component = view.get<ScriptListComponent>(entityHandle);
@@ -311,46 +299,31 @@ void World::updateScriptsAndFields() {
             for (auto &fieldManifest : clazz.fields) {
                 // Check if field is new - allocate memory and save it
                 if (!container.hasField(fieldManifest.name)) {
-                    Foundation::Memory value;
-                    switch (fieldManifest.type) {
-                        case ScriptFieldType::INTEGER: {
-                            value = Foundation::Memory::alloc(sizeof(int));
-                            memset(value.data, 0, sizeof(int));
-                            break;
-                        }
-                        case ScriptFieldType::FLOAT: {
-                            value = Foundation::Memory::alloc(sizeof(float));
-                            memset(value.data, 0, sizeof(float));
-                            break;
-                        }
-                        case ScriptFieldType::TEXTURE:
-                        case ScriptFieldType::ENTITY: {
-                            value = Foundation::Memory::alloc(sizeof(UUID));
-                            memset(value.data, 0, sizeof(UUID));
-                            break;
-                        }
-                        default: {
-                            PND_ASSERT(false, "Unknown field type");
-                            break;
-                        }
-                    }
                     ScriptField field = ScriptField(
-                        0, fieldManifest.handle, fieldManifest.name, fieldManifest.type, value
+                        0,
+                        fieldManifest.handle,
+                        fieldManifest.name,
+                        fieldManifest.type,
+                        getDefaultValueFor(fieldManifest.type)
                     );
                     container.addField(field);
                     continue;
                 }
                 ScriptField &field = container.getField(fieldManifest.name);
-                field.type = fieldManifest.type;
+                if (field.type != fieldManifest.type) {
+                    field.type = fieldManifest.type;
+                    field.value = getDefaultValueFor(fieldManifest.type);
+                }
             }
         }
     }
 }
 
 void World::initializeScriptCore() {
-    if (!GameContext::s_scriptEngine || !GameContext::s_scriptEngine->isLoaded()) { return; }
+    ScriptEngine *scriptEngine = GameContext::getScriptEngine();
+    if (!scriptEngine || !scriptEngine->isLoaded()) { return; }
     auto view = m_registry.view<ScriptListComponent>();
-    auto manifest = GameContext::s_scriptEngine->getManifest();
+    auto manifest = scriptEngine->getManifest();
     for (auto entityHandle : view) {
         if (!isValidEntt(entityHandle)) { continue; }
         auto &component = view.get<ScriptListComponent>(entityHandle);
@@ -373,7 +346,7 @@ void World::initializeScriptCore() {
             for (ScriptField &field : container.getFields()) {
                 field.instanceId = scriptInstanceId;
                 // field.fieldId = classManifest.getField(field.name.c_str()).handle;
-                ExternalCalls::setFieldValue(scriptInstanceId, field.fieldId, field.value.data);
+                ExternalCalls::setFieldValue(scriptInstanceId, field.fieldId, &field.value);
             }
         }
     }
@@ -408,32 +381,32 @@ void World::fillEntity(Entity entity, UUID id) {
     entity.addComponent<TagComponent>("Entity");
     entity.addComponent<RelationshipComponent>();
     entity.addComponent<TransformComponent>();
-    entity.addComponent<StaticMeshComponent>();
-    entity.addComponent<DynamicMeshComponent>();
+    entity.addComponent<MeshComponent>();
     entity.addComponent<ScriptListComponent>();
 }
 
 void World::destroy(Entity entity) {
+    UUID entityId = entity.getId();
     entity.removeFromParent();
     std::vector<UUID> children = entity.getChildEntities();
     for (UUID childHandle : children) {
         Entity child = getById(childHandle);
         destroy(child);
     }
-    m_entityIdMap.erase(entity.getId());
+    m_entityIdMap.erase(entityId);
     m_registry.destroy(entity.m_handle);
 #ifdef PND_EDITOR
     m_isChanged = true;
-    if (m_selectionContext.isSelected(entity)) { m_selectionContext.removeSelectedEntity(entity); }
+    if (SelectionContext::isEntitySelected(entityId)) {
+        SelectionContext::removeSelectedEntity(entityId);
+    }
 #endif
 }
 
 void World::clear() {
-    releaseAllScriptingFields();
 #ifdef PND_EDITOR
     m_commandManager.CLEAR();
     m_isChanged = false;
-    m_selectionContext.unselectAll();
 #endif
     for (auto id : m_registry.storage<entt::entity>()) {
         m_registry.destroy(id);
@@ -508,12 +481,12 @@ Entity World::getById(UUID id) {
     return m_entityIdMap.at(id);
 }
 
-void World::setViewId(Miren::ViewId id) {
-    m_renderingViewId = id;
-}
-
-void World::setSelectionViewId(Miren::ViewId id) {
-    m_selectionViewId = id;
+std::unordered_set<Entity> World::getById(std::unordered_set<UUID> ids) {
+    std::unordered_set<Entity> result;
+    for (UUID id : ids) {
+        result.emplace(getById(id));
+    }
+    return result;
 }
 
 glm::mat4 World::getWorldSpaceTransformMatrix(Entity entity) {
@@ -556,29 +529,15 @@ World &World::operator=(World &other) {
     copyAllComponents<TransformComponent>(src, dst);
     copyAllComponents<RelationshipComponent>(src, dst);
     copyAllComponents<SpriteRendererComponent>(src, dst);
-    copyAllComponents<StaticMeshComponent>(src, dst);
-    copyAllComponents<DynamicMeshComponent>(src, dst);
+    copyAllComponents<MeshComponent>(src, dst);
     copyAllComponents<CameraComponent>(src, dst);
     copyAllComponents<SkyComponent>(src, dst);
     copyAllComponents<Rigidbody2DComponent>(src, dst);
     copyAllComponents<BoxCollider2DComponent>(src, dst);
     copyAllComponents<ScriptListComponent>(src, dst);
-    // Duplicate scripting fields memory
-    {
-        auto view = dst.view<ScriptListComponent>();
-        for (auto entityHandle : view) {
-            auto &scriptList = view.get<ScriptListComponent>(entityHandle);
-            for (ExternalScript &script : scriptList.scripts) {
-                for (ScriptField &field : script.getFields()) {
-                    field.value = Foundation::Memory::copying(field.value.data, field.getSize());
-                }
-            }
-        }
-    }
 #ifdef PND_EDITOR
     sort();
 #endif
-    m_selectionContext = other.m_selectionContext;
     return *this;
 }
 
@@ -594,22 +553,12 @@ Entity World::duplicateEntity(Entity entity) {
 #endif
     copyComponent<TransformComponent>(src, dst, m_registry);
     copyComponent<SpriteRendererComponent>(src, dst, m_registry);
-    copyComponent<StaticMeshComponent>(src, dst, m_registry);
-    copyComponent<DynamicMeshComponent>(src, dst, m_registry);
+    copyComponent<MeshComponent>(src, dst, m_registry);
     copyComponent<CameraComponent>(src, dst, m_registry);
     copyComponent<SkyComponent>(src, dst, m_registry);
     copyComponent<Rigidbody2DComponent>(src, dst, m_registry);
     copyComponent<BoxCollider2DComponent>(src, dst, m_registry);
     copyComponent<ScriptListComponent>(src, dst, m_registry);
-    // Duplicate scripting fields memory
-    {
-        auto &scriptList = m_registry.get<ScriptListComponent>(dst);
-        for (ExternalScript &script : scriptList.scripts) {
-            for (ScriptField &field : script.getFields()) {
-                field.value = Foundation::Memory::copying(field.value.data, field.getSize());
-            }
-        }
-    }
     // Duplicate relationship component
     {
         RelationshipComponent &srcRelationship = m_registry.get<RelationshipComponent>(src);
@@ -639,14 +588,6 @@ Entity World::duplicateEntity(Entity entity) {
     m_isChanged = true;
 #endif
     return newEntity;
-}
-
-void World::releaseAllScriptingFields() {
-    auto view = m_registry.view<ScriptListComponent>();
-    for (auto entityHandle : view) {
-        ScriptListComponent &scriptList = view.get<ScriptListComponent>(entityHandle);
-        scriptList.releaseFields();
-    }
 }
 
 bool World::isValidEntt(entt::entity handle) {

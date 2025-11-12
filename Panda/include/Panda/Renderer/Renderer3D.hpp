@@ -5,8 +5,7 @@
 #pragma once
 
 #include "Panda/GameLogic/Components/TransformComponent.hpp"
-#include "Panda/Assets/StaticMeshAsset.hpp"
-#include "Panda/Assets/DynamicMeshAsset.hpp"
+#include "Panda/Assets/MeshAsset.hpp"
 #include "Panda/GameLogic/Camera.hpp"
 
 #include <Miren/Miren.hpp>
@@ -30,8 +29,8 @@ public:
     Renderer3D(Renderer3D &&other);
     ~Renderer3D() = default;
     void begin(Miren::ViewId id);
-    void submit(glm::mat4 &transform, StaticMeshAsset *mesh);
-    void submit(glm::mat4 &transform, DynamicMeshAsset *mesh);
+    void submitSky(glm::mat4 &skyViewProj, AssetRef<MeshAsset> skyMesh);
+    void submit(glm::mat4 &model, AssetRef<MeshAsset> mesh);
     void end();
     Statistics getStats();
     void setViewProj(glm::mat4 viewProj);
@@ -39,6 +38,8 @@ public:
     Renderer3D &operator=(Renderer3D &&other);
 
 private:
+    void flush();
+
     DrawData m_drawData;
     Miren::ViewId m_viewId;
     glm::mat4 m_viewProj;

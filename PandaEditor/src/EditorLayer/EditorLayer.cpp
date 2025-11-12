@@ -1,13 +1,15 @@
 #include "EditorLayer.hpp"
 
-#include "Panda/GameLogic/GameContext.hpp"
 #include "UI/Common/ImGuiHelper.hpp"
 #include "UI/Popups/EditorYesNoPopup.hpp"
 #include "UI/Popups/PickScriptPopup.hpp"
 #include "UI/Popups/EnterNamePopup.hpp"
 #include "UI/Popups/EditorAboutPopup.hpp"
-#include "Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp"
+#include "UI/Popups/LocateAssetPopup.hpp"
 
+#include <Panda/Renderer/MirenViewDistribution.hpp>
+#include <Panda/GameLogic/GameContext.hpp>
+#include <Panda/WorldCommands/Impl/AddRemoveEntitiesCommand.hpp>
 #include <Foundation/PlatformDetection.hpp>
 #include <Fern/Fern.hpp>
 #include <Fern/Events/WindowEvents.hpp>
@@ -19,7 +21,7 @@ EditorLayer::EditorLayer(Fern::Window *window)
     , m_playingWorld()
     , m_currentWorld(&m_editingWorld)
     , m_viewportFullscreen(false)
-    , m_panelsContainer(this, &m_cameraController)
+    , m_panelsContainer(this, &m_loader, &m_cameraController)
     , m_loader(&m_editingWorld, this)
     , m_startPanel(&m_loader)
     , m_editorCamera()
@@ -31,7 +33,7 @@ EditorLayer::EditorLayer(Fern::Window *window)
 
 void EditorLayer::onAttach() {
     Foundation::EditorLogger::init(ConsolePanel::loggerCallback);
-    GameContext::s_currentWorld = m_currentWorld;
+    GameContext::setCurrentWorld(m_currentWorld);
     Fern::Size dpi = Application::get()->getMainWindow()->getDpi();
     Fern::Size windowSize = Application::get()->getMainWindow()->getSize();
     // Default framebuffer initial size
@@ -39,10 +41,6 @@ void EditorLayer::onAttach() {
         0, Miren::Rect(0, 0, windowSize.width * dpi.width, windowSize.height * dpi.height)
     );
     m_panelsContainer.viewport.initWithSize(Size(100.f, 100.f));
-    m_editingWorld.setViewId(m_panelsContainer.viewport.getRenderingView());
-    m_editingWorld.setSelectionViewId(m_panelsContainer.viewport.getSelectionRenderingView());
-    m_playingWorld.setViewId(m_panelsContainer.viewport.getRenderingView());
-    m_grid.setViewId(m_panelsContainer.viewport.getRenderingView());
     m_panelsContainer.viewport.setCamera(&m_editorCamera);
     m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_cameraController.setPosition({0.f, 0.f, 4.f});
@@ -51,7 +49,7 @@ void EditorLayer::onAttach() {
 }
 
 void EditorLayer::onDetach() {
-    GameContext::s_currentWorld = nullptr;
+    GameContext::setCurrentWorld(nullptr);
 }
 
 void EditorLayer::onUpdate(double deltaTime) {
@@ -139,7 +137,7 @@ void EditorLayer::play() {
     m_sceneState = SceneState::PLAY;
     m_playingWorld = m_editingWorld;
     m_currentWorld = &m_playingWorld;
-    GameContext::s_currentWorld = m_currentWorld;
+    GameContext::setCurrentWorld(m_currentWorld);
     m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_playingWorld.startRunning();
     m_panelsContainer.viewport.focus();
@@ -149,7 +147,7 @@ void EditorLayer::simulate() {
     m_sceneState = SceneState::SIMULATE;
     m_playingWorld = m_editingWorld;
     m_currentWorld = &m_playingWorld;
-    GameContext::s_currentWorld = m_currentWorld;
+    GameContext::setCurrentWorld(m_currentWorld);
     m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_playingWorld.startRunning();
     m_panelsContainer.viewport.focus();
@@ -159,7 +157,7 @@ void EditorLayer::stop() {
     m_sceneState = SceneState::EDIT;
     m_panelsContainer.viewport.setCamera(&m_editorCamera);
     m_currentWorld = &m_editingWorld;
-    GameContext::s_currentWorld = m_currentWorld;
+    GameContext::setCurrentWorld(m_currentWorld);
     m_panelsContainer.setCurrentWorld(m_currentWorld);
     m_playingWorld.finishRunning();
     m_panelsContainer.viewport.focus();
@@ -173,6 +171,7 @@ void EditorLayer::loaderDidLoadProject(const std::string &name, const path_t &pa
 }
 
 void EditorLayer::loaderDidLoadWorld() {
+    SelectionContext::unselectAll();
     m_window->setTitle(m_loader.getProjectSettings().worldPath.c_str());
 }
 
@@ -283,6 +282,10 @@ void EditorLayer::menuBarOpenCppProject() {
     m_loader.openCppProject();
 }
 
+void EditorLayer::menuBarShowCppProject() {
+    m_loader.showCppProject();
+}
+
 void EditorLayer::menuBarSaveWorld() {
     saveWorld();
 }
@@ -312,10 +315,7 @@ void EditorLayer::menuBarCloseProject() {
 
 void EditorLayer::menuBarAbout() {
     EditorAboutPopup *popup = F_NEW(Foundation::getAllocator(), EditorAboutPopup);
-    popup->closeAction = [this, popup]() {
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
-    };
+    popup->closeAction = [popup]() { popup->isDeleted = true; };
     popup->title = "About";
     m_popups.emplace_back(popup);
 }
@@ -326,51 +326,70 @@ void EditorLayer::menuBarAbout() {
 
 void EditorLayer::addScriptToEntities(const std::unordered_set<Entity> &entities) {
     PickScriptPopup *popup = F_NEW(Foundation::getAllocator(), PickScriptPopup);
-    popup->closeAction = [this, popup]() {
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
-    };
-    popup->selectAction = [&](const std::unordered_set<Entity> &entities,
-                              ScriptClassManifest clazz) {
-        if (clazz.name) {
-            for (Entity entity : entities) {
-                // Map manifest fields to internal ScriptField type
-                std::vector<ScriptField> fields;
-                for (auto manifestField : clazz.fields) {
-                    Foundation::Memory data;
-                    switch (manifestField.type) {
-                        case ScriptFieldType::INTEGER: {
-                            data = Foundation::Memory::alloc(sizeof(int));
-                            break;
+    popup->closeAction = [popup]() { popup->isDeleted = true; };
+    popup->selectAction =
+        [this, popup](const std::unordered_set<Entity> &entities, ScriptClassManifest clazz) {
+            if (clazz.name) {
+                for (Entity entity : entities) {
+                    // Map manifest fields to internal ScriptField type
+                    std::vector<ScriptField> fields;
+                    for (auto manifestField : clazz.fields) {
+                        ScriptFieldValue value;
+                        switch (manifestField.type) {
+                            case ScriptFieldType::INTEGER: {
+                                value = int32_t(0);
+                                break;
+                            }
+                            case ScriptFieldType::FLOAT: {
+                                value = float(0.f);
+                                break;
+                            }
+                            case ScriptFieldType::TEXTURE:
+                            case ScriptFieldType::ENTITY:
+                            case ScriptFieldType::MATERIAL: {
+                                value = UUID(0);
+                                break;
+                            }
+                            default: {
+                                PND_ASSERT(false, "Unknown field type");
+                            }
                         }
-                        case ScriptFieldType::FLOAT: {
-                            data = Foundation::Memory::alloc(sizeof(float));
-                            break;
-                        }
-                        case ScriptFieldType::TEXTURE:
-                        case ScriptFieldType::ENTITY: {
-                            data = Foundation::Memory::alloc(sizeof(UUID));
-                            break;
-                        }
-                        default: {
-                            PND_ASSERT(false, "Unknown field type");
-                        }
+                        ScriptField field(
+                            0, manifestField.handle, manifestField.name, manifestField.type, value
+                        );
+                        fields.emplace_back(field);
                     }
-                    ScriptField field(
-                        0, manifestField.handle, manifestField.name, manifestField.type, data
-                    );
-                    fields.emplace_back(field);
+                    // TODO: Bind previously picked values
+                    entity.addScript(Panda::ExternalScript(0, clazz.name, fields));
                 }
-                // TODO: Bind previously picked values
-                entity.addScript(Panda::ExternalScript(0, clazz.name, fields));
             }
-        }
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
-    };
+            popup->isDeleted = true;
+        };
     popup->entities = entities;
     popup->title = "Add Script";
     popup->subtitle = "Pick a script from available Script classes list.";
+    m_popups.emplace_back(popup);
+}
+
+#pragma endregion
+
+#pragma region Asset properties draw output
+
+void EditorLayer::locateMissingAsset(AssetId id) {
+    AssetHandlerEditor *assetHandler =
+        static_cast<AssetHandlerEditor *>(GameContext::getAssetHandler());
+    PND_ASSERT(assetHandler != nullptr, "ASSET HANDLER IS NOT INITIALIZED");
+    MissingFiles missingFiles = assetHandler->getMissingAssetFiles(id);
+    LocateAssetPopup *popup = F_NEW(Foundation::getAllocator(), LocateAssetPopup);
+    popup->closeAction = [popup]() { popup->isDeleted = true; };
+    popup->doneAction = [id, assetHandler, popup]() {
+        assetHandler->locateMissingFiles(id, popup->missingFiles);
+        popup->isDeleted = true;
+    };
+    popup->missingFiles = missingFiles;
+    popup->projectPath = assetHandler->getProjectPath();
+    popup->title = "Locate missing asset";
+    popup->subtitle = "Asset location:";
     m_popups.emplace_back(popup);
 }
 
@@ -380,14 +399,10 @@ void EditorLayer::addScriptToEntities(const std::unordered_set<Entity> &entities
 
 void EditorLayer::showCreateFolderPopup() {
     EnterNamePopup *popup = F_NEW(Foundation::getAllocator(), EnterNamePopup);
-    popup->closeAction = [this, popup]() {
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
-    };
-    popup->doneAction = [&](std::string text) {
+    popup->closeAction = [popup]() { popup->isDeleted = true; };
+    popup->doneAction = [this, popup](std::string text) {
         if (!text.empty()) { m_panelsContainer.contentBrowser.createFolder(text); }
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
+        popup->isDeleted = true;
     };
     popup->title = "Create folder";
     popup->subtitle = "Enter folder name:";
@@ -398,28 +413,15 @@ void EditorLayer::deleteFileShowPopup(path_t path) {
     EditorYesNoPopup *popup = F_NEW(Foundation::getAllocator(), EditorYesNoPopup);
     popup->yesAction = [this, popup]() {
         m_panelsContainer.contentBrowser.confirmDeletion();
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
+        popup->isDeleted = true;
     };
-    popup->noAction = [this, popup]() {
-        F_DELETE(Foundation::getAllocator(), m_popups.back());
-        m_popups.pop_back();
-    };
+    popup->noAction = [popup]() { popup->isDeleted = true; };
     popup->closeAction = popup->noAction;
     popup->title = "Delete";
     popup->subtitle = "Delete \"" + path.filename().string() + "\"?";
     popup->yesText = "Yes";
     popup->noText = "No";
     m_popups.emplace_back(popup);
-}
-
-void EditorLayer::importAsset(const path_t &path) {
-    auto &assetHandler = m_loader.getAssetHandler();
-    assetHandler.registerTextureAsset(path);
-}
-
-UUID EditorLayer::getAssetId(const path_t &path) {
-    return m_loader.getAssetHandler().getAssetId(path);
 }
 
 #pragma endregion
@@ -596,10 +598,9 @@ void EditorLayer::processShortcuts() {
         } else {
             // Move to selected entity
             if (m_currentWorld) {
-                SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
-                auto selected = selectionContext.getSelectedEntities();
+                auto selected = SelectionContext::getSelectedEntities();
                 if (!selected.empty()) {
-                    m_cameraController.reset(selectionContext.getMedianPosition());
+                    m_cameraController.reset(SelectionContext::getMedianPosition());
                 }
             }
         }
@@ -608,15 +609,15 @@ void EditorLayer::processShortcuts() {
         m_viewportFullscreen = !m_viewportFullscreen;
     }
     if (ImGui::IsKeyPressed(ImGuiKey_D, false) && ctrl) {
-        SelectionContext &selectionContext = m_currentWorld->getSelectionContext();
         if (m_currentWorld) {
-            std::unordered_set<Entity> selected = selectionContext.getSelectedEntities();
+            std::unordered_set<UUID> selectedIds = SelectionContext::getSelectedEntities();
+            std::unordered_set<Entity> selected = m_currentWorld->getById(selectedIds);
             std::unordered_set<Entity> copies;
             for (auto entity : selected) {
                 Entity duplicate = m_currentWorld->duplicateEntity(entity);
                 copies.insert(duplicate);
-                selectionContext.removeSelectedEntity(entity, false);
-                selectionContext.addSelectedEntity(duplicate, false);
+                SelectionContext::removeSelectedEntity(entity.getId(), false);
+                SelectionContext::addSelectedEntity(duplicate.getId(), false);
             }
             WorldCommandManager &cmd = m_currentWorld->getCommandManger();
             AddRemoveEntitiesCommand update(copies);
