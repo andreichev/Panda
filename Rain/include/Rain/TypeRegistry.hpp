@@ -390,7 +390,8 @@ struct TypeDecoder<std::vector<T, Alloc>> {
     decode(const char *key, Decoder *decoder, const TypeInfo &info, std::vector<T, Alloc> &data) {
         data.clear();
         if (!decoder->beginArray(key)) {
-            return false;
+            // Here we allow to continue decoding, even if there is no array
+            return true;
         }
         auto memberInfo = getTypeRegistry()->findOrCreateType<T>();
         while (decoder->arrayHasElement()) {

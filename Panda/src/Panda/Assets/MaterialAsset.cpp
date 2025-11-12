@@ -1,3 +1,4 @@
+#include "Panda/Application/Application.hpp"
 #include "Panda/Assets/MaterialAsset.hpp"
 #include "Panda/Renderer/Std140Buffer.hpp"
 #include "Panda/Serialization/ShaderReflectionDataTransformer.hpp"
@@ -22,9 +23,7 @@ void MaterialAsset::bindFields() {
             }
             case MaterialFieldType::TEXTURE: {
                 UUID assetId = std::get<UUID>(field.value);
-                if (!assetId) {
-                    break;
-                }
+                if (!assetId) { break; }
                 auto handler = GameContext::getAssetHandler();
                 AssetRef<TextureAsset> texture = handler->makeRef<TextureAsset>(assetId);
                 Miren::TextureHandle handle = texture->getMirenHandle();
@@ -40,6 +39,15 @@ void MaterialAsset::bindFields() {
     if (ubo.getSize()) {
         Miren::addInputUniformBuffer(
             shaderHandle, "type_MATERIAL_FIELDS", ubo.getData(), ubo.getSize()
+        );
+    }
+    /// STANDART VALUES
+    ubo.clear();
+    float iTime = Panda::Application::get()->getTime();
+    ubo.addFloat(iTime);
+    if (ubo.getSize()) {
+        Miren::addInputUniformBuffer(
+            shaderHandle, "type_PANDA_FIELDS", ubo.getData(), ubo.getSize()
         );
     }
 }
@@ -64,8 +72,7 @@ void MaterialAsset::updateFields() {
     ShaderSpirvReflectionData reflection = m_shaderRef->getReflectionData();
     MaterialData shaderData = ShaderReflectionDataTransformer::transformToMaterialData(reflection);
     for (auto &field : m_data.inputs) {
-        const MaterialField &shaderField = shaderData.getField(field.name);
-        if (!shaderField) {
+        if (!shaderData.hasField(field.name)) {
             LOG_INFO_EDITOR("MATERIAL FIELD %s NOT FOUND.", field.name.c_str());
             m_data.removeField(field);
             continue;

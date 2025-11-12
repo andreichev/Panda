@@ -148,9 +148,7 @@ void ContentBrowser::onImGuiRender() {
                             DragDropItem item;
                             item.type = DragDropItemType::TEXTURE;
                             item.count = 1;
-                            PND_STATIC_ASSERT(
-                                sizeof(UUID) <= sizeof(DragDropItem::data)
-                            );
+                            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
                             memcpy(item.data, &assetId, sizeof(UUID));
                             ImGui::SetDragDropPayload(
                                 PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)

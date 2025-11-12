@@ -43,17 +43,15 @@ ShaderReflectionDataTransformer::transformToMaterialData(const ShaderSpirvReflec
         MaterialFieldType type = toMaterialFieldType(member.type);
         data.inputs.emplace_back(MaterialField(member.name, type, getDefaultValueFor(type)));
     }
-    for (auto image: reflection.separate_images) {
+    for (auto image : reflection.separate_images) {
         ShaderSamplerInfo sampler;
-        for (auto _sampler: reflection.separate_samplers) {
+        for (auto _sampler : reflection.separate_samplers) {
             if (_sampler.binding == image.binding) {
                 sampler = _sampler;
                 break;
             }
         }
-        if (sampler.name.empty()) {
-            continue;
-        }
+        if (sampler.name.empty()) { continue; }
         std::string name = "SPIRV_Cross_Combined" + image.name + sampler.name;
         MaterialFieldType type = MaterialFieldType::TEXTURE;
         data.inputs.emplace_back(MaterialField(name, type, getDefaultValueFor(type)));
