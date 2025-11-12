@@ -95,11 +95,8 @@ void ContentBrowser::onImGuiRender() {
     ImGui::Columns(columnCount, 0, false);
     for (auto &directoryEntry : std::filesystem::directory_iterator(m_currentDirectory)) {
         const path_t &path = directoryEntry.path();
-        AssetRef<Asset> asset;
-        {
-            UUID assetId = assetHandler->getAssetId(path);
-            asset = AssetRef<Asset>(assetHandler, assetId);
-        }
+        UUID assetId = assetHandler->getAssetId(path);
+        AssetRef<Asset> asset = AssetRef<Asset>(assetHandler, assetId);
         std::string filenameString = path.filename().string();
 
         if (!showHiddenFiles && filenameString[0] == '.') { continue; }
@@ -152,9 +149,9 @@ void ContentBrowser::onImGuiRender() {
                             item.type = DragDropItemType::TEXTURE;
                             item.count = 1;
                             PND_STATIC_ASSERT(
-                                sizeof(AssetRef<Asset>) <= sizeof(DragDropItem::data)
+                                sizeof(UUID) <= sizeof(DragDropItem::data)
                             );
-                            memcpy(item.data, &asset, sizeof(AssetRef<Asset>));
+                            memcpy(item.data, &assetId, sizeof(UUID));
                             ImGui::SetDragDropPayload(
                                 PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
                             );
@@ -170,8 +167,8 @@ void ContentBrowser::onImGuiRender() {
                             DragDropItem item;
                             item.type = DragDropItemType::SHADER;
                             item.count = 1;
-                            PND_STATIC_ASSERT(sizeof(asset) <= sizeof(DragDropItem::data));
-                            memcpy(item.data, &asset, sizeof(AssetRef<Asset>));
+                            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
+                            memcpy(item.data, &assetId, sizeof(UUID));
                             ImGui::SetDragDropPayload(
                                 PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
                             );
@@ -187,8 +184,8 @@ void ContentBrowser::onImGuiRender() {
                             DragDropItem item;
                             item.type = DragDropItemType::MATERIAL;
                             item.count = 1;
-                            PND_STATIC_ASSERT(sizeof(asset) <= sizeof(DragDropItem::data));
-                            memcpy(item.data, &asset, sizeof(AssetRef<Asset>));
+                            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
+                            memcpy(item.data, &asset, sizeof(UUID));
                             ImGui::SetDragDropPayload(
                                 PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
                             );

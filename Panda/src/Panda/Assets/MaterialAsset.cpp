@@ -22,6 +22,9 @@ void MaterialAsset::bindFields() {
             }
             case MaterialFieldType::TEXTURE: {
                 UUID assetId = std::get<UUID>(field.value);
+                if (!assetId) {
+                    break;
+                }
                 auto handler = GameContext::getAssetHandler();
                 AssetRef<TextureAsset> texture = handler->makeRef<TextureAsset>(assetId);
                 Miren::TextureHandle handle = texture->getMirenHandle();

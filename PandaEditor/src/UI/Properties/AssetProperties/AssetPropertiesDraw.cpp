@@ -101,8 +101,20 @@ void AssetPropertiesDraw::drawProperties(AssetId assetId) {
                             input.value = value;
                             break;
                         }
-                        case MaterialFieldType::VEC4:
-                        case MaterialFieldType::TEXTURE:
+                        case MaterialFieldType::VEC4: {
+                            Vec4 value = std::get<Vec4>(input.value);
+                            fieldsChanged |= propertyColor(input.name.c_str(), value, false);
+                            input.value = value;
+                            break;
+                        }
+                        case MaterialFieldType::TEXTURE: {
+                            UUID value = std::get<UUID>(input.value);
+                            AssetRef<Asset> asset = handler->makeRef<Asset>(value);
+                            fieldsChanged |= propertyTexture(input.name.c_str(), asset, false);
+                            value = asset.getId();
+                            input.value = value;
+                            break;
+                        }
                         case MaterialFieldType::UNKNOWN: {
                             ImGui::TextUnformatted(input.name.c_str());
                             break;
