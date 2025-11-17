@@ -186,10 +186,9 @@ namespace InternalCalls {
     }
 
     void spriteRendererComponent_SetMaterial(EntityHandle entityId, MaterialHandle materialId) {
-        AssetHandler *assetHandler = GameContext::getAssetHandler();
         Entity entity = GameContext::getCurrentWorld()->getById(entityId);
         SpriteRendererComponent &sr = entity.getComponent<SpriteRendererComponent>();
-        sr.material = assetHandler->makeRef(materialId);
+        sr.material = materialId;
     }
 
     void spriteRendererComponent_SetCell(EntityHandle entityId, int cols, int rows, int index) {

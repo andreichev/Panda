@@ -12,6 +12,7 @@ enum class DragDropItemType { TEXTURE, ENTITY, SHADER, MATERIAL };
 struct DragDropItem {
     DragDropItemType type;
     int count;
+    // TODO: replace with std::variant
     uint8_t data[1024];
 };
 

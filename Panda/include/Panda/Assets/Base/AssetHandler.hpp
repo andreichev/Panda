@@ -55,6 +55,10 @@ public:
         }
     }
 
+    bool isLoaded(AssetId id) {
+        return m_loadedAssets.contains(id);
+    }
+
 #ifdef PND_EDITOR
     virtual UUID getAssetId(path_t path) {
         return 0;

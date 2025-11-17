@@ -10,4 +10,6 @@ FallbackTextureAsset::FallbackTextureAsset() {
     create(violetTextureCreate);
 }
 
+FallbackMaterialAsset::FallbackMaterialAsset() {}
+
 } // namespace Panda

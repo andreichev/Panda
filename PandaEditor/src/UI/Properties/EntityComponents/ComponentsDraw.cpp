@@ -340,7 +340,7 @@ void ComponentsDraw::drawComponents(const std::unordered_set<Entity> &entities) 
                 ImGui::Text("Multi edit not supported");
                 return;
             }
-            ImGui::Text("Mesh ID: %u", (uint32_t)component.mesh.getId());
+            ImGui::Text("Mesh: %u", (uint32_t)component.mesh);
         }
     );
     drawComponent<CameraComponent>(

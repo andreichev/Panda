@@ -28,7 +28,6 @@ public:
     void closeProject();
     const path_t &getProjectPath();
     const std::map<AssetId, AssetInfo> &getRegistry();
-    bool isLoaded(AssetId id);
     std::string getAssetName(const AssetInfo &info);
     bool assetFilesExist(AssetId id);
     MissingFiles getMissingAssetFiles(AssetId id);

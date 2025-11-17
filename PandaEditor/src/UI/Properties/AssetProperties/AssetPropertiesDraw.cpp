@@ -83,11 +83,9 @@ void AssetPropertiesDraw::drawProperties(AssetId assetId) {
                 ShaderAssetMeta shaderMeta = std::get<ShaderAssetMeta>(shaderInfo.meta);
                 shaderPath = assetHandler->getProjectPath() / shaderMeta.fragmentCodePath;
             }
-            AssetRef<Asset> asset = AssetRef<Asset>(meta.shader);
             if (assetHandler->isLoaded(assetId)) {
                 AssetRef<MaterialAsset> material = assetHandler->makeRef<MaterialAsset>(assetId);
-                if (propertyShader("Shader", shaderPath, asset, false)) {
-                    meta.shader = asset.getId();
+                if (propertyShader("Shader", shaderPath, meta.shader, false)) {
                     info.meta = meta;
                     assetHandler->updateInfo(assetId, info);
                 }
@@ -109,9 +107,7 @@ void AssetPropertiesDraw::drawProperties(AssetId assetId) {
                         }
                         case MaterialFieldType::TEXTURE: {
                             UUID value = std::get<UUID>(input.value);
-                            AssetRef<Asset> asset = handler->makeRef<Asset>(value);
-                            fieldsChanged |= propertyTexture(input.name.c_str(), asset, false);
-                            value = asset.getId();
+                            fieldsChanged |= propertyTexture(input.name.c_str(), value, false);
                             input.value = value;
                             break;
                         }

@@ -178,7 +178,8 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
             rect.transform = getWorldSpaceTransformMatrix(entity);
             rect.color = spriteComponent.color;
             if (spriteComponent.material) {
-                rect.material = spriteComponent.material.as<MaterialAsset>();
+                AssetHandler *handler = GameContext::getAssetHandler();
+                rect.material = handler->makeRef<MaterialAsset>(spriteComponent.material);
             }
             rect.size = {1.f, 1.f};
             rect.id = id.id;
@@ -197,9 +198,13 @@ void World::renderWorld(glm::mat4 &viewProjMtx, glm::mat4 &skyViewProjMtx) {
         auto view = m_registry.view<MeshComponent, TransformComponent>();
         for (auto entityHandle : view) {
             if (!isValidEntt(entityHandle)) { continue; }
-            auto &staticMeshComponent = view.get<MeshComponent>(entityHandle);
-            auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
-            m_renderer3d.submit(transform, staticMeshComponent.mesh);
+            auto &meshComponent = view.get<MeshComponent>(entityHandle);
+            if (meshComponent.mesh) {
+                auto transform = getWorldSpaceTransformMatrix({entityHandle, this});
+                AssetHandler *handler = GameContext::getAssetHandler();
+                auto mesh = handler->makeRef<MeshAsset>(meshComponent.mesh);
+                m_renderer3d.submit(transform, mesh);
+            }
         }
     }
 }
@@ -218,13 +223,17 @@ void World::renderSelectedGeometry(glm::mat4 &viewProjMtx) {
             m_renderer2d.drawRect(rect);
         }
     }
-    // Render dynamic meshes
+    // Render meshes
     {
         for (auto entity : selected) {
             if (!entity.hasComponent<MeshComponent>()) { continue; }
-            auto &dynamicMeshComponent = entity.getComponent<MeshComponent>();
-            auto transform = getWorldSpaceTransformMatrix(entity);
-            m_renderer3d.submit(transform, dynamicMeshComponent.mesh);
+            auto &meshComponent = entity.getComponent<MeshComponent>();
+            if (meshComponent.mesh) {
+                auto transform = getWorldSpaceTransformMatrix(entity);
+                AssetHandler *handler = GameContext::getAssetHandler();
+                auto mesh = handler->makeRef<MeshAsset>(meshComponent.mesh);
+                m_renderer3d.submit(transform, mesh);
+            }
         }
     }
     // TOUCH SELECTION VIEW ID TO CLEAN

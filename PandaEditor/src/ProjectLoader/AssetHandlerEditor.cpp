@@ -90,12 +90,12 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
                 asset = F_NEW(m_allocator, ShaderAsset)();
                 if (!vertExists) {
                     LOG_ERROR(
-                        "SHADER ASSET %u NOT FOUND AT PATH %s: ",
+                        "SHADER ASSET %u NOT FOUND AT PATH: %s",
                         id,
                         meta.vertexCodePath.string().c_str()
                     );
                     LOG_ERROR_EDITOR(
-                        "SHADER ASSET %u NOT FOUND AT PATH %s: ",
+                        "SHADER ASSET %u NOT FOUND AT PATH: %s",
                         id,
                         meta.fragmentCodePath.string().c_str()
                     );
@@ -103,12 +103,12 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
                 }
                 if (!fragExists) {
                     LOG_ERROR(
-                        "SHADER ASSET %u NOT FOUND AT PATH %s: ",
+                        "SHADER ASSET %u NOT FOUND AT PATH: %s",
                         id,
                         meta.vertexCodePath.string().c_str()
                     );
                     LOG_ERROR_EDITOR(
-                        "SHADER ASSET %u NOT FOUND AT PATH %s: ",
+                        "SHADER ASSET %u NOT FOUND AT PATH: %s",
                         id,
                         meta.fragmentCodePath.string().c_str()
                     );
@@ -144,8 +144,7 @@ Asset *AssetHandlerEditor::loadInternal(AssetId id, bool forcedReload) {
                 LOG_ERROR_EDITOR(
                     "MATERIAL %u FILE %s NOT FOUND", id, meta.materialPath.string().c_str()
                 );
-                // TODO: Create fallback material
-                asset = nullptr;
+                asset = F_NEW(m_allocator, FallbackMaterialAsset);
                 addMissingFile(id, 0, meta.materialPath);
             }
             break;
@@ -395,10 +394,6 @@ std::unordered_set<path_t> AssetHandlerEditor::getAssetPaths(AssetId id) {
 
 const std::map<AssetId, AssetInfo> &AssetHandlerEditor::getRegistry() {
     return m_registry;
-}
-
-bool AssetHandlerEditor::isLoaded(AssetId id) {
-    return m_loadedAssets.contains(id);
 }
 
 bool AssetHandlerEditor::assetFilesExist(AssetId id) {

@@ -69,6 +69,7 @@ MaterialData &MaterialAsset::getInputs() {
 }
 
 void MaterialAsset::updateFields() {
+    if (!m_shaderRef) { return; }
     ShaderSpirvReflectionData reflection = m_shaderRef->getReflectionData();
     MaterialData shaderData = ShaderReflectionDataTransformer::transformToMaterialData(reflection);
     for (auto &field : m_data.inputs) {

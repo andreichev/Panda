@@ -12,7 +12,7 @@
 
 namespace Panda {
 
-class MaterialAsset final : public Asset {
+class MaterialAsset : public Asset {
 public:
     MaterialAsset()
         : Asset(AssetType::MATERIAL)
@@ -29,7 +29,7 @@ public:
     }
 
     bool isValid() {
-        return m_shaderRef->getMirenHandle().isValid();
+        return m_shaderRef && m_shaderRef->getMirenHandle().isValid();
     }
 
     void bindFields();

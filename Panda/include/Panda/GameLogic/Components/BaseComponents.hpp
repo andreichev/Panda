@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Panda/Base/Base.hpp"
-#include "Panda/Assets/MeshAsset.hpp"
 #include "Panda/GameLogic/Components/WorldCamera.hpp"
 #include "Panda/ScriptEngine/ExternalScript.hpp"
 
@@ -73,14 +72,14 @@ struct SpriteRendererComponent final {
     int cols = 1;
     int rows = 1;
     int index = 0;
-    AssetRef<Asset> material;
+    UUID material = 0;
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const SpriteRendererComponent &other) = default;
 };
 
 struct MeshComponent final {
-    AssetRef<MeshAsset> mesh;
+    UUID mesh = 0;
 
     MeshComponent() = default;
     MeshComponent(const MeshComponent &other) = default;
@@ -125,7 +124,7 @@ struct BoxCollider2DComponent final {
 
 struct SkyComponent final {
     // TODO: Add sky parameters.
-    AssetRef<Asset> material;
+    UUID material = 0;
 };
 
 } // namespace Panda

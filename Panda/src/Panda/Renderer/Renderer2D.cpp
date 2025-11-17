@@ -137,6 +137,7 @@ void Renderer2D::flush() {
             break;
         }
     }
+    if (!material || !material->isValid()) { return; }
     Miren::ProgramHandle shaderHandle = material->getShaderAsset()->getMirenHandle();
     Miren::setShader(shaderHandle);
     Std140Buffer uboVert;

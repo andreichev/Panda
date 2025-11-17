@@ -39,13 +39,7 @@ void WorldMapper::fillWorld(World &world, const WorldDto &worldDto) {
             spriteRenderer.cols = spriteRendererDto.cols;
             spriteRenderer.rows = spriteRendererDto.rows;
             spriteRenderer.index = spriteRendererDto.index;
-            AssetRef<Asset> material;
-            if (spriteRendererDto.material) {
-                AssetHandler *handler = GameContext::getAssetHandler();
-                PND_ASSERT(handler != nullptr, "INVALID ASSET HANDLER");
-                material = handler->makeRef<Asset>(spriteRendererDto.material);
-            }
-            spriteRenderer.material = material;
+            spriteRenderer.material = spriteRendererDto.material;
         }
         // CUBE MAP COMPONENT
         if (entityDto.cubeMapComponent.has_value()) { entity.addComponent<SkyComponent>(); }
@@ -131,7 +125,7 @@ WorldDto WorldMapper::toDto(const World &world) {
             spriteRendererDto.cols = spriteRenderer.cols;
             spriteRendererDto.rows = spriteRenderer.rows;
             spriteRendererDto.index = spriteRenderer.index;
-            spriteRendererDto.material = spriteRenderer.material.getId();
+            spriteRendererDto.material = spriteRenderer.material;
             entityDto.spriteRendererComponent = spriteRendererDto;
         }
         // PHYSICS

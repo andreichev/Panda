@@ -118,9 +118,9 @@ bool drawVec3Control(
     uint32_t inconsistentAxes = 0
 );
 bool propertyColor(const char *label, Color &value, bool isInconsistent);
-bool propertyTexture(const char *label, AssetRef<Asset> &asset, bool isInconsistent);
-bool propertyShader(const char *label, path_t path, AssetRef<Asset> &asset, bool isInconsistent);
-bool propertyMaterial(const char *label, AssetRef<Asset> &asset, bool isInconsistent);
+bool propertyTexture(const char *label, UUID &assetId, bool isInconsistent);
+bool propertyShader(const char *label, path_t path, UUID &assetId, bool isInconsistent);
+bool propertyMaterial(const char *label, UUID &assetId, bool isInconsistent);
 bool drawScriptFieldValue(ScriptField &field);
 
 } // namespace Panda
