@@ -31,7 +31,6 @@ target_include_directories(Panda PUBLIC ${VENDOR_DIRECTORY}/glm)
 
 # Dependencies - stb_image
 target_link_libraries(Panda stb_image)
-target_include_directories(Panda PRIVATE ${VENDOR_DIRECTORY}/stb_image)
 
 # Dependencies - entt
 target_link_libraries(Panda EnTT)
@@ -50,3 +49,6 @@ target_link_libraries(Panda dylib)
 
 # Dependencies - box2d
 target_link_libraries(Panda box2d)
+
+# Dependencies - cgltf
+target_link_libraries(Panda cgltf)
