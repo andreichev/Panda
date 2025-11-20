@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Model/DragDropItem.hpp"
+
 #include <Panda/Assets/Base/AssetInfo.hpp>
 
 namespace Panda {
@@ -21,6 +23,7 @@ private:
     void selectAsset(AssetId id);
     void unselectAsset(AssetId id);
     void deleteSelectedAssets();
+    DragDropItemType getDragDropItemType(AssetType asetType);
 
     ProjectLoader *m_projectLoader;
     int m_rowIndex;

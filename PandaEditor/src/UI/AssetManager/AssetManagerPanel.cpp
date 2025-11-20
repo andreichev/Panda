@@ -3,7 +3,6 @@
 //
 
 #include "AssetManagerPanel.hpp"
-
 #include "ProjectLoader/AssetHandlerEditor.hpp"
 #include "ProjectLoader/ProjectLoader.hpp"
 #include "UI/Properties/AssetProperties/AssetPropertiesDraw.hpp"
@@ -28,6 +27,7 @@ void AssetManagerPanel::drawAssetRow(AssetInfo assetInfo) {
     bool ctrl = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
     bool shift = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
     uint32_t id = assetInfo.id;
+    std::string name = assetHandler->getAssetName(assetInfo);
     char label[32];
     snprintf(label, 30, "%u", id);
     ImGui::PushID(id);
@@ -41,6 +41,17 @@ void AssetManagerPanel::drawAssetRow(AssetInfo assetInfo) {
     ImGuiSelectableFlags selectableFlags =
         ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap;
     bool isClicked = ImGui::Selectable(label, isSelected, selectableFlags);
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        if (ImGui::GetDragDropPayload() == nullptr) {
+            DragDropItem item;
+            item.type = getDragDropItemType(assetInfo.type);
+            item.values[0] = assetInfo.id;
+            item.count = 1;
+            ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
+        }
+        ImGui::TextUnformatted(name.c_str());
+        ImGui::EndDragDropSource();
+    }
     ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 5.0f);
     if (ImGui::BeginPopupContextItem(label)) {
         if (!isSelected) {
@@ -67,7 +78,6 @@ void AssetManagerPanel::drawAssetRow(AssetInfo assetInfo) {
     ImGui::TextUnformatted(assetInfo.getTypeStr());
     // NAME
     ImGui::TableNextColumn();
-    std::string name = assetHandler->getAssetName(assetInfo);
     ImGui::TextUnformatted(name.c_str());
     // IS VALID
     ImGui::TableNextColumn();
@@ -160,6 +170,24 @@ void AssetManagerPanel::deleteSelectedAssets() {
     for (auto &file : selectedFiles) {
         AssetId assetId = assetHandler->getAssetId(file);
         if (assetId) { assetHandler->removeAsset(assetId); }
+    }
+}
+
+DragDropItemType AssetManagerPanel::getDragDropItemType(AssetType asetType) {
+    switch (asetType) {
+        case AssetType::TEXTURE: {
+            return DragDropItemType::TEXTURE;
+        }
+        case AssetType::SHADER: {
+            return DragDropItemType::SHADER;
+        }
+        case AssetType::MATERIAL: {
+            return DragDropItemType::MATERIAL;
+        }
+        default: {
+            PND_ASSERT(false, "Invalid asset type for drag drop");
+            return DragDropItemType::TEXTURE;
+        }
     }
 }
 

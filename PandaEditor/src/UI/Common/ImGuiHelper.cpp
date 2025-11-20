@@ -526,8 +526,7 @@ bool propertyTexture(const char *label, UUID &assetId, bool isInconsistent) {
         if (ImGui::GetDragDropPayload() == nullptr) {
             DragDropItem item;
             item.type = DragDropItemType::TEXTURE;
-            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
-            memcpy(item.data, &assetId, sizeof(UUID));
+            item.values[0] = assetId;
             item.count = 1;
             ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
         }
@@ -539,7 +538,7 @@ bool propertyTexture(const char *label, UUID &assetId, bool isInconsistent) {
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
             if (item.type == DragDropItemType::TEXTURE) {
-                memcpy(&assetId, item.data, sizeof(UUID));
+                assetId = item.values[0];
                 changed = true;
             }
         }
@@ -584,8 +583,7 @@ bool propertyEntity(const char *label, UUID *value) {
             DragDropItem item;
             item.type = DragDropItemType::ENTITY;
             UUID assetId = *value;
-            PND_STATIC_ASSERT(sizeof(assetId) <= sizeof(DragDropItem::data));
-            memcpy(item.data, &assetId, sizeof(assetId));
+            item.values[0] = assetId;
             item.count = 1;
             ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
         }
@@ -597,7 +595,8 @@ bool propertyEntity(const char *label, UUID *value) {
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
             if (item.type == DragDropItemType::ENTITY) {
-                memcpy(value, item.data, sizeof(UUID));
+                *value = item.values[0];
+                ;
                 changed = true;
             }
         }
@@ -641,8 +640,7 @@ bool propertyShader(const char *label, path_t path, UUID &assetId, bool isIncons
         if (ImGui::GetDragDropPayload() == nullptr) {
             DragDropItem item;
             item.type = DragDropItemType::SHADER;
-            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
-            memcpy(item.data, &assetId, sizeof(UUID));
+            item.values[0] = assetId;
             item.count = 1;
             ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
         }
@@ -654,7 +652,7 @@ bool propertyShader(const char *label, path_t path, UUID &assetId, bool isIncons
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
             if (item.type == DragDropItemType::SHADER) {
-                memcpy(&assetId, item.data, sizeof(UUID));
+                assetId = item.values[0];
                 changed = true;
             }
         }
@@ -698,8 +696,7 @@ bool propertyMaterial(const char *label, UUID &assetId, bool isInconsistent) {
         if (ImGui::GetDragDropPayload() == nullptr) {
             DragDropItem item;
             item.type = DragDropItemType::MATERIAL;
-            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
-            memcpy(item.data, &assetId, sizeof(UUID));
+            item.values[0] = assetId;
             item.count = 1;
             ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
         }
@@ -711,7 +708,7 @@ bool propertyMaterial(const char *label, UUID &assetId, bool isInconsistent) {
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
             if (item.type == DragDropItemType::MATERIAL) {
-                memcpy(&assetId, item.data, sizeof(UUID));
+                assetId = item.values[0];
                 changed = true;
             }
         }

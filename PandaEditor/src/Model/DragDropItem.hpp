@@ -5,15 +5,15 @@
 
 namespace Panda {
 
-static const char *PANDA_DRAGDROP_NAME = "PANDA_DRAGDROP";
+constexpr const char *PANDA_DRAGDROP_NAME = "PANDA_DRAGDROP";
+constexpr int MAX_DRAGDROP_VALUES = 64;
 
 enum class DragDropItemType { TEXTURE, ENTITY, SHADER, MATERIAL };
 
 struct DragDropItem {
     DragDropItemType type;
     int count;
-    // TODO: replace with std::variant
-    uint8_t data[1024];
+    UUID values[MAX_DRAGDROP_VALUES];
 };
 
 } // namespace Panda

@@ -64,10 +64,9 @@ void WorldHierarchyPanel::onImGuiRender() {
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
             if (item.type == DragDropItemType::ENTITY) {
-                UUID *droppedIds = (UUID *)item.data;
                 std::vector<Entity> droppedEntities;
                 for (int i = 0; i < item.count; i++) {
-                    Entity entity = m_world->getById(droppedIds[i]);
+                    Entity entity = m_world->getById(item.values[i]);
                     if (entity.getParent()) { droppedEntities.push_back(entity); }
                 }
                 if (!droppedEntities.empty()) {
@@ -131,17 +130,16 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
                     selectedIds.push_back(selected);
                 }
                 PND_ASSERT_F(
-                    sizeof(UUID) * selectedIds.size() <= sizeof(DragDropItem::data),
+                    selectedIds.size() <= MAX_DRAGDROP_VALUES,
                     "NEED TO INCREASE DragDropItem.data SIZE. REQUIRED %d",
-                    sizeof(UUID) * selectedIds.size()
+                    selectedIds.size()
                 );
-                memcpy(item.data, selectedIds.data(), sizeof(UUID) * selectedIds.size());
-                item.count = SelectionContext::selectedEntitiesCount();
+                std::copy(selectedIds.begin(), selectedIds.end(), item.values);
+                item.count = selectedIds.size();
             } else {
                 SelectionContext::unselectAll();
                 SelectionContext::addSelectedEntity(entityId);
-                PND_STATIC_ASSERT(sizeof(entityId) <= sizeof(DragDropItem::data));
-                memcpy(item.data, &entityId, sizeof(entityId));
+                item.values[0] = entityId;
                 item.count = 1;
             }
             ImGui::SetDragDropPayload(PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem));
@@ -160,12 +158,11 @@ void WorldHierarchyPanel::drawEntityNode(Entity entity) {
             PND_ASSERT(payload->DataSize == sizeof(DragDropItem), "WRONG DRAGDROP ITEM SIZE");
             DragDropItem &item = *(DragDropItem *)payload->Data;
             if (item.type == DragDropItemType::ENTITY) {
-                UUID *droppedIds = (UUID *)item.data;
                 std::vector<Entity> droppedEntities;
                 for (int i = 0; i < item.count; i++) {
                     // If we didn't drop to the same entity
-                    if (droppedIds[i] == entityId) { continue; }
-                    Entity droppedEntity = m_world->getById(droppedIds[i]);
+                    if (item.values[i] == entityId) { continue; }
+                    Entity droppedEntity = m_world->getById(item.values[i]);
                     // If entity doesn't have that child already
                     if (entity.hasChild(droppedEntity)) { continue; }
                     droppedEntities.push_back(droppedEntity);

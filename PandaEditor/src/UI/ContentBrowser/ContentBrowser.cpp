@@ -148,8 +148,7 @@ void ContentBrowser::onImGuiRender() {
                             DragDropItem item;
                             item.type = DragDropItemType::TEXTURE;
                             item.count = 1;
-                            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
-                            memcpy(item.data, &assetId, sizeof(UUID));
+                            item.values[0] = assetId;
                             ImGui::SetDragDropPayload(
                                 PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
                             );
@@ -165,8 +164,7 @@ void ContentBrowser::onImGuiRender() {
                             DragDropItem item;
                             item.type = DragDropItemType::SHADER;
                             item.count = 1;
-                            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
-                            memcpy(item.data, &assetId, sizeof(UUID));
+                            item.values[0] = assetId;
                             ImGui::SetDragDropPayload(
                                 PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
                             );
@@ -182,8 +180,7 @@ void ContentBrowser::onImGuiRender() {
                             DragDropItem item;
                             item.type = DragDropItemType::MATERIAL;
                             item.count = 1;
-                            PND_STATIC_ASSERT(sizeof(UUID) <= sizeof(DragDropItem::data));
-                            memcpy(item.data, &assetId, sizeof(UUID));
+                            item.values[0] = assetId;
                             ImGui::SetDragDropPayload(
                                 PANDA_DRAGDROP_NAME, &item, sizeof(DragDropItem)
                             );
