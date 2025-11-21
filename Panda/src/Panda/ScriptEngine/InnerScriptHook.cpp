@@ -254,19 +254,25 @@ namespace InternalCalls {
 
     /// MATERIAL
 
-    void material_SetColor(
+    void material_SetFloatValue(MaterialHandle materialId, const char *name, float value) {
+        AssetHandler *assetHandler = GameContext::getAssetHandler();
+        auto material = assetHandler->makeRef<MaterialAsset>(materialId);
+        material->setFieldValue(name, value);
+    }
+
+    void material_SetVec4Value(
         MaterialHandle materialId, const char *name, float r, float g, float b, float a
     ) {
         AssetHandler *assetHandler = GameContext::getAssetHandler();
         auto material = assetHandler->makeRef<MaterialAsset>(materialId);
-        Color color(r, g, b, a);
-        material->setFieldValue(name, color);
+        Vec4 value(r, g, b, a);
+        material->setFieldValue(name, value);
     }
 
-    void material_SetTexture(MaterialHandle materialId, const char *name, TextureHandle textureId) {
+    void material_SetTextureValue(MaterialHandle materialId, const char *name, TextureHandle value) {
         AssetHandler *assetHandler = GameContext::getAssetHandler();
         auto material = assetHandler->makeRef<MaterialAsset>(materialId);
-        material->setFieldValue(name, UUID(textureId));
+        material->setFieldValue(name, UUID(value));
     }
 
     /// CONSOLE
@@ -342,8 +348,9 @@ void initScriptHook() {
     g_scriptSymbols["rigidbody2DComponent_setFriction"] =
         (void *)InternalCalls::rigidbody2DComponent_setFriction;
     /// MATERIAL
-    g_scriptSymbols["material_SetColor"] = (void *)InternalCalls::material_SetColor;
-    g_scriptSymbols["material_SetTexture"] = (void *)InternalCalls::material_SetTexture;
+    g_scriptSymbols["material_SetFloatValue"] = (void *)InternalCalls::material_SetFloatValue;
+    g_scriptSymbols["material_SetVec4Value"] = (void *)InternalCalls::material_SetVec4Value;
+    g_scriptSymbols["material_SetTextureValue"] = (void *)InternalCalls::material_SetTextureValue;
     /// CONSOLE
     g_scriptSymbols["console_Log"] = (void *)InternalCalls::console_Log;
 
